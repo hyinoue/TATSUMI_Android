@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- タイトルバー -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:background="#0000FF"
+        android:gravity="left"
+        android:text="メインメニュー"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- メインスクロール領域（下ボタンの上まで） -->
+    <ScrollView
+        android:id="@+id/scrollMain"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="false"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
+
+        <!-- ScrollView直下は必ず1つだけ -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="16dp">
+
+            <!-- 1. データ送受信 -->
+            <Button
+                android:id="@+id/btnDataReceive"
+                android:layout_width="290dp"
+                android:layout_height="50dp"
+                android:text="１.データ送受信"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                app:backgroundTint="@color/menu_button_bg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 最終受信（データ送受信ボタンと同じ幅で真下） -->
+            <TextView
+                android:id="@+id/lblDataReceiveTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="最終受信  ----/--/-- --:--"
+                android:textSize="10sp"
+                app:layout_constraintTop_toBottomOf="@id/btnDataReceive"
+                app:layout_constraintStart_toStartOf="@id/btnDataReceive"
+                app:layout_constraintEnd_toEndOf="@id/btnDataReceive" />
+
+            <!-- 未送有（最終受信の右下＝データ送受信ボタンの右下側に配置） -->
+            <TextView
+                android:id="@+id/lblDataReceive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:paddingLeft="10dp"
+                android:paddingTop="0dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="0dp"
+                android:text="未送有"
+                android:textColor="#333333"
+                android:textSize="10sp"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/lblDataReceiveTime"
+                app:layout_constraintEnd_toEndOf="@id/btnDataReceive" />
+
+            <!-- 2. 積載束選定 -->
+            <Button
+                android:id="@+id/btnBundleSelect"
+                android:layout_width="290dp"
+                android:layout_height="50dp"
+                android:text="２.積載束選定"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                app:backgroundTint="@color/menu_button_bg"
+                app:layout_constraintTop_toBottomOf="@id/lblDataReceive"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- コンテナサイズ（積載束選定ボタンの右下：左にタイトル、右にコンボ） -->
+            <LinearLayout
+                android:id="@+id/rowContainerSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/btnBundleSelect"
+                app:layout_constraintEnd_toEndOf="@id/btnBundleSelect">
+
+                <TextView
+                    android:id="@+id/lblContainerSizeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="コンテナサイズ"
+                    android:textSize="10sp"
+                    android:textColor="#333333"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="6dp" />
+
+                <!-- コンボボックス（Spinner） -->
+                <Spinner
+                    android:id="@+id/spContainerSize"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dropdown" />
+            </LinearLayout>
+
+            <!-- 3. コンテナ情報入力 -->
+            <Button
+                android:id="@+id/btnContainerInput"
+                android:layout_width="290dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="0dp"
+                android:text="３.コンテナ情報入力"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                app:backgroundTint="@color/menu_button_bg"
+                app:layout_constraintTop_toBottomOf="@id/rowContainerSize"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 選定済（コンテナ情報入力の右下） -->
+            <TextView
+                android:id="@+id/lblContainerInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:paddingLeft="10dp"
+                android:paddingTop="0dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="0dp"
+                android:text="選定済"
+                android:textColor="#333333"
+                android:textSize="10sp"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/btnContainerInput"
+                app:layout_constraintEnd_toEndOf="@id/btnContainerInput" />
+
+            <!-- 4. 重量計算 -->
+            <Button
+                android:id="@+id/btnWeightCalc"
+                android:layout_width="290dp"
+                android:layout_height="50dp"
+                android:text="４.重量計算"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                app:backgroundTint="@color/menu_button_bg"
+                app:layout_constraintTop_toBottomOf="@id/lblContainerInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 5. 照合コンテナ選定 -->
+            <Button
+                android:id="@+id/btnCollateContainerSelect"
+                android:layout_width="290dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:text="５.照合コンテナ選定"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                app:backgroundTint="@color/menu_button_bg"
+                app:layout_constraintTop_toBottomOf="@id/btnWeightCalc"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 作業状況タイトル（左に寄せる） -->
+            <LinearLayout
+                android:id="@+id/workTitleRow"
+                android:layout_width="0dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                app:layout_constraintTop_toBottomOf="@id/btnCollateContainerSelect"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="wrap_content"
+                    android:background="#FFA500"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="作業状況"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 作業状況グリッド（左に寄せる：左右padding 0） -->
+            <GridLayout
+                android:id="@+id/gridWorkStatus"
+                android:layout_width="0dp"
+                android:layout_height="85dp"
+                android:layout_marginTop="6dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:columnCount="6"
+                android:rowCount="4"
+                app:layout_constraintTop_toBottomOf="@id/workTitleRow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- ヘッダ（6列） -->
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="予定"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="完了"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="残り"
+                    android:textStyle="bold" />
+
+                <!-- コンテナ -->
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="コンテナ"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblContainerPlan"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="22" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="/" />
+
+                <TextView
+                    android:id="@+id/lblContainerFin"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="5" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/lblZanContainer"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="17" />
+
+                <!-- 出荷束数 -->
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="出荷束数"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblBundlePlan"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="217" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="/" />
+
+                <TextView
+                    android:id="@+id/lblBundleFin"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="46" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/lblZanBundle"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="171" />
+
+                <!-- 出荷重量 -->
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="出荷重量(t)"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblWeightPlan"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="407" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="/" />
+
+                <TextView
+                    android:id="@+id/lblWeightFin"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="84" />
+
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/lblZanWeight"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:background="#D9D9FF"
+                    android:gravity="end|center_vertical"
+                    android:paddingRight="8dp"
+                    android:text="323" />
+            </GridLayout>
+
+            <!-- ★確認用（OK/NG表示） -->
+            <TextView
+                android:id="@+id/tvCenterStatus"
+                android:layout_width="272dp"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text=""
+                android:textSize="10dp"
+                app:layout_constraintTop_toBottomOf="@id/btnCollateContainerSelect"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- 下固定ボタン（共通部品） -->
+    <include
+        android:id="@+id/includeBottomButtons"
+        layout="@layout/view_buttons"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

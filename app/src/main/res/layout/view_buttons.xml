@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp">
+
+    <!-- 青（左端：右だけ隙間） -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBottomBlue"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:padding="0dp"
+        android:minHeight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="#0000FF"
+        app:cornerRadius="0dp" />
+
+    <!-- 赤 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBottomRed"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:padding="0dp"
+        android:minHeight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="#FF0000"
+        app:cornerRadius="0dp" />
+
+    <!-- 緑 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBottomGreen"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:padding="0dp"
+        android:minHeight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="#008000"
+        app:cornerRadius="0dp" />
+
+    <!-- 黄（右端） -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBottomYellow"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:padding="0dp"
+        android:minHeight="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="#FFD400"
+        app:cornerRadius="0dp" />
+
+</LinearLayout>
