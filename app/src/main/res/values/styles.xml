@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 黒枠だけ共通化（背景色は各ボタンの backgroundTint をそのまま使う） -->
+    <style name="AppButton.BlackStroke" parent="Widget.MaterialComponents.Button">
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">#000000</item>
+        <item name="cornerRadius">0dp</item>
+
+        <!-- 余白や高さを揃えたいなら（任意） -->
+        <!-- <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">0dp</item> -->
+    </style>
+
+</resources>

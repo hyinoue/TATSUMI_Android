@@ -1,10 +1,14 @@
 package com.example.myapplication.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
@@ -46,6 +50,40 @@ public class MenuActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        // ==============================
+// コンテナサイズ（20ft/40ft）をSpinnerに設定し、選択を保存
+// ==============================
+        Spinner spContainerSize = findViewById(R.id.spContainerSize);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.container_sizes,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spContainerSize.setAdapter(adapter);
+
+        final SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+
+// 保存済みを復元（デフォルト 20ft）
+        String savedSize = prefs.getString("container_size", "20ft");
+        int pos = adapter.getPosition(savedSize);
+        if (pos >= 0) spContainerSize.setSelection(pos);
+
+// 変更されたら保存
+        spContainerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = parent.getItemAtPosition(position).toString();
+                prefs.edit().putString("container_size", selected).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
 
         // ▼ 下ボタン（include）を取得
         View bottom = findViewById(R.id.includeBottomButtons);

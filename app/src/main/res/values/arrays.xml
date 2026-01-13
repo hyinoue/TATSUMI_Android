@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="container_sizes">
+        <item>20ft</item>
+        <item>40ft</item>
+    </string-array>
+</resources>
