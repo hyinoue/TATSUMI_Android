@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CCFFCC">
+
+    <!-- タイトル（指定どおり） -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:background="#0000FF"
+        android:gravity="left|center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="バーコードテスト"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 下部ボタン（指定どおり） -->
+    <include
+        android:id="@+id/includeBottomButtons"
+        layout="@layout/view_buttons"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- 上側テキストボックス（中央より少し上） -->
+    <EditText
+        android:id="@+id/etBarcode"
+        android:layout_width="240dp"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_edittext_black_border"
+        android:singleLine="true"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/tvKindLabel"
+        app:layout_constraintVertical_bias="0.35"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 「種類」ラベル -->
+    <TextView
+        android:id="@+id/tvKindLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="種類"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/etBarcode"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 大きなスクロールボックス -->
+    <ScrollView
+        android:id="@+id/scrollKind"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvKindLabel"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 中身 -->
+        <TextView
+            android:id="@+id/tvKindContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:background="@drawable/bg_menu_count"
+            android:padding="8dp"
+            android:text=""
+            android:textColor="#000000"
+            android:textSize="14sp" />
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

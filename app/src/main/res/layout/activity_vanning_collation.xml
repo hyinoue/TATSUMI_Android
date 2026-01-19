@@ -4,21 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- タイトル：上固定 -->
+    <!-- タイトル：上固定（これはそのまま） -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:background="#0000FF"
         android:gravity="left|center_vertical"
-        android:text="積載束選択"
+        android:text="積載束照合"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 上部：入力エリア -->
+    <!-- 上部：入力エリア（表以外：文字小さめ＆高さ低め） -->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：コンテナ重量 / ダンネージ -->
+        <!-- 1行目：コンテナNo / 積載束数 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,51 +39,54 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="コンテナ" />
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:text="コンテナNo. " />
 
             <EditText
-                android:id="@+id/etContainerKg"
+                android:id="@+id/etContainerNo"
                 android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="6dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="0dp"
                 android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:gravity="end|center_vertical"
-                android:inputType="number"
-                android:paddingEnd="8dp"
-                android:text="2200" />
+                android:background="@drawable/bg_menu_count"
+                android:gravity="center_vertical"
+                android:inputType="text"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:textSize="13sp"
+                android:text="TSTU0000020" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="kg" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:text="ダンネージ" />
+                android:layout_marginStart="3dp"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:text="積載束数" />
 
             <EditText
-                android:id="@+id/etDunnageKg"
-                android:layout_width="32dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="6dp"
-                android:background="#FFFFFF"
+                android:id="@+id/etSekisaiBundleCount"
+                android:layout_width="44dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/bg_menu_count"
                 android:gravity="end|center_vertical"
                 android:inputType="number"
-                android:paddingEnd="8dp"
+                android:paddingEnd="6dp"
+                android:textSize="14sp"
                 android:text="32" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="kg" />
+                android:layout_marginStart="3dp"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:text="束" />
         </LinearLayout>
 
-        <!-- 2行目：現品番号 -->
+        <!-- 2行目：作業日時 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,23 +97,60 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="現品番号" />
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:layout_marginStart="19dp"
+                android:text="作業日時" />
 
             <EditText
-                android:id="@+id/etGenpinNo"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:id="@+id/etSagyouDateTime"
+                android:layout_width="150dp"
+                android:layout_height="28dp"
                 android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
+                android:layout_weight="0"
                 android:gravity="center_vertical"
+                android:background="@drawable/bg_menu_count"
                 android:inputType="text"
-                android:paddingStart="8dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:textSize="14sp"
+                android:text="2020/03/23 13:25" />
+        </LinearLayout>
+
+        <!-- 3行目：現品番号 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:layout_marginStart="19dp"
+                android:text="現品番号" />
+
+            <!-- ★同じIDが2回あったので修正（重要） -->
+            <EditText
+                android:id="@+id/etGenpinNo"
+                android:layout_width="150dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="0"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_edittext_black_border"
+                android:inputType="text"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:textSize="14sp"
                 android:text="607778L27338 TEST" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 表ヘッダ（P/M/B/No/Index/重量/削除） -->
+    <!-- 表ヘッダ（ここは表なので変更なし） -->
     <LinearLayout
         android:id="@+id/rowTableHeader"
         android:layout_width="0dp"
@@ -124,58 +164,53 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_weight="2.2"
             android:gravity="center"
-            android:text="P"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="P No"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
+            android:layout_height="match_parent"
+            android:layout_weight="2.2"
             android:gravity="center"
-            android:text="M"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="B No"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
+            android:layout_height="match_parent"
+            android:layout_weight="1.8"
             android:gravity="center"
-            android:text="B"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="No"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
             android:text="Index"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:layout_weight="1.8"
             android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
             android:text="重量"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.5"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
             android:gravity="center"
-            android:text="" />
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="確"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- 一覧（表の中身） -->
@@ -183,13 +218,13 @@
         android:id="@+id/rvBundles"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#FFFFFF"
+        android:background="#888888"
         app:layout_constraintTop_toBottomOf="@id/rowTableHeader"
         app:layout_constraintBottom_toTopOf="@id/areaFooter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 下部：集計エリア -->
+    <!-- 下部：集計エリア（表以外：文字小さめ＆高さ低め） -->
     <LinearLayout
         android:id="@+id/areaFooter"
         android:layout_width="0dp"
@@ -203,49 +238,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="積載束数" />
-
-            <TextView
-                android:id="@+id/tvBundleCount"
-                android:layout_width="60dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="6dp"
-                android:background="#FFFFFF"
-                android:gravity="center"
-                android:text="12" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:text="総重量" />
-
-            <TextView
-                android:id="@+id/tvTotalWeight"
-                android:layout_width="120dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="6dp"
-                android:background="#FFFFFF"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="23,646" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="kg" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
@@ -253,23 +245,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="積載可能残重量" />
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:text="読込束数" />
 
             <TextView
-                android:id="@+id/tvRemainWeight"
-                android:layout_width="120dp"
-                android:layout_height="32dp"
+                android:id="@+id/tvReadCount"
+                android:layout_width="44dp"
+                android:layout_height="26dp"
                 android:layout_marginStart="6dp"
-                android:background="#FFFFFF"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="354" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="kg" />
+                android:background="@drawable/bg_menu_count"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:text="0" />
         </LinearLayout>
 
     </LinearLayout>
@@ -283,6 +272,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

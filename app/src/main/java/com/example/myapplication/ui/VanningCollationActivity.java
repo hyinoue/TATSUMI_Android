@@ -7,11 +7,11 @@ import android.view.View;
 import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
-public class SyougoBundleActivity extends BaseActivity {
+public class VanningCollationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_syougobundle);
+        setContentView(R.layout.activity_vanning_collation);
 
         // ▼ 下ボタン（include）を取得
         View bottom = findViewById(R.id.includeBottomButtons);

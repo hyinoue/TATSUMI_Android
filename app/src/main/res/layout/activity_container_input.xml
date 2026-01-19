@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- タイトルバー -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:background="#0000FF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="コンテナ情報入力"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="Ver 1.0.0"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- メイン（下ボタンの上まで） -->
+    <ScrollView
+        android:id="@+id/scrollMain"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <!-- 共通：左ラベル幅を揃えるため -->
+            <!-- 1行目：コンテナNo + 撮影 -->
+            <LinearLayout
+                android:id="@+id/rowContainerNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvLabelContainerNo"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="コンテナNo."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- 小枠（例：TSTU） -->
+                <EditText
+                    android:id="@+id/etContainerNo1"
+                    android:layout_width="30dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:gravity="center"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    android:padding="4dp"
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="18dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="U"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp" />
+
+                <!-- 本体枠（例：0000020） -->
+                <EditText
+                    android:id="@+id/etContainerNo2"
+                    android:layout_width="60dp"
+                    android:layout_height="26dp"
+                    android:layout_weight="0"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:gravity="center_vertical"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="6dp"
+                    android:text="" />
+
+                <!-- 青ブロック（画像の青い部分） -->
+                <View
+                    android:id="@+id/viewBlueBlock"
+                    android:layout_width="22dp"
+                    android:layout_height="26dp"
+                    android:layout_marginStart="6dp"
+                    android:background="#66AEEF" />
+
+                <Button
+                    android:id="@+id/btnPhotoContainerNo"
+                    android:layout_width="64dp"
+                    android:layout_height="36dp"
+                    android:text="撮影"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:padding="0dp" />
+            </LinearLayout>
+
+            <!-- 2行目：コンテナ自重 -->
+            <LinearLayout
+                android:id="@+id/rowContainerWeight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowContainerNo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="コンテナ自重"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvContainerKg"
+                    android:layout_width="70dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="end|center_vertical"
+                    android:paddingEnd="8dp"
+                    android:text="2200"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="kg"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 3行目：ダンネージ -->
+            <LinearLayout
+                android:id="@+id/rowDunnage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowContainerWeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="ダンネージ"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etDunnageKg"
+                    android:layout_width="70dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:gravity="end|center_vertical"
+                    android:inputType="number"
+                    android:paddingEnd="8dp"
+                    android:text="32"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="kg"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 4行目：番線 -->
+            <LinearLayout
+                android:id="@+id/rowBansen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowDunnage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="番線"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvBansenKg"
+                    android:layout_width="70dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="end|center_vertical"
+                    android:paddingEnd="8dp"
+                    android:text="12"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="kg"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 5行目：積載束数 -->
+            <LinearLayout
+                android:id="@+id/rowBundleCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowBansen"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="積載束数"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvSekisaiBundleCount"
+                    android:layout_width="70dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="end|center_vertical"
+                    android:paddingEnd="8dp"
+                    android:text="12"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="束"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 6行目：総重量 -->
+            <LinearLayout
+                android:id="@+id/rowTotalWeight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowBundleCount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="総重量"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvTotalKg"
+                    android:layout_width="90dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="end|center_vertical"
+                    android:paddingEnd="8dp"
+                    android:text="23,646"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="kg"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 7行目：シールNo + 撮影 -->
+            <LinearLayout
+                android:id="@+id/rowSealNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowTotalWeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="シールNo."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etSealNo"
+                    android:layout_width="0dp"
+                    android:layout_height="26dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:gravity="center_vertical"
+                    android:inputType="text"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
+                    android:textSize="14sp"
+                    android:text="" />
+
+                <Button
+                    android:id="@+id/btnPhotoSealNo"
+                    android:layout_width="64dp"
+                    android:layout_height="36dp"
+                    android:text="撮影"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:padding="0dp" />
+            </LinearLayout>
+
+            <!-- 8行目：予約No（長めの入力） -->
+            <LinearLayout
+                android:id="@+id/rowYoyakuNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowSealNo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="予約No."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etYoyakuNo"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="center_vertical"
+                    android:inputType="text"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
+                    android:textSize="14sp"
+                    android:text="" />
+            </LinearLayout>
+
+            <!-- 予約Noの下：撮影画像表示エリア（左：コンテナNo撮影 / 右：シールNo撮影） -->
+            <LinearLayout
+                android:id="@+id/rowPhotos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/rowYoyakuNo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- 左側：ラベル幅分の空き（画像の「予約No左下スペース」っぽく） -->
+                <View
+                    android:layout_width="90dp"
+                    android:layout_height="1dp" />
+
+                <ImageView
+                    android:id="@+id/ivPhotoContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="container photo" />
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
+
+                <ImageView
+                    android:id="@+id/ivPhotoSeal"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_edittext_black_border"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="seal photo" />
+            </LinearLayout>
+
+
+            <!-- 下寄せ：積載可残重量 -->
+            <LinearLayout
+                android:id="@+id/rowRemain"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="積載可残重量"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:gravity="end"
+                    android:paddingEnd="10dp" />
+
+                <TextView
+                    android:id="@+id/tvRemainKg"
+                    android:layout_width="70dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_menu_count"
+                    android:gravity="end|center_vertical"
+                    android:paddingEnd="8dp"
+                    android:text="354"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="kg"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- 画面下部ボタン（あなた指定の include） -->
+    <include
+        android:id="@+id/includeBottomButtons"
+        layout="@layout/view_buttons"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CCFFCC">
+
+    <!-- 上部タイトルバー -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:background="#0000FF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="振動設定"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="Ver 1.0.0"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- メイン領域（下ボタンの上まで） -->
+    <ScrollView
+        android:id="@+id/scrollMain"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp">
+
+            <!-- ===== ブザー音設定 ===== -->
+            <TextView
+                android:id="@+id/tvBuzzerTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="ブザー音設定"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnBuzzerTest"
+                app:layout_constraintHorizontal_bias="0" />
+
+            <Button
+                android:id="@+id/btnBuzzerTest"
+                android:layout_width="92dp"
+                android:layout_height="36dp"
+                android:text="テスト"
+                android:textSize="16sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:layout_constraintTop_toTopOf="@id/tvBuzzerTitle"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <CheckBox
+                android:id="@+id/chkBuzzerOnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="On/Off"
+                android:textSize="18sp"
+                android:buttonTint="#000000"
+                app:layout_constraintTop_toBottomOf="@id/tvBuzzerTitle"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- 音量 -->
+            <TextView
+                android:id="@+id/tvBuzzerVolumeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="音量"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                app:layout_constraintTop_toBottomOf="@id/chkBuzzerOnOff"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Spinner
+                android:id="@+id/spBuzzerVolume"
+                android:layout_width="170dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="22dp"
+                app:layout_constraintTop_toTopOf="@id/tvBuzzerVolumeLabel"
+                app:layout_constraintStart_toEndOf="@id/tvBuzzerVolumeLabel" />
+
+            <!-- 長さ（ミリ秒） -->
+            <TextView
+                android:id="@+id/tvBuzzerLengthLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="長さ(ミリ秒)"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                app:layout_constraintTop_toBottomOf="@id/tvBuzzerVolumeLabel"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/etBuzzerLengthMs"
+                android:layout_width="180dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="14dp"
+                android:inputType="number"
+                android:text="200"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@android:drawable/edit_text"
+                app:layout_constraintTop_toTopOf="@id/tvBuzzerLengthLabel"
+                app:layout_constraintStart_toEndOf="@id/tvBuzzerLengthLabel" />
+
+            <!-- セクション区切り（余白） -->
+            <View
+                android:id="@+id/space1"
+                android:layout_width="0dp"
+                android:layout_height="22dp"
+                app:layout_constraintTop_toBottomOf="@id/etBuzzerLengthMs"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- ===== バイブレーション設定 ===== -->
+            <TextView
+                android:id="@+id/tvVibrationTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="バイブレーション設定"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/space1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnVibrationTest"
+                app:layout_constraintHorizontal_bias="0" />
+
+            <Button
+                android:id="@+id/btnVibrationTest"
+                android:layout_width="92dp"
+                android:layout_height="36dp"
+                android:text="テスト"
+                android:textSize="16sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:layout_constraintTop_toTopOf="@id/tvVibrationTitle"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <CheckBox
+                android:id="@+id/chkVibrationOnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="On/Off"
+                android:textSize="18sp"
+                android:buttonTint="#000000"
+                app:layout_constraintTop_toBottomOf="@id/tvVibrationTitle"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- 長さ（ミリ秒） -->
+            <TextView
+                android:id="@+id/tvVibLengthLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="長さ(ミリ秒)"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                app:layout_constraintTop_toBottomOf="@id/chkVibrationOnOff"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/etVibLengthMs"
+                android:layout_width="180dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="14dp"
+                android:inputType="number"
+                android:text="250"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@android:drawable/edit_text"
+                app:layout_constraintTop_toTopOf="@id/tvVibLengthLabel"
+                app:layout_constraintStart_toEndOf="@id/tvVibLengthLabel" />
+
+            <!-- 回数 -->
+            <TextView
+                android:id="@+id/tvVibCountLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="回数"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                app:layout_constraintTop_toBottomOf="@id/tvVibLengthLabel"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/etVibCount"
+                android:layout_width="180dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="80dp"
+                android:inputType="number"
+                android:text="3"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@android:drawable/edit_text"
+                app:layout_constraintTop_toTopOf="@id/tvVibCountLabel"
+                app:layout_constraintStart_toEndOf="@id/tvVibCountLabel" />
+
+            <!-- 間隔（ミリ秒） -->
+            <TextView
+                android:id="@+id/tvVibIntervalLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="間隔(ミリ秒)"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                app:layout_constraintTop_toBottomOf="@id/tvVibCountLabel"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/etVibIntervalMs"
+                android:layout_width="180dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="14dp"
+                android:inputType="number"
+                android:text="100"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@android:drawable/edit_text"
+                app:layout_constraintTop_toTopOf="@id/tvVibIntervalLabel"
+                app:layout_constraintStart_toEndOf="@id/tvVibIntervalLabel" />
+
+            <!-- 下の余白（スクロール時に下ボタンに隠れないように） -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                app:layout_constraintTop_toBottomOf="@id/etVibIntervalMs"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- 画面下部ボタン -->
+    <include
+        android:id="@+id/includeBottomButtons"
+        layout="@layout/view_buttons"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

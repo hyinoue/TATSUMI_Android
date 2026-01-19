@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,31 +32,70 @@ public class MenuActivity extends BaseActivity {
     private static final String TAG = "MENU";
 
     // ★★★ 実運用値に置き換えてください ★★★
-    // コンテナ番号（例：SESU010355 のような実在の番号）
     private static final String REAL_CONTAINER_NO = "SESU010355";
-    // シール番号（実運用の桁・形式）
     private static final String REAL_SEAL_NO = "1234567";
-
-    // 重量（運用ルールに合わせて）
     private static final int REAL_CONTAINER_JYURYO = 3800;
     private static final int REAL_DUNNAGE_JYURYO = 200;
 
     // 送る束の数（まずは1件でDB更新を確認 → 問題なければ全部送る等）
-    private static final int SEND_BUNDLE_LIMIT = 1; // まずは1推奨。全部送りたいなら 0（=全件送信）に。
+    private static final int SEND_BUNDLE_LIMIT = 1; // 全件送りたいなら 0
 
     private ExecutorService io;
+
+    // ===== Views =====
     private TextView tvCenterStatus;
+    private Spinner spContainerSize;
+
+    private Button btnDataReceive;
+    private Button btnBundleSelect;
+    private Button btnContainerInput;
+    private Button btnWeightCalc;
+    private Button btnCollateContainerSelect;
+
+    // 下ボタン（include）
+    private MaterialButton btnBottomBlue;
+    private MaterialButton btnBottomRed;
+    private MaterialButton btnBottomGreen;
+    private MaterialButton btnBottomYellow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // ==============================
-// コンテナサイズ（20ft/40ft）をSpinnerに設定し、選択を保存
-// ==============================
-        Spinner spContainerSize = findViewById(R.id.spContainerSize);
+        io = Executors.newSingleThreadExecutor();
 
+        initViews();
+        setupContainerSizeSpinner();
+        setupBottomButtons();
+        wireActions();
+    }
+
+    // ==============================
+    // View取得
+    // ==============================
+    private void initViews() {
+        tvCenterStatus = findViewById(R.id.tvCenterStatus);
+
+        spContainerSize = findViewById(R.id.spContainerSize);
+
+        btnDataReceive = findViewById(R.id.btnDataReceive);
+        btnBundleSelect = findViewById(R.id.btnBundleSelect);
+        btnContainerInput = findViewById(R.id.btnContainerInput);
+        btnWeightCalc = findViewById(R.id.btnWeightCalc);
+        btnCollateContainerSelect = findViewById(R.id.btnCollateContainerSelect);
+
+        View bottom = findViewById(R.id.includeBottomButtons);
+        btnBottomBlue = bottom.findViewById(R.id.btnBottomBlue);
+        btnBottomRed = bottom.findViewById(R.id.btnBottomRed);
+        btnBottomGreen = bottom.findViewById(R.id.btnBottomGreen);
+        btnBottomYellow = bottom.findViewById(R.id.btnBottomYellow);
+    }
+
+    // ==============================
+    // コンテナサイズSpinner（20ft/40ft）保存・復元
+    // ==============================
+    private void setupContainerSizeSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
                 R.array.container_sizes,
@@ -66,12 +106,12 @@ public class MenuActivity extends BaseActivity {
 
         final SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
 
-// 保存済みを復元（デフォルト 20ft）
+        // 保存済みを復元（デフォルト 20ft）
         String savedSize = prefs.getString("container_size", "20ft");
         int pos = adapter.getPosition(savedSize);
         if (pos >= 0) spContainerSize.setSelection(pos);
 
-// 変更されたら保存
+        // 変更されたら保存
         spContainerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -83,64 +123,115 @@ public class MenuActivity extends BaseActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+    }
 
+    // ==============================
+    // 下ボタン（include）の文言と役割
+    // ==============================
+    private void setupBottomButtons() {
+        // 画面ごとにここだけ変える（現状は「再起動」だけ使う）
+        btnBottomBlue.setText("");
+        btnBottomRed.setText("");
+        btnBottomGreen.setText("");
+        btnBottomYellow.setText("再起動");
+    }
 
-        // ▼ 下ボタン（include）を取得
-        View bottom = findViewById(R.id.includeBottomButtons);
+    // ==============================
+    // クリック処理（画面ボタン）
+    // ==============================
+    private void wireActions() {
 
-        // ▼ 各ボタンを取得
-        MaterialButton btnBlue = bottom.findViewById(R.id.btnBottomBlue);
-        MaterialButton btnRed = bottom.findViewById(R.id.btnBottomRed);
-        MaterialButton btnGreen = bottom.findViewById(R.id.btnBottomGreen);
-        MaterialButton btnYellow = bottom.findViewById(R.id.btnBottomYellow);
-
-        // ▼ 文字設定（画面ごとにここだけ変える）
-        btnBlue.setText("");
-        btnRed.setText("");
-        btnGreen.setText("");
-        btnYellow.setText("再起動");
-
-        // ※フルスクリーンは BaseActivity が実施（applyImmersive() の直書きは不要）
-
-        io = Executors.newSingleThreadExecutor();
-        tvCenterStatus = findViewById(R.id.tvCenterStatus);
-
-        Button btnDataReceive = findViewById(R.id.btnDataReceive);
+        // 送信テスト
         btnDataReceive.setOnClickListener(v -> {
             setCenterStatus("送信テスト中...");
             io.execute(this::sendSyukkaDataReal);
         });
 
-        // 積載束選択
-        Button btnBundleSelect = findViewById(R.id.btnBundleSelect);
-        btnBundleSelect.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, BundleSelectActivity.class);
-            startActivity(intent);
-        });
+        // 画面遷移（タップ）
+        btnBundleSelect.setOnClickListener(v -> goBundleSelect());
+        btnContainerInput.setOnClickListener(v -> goContainerInput());
+        btnWeightCalc.setOnClickListener(v -> goBundleSelect());
+        btnCollateContainerSelect.setOnClickListener(v -> goCollateContainerSelect());
 
-        // コンテナ入力
-        Button btnContainerInput = findViewById(R.id.btnContainerInput);
-        btnContainerInput.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, ContainerInputActivity.class);
-            startActivity(intent);
-        });
+        // 下ボタン（黄色）：再起動（この画面を作り直す）
+        btnBottomYellow.setOnClickListener(v -> onRestartMenu());
+    }
 
-        // 重量計算
-        Button btnWeightCalc = findViewById(R.id.btnWeightCalc);
-        btnWeightCalc.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, CalcJyuryoActivity.class);
-            startActivity(intent);
-        });
+    // ==============================
+    // 画面遷移（共通メソッド化）
+    // ==============================
+    private void goServiceMenu() {
+        startActivity(new Intent(this, ServiceMenuActivity.class));
+    }
 
-        // 照合コンテナ選定
-        Button btnCollateContainerSelect = findViewById(R.id.btnCollateContainerSelect);
-        btnCollateContainerSelect.setOnClickListener(v -> {
-            Intent intent = new Intent(
-                    MenuActivity.this,
-                    SyougoContainerActivity.class
-            );
-            startActivity(intent);
-        });
+    private void goBundleSelect() {
+        startActivity(new Intent(this, BundleSelectActivity.class));
+    }
+
+    private void goContainerInput() {
+        startActivity(new Intent(this, ContainerInputActivity.class));
+    }
+
+    private void goCollateContainerSelect() {
+        startActivity(new Intent(this, CollateContainerSelectActivity.class));
+    }
+
+    // ==============================
+    // 再起動（メニュー画面だけ作り直す）
+    // ==============================
+    private void onRestartMenu() {
+        // シンプルに Activity を作り直す（“アプリ全体再起動”ではなくメニュー再描画）
+        recreate();
+    }
+
+    // ==============================
+    // ハンディ物理キー対応：
+    // 0 → サービスメニュー
+    // 2 → 積載束選定
+    // 3 → コンテナ情報入力
+    // 4 → 重量計算
+    // 5 → 照合コンテナ選定
+    // ==============================
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        // ★長押し連打防止（業務端末は必須）
+        if (event.getRepeatCount() > 0) {
+            return true;
+        }
+
+        switch (keyCode) {
+
+            // 数字キー（0/2/3/4/5）
+            case KeyEvent.KEYCODE_0:
+                goServiceMenu();
+                return true;
+
+            case KeyEvent.KEYCODE_2:
+                goBundleSelect();
+                return true;
+
+            case KeyEvent.KEYCODE_3:
+                goContainerInput();
+                return true;
+
+            case KeyEvent.KEYCODE_4:
+                goBundleSelect();
+                return true;
+
+            case KeyEvent.KEYCODE_5:
+                goCollateContainerSelect();
+                return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    // ==============================
+    // ステータス表示
+    // ==============================
+    private void setCenterStatus(String text) {
+        if (tvCenterStatus != null) tvCenterStatus.setText(text);
     }
 
     /**
@@ -169,7 +260,7 @@ public class MenuActivity extends BaseActivity {
             BunningData b = new BunningData();
             b.syukkaYmd = sagyouYmd;
 
-            // ★ここが「実運用の形」：実際に運用で使う値を入れる
+            // ★実運用の形：実際に運用で使う値を入れる
             b.containerNo = REAL_CONTAINER_NO;
             b.sealNo = REAL_SEAL_NO;
             b.containerJyuryo = REAL_CONTAINER_JYURYO;
@@ -181,12 +272,11 @@ public class MenuActivity extends BaseActivity {
             for (int i = 0; i < limit; i++) {
                 SyukkaMeisai m = meisai.get(i);
 
-                // そのまま追加（キーを変えない＝サーバDBに存在する前提を崩さない）
                 SyukkaMeisai send = new SyukkaMeisai();
                 send.heatNo = m.heatNo;
                 send.sokuban = m.sokuban;
                 send.syukkaSashizuNo = m.syukkaSashizuNo;
-                send.bundleNo = m.bundleNo;    // ★bundleNo（小文字）重要
+                send.bundleNo = m.bundleNo;  // ★bundleNo（小文字）重要
                 send.jyuryo = m.jyuryo;
                 send.bookingNo = m.bookingNo;
 
@@ -222,10 +312,6 @@ public class MenuActivity extends BaseActivity {
         }
     }
 
-    private void setCenterStatus(String text) {
-        tvCenterStatus.setText(text);
-    }
-
     private void logSyukkaHeaderList(String label, SyukkaData data) {
         if (data == null) {
             Log.i(TAG, label + " HEADER: data=null");
@@ -236,7 +322,7 @@ public class MenuActivity extends BaseActivity {
             return;
         }
 
-        SyukkaHeader h = data.header.get(0); // 先頭1件を見る
+        SyukkaHeader h = data.header.get(0);
 
         Log.i(TAG, label + " HEADER:"
                 + " bookingNo=" + h.bookingNo

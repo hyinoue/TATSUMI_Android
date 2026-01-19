@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- タイトル：上固定 -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:background="#0000FF"
+        android:gravity="left|center_vertical"
+        android:text="バンニングレポート作成"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 上部：入力エリア -->
+    <LinearLayout
+        android:id="@+id/areaHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 1行目：コンテナ重量 / ダンネージ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:text="テーブル" />
+
+            <!-- コンボボックス（Spinner） -->
+            <Spinner
+                android:id="@+id/spContainerSize"
+                android:layout_width="240dp"
+                android:layout_marginStart="10dp"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <!-- 2行目：現品番号 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 一覧（表の中身） -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBundles"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#888888"
+        app:layout_constraintTop_toBottomOf="@+id/areaHeader"
+        app:layout_constraintBottom_toTopOf="@id/areaFooter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <!-- 下部：集計エリア -->
+    <LinearLayout
+        android:id="@+id/areaFooter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/includeBottomButtons"
+        layout="@layout/view_buttons"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
