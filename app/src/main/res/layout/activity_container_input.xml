@@ -425,7 +425,6 @@
                     android:layout_width="0dp"
                     android:layout_height="90dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_edittext_black_border"
                     android:scaleType="centerCrop"
                     android:contentDescription="container photo" />
 
@@ -438,7 +437,6 @@
                     android:layout_width="0dp"
                     android:layout_height="90dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_edittext_black_border"
                     android:scaleType="centerCrop"
                     android:contentDescription="seal photo" />
             </LinearLayout>
