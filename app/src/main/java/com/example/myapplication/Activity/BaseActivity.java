@@ -1,0 +1,508 @@
+package com.example.myapplication.Activity;
+
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+
+import com.example.myapplication.R;
+import com.google.android.material.button.MaterialButton;
+
+public class BaseActivity extends AppCompatActivity {
+
+    // ===== public types =====
+
+    public enum MsgDispMode {MsgBox, Label}
+
+    public interface QuestionCallback {
+        void onResult(boolean yes);
+    }
+
+    // ===== settings =====
+
+    /**
+     * ラベル(バナー)表示時間(ms)
+     */
+    protected int labelDisplayTimeMs = 2500;
+
+    // ===== internal =====
+
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
+    // Label風バナー（frmBase.lblErrMsg相当）
+    private TextView bannerView;
+    private Runnable bannerHideRunnable;
+
+    // Wait overlay（frmBase.pnlWaitLong/Short相当）
+    private FrameLayout overlayLong;
+    private FrameLayout overlayShort;
+
+    // 画面下4色ボタン（存在する画面だけ自動で捕まえる）
+    private MaterialButton btnBottomRed;
+    private MaterialButton btnBottomBlue;
+    private MaterialButton btnBottomGreen;
+    private MaterialButton btnBottomYellow;
+    private boolean bottomButtonsBound = false;
+
+    @Override
+    protected void onCreate(@Nullable android.os.Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        applyFullScreen();
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        ensureBaseOverlaysAttached();
+        bindBottomButtonsIfExists();
+    }
+
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        ensureBaseOverlaysAttached();
+        bindBottomButtonsIfExists();
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        super.setContentView(view, params);
+        ensureBaseOverlaysAttached();
+        bindBottomButtonsIfExists();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) applyFullScreen();
+    }
+
+    // ===== Full screen（あなたの既存実装） =====
+
+    protected void applyFullScreen() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        View decorView = getWindow().getDecorView();
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(getWindow(), decorView);
+
+        if (controller != null) {
+            controller.hide(WindowInsetsCompat.Type.statusBars()
+                    | WindowInsetsCompat.Type.navigationBars());
+
+            controller.setSystemBarsBehavior(
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            );
+        }
+    }
+
+    // ===== frmBase: ErrorProccess 相当 =====
+
+    protected void errorProcess(String procName, Exception ex) {
+        hideLoadingLong();
+        hideLoadingShort();
+        showErrorMsg("エラーが発生しました\n" + safeMessage(ex), MsgDispMode.MsgBox);
+    }
+
+    protected void errorProcess(String procName, String message, Exception ex) {
+        hideLoadingLong();
+        hideLoadingShort();
+        showErrorMsg("エラーが発生しました\n" + procName + "\n" + message + "\n" + safeMessage(ex), MsgDispMode.MsgBox);
+    }
+
+    private String safeMessage(Exception ex) {
+        if (ex == null) return "";
+        String m = ex.getMessage();
+        return (m == null) ? ex.getClass().getSimpleName() : m;
+    }
+
+    // ===== frmBase: ShowXxxMsg 相当 =====
+
+    public void showErrorMsg(String msg, MsgDispMode mode) {
+        hideLoadingLong();
+        hideLoadingShort();
+        if (mode == MsgDispMode.MsgBox) showDialog("エラー", msg);
+        else showBanner(msg, BannerType.ERROR);
+    }
+
+    public void showWarningMsg(String msg, MsgDispMode mode) {
+        hideLoadingLong();
+        hideLoadingShort();
+        if (mode == MsgDispMode.MsgBox) showDialog("警告", msg);
+        else showBanner(msg, BannerType.WARNING);
+    }
+
+    public void showInfoMsg(String msg, MsgDispMode mode) {
+        if (mode == MsgDispMode.MsgBox) {
+            hideLoadingLong();
+            hideLoadingShort();
+            showDialog("情報", msg);
+        } else {
+            showBanner(msg, BannerType.INFO);
+        }
+    }
+
+    public void showQuestion(String msg, QuestionCallback callback) {
+        hideLoadingLong();
+        hideLoadingShort();
+
+        runOnUiThread(() -> new AlertDialog.Builder(this)
+                .setTitle("確認")
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton("はい", (d, w) -> {
+                    if (callback != null) callback.onResult(true);
+                })
+                .setNegativeButton("いいえ", (d, w) -> {
+                    if (callback != null) callback.onResult(false);
+                })
+                .show());
+    }
+
+    private void showDialog(String title, String msg) {
+        runOnUiThread(() -> new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(msg)
+                .setPositiveButton("OK", null)
+                .show());
+    }
+
+    // ===== Banner（Label表示相当） =====
+
+    private enum BannerType {ERROR, WARNING, INFO}
+
+    private void showBanner(String msg, BannerType type) {
+        ensureBaseOverlaysAttached();
+
+        runOnUiThread(() -> {
+            if (bannerHideRunnable != null) uiHandler.removeCallbacks(bannerHideRunnable);
+
+            bannerView.setText(msg);
+            bannerView.bringToFront();
+
+            if (type == BannerType.INFO) {
+                bannerView.setBackgroundColor(Color.rgb(64, 64, 255)); // 青
+                bannerView.setTextColor(Color.WHITE);
+            } else {
+                bannerView.setBackgroundColor(Color.rgb(255, 64, 64)); // 赤
+                bannerView.setTextColor(Color.YELLOW);
+            }
+
+            bannerView.setVisibility(View.VISIBLE);
+
+            bannerHideRunnable = () -> bannerView.setVisibility(View.GONE);
+            uiHandler.postDelayed(bannerHideRunnable, labelDisplayTimeMs);
+        });
+    }
+
+    private void hideBannerNow() {
+        if (bannerView == null) return;
+        runOnUiThread(() -> {
+            if (bannerHideRunnable != null) uiHandler.removeCallbacks(bannerHideRunnable);
+            bannerView.setVisibility(View.GONE);
+        });
+    }
+
+    // ===== Loading overlay =====
+
+    protected void showLoadingLong() {
+        ensureBaseOverlaysAttached();
+        runOnUiThread(() -> {
+            overlayLong.bringToFront();
+            overlayLong.setVisibility(View.VISIBLE);
+        });
+    }
+
+    protected void hideLoadingLong() {
+        if (overlayLong == null) return;
+        runOnUiThread(() -> overlayLong.setVisibility(View.GONE));
+    }
+
+    protected void showLoadingShort() {
+        ensureBaseOverlaysAttached();
+        runOnUiThread(() -> {
+            overlayShort.bringToFront();
+            overlayShort.setVisibility(View.VISIBLE);
+        });
+    }
+
+    protected void hideLoadingShort() {
+        if (overlayShort == null) return;
+        runOnUiThread(() -> overlayShort.setVisibility(View.GONE));
+    }
+
+    // ===== Function keys（物理キー → onFunctionXxx に集約） =====
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
+            // 長押し連打防止
+            if (event.getRepeatCount() > 0) return true;
+
+            int keyCode = event.getKeyCode();
+
+            // ★並び：左から「青・赤・緑・黄」
+            // 物理キー：F1=青、F2=赤、F3=緑、F4=黄 に統一
+            if (keyCode == KeyEvent.KEYCODE_F1) {
+                if (canRunBlue()) onFunctionBlue();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_F2) {
+                if (canRunRed()) onFunctionRed();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_F3) {
+                if (canRunGreen()) onFunctionGreen();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_F4) {
+                if (canRunYellow()) onFunctionYellow();
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    // 子画面で override（タップも物理キーもここに集約）
+    protected void onFunctionRed() {
+    }
+
+    protected void onFunctionBlue() {
+    }
+
+    protected void onFunctionGreen() {
+    }
+
+    protected void onFunctionYellow() {
+    }
+
+    // ===== ★画面下4色ボタン連動 =====
+
+    /**
+     * 画面に下部ボタンがある場合だけ自動で拾って、タップ → onFunctionXxx に流す。
+     * frmBase の「ボタンTextが空なら反応しない」も再現。
+     */
+    protected void bindBottomButtonsIfExists() {
+        if (bottomButtonsBound) {
+            // 文言を書き換えた時のために状態だけ更新
+            refreshBottomButtonsEnabled();
+            return;
+        }
+
+        View red = findViewById(R.id.btnBottomRed);
+        View blue = findViewById(R.id.btnBottomBlue);
+        View green = findViewById(R.id.btnBottomGreen);
+        View yellow = findViewById(R.id.btnBottomYellow);
+
+        // includeしてない画面でも安全にスルー
+        if (!(red instanceof MaterialButton) ||
+                !(blue instanceof MaterialButton) ||
+                !(green instanceof MaterialButton) ||
+                !(yellow instanceof MaterialButton)) {
+            return;
+        }
+
+        btnBottomRed = (MaterialButton) red;
+        btnBottomBlue = (MaterialButton) blue;
+        btnBottomGreen = (MaterialButton) green;
+        btnBottomYellow = (MaterialButton) yellow;
+
+        // タップ → onFunctionXxx（Textが空なら反応しない）
+        btnBottomRed.setOnClickListener(v -> {
+            if (canRunRed()) onFunctionRed();
+        });
+        btnBottomBlue.setOnClickListener(v -> {
+            if (canRunBlue()) onFunctionBlue();
+        });
+        btnBottomGreen.setOnClickListener(v -> {
+            if (canRunGreen()) onFunctionGreen();
+        });
+        btnBottomYellow.setOnClickListener(v -> {
+            if (canRunYellow()) onFunctionYellow();
+        });
+
+        bottomButtonsBound = true;
+        refreshBottomButtonsEnabled();
+    }
+
+    /**
+     * 画面側で setText("") / setText("戻る") など変えるだけで、押せる/押せないを同期
+     */
+    protected void refreshBottomButtonsEnabled() {
+        if (!bottomButtonsBound) return;
+
+        applyEnabledStyle(btnBottomRed, isActiveByText(btnBottomRed));
+        applyEnabledStyle(btnBottomBlue, isActiveByText(btnBottomBlue));
+        applyEnabledStyle(btnBottomGreen, isActiveByText(btnBottomGreen));
+        applyEnabledStyle(btnBottomYellow, isActiveByText(btnBottomYellow));
+    }
+
+    private boolean isActiveByText(MaterialButton btn) {
+        if (btn == null) return false;
+        CharSequence t = btn.getText();
+        return t != null && t.toString().trim().length() > 0;
+    }
+
+    private void applyEnabledStyle(MaterialButton btn, boolean enabled) {
+        if (btn == null) return;
+        btn.setEnabled(enabled);
+    }
+
+    // 「物理キー」でも同じ判定を効かせる（Text空は動かさない）
+    private boolean canRunRed() {
+        return bottomButtonsBound ? isActive(btnBottomRed) : true;
+    }
+
+    private boolean canRunBlue() {
+        return bottomButtonsBound ? isActive(btnBottomBlue) : true;
+    }
+
+    private boolean canRunGreen() {
+        return bottomButtonsBound ? isActive(btnBottomGreen) : true;
+    }
+
+    private boolean canRunYellow() {
+        return bottomButtonsBound ? isActive(btnBottomYellow) : true;
+    }
+
+    private boolean isActive(MaterialButton btn) {
+        if (btn == null) return false;
+        if (btn.getVisibility() != View.VISIBLE) return false;
+        if (!btn.isEnabled()) return false;
+        CharSequence t = btn.getText();
+        return t != null && t.toString().trim().length() > 0;
+    }
+
+    // ===== Overlays attach =====
+
+    private void ensureBaseOverlaysAttached() {
+        if (bannerView != null && overlayLong != null && overlayShort != null) return;
+
+        runOnUiThread(() -> {
+            View root = findViewById(android.R.id.content);
+            if (!(root instanceof ViewGroup)) return;
+
+            ViewGroup content = (ViewGroup) root;
+
+            if (bannerView == null) {
+                bannerView = createBannerView();
+                content.addView(bannerView);
+            }
+            if (overlayLong == null) {
+                overlayLong = createLoadingOverlay(true);
+                content.addView(overlayLong);
+            }
+            if (overlayShort == null) {
+                overlayShort = createLoadingOverlay(false);
+                content.addView(overlayShort);
+            }
+        });
+    }
+
+    private TextView createBannerView() {
+        TextView tv = new TextView(this);
+        tv.setVisibility(View.GONE);
+        tv.setText("XXXXXXXXXX");
+        tv.setTextSize(18);
+        tv.setGravity(Gravity.CENTER);
+        tv.setPadding(16, 16, 16, 16);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                dpToPx(90)
+        );
+        lp.gravity = Gravity.BOTTOM;
+        tv.setLayoutParams(lp);
+
+        tv.setBackgroundColor(Color.RED);
+        tv.setTextColor(Color.YELLOW);
+        return tv;
+    }
+
+    private FrameLayout createLoadingOverlay(boolean isLong) {
+        FrameLayout overlay = new FrameLayout(this);
+        overlay.setVisibility(View.GONE);
+        overlay.setClickable(true); // 背面操作ブロック
+        overlay.setBackgroundColor(Color.rgb(0, 64, 0));
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        overlay.setLayoutParams(lp);
+
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        FrameLayout.LayoutParams boxLp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        boxLp.gravity = Gravity.CENTER;
+        box.setLayoutParams(boxLp);
+
+        TextView t1 = new TextView(this);
+        t1.setTextSize(24);
+        t1.setTextColor(Color.WHITE);
+        t1.setGravity(Gravity.CENTER_HORIZONTAL);
+        t1.setText(isLong ? "処理中です" : "処理中");
+        t1.setPadding(0, dpToPx(8), 0, dpToPx(8));
+        box.addView(t1);
+
+        if (isLong) {
+            TextView t2 = new TextView(this);
+            t2.setTextSize(24);
+            t2.setTextColor(Color.WHITE);
+            t2.setGravity(Gravity.CENTER_HORIZONTAL);
+            t2.setText("しばらくお待ちください…");
+            t2.setPadding(0, dpToPx(8), 0, dpToPx(8));
+            box.addView(t2);
+        }
+
+        overlay.addView(box);
+        return overlay;
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
+    // ===== version helper（必要なら使う） =====
+    protected String getAppVersionName() {
+        try {
+            PackageManager pm = getPackageManager();
+            PackageInfo pi;
+            if (Build.VERSION.SDK_INT >= 33) {
+                pi = pm.getPackageInfo(getPackageName(), PackageManager.PackageInfoFlags.of(0));
+            } else {
+                //noinspection deprecation
+                pi = pm.getPackageInfo(getPackageName(), 0);
+            }
+            return pi.versionName;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+}

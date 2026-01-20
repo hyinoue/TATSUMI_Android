@@ -23,62 +23,60 @@
         android:theme="@style/Theme.MyApplication">
 
         <activity
-            android:name=".ui.ServiceMenuActivity"
+            android:name=".Activity.ServiceMenuActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.BundleSelectActivity"
+            android:name=".Activity.BundleSelectActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.ContainerInputActivity"
+            android:name=".Activity.ContainerInputActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
 
         <activity
-            android:name=".ui.CollateContainerSelectActivity"
+            android:name=".Activity.CollateContainerSelectActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.VanningCollationActivity"
+            android:name=".Activity.VanningCollationActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
-        <activity
-            android:name=".ui.CameraSettingActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".Activity.CameraSettingActivity" />
 
         <activity
-            android:name=".ui.CameraPreviewActivity"
+            android:name=".Activity.CameraPreviewActivity"
             android:exported="false" />
 
 
         <activity
-            android:name=".ui.DbTestActivity"
+            android:name=".Activity.DbTestActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.CommTestActivity"
+            android:name=".Activity.CommTestActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.ImagerTestActivity"
+            android:name=".Activity.ImagerTestActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.SystemLibActivity"
+            android:name=".Activity.SystemLibActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".ui.ServerSettingActivity"
+            android:name=".Activity.ServerSettingActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
@@ -95,7 +93,7 @@
 
 
         <activity
-            android:name=".ui.MenuActivity"
+            android:name=".Activity.MenuActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication.NoActionBar">
             <intent-filter>
