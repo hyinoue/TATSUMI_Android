@@ -1,5 +1,4 @@
-package com.example.myapplication.Activity;
-
+package com.example.myapplication.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,12 +7,11 @@ import android.view.View;
 import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
-
-public class CollateContainerSelectActivity extends BaseActivity {
+public class VanningCollationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collate_container_select);
+        setContentView(R.layout.activity_vanning_collation);
 
         // ▼ 下ボタン（include）を取得
         View bottom = findViewById(R.id.includeBottomButtons);
@@ -25,16 +23,19 @@ public class CollateContainerSelectActivity extends BaseActivity {
         MaterialButton btnYellow = bottom.findViewById(R.id.btnBottomYellow);
 
         // ▼ 文字設定（画面ごとにここだけ変える）
-        btnBlue.setText("決定");
+        btnBlue.setText("確定");
         btnRed.setText("");
         btnGreen.setText("");
         btnYellow.setText("終了");
 
-        btnBlue.setOnClickListener(v -> {
-            Intent intent = new Intent(CollateContainerSelectActivity.this, VanningCollationActivity.class);
+        btnYellow.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MenuActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
+            finish();
         });
-        btnYellow.setOnClickListener(v -> finish());
+
     }
 
     // ==============================

@@ -1,14 +1,14 @@
-package com.example.myapplication.Activity;
+package com.example.myapplication.activity;
 
 import android.os.Bundle;
 
 import com.example.myapplication.R;
 
-public class ServerSettingActivity extends BaseActivity {
+public class ImagerTestActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_server_setting);
+        setContentView(R.layout.activity_imager_test);
     }
 }

@@ -1,14 +1,15 @@
-package com.example.myapplication.Activity;
+package com.example.myapplication.activity;
 
 import android.os.Bundle;
 
 import com.example.myapplication.R;
 
-public class SystemLibActivity extends BaseActivity {
+public class DbTestActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_system_lib);
+        setContentView(R.layout.activity_db_test);
     }
 }
+

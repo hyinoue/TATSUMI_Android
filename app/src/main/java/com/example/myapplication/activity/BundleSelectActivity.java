@@ -1,5 +1,5 @@
 // BundleSelectActivity.java
-package com.example.myapplication.Activity;
+package com.example.myapplication.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
