@@ -24,6 +24,16 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
+/**
+ * 動作はそのままに、重複を削って短くした BaseActivity
+ * <p>
+ * 仕様（元のまま）：
+ * - ActionBar非表示＋全画面（status/navigation bar hide、swipeで一時表示）
+ * - frmBase.lblErrMsg相当のバナー表示（一定時間で自動消去）
+ * - frmBase.pnlWaitLong/Short相当のローディングオーバーレイ
+ * - 物理キーF1～F4 → 青/赤/緑/黄 の onFunctionXxx に集約（Text空なら動かさない）
+ * - 画面下4色ボタン（存在する画面だけ）→ onFunctionXxx に集約（Text空なら動かさない）
+ */
 public class BaseActivity extends AppCompatActivity {
 
     // ===== public types =====
@@ -66,23 +76,27 @@ public class BaseActivity extends AppCompatActivity {
         applyFullScreen();
     }
 
+    // setContentViewは layoutResID 版だけで十分（通常これしか使わない）
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        ensureBaseOverlaysAttached();
-        bindBottomButtonsIfExists();
+        afterSetContentView();
     }
 
+    // もし setContentView(View...) を使っている画面がある場合だけ必要。通常は不要だが安全のため残す。
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
-        ensureBaseOverlaysAttached();
-        bindBottomButtonsIfExists();
+        afterSetContentView();
     }
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
+        afterSetContentView();
+    }
+
+    private void afterSetContentView() {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
     }
@@ -93,7 +107,7 @@ public class BaseActivity extends AppCompatActivity {
         if (hasFocus) applyFullScreen();
     }
 
-    // ===== Full screen（あなたの既存実装） =====
+    // ===== Full screen（元の仕様のまま） =====
 
     protected void applyFullScreen() {
         if (getSupportActionBar() != null) {
@@ -116,7 +130,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    // ===== frmBase: ErrorProccess 相当 =====
+    // ===== frmBase: ErrorProcess 相当 =====
 
     protected void errorProcess(String procName, Exception ex) {
         hideLoadingLong();
@@ -215,6 +229,7 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressWarnings("unused")
     private void hideBannerNow() {
         if (bannerView == null) return;
         runOnUiThread(() -> {
@@ -252,8 +267,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     // ===== Function keys（物理キー → onFunctionXxx に集約） =====
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
 
             // 長押し連打防止
@@ -264,19 +281,19 @@ public class BaseActivity extends AppCompatActivity {
             // ★並び：左から「青・赤・緑・黄」
             // 物理キー：F1=青、F2=赤、F3=緑、F4=黄 に統一
             if (keyCode == KeyEvent.KEYCODE_F1) {
-                if (canRunBlue()) onFunctionBlue();
+                if (canRun(btnBottomBlue)) onFunctionBlue();
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_F2) {
-                if (canRunRed()) onFunctionRed();
+                if (canRun(btnBottomRed)) onFunctionRed();
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_F3) {
-                if (canRunGreen()) onFunctionGreen();
+                if (canRun(btnBottomGreen)) onFunctionGreen();
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_F4) {
-                if (canRunYellow()) onFunctionYellow();
+                if (canRun(btnBottomYellow)) onFunctionYellow();
                 return true;
             }
         }
@@ -303,42 +320,37 @@ public class BaseActivity extends AppCompatActivity {
      * frmBase の「ボタンTextが空なら反応しない」も再現。
      */
     protected void bindBottomButtonsIfExists() {
+        // 既にバインド済みなら、文言変更に追従して押下可否だけ更新
         if (bottomButtonsBound) {
-            // 文言を書き換えた時のために状態だけ更新
             refreshBottomButtonsEnabled();
             return;
         }
 
-        View red = findViewById(R.id.btnBottomRed);
-        View blue = findViewById(R.id.btnBottomBlue);
-        View green = findViewById(R.id.btnBottomGreen);
-        View yellow = findViewById(R.id.btnBottomYellow);
+        MaterialButton red = asMaterialButton(findViewById(R.id.btnBottomRed));
+        MaterialButton blue = asMaterialButton(findViewById(R.id.btnBottomBlue));
+        MaterialButton green = asMaterialButton(findViewById(R.id.btnBottomGreen));
+        MaterialButton yellow = asMaterialButton(findViewById(R.id.btnBottomYellow));
 
         // includeしてない画面でも安全にスルー
-        if (!(red instanceof MaterialButton) ||
-                !(blue instanceof MaterialButton) ||
-                !(green instanceof MaterialButton) ||
-                !(yellow instanceof MaterialButton)) {
-            return;
-        }
+        if (red == null || blue == null || green == null || yellow == null) return;
 
-        btnBottomRed = (MaterialButton) red;
-        btnBottomBlue = (MaterialButton) blue;
-        btnBottomGreen = (MaterialButton) green;
-        btnBottomYellow = (MaterialButton) yellow;
+        btnBottomRed = red;
+        btnBottomBlue = blue;
+        btnBottomGreen = green;
+        btnBottomYellow = yellow;
 
         // タップ → onFunctionXxx（Textが空なら反応しない）
         btnBottomRed.setOnClickListener(v -> {
-            if (canRunRed()) onFunctionRed();
+            if (canRun(btnBottomRed)) onFunctionRed();
         });
         btnBottomBlue.setOnClickListener(v -> {
-            if (canRunBlue()) onFunctionBlue();
+            if (canRun(btnBottomBlue)) onFunctionBlue();
         });
         btnBottomGreen.setOnClickListener(v -> {
-            if (canRunGreen()) onFunctionGreen();
+            if (canRun(btnBottomGreen)) onFunctionGreen();
         });
         btnBottomYellow.setOnClickListener(v -> {
-            if (canRunYellow()) onFunctionYellow();
+            if (canRun(btnBottomYellow)) onFunctionYellow();
         });
 
         bottomButtonsBound = true;
@@ -351,10 +363,15 @@ public class BaseActivity extends AppCompatActivity {
     protected void refreshBottomButtonsEnabled() {
         if (!bottomButtonsBound) return;
 
-        applyEnabledStyle(btnBottomRed, isActiveByText(btnBottomRed));
-        applyEnabledStyle(btnBottomBlue, isActiveByText(btnBottomBlue));
-        applyEnabledStyle(btnBottomGreen, isActiveByText(btnBottomGreen));
-        applyEnabledStyle(btnBottomYellow, isActiveByText(btnBottomYellow));
+        applyEnabled(btnBottomRed, isActiveByText(btnBottomRed));
+        applyEnabled(btnBottomBlue, isActiveByText(btnBottomBlue));
+        applyEnabled(btnBottomGreen, isActiveByText(btnBottomGreen));
+        applyEnabled(btnBottomYellow, isActiveByText(btnBottomYellow));
+    }
+
+    private boolean canRun(MaterialButton btn) {
+        // 「下部ボタンが無い画面」でも物理キーは通す（元仕様）
+        return !bottomButtonsBound || isActive(btn);
     }
 
     private boolean isActiveByText(MaterialButton btn) {
@@ -363,34 +380,20 @@ public class BaseActivity extends AppCompatActivity {
         return t != null && t.toString().trim().length() > 0;
     }
 
-    private void applyEnabledStyle(MaterialButton btn, boolean enabled) {
-        if (btn == null) return;
-        btn.setEnabled(enabled);
-    }
-
-    // 「物理キー」でも同じ判定を効かせる（Text空は動かさない）
-    private boolean canRunRed() {
-        return bottomButtonsBound ? isActive(btnBottomRed) : true;
-    }
-
-    private boolean canRunBlue() {
-        return bottomButtonsBound ? isActive(btnBottomBlue) : true;
-    }
-
-    private boolean canRunGreen() {
-        return bottomButtonsBound ? isActive(btnBottomGreen) : true;
-    }
-
-    private boolean canRunYellow() {
-        return bottomButtonsBound ? isActive(btnBottomYellow) : true;
-    }
-
     private boolean isActive(MaterialButton btn) {
         if (btn == null) return false;
         if (btn.getVisibility() != View.VISIBLE) return false;
         if (!btn.isEnabled()) return false;
-        CharSequence t = btn.getText();
-        return t != null && t.toString().trim().length() > 0;
+        return isActiveByText(btn);
+    }
+
+    private void applyEnabled(MaterialButton btn, boolean enabled) {
+        if (btn == null) return;
+        btn.setEnabled(enabled);
+    }
+
+    private MaterialButton asMaterialButton(View v) {
+        return (v instanceof MaterialButton) ? (MaterialButton) v : null;
     }
 
     // ===== Overlays attach =====

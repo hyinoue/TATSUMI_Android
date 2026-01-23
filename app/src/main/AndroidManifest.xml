@@ -75,10 +75,19 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
+
         <activity
             android:name=".activity.ServerSettingActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
+
+        <receiver
+            android:name=".receiver.DensoScanReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.myapplication.DENSO_SCAN" />
+            </intent-filter>
+        </receiver>
 
 
         <provider

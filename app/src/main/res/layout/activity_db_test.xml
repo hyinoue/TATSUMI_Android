@@ -29,7 +29,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：コンテナ重量 / ダンネージ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +41,6 @@
                 android:textColor="#000000"
                 android:text="テーブル" />
 
-            <!-- コンボボックス（Spinner） -->
             <Spinner
                 android:id="@+id/spContainerSize"
                 android:layout_width="240dp"
@@ -52,27 +50,38 @@
                 android:spinnerMode="dropdown" />
         </LinearLayout>
 
-        <!-- 2行目：現品番号 -->
+        <!-- 2行目：現品番号（今は空） -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"></LinearLayout>
 
-        </LinearLayout>
     </LinearLayout>
 
     <!-- 一覧（表の中身） -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvBundles"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/areaTable"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#888888"
         app:layout_constraintTop_toBottomOf="@+id/areaHeader"
         app:layout_constraintBottom_toTopOf="@id/areaFooter"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.evrencoskun.tableview.TableView
+            android:id="@+id/tableView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_edittext_black_border"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- 下部：集計エリア -->
     <LinearLayout
         android:id="@+id/areaFooter"
@@ -82,9 +91,7 @@
         android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
-
-    </LinearLayout>
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"></LinearLayout>
 
     <include
         android:id="@+id/includeBottomButtons"

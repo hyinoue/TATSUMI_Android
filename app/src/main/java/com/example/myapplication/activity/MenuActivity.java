@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.myapplication.R;
 import com.example.myapplication.connector.SvcHandyRepository;
+import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 public class MenuActivity extends BaseActivity {
 
@@ -56,6 +58,19 @@ public class MenuActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        // ★ DB生成確認用（一時コード）
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+
+        // ★ DB生成確認用：バックグラウンドで1回だけ呼ぶ
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                db.yoteiDao().findAll();
+            } catch (Exception e) {
+                e.printStackTrace(); // Logcatに出やすくする
+            }
+        });
+
 
         io = Executors.newSingleThreadExecutor();
 
