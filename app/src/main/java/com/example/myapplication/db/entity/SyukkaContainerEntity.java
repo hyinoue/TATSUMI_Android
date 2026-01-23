@@ -29,6 +29,9 @@ public class SyukkaContainerEntity {
     @ColumnInfo(name = "SYUKKA_STATUS")
     public Integer syukkaStatus;
 
+    @ColumnInfo(name = "DATA_SEND_YMDHMS")
+    public String dataSendYmdhms; // DATE→TEXT(ISO)
+
     @ColumnInfo(name = "INSERT_PROC_NAME")
     public String insertProcName;
 

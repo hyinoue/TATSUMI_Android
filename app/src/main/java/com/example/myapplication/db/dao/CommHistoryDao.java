@@ -18,6 +18,9 @@ public interface CommHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(CommHistoryEntity entity);
 
+    @Query("DELETE FROM C_COMM_HISTORY WHERE START_YMDHMS < :threshold")
+    void deleteBefore(String threshold);
+
     @Query("DELETE FROM C_COMM_HISTORY")
     void deleteAll();
 }

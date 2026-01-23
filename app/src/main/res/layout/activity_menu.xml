@@ -262,8 +262,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="22" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -279,8 +278,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="5" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -295,8 +293,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="17" />
+                android:paddingRight="8dp" />
 
             <!-- 出荷束数 -->
             <TextView
@@ -315,8 +312,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="217" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -332,8 +328,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="46" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -348,8 +343,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="171" />
+                android:paddingRight="8dp" />
 
             <!-- 出荷重量 -->
             <TextView
@@ -368,8 +362,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="407" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -385,8 +378,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="84" />
+                android:paddingRight="8dp" />
 
             <TextView
                 android:layout_width="20dp"
@@ -401,8 +393,7 @@
                 android:background="@color/menu_button_bg"
                 android:gravity="end|center_vertical"
                 android:textColor="#000000"
-                android:paddingRight="8dp"
-                android:text="323" />
+                android:paddingRight="8dp" />
         </GridLayout>
 
         <!-- ★確認用（OK/NG表示） -->

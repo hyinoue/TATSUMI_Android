@@ -24,6 +24,14 @@ public interface SyukkaMeisaiDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(SyukkaMeisaiEntity entity);
 
+    @Query("SELECT * FROM T_SYUKKA_MEISAI WHERE CONTAINER_ID = :containerId")
+    List<SyukkaMeisaiEntity> findByContainerId(int containerId);
+
+    @Query("DELETE FROM T_SYUKKA_MEISAI WHERE CONTAINER_ID IS NOT NULL AND EXISTS(" +
+            "SELECT 1 FROM T_SYUKKA_CONTAINER WHERE T_SYUKKA_CONTAINER.CONTAINER_ID = T_SYUKKA_MEISAI.CONTAINER_ID " +
+            "AND T_SYUKKA_CONTAINER.DATA_SEND_YMDHMS IS NOT NULL)")
+    void deleteSentLinked();
+
     @Query("DELETE FROM T_SYUKKA_MEISAI")
     void deleteAll();
 

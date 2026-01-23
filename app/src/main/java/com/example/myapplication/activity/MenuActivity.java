@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
+import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.connector.SvcHandyRepository;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.model.BunningData;
@@ -154,10 +155,10 @@ public class MenuActivity extends BaseActivity {
     // ==============================
     private void wireActions() {
 
-        // 送信テスト
+        // データ送受信
         btnDataReceive.setOnClickListener(v -> {
-            setCenterStatus("送信テスト中...");
-            io.execute(this::sendSyukkaDataReal);
+            setCenterStatus("データ送受信中...");
+            io.execute(this::runDataSync);
         });
 
         // 画面遷移（タップ）
@@ -350,6 +351,18 @@ public class MenuActivity extends BaseActivity {
                 + " knaryoJyuryoSum=" + h.knaryoJyuryoSum
                 + " lastUpdYmdHms=" + (h.lastUpdYmdHms != null ? h.lastUpdYmdHms.toString() : "null")
         );
+    }
+
+    private void runDataSync() {
+        try {
+            DataSync sync = new DataSync(getApplicationContext());
+            sync.runSync();
+            runOnUiThread(() -> setCenterStatus("データ送受信完了"));
+        } catch (Exception ex) {
+            Log.e(TAG, "DataSync failed", ex);
+            String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
+            runOnUiThread(() -> setCenterStatus("NG " + msg));
+        }
     }
 
     @Override

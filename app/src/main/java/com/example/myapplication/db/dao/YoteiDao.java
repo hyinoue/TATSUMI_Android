@@ -15,6 +15,12 @@ public interface YoteiDao {
     @Query("SELECT * FROM T_YOTEI")
     List<YoteiEntity> findAll();
 
+    @Query("SELECT * FROM T_YOTEI LIMIT 1")
+    YoteiEntity findFirst();
+
+    @Query("SELECT * FROM T_YOTEI WHERE LAST_UPD_YMDHMS IS NULL")
+    List<YoteiEntity> findWithNullLastUpd();
+
     @Query("SELECT * FROM T_YOTEI WHERE BOOKING_NO = :bookingNo")
     YoteiEntity findByBookingNo(String bookingNo);
 

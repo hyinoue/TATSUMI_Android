@@ -15,11 +15,20 @@ public class KakuninMeisaiEntity {
     @ColumnInfo(name = "SOKUBAN")
     public String sokuban;
 
-    @ColumnInfo(name = "BOOKING_NO")
-    public String bookingNo;
+    @ColumnInfo(name = "SYUKKA_SASHIZU_NO")
+    public String syukkaSashizuNo;
+
+    @ColumnInfo(name = "BUNDLE_NO")
+    public String bundleNo;
+
+    @ColumnInfo(name = "JYURYO")
+    public Integer jyuryo;
 
     @ColumnInfo(name = "CONTAINER_ID")
-    public Integer containerId;
+    public String containerId;
+
+    @ColumnInfo(name = "CONTAINER_SYOUGO_KAKUNIN")
+    public Boolean containerSyougoKakunin; // BIT→INTEGER
 
     @ColumnInfo(name = "KAKUNIN_CONTAINER_ID")
     public Integer kakuninContainerId;

@@ -158,7 +158,6 @@
                     android:background="@drawable/bg_menu_count"
                     android:gravity="end|center_vertical"
                     android:paddingEnd="8dp"
-                    android:text="2200"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -198,7 +197,6 @@
                     android:gravity="end|center_vertical"
                     android:inputType="number"
                     android:paddingEnd="8dp"
-                    android:text="32"
                     android:textSize="14sp" />
 
                 <TextView
@@ -236,7 +234,6 @@
                     android:background="@drawable/bg_menu_count"
                     android:gravity="end|center_vertical"
                     android:paddingEnd="8dp"
-                    android:text="12"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -275,7 +272,6 @@
                     android:background="@drawable/bg_menu_count"
                     android:gravity="end|center_vertical"
                     android:paddingEnd="8dp"
-                    android:text="12"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -314,7 +310,6 @@
                     android:background="@drawable/bg_menu_count"
                     android:gravity="end|center_vertical"
                     android:paddingEnd="8dp"
-                    android:text="23,646"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -471,7 +466,6 @@
                     android:background="@drawable/bg_menu_count"
                     android:gravity="end|center_vertical"
                     android:paddingEnd="8dp"
-                    android:text="354"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 

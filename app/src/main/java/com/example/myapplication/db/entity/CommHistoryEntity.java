@@ -17,6 +17,9 @@ public class CommHistoryEntity {
     @ColumnInfo(name = "COMM_RESULT")
     public Integer commResult;
 
+    @ColumnInfo(name = "START_YMDHMS")
+    public String startYmdhms;
+
     @ColumnInfo(name = "INSERT_PROC_NAME")
     public String insertProcName;
 

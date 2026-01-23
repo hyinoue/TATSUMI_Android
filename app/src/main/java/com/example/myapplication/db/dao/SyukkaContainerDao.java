@@ -21,6 +21,15 @@ public interface SyukkaContainerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(SyukkaContainerEntity entity);
 
+    @Query("SELECT * FROM T_SYUKKA_CONTAINER WHERE DATA_SEND_YMDHMS IS NULL ORDER BY CONTAINER_ID")
+    List<SyukkaContainerEntity> findUnsent();
+
+    @Query("UPDATE T_SYUKKA_CONTAINER SET DATA_SEND_YMDHMS = :dataSendYmdhms WHERE CONTAINER_ID = :containerId")
+    int markSent(int containerId, String dataSendYmdhms);
+
+    @Query("DELETE FROM T_SYUKKA_CONTAINER WHERE DATA_SEND_YMDHMS IS NOT NULL")
+    void deleteSent();
+
     @Query("DELETE FROM T_SYUKKA_CONTAINER")
     void deleteAll();
 }

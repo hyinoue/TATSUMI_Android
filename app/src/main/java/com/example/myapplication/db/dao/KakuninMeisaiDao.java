@@ -15,8 +15,8 @@ public interface KakuninMeisaiDao {
     @Query("SELECT * FROM T_KAKUNIN_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
     KakuninMeisaiEntity findOne(String heatNo, String sokuban);
 
-    @Query("SELECT * FROM T_KAKUNIN_MEISAI WHERE BOOKING_NO = :bookingNo")
-    List<KakuninMeisaiEntity> findByBookingNo(String bookingNo);
+    @Query("SELECT * FROM T_KAKUNIN_MEISAI WHERE CONTAINER_ID = :containerId")
+    List<KakuninMeisaiEntity> findByContainerId(String containerId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(KakuninMeisaiEntity entity);

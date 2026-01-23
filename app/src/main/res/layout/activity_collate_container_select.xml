@@ -50,8 +50,7 @@
                 android:background="@drawable/bg_edittext_black_border"
                 android:gravity="end|center_vertical"
                 android:inputType="number"
-                android:paddingEnd="8dp"
-                android:text="2200" />
+                android:paddingEnd="8dp" />
         </LinearLayout>
 
         <!-- 2行目：現品番号 -->
