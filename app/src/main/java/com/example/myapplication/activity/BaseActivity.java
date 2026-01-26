@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -69,10 +71,18 @@ public class BaseActivity extends AppCompatActivity {
     private MaterialButton btnBottomGreen;
     private MaterialButton btnBottomYellow;
     private boolean bottomButtonsBound = false;
+    private boolean systemUiListenersAttached = false;
 
     @Override
     protected void onCreate(@Nullable android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        applyFullScreen();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         applyFullScreen();
     }
 
@@ -117,13 +127,52 @@ public class BaseActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         View decorView = getWindow().getDecorView();
+        applyImmersiveFlags(decorView);
+        hideSystemBars(decorView);
+        ensureSystemUiListeners(decorView);
+    }
+
+    private void applyImmersiveFlags(View decorView) {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        );
+    }
+
+    private void ensureSystemUiListeners(View decorView) {
+        if (systemUiListenersAttached) {
+            return;
+        }
+
+        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
+            if ((visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0
+                    || (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                applyFullScreen();
+            }
+        });
+
+        decorView.getViewTreeObserver().addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
+            applyImmersiveFlags(decorView);
+            hideSystemBars(decorView);
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(decorView, (view, insets) -> {
+            hideSystemBars(decorView);
+            return insets;
+        });
+
+        systemUiListenersAttached = true;
+    }
+
+    private void hideSystemBars(View decorView) {
         WindowInsetsControllerCompat controller =
                 WindowCompat.getInsetsController(getWindow(), decorView);
-
         if (controller != null) {
-            controller.hide(WindowInsetsCompat.Type.statusBars()
-                    | WindowInsetsCompat.Type.navigationBars());
-
+            controller.hide(WindowInsetsCompat.Type.systemBars());
             controller.setSystemBarsBehavior(
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             );

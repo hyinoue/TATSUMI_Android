@@ -16,6 +16,8 @@ import com.example.myapplication.R;
 import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.connector.SvcHandyRepository;
 import com.example.myapplication.db.AppDatabase;
+import com.example.myapplication.db.entity.SystemEntity;
+import com.example.myapplication.db.entity.YoteiEntity;
 import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
@@ -55,6 +57,19 @@ public class MenuActivity extends BaseActivity {
     private Button btnWeightCalc;
     private Button btnCollateContainerSelect;
 
+    private TextView lblDataReceiveTime;
+    private TextView lblDataReceive;
+    private TextView lblContainerInput;
+    private TextView lblContainerPlan;
+    private TextView lblContainerFin;
+    private TextView lblBundlePlan;
+    private TextView lblBundleFin;
+    private TextView lblWeightPlan;
+    private TextView lblWeightFin;
+    private TextView lblZanContainer;
+    private TextView lblZanBundle;
+    private TextView lblZanWeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,13 +98,18 @@ public class MenuActivity extends BaseActivity {
 
         // 画面内ボタン類のクリック
         wireActions();
+
+        if (btnDataReceive != null) {
+            btnDataReceive.requestFocus();
+        }
+
+        refreshInformation();
     }
 
     // ==============================
     // View取得
     // ==============================
     private void initViews() {
-        tvCenterStatus = findViewById(R.id.tvCenterStatus);
         spContainerSize = findViewById(R.id.spContainerSize);
 
         btnDataReceive = findViewById(R.id.btnDataReceive);
@@ -97,6 +117,19 @@ public class MenuActivity extends BaseActivity {
         btnContainerInput = findViewById(R.id.btnContainerInput);
         btnWeightCalc = findViewById(R.id.btnWeightCalc);
         btnCollateContainerSelect = findViewById(R.id.btnCollateContainerSelect);
+
+        lblDataReceiveTime = findViewById(R.id.lblDataReceiveTime);
+        lblDataReceive = findViewById(R.id.lblDataReceive);
+        lblContainerInput = findViewById(R.id.lblContainerInput);
+        lblContainerPlan = findViewById(R.id.lblContainerPlan);
+        lblContainerFin = findViewById(R.id.lblContainerFin);
+        lblBundlePlan = findViewById(R.id.lblBundlePlan);
+        lblBundleFin = findViewById(R.id.lblBundleFin);
+        lblWeightPlan = findViewById(R.id.lblWeightPlan);
+        lblWeightFin = findViewById(R.id.lblWeightFin);
+        lblZanContainer = findViewById(R.id.lblZanContainer);
+        lblZanBundle = findViewById(R.id.lblZanBundle);
+        lblZanWeight = findViewById(R.id.lblZanWeight);
     }
 
     // ==============================
@@ -157,14 +190,13 @@ public class MenuActivity extends BaseActivity {
 
         // データ送受信
         btnDataReceive.setOnClickListener(v -> {
-            setCenterStatus("データ送受信中...");
-            io.execute(this::runDataSync);
+            startDataSync();
         });
 
         // 画面遷移（タップ）
-        btnBundleSelect.setOnClickListener(v -> goBundleSelect());
+        btnBundleSelect.setOnClickListener(v -> goBundleSelect(BundleSelectActivity.MODE_NORMAL));
         btnContainerInput.setOnClickListener(v -> goContainerInput());
-        btnWeightCalc.setOnClickListener(v -> goBundleSelect());
+        btnWeightCalc.setOnClickListener(v -> goBundleSelect(BundleSelectActivity.MODE_JYURYO));
         btnCollateContainerSelect.setOnClickListener(v -> goCollateContainerSelect());
     }
 
@@ -180,6 +212,12 @@ public class MenuActivity extends BaseActivity {
         recreate();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshInformation();
+    }
+
     // ==============================
     // 画面遷移（共通メソッド化）
     // ==============================
@@ -187,8 +225,10 @@ public class MenuActivity extends BaseActivity {
         startActivity(new Intent(this, ServiceMenuActivity.class));
     }
 
-    private void goBundleSelect() {
-        startActivity(new Intent(this, BundleSelectActivity.class));
+    private void goBundleSelect(String mode) {
+        Intent intent = new Intent(this, BundleSelectActivity.class);
+        intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
+        startActivity(intent);
     }
 
     private void goContainerInput() {
@@ -218,8 +258,12 @@ public class MenuActivity extends BaseActivity {
                 goServiceMenu();
                 return true;
 
+            case KeyEvent.KEYCODE_1:
+                startDataSync();
+                return true;
+
             case KeyEvent.KEYCODE_2:
-                goBundleSelect();
+                goBundleSelect(BundleSelectActivity.MODE_NORMAL);
                 return true;
 
             case KeyEvent.KEYCODE_3:
@@ -227,7 +271,7 @@ public class MenuActivity extends BaseActivity {
                 return true;
 
             case KeyEvent.KEYCODE_4:
-                goBundleSelect();
+                goBundleSelect(BundleSelectActivity.MODE_JYURYO);
                 return true;
 
             case KeyEvent.KEYCODE_5:
@@ -249,6 +293,11 @@ public class MenuActivity extends BaseActivity {
     // ===========================================================
     private void setCenterStatus(String text) {
         if (tvCenterStatus != null) tvCenterStatus.setText(text);
+    }
+
+    private void startDataSync() {
+        setCenterStatus("データ送受信中...");
+        io.execute(this::runDataSync);
     }
 
     /**
@@ -354,15 +403,133 @@ public class MenuActivity extends BaseActivity {
     }
 
     private void runDataSync() {
+        showLoadingLong();
         try {
             DataSync sync = new DataSync(getApplicationContext());
             sync.runSync();
-            runOnUiThread(() -> setCenterStatus("データ送受信完了"));
+            runOnUiThread(() -> {
+                setCenterStatus("データ送受信完了");
+                showInfoMsg("データ送受信完了", MsgDispMode.Label);
+            });
+            refreshInformation();
         } catch (Exception ex) {
             Log.e(TAG, "DataSync failed", ex);
             String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
             runOnUiThread(() -> setCenterStatus("NG " + msg));
+        } finally {
+            hideLoadingLong();
         }
+    }
+
+    private void refreshInformation() {
+        io.execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+            SystemEntity system = db.systemDao().findById(1);
+            String dataRecv = (system != null) ? system.dataRecvYmdhms : null;
+
+            boolean hasUnsentSyukka = !db.syukkaContainerDao().findUnsent().isEmpty();
+            boolean hasUnsentKakunin = false;
+            if (!hasUnsentSyukka) {
+                hasUnsentKakunin = !db.kakuninContainerDao().findUnsentCompleted().isEmpty();
+            }
+
+            boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
+            List<YoteiEntity> yoteiRows = db.yoteiDao().findAll();
+
+            long kanryoContainer = 0;
+            long kanryoBundole = 0;
+            long kanryoJyuryo = 0;
+            long containerCount = 0;
+            long goukeiBundole = 0;
+            long goukeiJyuryo = 0;
+
+            for (YoteiEntity row : yoteiRows) {
+                kanryoContainer += intOrZero(row.kanryoContainer);
+                kanryoBundole += intOrZero(row.kanryoBundole);
+                kanryoJyuryo += intOrZero(row.kanryoJyuryo);
+                containerCount += intOrZero(row.containerCount);
+                goukeiBundole += intOrZero(row.goukeiBundole);
+                goukeiJyuryo += intOrZero(row.goukeiJyuryo);
+            }
+
+            long kanryoJyuryoTon = Math.round(kanryoJyuryo / 1000.0);
+            long goukeiJyuryoTon = Math.round(goukeiJyuryo / 1000.0);
+
+            long zanContainer = containerCount - kanryoContainer;
+            long zanBundle = goukeiBundole - kanryoBundole;
+            long zanWeight = goukeiJyuryoTon - kanryoJyuryoTon;
+
+            final String recvText = (dataRecv == null || dataRecv.trim().isEmpty())
+                    ? "----/--/-- --:--"
+                    : dataRecv;
+
+            final boolean showUnsent = hasUnsentSyukka || hasUnsentKakunin;
+            final boolean hasWorkFinal = hasWork;
+            final long kanryoContainerFinal = kanryoContainer;
+            final long kanryoBundoleFinal = kanryoBundole;
+            final long kanryoJyuryoTonFinal = kanryoJyuryoTon;
+            final long containerCountFinal = containerCount;
+            final long goukeiBundoleFinal = goukeiBundole;
+            final long goukeiJyuryoTonFinal = goukeiJyuryoTon;
+            final long zanContainerFinal = zanContainer;
+            final long zanBundleFinal = zanBundle;
+            final long zanWeightFinal = zanWeight;
+
+            runOnUiThread(() -> {
+                if (lblDataReceiveTime != null) {
+                    lblDataReceiveTime.setText("最終受信　" + recvText);
+                }
+                if (lblDataReceive != null) {
+                    lblDataReceive.setVisibility(showUnsent ? View.VISIBLE : View.INVISIBLE);
+                }
+                if (lblContainerInput != null) {
+                    lblContainerInput.setVisibility(hasWorkFinal ? View.VISIBLE : View.INVISIBLE);
+                }
+
+                if (lblContainerFin != null) {
+                    lblContainerFin.setText(formatNumber(kanryoContainerFinal));
+                }
+                if (lblBundleFin != null) {
+                    lblBundleFin.setText(formatNumber(kanryoBundoleFinal));
+                }
+                if (lblWeightFin != null) {
+                    lblWeightFin.setText(formatNumber(kanryoJyuryoTonFinal));
+                }
+                if (lblContainerPlan != null) {
+                    lblContainerPlan.setText(formatNumber(containerCountFinal));
+                }
+                if (lblBundlePlan != null) {
+                    lblBundlePlan.setText(formatNumber(goukeiBundoleFinal));
+                }
+                if (lblWeightPlan != null) {
+                    lblWeightPlan.setText(formatNumber(goukeiJyuryoTonFinal));
+                }
+                if (lblZanContainer != null) {
+                    lblZanContainer.setText(formatRemaining(zanContainerFinal));
+                }
+                if (lblZanBundle != null) {
+                    lblZanBundle.setText(formatRemaining(zanBundleFinal));
+                }
+                if (lblZanWeight != null) {
+                    lblZanWeight.setText(formatRemaining(zanWeightFinal));
+                }
+            });
+        });
+    }
+
+    private String formatNumber(long value) {
+        return String.format(Locale.JAPAN, "%,d", value);
+    }
+
+    private String formatRemaining(long value) {
+        if (value == 0) {
+            return "";
+        }
+        return formatNumber(value);
+    }
+
+    private int intOrZero(Integer value) {
+        return value == null ? 0 : value;
     }
 
     @Override

@@ -22,7 +22,7 @@
             android:layout_marginStart="10dp"
             android:text="コンテナ情報入力"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:gravity="center_vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

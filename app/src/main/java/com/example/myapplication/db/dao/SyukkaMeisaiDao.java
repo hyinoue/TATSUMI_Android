@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RoomWarnings;
 
 import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 
@@ -21,8 +22,21 @@ public interface SyukkaMeisaiDao {
     @Query("UPDATE T_SYUKKA_MEISAI SET BUNDLE_NO = :bundleNo WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
     int updateBundleNo(String heatNo, String sokuban, String bundleNo);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void upsert(SyukkaMeisaiEntity entity);
+    @Query("UPDATE T_SYUKKA_MEISAI " +
+            "SET SYUKKA_SASHIZU_NO = :syukkaSashizuNo, " +
+            "BUNDLE_NO = :bundleNo, " +
+            "JYURYO = :jyuryo, " +
+            "BOOKING_NO = :bookingNo " +
+            "WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
+    int updateFromReceive(String heatNo,
+                          String sokuban,
+                          String syukkaSashizuNo,
+                          String bundleNo,
+                          Integer jyuryo,
+                          String bookingNo);
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    void insert(SyukkaMeisaiEntity entity);
 
     @Query("SELECT * FROM T_SYUKKA_MEISAI WHERE CONTAINER_ID = :containerId")
     List<SyukkaMeisaiEntity> findByContainerId(int containerId);
@@ -38,18 +52,25 @@ public interface SyukkaMeisaiDao {
     // ========= Controller用 =========
 
     // 存在チェック用（CheckBundleで使う）
-    @Query("SELECT HEAT_NO, SOKUBAN, JYURYO, CONTAINER_ID, BOOKING_NO " +
-            "FROM T_SYUKKA_MEISAI " +
-            "WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban " +
-            "LIMIT 1")
+    @Query(
+            "SELECT HEAT_NO, SOKUBAN, JYURYO, CONTAINER_ID, BOOKING_NO " +
+                    "FROM T_SYUKKA_MEISAI " +
+                    "WHERE trim(HEAT_NO) = trim(:heatNo) " +
+                    "AND trim(SOKUBAN) = trim(:sokuban) " +
+                    "LIMIT 1"
+    )
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     SyukkaMeisaiEntity findOneForCheck(String heatNo, String sokuban);
 
+
     // AddBundle用（CONTAINER_ID IS NULL 条件）
-    @Query("SELECT HEAT_NO, SOKUBAN, SYUKKA_SASHIZU_NO, BUNDLE_NO, JYURYO, BOOKING_NO, CONTAINER_ID " +
-            "FROM T_SYUKKA_MEISAI " +
-            "WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban AND CONTAINER_ID IS NULL " +
-            "LIMIT 1")
+    @Query(
+            "SELECT * FROM T_SYUKKA_MEISAI " +
+                    "WHERE trim(HEAT_NO) = trim(:heatNo) " +
+                    "AND trim(SOKUBAN) = trim(:sokuban)"
+    )
     SyukkaMeisaiEntity findOneForAdd(String heatNo, String sokuban);
+
 
     // AddBundleNo用（BUNDLE_NOが空の時だけ更新）
     @Query("UPDATE T_SYUKKA_MEISAI SET BUNDLE_NO = :bundleNo " +

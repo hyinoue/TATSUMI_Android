@@ -23,7 +23,7 @@
             android:layout_marginStart="10dp"
             android:text="サービスメニュー"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

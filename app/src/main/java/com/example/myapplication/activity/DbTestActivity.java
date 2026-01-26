@@ -1,14 +1,15 @@
 package com.example.myapplication.activity;
 
+import android.app.AlertDialog;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,7 +20,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.evrencoskun.tableview.TableView;
 import com.evrencoskun.tableview.adapter.AbstractTableAdapter;
 import com.evrencoskun.tableview.adapter.recyclerview.holder.AbstractViewHolder;
-import com.evrencoskun.tableview.listener.ITableViewListener;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 
@@ -30,8 +30,6 @@ import java.util.concurrent.Executors;
 
 public class DbTestActivity extends BaseActivity {
 
-    private static final String TAG = "DbTestActivity";
-
     private Spinner spTables;
     private TableView tableView;
 
@@ -39,8 +37,6 @@ public class DbTestActivity extends BaseActivity {
     private ExecutorService executor;
 
     private MyTableAdapter tableAdapter;
-
-    // 画面遷移時クラッシュ予防（UI更新ガード）
     private volatile boolean isAlive = false;
 
     @Override
@@ -49,8 +45,6 @@ public class DbTestActivity extends BaseActivity {
         setContentView(R.layout.activity_db_test);
 
         isAlive = true;
-
-        Log.e(TAG, "DbTestActivity onCreate: " + getClass().getName());
 
         spTables = findViewById(R.id.spContainerSize);
         tableView = findViewById(R.id.tableView);
@@ -61,68 +55,6 @@ public class DbTestActivity extends BaseActivity {
         tableAdapter = new MyTableAdapter();
         tableView.setAdapter(tableAdapter);
 
-        // ★クリックは TableViewListener で取る（安定）
-        tableView.setTableViewListener(new ITableViewListener() {
-
-            // -------------------------
-            // 必須：Cell click / double click
-            // -------------------------
-            @Override
-            public void onCellClicked(RecyclerView.ViewHolder cellView, int columnPosition, int rowPosition) {
-                // 1列目タップ → 行選択（青ハイライトは1列目除外は adapter 側で反映）
-                if (columnPosition == 0) {
-                    tableAdapter.selectRow(rowPosition);
-                } else {
-                    tableAdapter.selectCell(rowPosition, columnPosition);
-                }
-            }
-
-            @Override
-            public void onCellDoubleClicked(RecyclerView.ViewHolder cellView, int columnPosition, int rowPosition) {
-                // ダブルクリックは同じ動作でOK（不要なら何もしないでも可）
-                if (columnPosition == 0) {
-                    tableAdapter.selectRow(rowPosition);
-                } else {
-                    tableAdapter.selectCell(rowPosition, columnPosition);
-                }
-            }
-
-            @Override
-            public void onCellLongPressed(RecyclerView.ViewHolder cellView, int columnPosition, int rowPosition) {
-                // 使わないなら空でOK
-            }
-
-            // -------------------------
-            // Column header
-            // -------------------------
-            @Override
-            public void onColumnHeaderClicked(RecyclerView.ViewHolder columnHeaderView, int columnPosition) {
-            }
-
-            @Override
-            public void onColumnHeaderDoubleClicked(RecyclerView.ViewHolder columnHeaderView, int columnPosition) {
-            }
-
-            @Override
-            public void onColumnHeaderLongPressed(RecyclerView.ViewHolder columnHeaderView, int columnPosition) {
-            }
-
-            // -------------------------
-            // Row header
-            // -------------------------
-            @Override
-            public void onRowHeaderClicked(RecyclerView.ViewHolder rowHeaderView, int rowPosition) {
-            }
-
-            @Override
-            public void onRowHeaderDoubleClicked(RecyclerView.ViewHolder rowHeaderView, int rowPosition) {
-            }
-
-            @Override
-            public void onRowHeaderLongPressed(RecyclerView.ViewHolder rowHeaderView, int rowPosition) {
-            }
-        });
-
         roomDb = AppDatabase.getInstance(this);
         executor = Executors.newSingleThreadExecutor();
 
@@ -130,9 +62,8 @@ public class DbTestActivity extends BaseActivity {
 
         spTables.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
-                String tableName = (String) parent.getItemAtPosition(position);
-                loadTableData(tableName);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                loadTableData((String) parent.getItemAtPosition(position));
             }
 
             @Override
@@ -144,103 +75,66 @@ public class DbTestActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         isAlive = false;
-        if (executor != null) {
-            executor.shutdownNow();
-            executor = null;
-        }
+        if (executor != null) executor.shutdownNow();
         super.onDestroy();
     }
 
+    // =============================================================================================
+    // DB
+    // =============================================================================================
+
     private void loadTableNames() {
         executor.execute(() -> {
-            List<String> tables;
-            try {
-                tables = getTableNames(roomDb);
-            } catch (Exception e) {
-                Log.e(TAG, "getTableNames failed", e);
-                tables = new ArrayList<>();
+            List<String> list = new ArrayList<>();
+            SupportSQLiteDatabase db = roomDb.getOpenHelper().getReadableDatabase();
+
+            try (Cursor c = db.query(
+                    "SELECT name FROM sqlite_master " +
+                            "WHERE type='table' " +
+                            "AND name NOT LIKE 'sqlite_%' " +
+                            "ORDER BY name ASC"
+            )) {
+                while (c.moveToNext()) list.add(c.getString(0));
             }
 
-            List<String> finalTables = tables;
             runOnUiThread(() -> {
                 if (!isAlive || isFinishing() || isDestroyed()) return;
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                        this,
-                        android.R.layout.simple_spinner_item,
-                        finalTables
-                );
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spTables.setAdapter(adapter);
+                ArrayAdapter<String> ad = new ArrayAdapter<>(
+                        this, android.R.layout.simple_spinner_item, list);
+                ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spTables.setAdapter(ad);
             });
         });
     }
 
-    private void loadTableData(String tableName) {
+    private void loadTableData(String table) {
         executor.execute(() -> {
-            TableData tableData;
-            try {
-                tableData = selectAllAsTable(roomDb, tableName);
-            } catch (Exception e) {
-                Log.e(TAG, "selectAll failed: " + tableName, e);
-                tableData = new TableData(new ArrayList<>(), new ArrayList<>());
+            List<String> cols = new ArrayList<>();
+            List<List<String>> rows = new ArrayList<>();
+
+            SupportSQLiteDatabase db = roomDb.getOpenHelper().getReadableDatabase();
+            try (Cursor c = db.query("SELECT * FROM " + table)) {
+                for (String s : c.getColumnNames()) cols.add(s);
+
+                while (c.moveToNext()) {
+                    List<String> r = new ArrayList<>();
+                    for (int i = 0; i < cols.size(); i++) {
+                        r.add(c.isNull(i) ? "NULL" : c.getString(i));
+                    }
+                    rows.add(r);
+                }
             }
 
-            TableData finalData = tableData;
             runOnUiThread(() -> {
                 if (!isAlive || isFinishing() || isDestroyed()) return;
-                tableAdapter.setTable(finalData.columns, finalData.rows);
+                tableAdapter.setTable(cols, rows);
             });
         });
-    }
-
-    private List<String> getTableNames(AppDatabase db) {
-        List<String> list = new ArrayList<>();
-        SupportSQLiteDatabase sdb = db.getOpenHelper().getReadableDatabase();
-
-        try (Cursor c = sdb.query(
-                "SELECT name FROM sqlite_master " +
-                        "WHERE type='table' " +
-                        "AND name NOT LIKE 'sqlite_%' " +
-                        "ORDER BY name"
-        )) {
-            while (c.moveToNext()) list.add(c.getString(0));
-        }
-        return list;
-    }
-
-    private TableData selectAllAsTable(AppDatabase db, String tableName) {
-        List<String> columns = new ArrayList<>();
-        List<List<String>> rows = new ArrayList<>();
-        SupportSQLiteDatabase sdb = db.getOpenHelper().getReadableDatabase();
-
-        try (Cursor c = sdb.query("SELECT * FROM " + tableName)) {
-            String[] colArray = c.getColumnNames();
-            for (String col : colArray) columns.add(col);
-
-            while (c.moveToNext()) {
-                List<String> row = new ArrayList<>();
-                for (int i = 0; i < colArray.length; i++) {
-                    row.add(c.isNull(i) ? "NULL" : c.getString(i));
-                }
-                rows.add(row);
-            }
-        }
-        return new TableData(columns, rows);
-    }
-
-    private static class TableData {
-        final List<String> columns;
-        final List<List<String>> rows;
-
-        TableData(List<String> columns, List<List<String>> rows) {
-            this.columns = columns;
-            this.rows = rows;
-        }
     }
 
     // =============================================================================================
-    // TableView adapter（新規ファイルなし）
+    // TableView Adapter
     // =============================================================================================
 
     private static class Col {
@@ -269,179 +163,151 @@ public class DbTestActivity extends BaseActivity {
 
     private class MyTableAdapter extends AbstractTableAdapter<Col, Row, Cell> {
 
-        // 色
-        private final int headerColor = 0xFFC5B8FF;   // 列ヘッダ
-        private final int firstRowColor = 0xFFC5B8FF; // 1行目
-        private final int selectBlue = 0xFF3399FF;    // 選択
-
-        // サイズ
-        private final int defaultColWidthDp = 120;
+        // 見た目
+        private final int headerColor = 0xFFC5B8FF;
         private final int rowHeaderWidthDp = 48;
+        private final int textSp = 11;
 
-        // 高さ（ここで調整）
-        private final int headerHeightDp = 22; // 列名
-        private final int rowHeightDp = 28;    // セル
-
-        // 列幅（px）
+        // 列幅（px）自動調整
         private final List<Integer> colWidthsPx = new ArrayList<>();
 
-        // 選択状態（行選択：selectedCol=-1、セル選択：>=0）
-        private int selectedRow = -1;
-        private int selectedCol = -1;
+        // データ保持（全文表示 & 列幅計算）
+        private final List<String> currentColumns = new ArrayList<>();
+        private final List<List<String>> currentRows = new ArrayList<>();
 
-        private class TVH extends AbstractViewHolder {
+        private int dp(int v) {
+            return (int) (v * getResources().getDisplayMetrics().density);
+        }
+
+        private String norm(String s) {
+            if (s == null) return "";
+            return s.replace("\n", " ").replace("\r", " ");
+        }
+
+        // ---------------- Column Header ----------------
+
+        private class HeaderVH extends AbstractViewHolder {
+            final FrameLayout root;
             final TextView tv;
 
-            TVH(TextView itemView) {
-                super(itemView);
-                tv = itemView;
+            HeaderVH(FrameLayout r, TextView t) {
+                super(r);
+                root = r;
+                tv = t;
             }
         }
 
-        private int dpToPx(int dp) {
-            return (int) (dp * getResources().getDisplayMetrics().density);
-        }
-
-        private TextView newCellTextView(int minWidthDp, boolean bold) {
-            TextView tv = new TextView(DbTestActivity.this);
-            tv.setMinWidth(dpToPx(minWidthDp));
-            tv.setSingleLine(true);
-            tv.setEllipsize(TextUtils.TruncateAt.END);
-            tv.setIncludeFontPadding(false);
-            tv.setPadding(dpToPx(6), 0, dpToPx(6), 0);
-            tv.setTextColor(0xFF000000);
-            tv.setGravity(Gravity.CENTER_VERTICAL);
-
-            int h = dpToPx(rowHeightDp);
-            tv.setMinHeight(h);
-            tv.setHeight(h);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-
-            if (bold) tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
-
-            tv.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            return tv;
-        }
-
-        private TextView newHeaderTextView(int minWidthDp, boolean bold) {
-            TextView tv = new TextView(DbTestActivity.this);
-            tv.setMinWidth(dpToPx(minWidthDp));
-            tv.setSingleLine(true);
-            tv.setEllipsize(TextUtils.TruncateAt.END);
-            tv.setIncludeFontPadding(false);
-            tv.setPadding(dpToPx(6), 0, dpToPx(6), 0);
-            tv.setTextColor(0xFF000000);
-            tv.setGravity(Gravity.CENTER_VERTICAL);
-
-            int h = dpToPx(headerHeightDp);
-            tv.setMinHeight(h);
-            tv.setHeight(h);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-
-            if (bold) tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
-
-            tv.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            return tv;
-        }
-
-        // Activityから呼ぶ：行選択
-        void selectRow(int rowPosition) {
-            selectedRow = rowPosition;
-            selectedCol = -1;
-            notifyDataSetChanged();
-        }
-
-        // Activityから呼ぶ：セル選択
-        void selectCell(int rowPosition, int columnPosition) {
-            selectedRow = rowPosition;
-            selectedCol = columnPosition;
-            notifyDataSetChanged();
-        }
-
-        // Column Header
         @Override
         public AbstractViewHolder onCreateColumnHeaderViewHolder(ViewGroup parent, int viewType) {
-            TextView tv = newHeaderTextView(defaultColWidthDp, true);
-            tv.setBackgroundColor(headerColor);
-            return new TVH(tv);
+            FrameLayout root = new FrameLayout(DbTestActivity.this);
+            root.setBackgroundColor(headerColor);
+            root.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+
+            TextView tv = new TextView(DbTestActivity.this);
+            FrameLayout.LayoutParams tvLp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
+            tvLp.gravity = Gravity.CENTER;
+            tv.setLayoutParams(tvLp);
+
+            tv.setTextColor(0xFF000000);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
+
+            // 列幅を広げるので省略は不要
+            tv.setSingleLine(true);
+            tv.setEllipsize(null);
+
+            tv.setGravity(Gravity.CENTER);
+            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+
+            root.addView(tv);
+            return new HeaderVH(root, tv);
         }
 
         @Override
         public void onBindColumnHeaderViewHolder(AbstractViewHolder holder, Col columnHeader, int columnPosition) {
-            TextView tv = ((TVH) holder).tv;
-            tv.setText(columnHeader.v);
+            HeaderVH h = (HeaderVH) holder;
+            h.tv.setText(columnHeader.v);
 
-            ViewGroup.LayoutParams lp = tv.getLayoutParams();
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) h.root.getLayoutParams();
             lp.width = getColWidthPx(columnPosition);
-            tv.setLayoutParams(lp);
+            h.root.setLayoutParams(lp);
         }
 
-        // Row Header（行番号）
+        // ---------------- Row Header ----------------
+
         @Override
         public AbstractViewHolder onCreateRowHeaderViewHolder(ViewGroup parent, int viewType) {
-            TextView tv = newCellTextView(rowHeaderWidthDp, true);
-            tv.setBackgroundResource(R.drawable.bg_menu_count);
-            return new TVH(tv);
+            TextView tv = new TextView(DbTestActivity.this);
+            tv.setTextColor(0xFF000000);
+            tv.setGravity(Gravity.CENTER);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+
+            tv.setLayoutParams(new RecyclerView.LayoutParams(
+                    dp(rowHeaderWidthDp),
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            return new AbstractViewHolder(tv) {
+            };
         }
 
         @Override
         public void onBindRowHeaderViewHolder(AbstractViewHolder holder, Row rowHeader, int rowPosition) {
-            TextView tv = ((TVH) holder).tv;
+            TextView tv = (TextView) holder.itemView;
             tv.setText(rowHeader.v);
-
-            boolean isRowSelected = (selectedRow == rowPosition && selectedCol == -1);
-            if (isRowSelected) tv.setBackgroundColor(selectBlue);
-            else tv.setBackgroundResource(R.drawable.bg_menu_count);
         }
 
-        // Cell
+        // ---------------- Cell ----------------
+
         @Override
         public AbstractViewHolder onCreateCellViewHolder(ViewGroup parent, int viewType) {
-            TextView tv = newCellTextView(defaultColWidthDp, false);
-            tv.setBackgroundResource(R.drawable.bg_edittext_black_border);
-            return new TVH(tv);
+            TextView tv = new TextView(DbTestActivity.this);
+            tv.setTextColor(0xFF000000);
+
+            // 列幅を広げるので省略は不要
+            tv.setSingleLine(true);
+            tv.setEllipsize(null);
+
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            tv.setGravity(Gravity.CENTER_VERTICAL);
+            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+
+            tv.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            return new AbstractViewHolder(tv) {
+            };
         }
 
         @Override
         public void onBindCellViewHolder(AbstractViewHolder holder, Cell cell, int columnPosition, int rowPosition) {
-            TextView tv = ((TVH) holder).tv;
-            tv.setText(cell.v);
+            TextView tv = (TextView) holder.itemView;
 
-            ViewGroup.LayoutParams lp = tv.getLayoutParams();
+            tv.setText(norm(cell.v));
+
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) tv.getLayoutParams();
             lp.width = getColWidthPx(columnPosition);
             tv.setLayoutParams(lp);
-
-            boolean isFirstColumn = (columnPosition == 0);
-
-            boolean isCellSelected = (selectedRow == rowPosition && selectedCol == columnPosition);
-            boolean isRowSelected = (selectedRow == rowPosition && selectedCol == -1);
-
-            // 要件：
-            // ・行選択青：1列目除外
-            // ・セル選択青：1列目除外
-            if (!isFirstColumn && isCellSelected) {
-                tv.setBackgroundColor(selectBlue);
-            } else if (!isFirstColumn && isRowSelected) {
-                tv.setBackgroundColor(selectBlue);
-            } else if (rowPosition == 0) {
-                tv.setBackgroundColor(firstRowColor);
-            } else {
-                tv.setBackgroundResource(R.drawable.bg_edittext_black_border);
-            }
         }
 
-        // Corner
+        // ---------------- Corner ----------------
+
         @Override
-        public android.view.View onCreateCornerView(ViewGroup parent) {
-            TextView tv = newHeaderTextView(rowHeaderWidthDp, false);
-            tv.setBackgroundColor(headerColor);
-            return tv;
+        public View onCreateCornerView(ViewGroup parent) {
+            FrameLayout root = new FrameLayout(DbTestActivity.this);
+            root.setBackgroundColor(headerColor);
+            root.setLayoutParams(new RecyclerView.LayoutParams(
+                    dp(rowHeaderWidthDp),
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            return root;
         }
 
         @Override
@@ -459,37 +325,99 @@ public class DbTestActivity extends BaseActivity {
             return 0;
         }
 
-        void setTable(List<String> columns, List<List<String>> rows) {
-            selectedRow = -1;
-            selectedCol = -1;
+        // ---------------- Data ----------------
 
-            colWidthsPx.clear();
-            int w = dpToPx(defaultColWidthDp);
-            for (int i = 0; i < columns.size(); i++) colWidthsPx.add(w);
+        void showFullTextDialogIfNeeded(int rowPosition, int columnPosition) {
+            if (rowPosition < 0 || columnPosition < 0) return;
+            if (rowPosition >= currentRows.size()) return;
+            List<String> row = currentRows.get(rowPosition);
+            if (columnPosition >= row.size()) return;
 
-            List<Col> colHeaders = new ArrayList<>();
-            for (String c : columns) colHeaders.add(new Col(c));
+            String value = row.get(columnPosition);
+            if (value == null) value = "";
 
-            List<Row> rowHeaders = new ArrayList<>();
-            for (int r = 0; r < rows.size(); r++) rowHeaders.add(new Row(String.valueOf(r + 1)));
+            if (value.length() <= 12) return;
 
-            List<List<Cell>> cellItems = new ArrayList<>();
-            for (List<String> row : rows) {
+            String title = (columnPosition < currentColumns.size()) ? currentColumns.get(columnPosition) : "Cell";
+
+            new AlertDialog.Builder(DbTestActivity.this)
+                    .setTitle(title + " (Row " + (rowPosition + 1) + ")")
+                    .setMessage(value)
+                    .setPositiveButton("OK", null)
+                    .show();
+        }
+
+        void setTable(List<String> cols, List<List<String>> data) {
+            currentColumns.clear();
+            currentRows.clear();
+            currentColumns.addAll(cols);
+            currentRows.addAll(data);
+
+            autoAdjustColumnWidths();
+
+            List<Col> ch = new ArrayList<>();
+            for (String s : currentColumns) ch.add(new Col(s));
+
+            List<Row> rh = new ArrayList<>();
+            for (int i = 0; i < currentRows.size(); i++) rh.add(new Row(String.valueOf(i + 1)));
+
+            List<List<Cell>> ci = new ArrayList<>();
+            for (List<String> r : currentRows) {
                 List<Cell> one = new ArrayList<>();
-                for (int i = 0; i < columns.size(); i++) {
-                    String v = (i < row.size()) ? row.get(i) : "";
+                for (int i = 0; i < currentColumns.size(); i++) {
+                    String v = (i < r.size()) ? r.get(i) : "";
                     one.add(new Cell(v));
                 }
-                cellItems.add(one);
+                ci.add(one);
             }
 
-            setAllItems(colHeaders, rowHeaders, cellItems);
+            setAllItems(ch, rh, ci);
+        }
+
+        /**
+         * 列幅を「ヘッダ（太字） + セル（通常）」の最大文字幅に合わせて決める（上限なし）
+         * ★最後の1文字見切れ対策で safety を少し足す
+         */
+        private void autoAdjustColumnWidths() {
+            colWidthsPx.clear();
+
+            TextView headerMeasure = new TextView(DbTestActivity.this);
+            headerMeasure.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            headerMeasure.setTypeface(headerMeasure.getTypeface(), android.graphics.Typeface.BOLD);
+
+            TextView cellMeasure = new TextView(DbTestActivity.this);
+            cellMeasure.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+
+            int pad = dp(12);       // 左右padding相当
+            int min = dp(60);       // 最小幅
+            int safety = dp(4);     // ★見切れ防止の安全マージン（1文字欠け対策）
+
+            for (int c = 0; c < currentColumns.size(); c++) {
+                float w = 0f;
+
+                // ヘッダ（太字Paintで計測）
+                String header = norm(currentColumns.get(c));
+                w = Math.max(w, headerMeasure.getPaint().measureText(header));
+
+                // セル（通常Paintで計測）
+                for (List<String> r : currentRows) {
+                    if (c >= r.size()) continue;
+                    String v = norm(r.get(c));
+                    w = Math.max(w, cellMeasure.getPaint().measureText(v));
+                }
+
+                int wPx = (int) Math.ceil(w) + pad + safety;
+                if (wPx < min) wPx = min;
+
+                colWidthsPx.add(wPx);
+            }
         }
 
         private int getColWidthPx(int columnPosition) {
-            if (columnPosition >= 0 && columnPosition < colWidthsPx.size())
+            if (columnPosition >= 0 && columnPosition < colWidthsPx.size()) {
                 return colWidthsPx.get(columnPosition);
-            return dpToPx(defaultColWidthDp);
+            }
+            return dp(120);
         }
     }
 }

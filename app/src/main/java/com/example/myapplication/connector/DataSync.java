@@ -270,14 +270,26 @@ public class DataSync {
             }
 
             for (SyukkaMeisai bundle : data.meisai) {
-                SyukkaMeisaiEntity entity = new SyukkaMeisaiEntity();
-                entity.heatNo = bundle.heatNo;
-                entity.sokuban = bundle.sokuban;
-                entity.syukkaSashizuNo = bundle.syukkaSashizuNo;
-                entity.bundleNo = bundle.bundleNo;
-                entity.jyuryo = bundle.jyuryo;
-                entity.bookingNo = bundle.bookingNo;
-                syukkaMeisaiDao.upsert(entity);
+                SyukkaMeisaiEntity existing = syukkaMeisaiDao.findOne(bundle.heatNo, bundle.sokuban);
+                if (existing != null) {
+                    syukkaMeisaiDao.updateFromReceive(
+                            bundle.heatNo,
+                            bundle.sokuban,
+                            bundle.syukkaSashizuNo,
+                            bundle.bundleNo,
+                            bundle.jyuryo,
+                            bundle.bookingNo
+                    );
+                } else {
+                    SyukkaMeisaiEntity entity = new SyukkaMeisaiEntity();
+                    entity.heatNo = bundle.heatNo;
+                    entity.sokuban = bundle.sokuban;
+                    entity.syukkaSashizuNo = bundle.syukkaSashizuNo;
+                    entity.bundleNo = bundle.bundleNo;
+                    entity.jyuryo = bundle.jyuryo;
+                    entity.bookingNo = bundle.bookingNo;
+                    syukkaMeisaiDao.insert(entity);
+                }
             }
 
             String now = formatDbDate(new Date());

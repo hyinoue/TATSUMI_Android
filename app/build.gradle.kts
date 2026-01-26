@@ -52,6 +52,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.2")
     implementation("androidx.camera:camera-lifecycle:1.3.2")
     implementation("androidx.camera:camera-view:1.3.2")
+    implementation("androidx.core:core:1.13.1")
 
     //DBのroom
     implementation("androidx.room:room-runtime:2.6.1")

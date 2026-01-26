@@ -52,14 +52,24 @@ public final class BundleTableViewKit {
         private final TableView tableView;
         private final BundleSelectController controller;
         private final BundleTableAdapter adapter;
+        @Nullable
+        private final Runnable onRefreshed;
 
         public Binder(@NonNull Context context,
                       @NonNull TableView tableView,
                       @NonNull BundleSelectController controller) {
+            this(context, tableView, controller, null);
+        }
+
+        public Binder(@NonNull Context context,
+                      @NonNull TableView tableView,
+                      @NonNull BundleSelectController controller,
+                      @Nullable Runnable onRefreshed) {
             this.context = context;
             this.tableView = tableView;
             this.controller = controller;
             this.adapter = new BundleTableAdapter(context);
+            this.onRefreshed = onRefreshed;
         }
 
         public void bind() {
@@ -79,6 +89,9 @@ public final class BundleTableViewKit {
             List<BundleGridRow> rows = controller.getDisplayRows();
             TableData data = TableData.build(rows);
             adapter.setAllItems(data.columnHeaders, data.rowHeaders, data.cells);
+            if (onRefreshed != null) {
+                onRefreshed.run();
+            }
         }
     }
 
