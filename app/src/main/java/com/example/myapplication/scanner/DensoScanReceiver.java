@@ -1,4 +1,4 @@
-package com.example.myapplication.receiver;
+package com.example.myapplication.scanner;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

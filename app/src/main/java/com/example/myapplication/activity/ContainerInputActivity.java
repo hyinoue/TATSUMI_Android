@@ -203,6 +203,7 @@ public class ContainerInputActivity extends BaseActivity {
         if (btnRed != null) btnRed.setText("");
         if (btnGreen != null) btnGreen.setText("");
         if (btnYellow != null) btnYellow.setText("終了");
+        refreshBottomButtonsEnabled();
     }
 
     //============================================================

@@ -10,8 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.example.myapplication.R;
-import com.example.myapplication.barcode.DensoScannerController;
-import com.example.myapplication.barcode.OnScanListener;
+import com.example.myapplication.scanner.DensoScannerController;
+import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
 /**

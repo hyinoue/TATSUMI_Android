@@ -1,4 +1,4 @@
-package com.example.myapplication.barcode;
+package com.example.myapplication.scanner;
 
 import android.app.Activity;
 import android.os.Handler;

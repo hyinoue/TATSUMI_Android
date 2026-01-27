@@ -1,4 +1,4 @@
-package com.example.myapplication.barcode;
+package com.example.myapplication.scanner;
 
 import androidx.annotation.Nullable;
 

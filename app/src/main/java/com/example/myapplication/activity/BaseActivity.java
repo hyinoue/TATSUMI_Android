@@ -20,11 +20,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.List;
 
 /**
  * 動作はそのままに、重複を削って短くした BaseActivity
@@ -35,6 +38,12 @@ import com.google.android.material.button.MaterialButton;
  * - frmBase.pnlWaitLong/Short相当のローディングオーバーレイ
  * - 物理キーF1～F4 → 青/赤/緑/黄 の onFunctionXxx に集約（Text空なら動かさない）
  * - 画面下4色ボタン（存在する画面だけ）→ onFunctionXxx に集約（Text空なら動かさない）
+ * <p>
+ * Android 13対策：
+ * - EditTextフォーカス/IME表示のタイミングでナビバーが「出っぱなし」になる端末があるため、
+ * (1) WindowInsetsControllerCompat を中心に hide
+ * (2) insetsで「barsがvisible」になった瞬間を検知→即hideを複数回
+ * (3) IMEアニメ中も onProgress でhideを当て続ける
  */
 public class BaseActivity extends AppCompatActivity {
 
@@ -65,13 +74,29 @@ public class BaseActivity extends AppCompatActivity {
     private FrameLayout overlayLong;
     private FrameLayout overlayShort;
 
-    // 画面下4色ボタン（存在する画面だけ自動で捕まえる）
+    // 画面下4色ボタン
     private MaterialButton btnBottomRed;
     private MaterialButton btnBottomBlue;
     private MaterialButton btnBottomGreen;
     private MaterialButton btnBottomYellow;
     private boolean bottomButtonsBound = false;
+
+    // System UI制御
     private boolean systemUiListenersAttached = false;
+    private boolean systemUiLayoutListenerAttached = false;
+    private boolean systemUiInsetsAnimationListenerAttached = false;
+
+    private static final int SYSTEM_UI_HIDE_RETRY_COUNT = 5;          // ←少し増やす（出っぱなし対策）
+    private static final int SYSTEM_UI_HIDE_RETRY_DELAY_MS = 120;
+    private static final int SYSTEM_UI_HIDE_LOOP_DELAY_MS = 400;      // ←少し短く（出っぱなし対策）
+
+    private Runnable systemUiHideRunnable;
+    private int systemUiHideRetryCount = 0;
+
+    private Runnable systemUiKeepHiddenRunnable;
+
+    // EditText focus 対策（多重アタッチ防止）
+    private boolean editTextFocusHookAttached = false;
 
     @Override
     protected void onCreate(@Nullable android.os.Bundle savedInstanceState) {
@@ -84,16 +109,21 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         applyFullScreen();
+        startSystemUiHideLoop();
     }
 
-    // setContentViewは layoutResID 版だけで十分（通常これしか使わない）
+    @Override
+    protected void onPause() {
+        stopSystemUiHideLoop();
+        super.onPause();
+    }
+
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         afterSetContentView();
     }
 
-    // もし setContentView(View...) を使っている画面がある場合だけ必要。通常は不要だが安全のため残す。
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
@@ -109,29 +139,43 @@ public class BaseActivity extends AppCompatActivity {
     private void afterSetContentView() {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
+        attachEditTextFocusHideOnce(); // ★今回の追加
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) applyFullScreen();
+        if (hasFocus) {
+            applyFullScreen();
+            scheduleHideSystemBars(getWindow().getDecorView());
+        }
     }
 
-    // ===== Full screen（元の仕様のまま） =====
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        scheduleHideSystemBars(getWindow().getDecorView());
+    }
+
+    // ===== Full screen =====
 
     protected void applyFullScreen() {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
+        // Edge-to-edge（InsetsControllerで制御）
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         View decorView = getWindow().getDecorView();
-        applyImmersiveFlags(decorView);
-        hideSystemBars(decorView);
+        applyImmersiveFlags(decorView);  // 旧フラグ（OEM保険）
+        hideSystemBars(decorView);       // 新方式中心
         ensureSystemUiListeners(decorView);
     }
 
+    /**
+     * 旧方式（OEM端末の保険）
+     */
     private void applyImmersiveFlags(View decorView) {
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -144,38 +188,193 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void ensureSystemUiListeners(View decorView) {
-        if (systemUiListenersAttached) {
-            return;
-        }
+        if (systemUiListenersAttached) return;
 
+        // 旧コールバック：表示されたら隠す（保険）
         decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
             if ((visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0
                     || (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                applyFullScreen();
+                scheduleHideSystemBars(decorView);
             }
         });
 
-        decorView.getViewTreeObserver().addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
-            applyImmersiveFlags(decorView);
-            hideSystemBars(decorView);
-        });
-
+        // ★重要：insetsが来たときに「bars visible」を検知して即hide
         ViewCompat.setOnApplyWindowInsetsListener(decorView, (view, insets) -> {
-            hideSystemBars(decorView);
+            boolean barsVisible =
+                    insets.isVisible(WindowInsetsCompat.Type.navigationBars())
+                            || insets.isVisible(WindowInsetsCompat.Type.statusBars());
+
+            if (barsVisible) {
+                // ここで「出っぱなし」になるので、即座に複数回叩く
+                forceHideNowAndSoon(decorView);
+            }
+
+            // 通常の保険
+            scheduleHideSystemBars(decorView);
+
+            // ★insetsは改造しない（改造するとOEMで出っぱなしが悪化する例がある）
             return insets;
         });
+
+        // レイアウト変化でも隠す（IME表示時など）
+        if (!systemUiLayoutListenerAttached) {
+            decorView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                scheduleHideSystemBars(decorView);
+            });
+            systemUiLayoutListenerAttached = true;
+        }
+
+        // ★IMEアニメ中にも毎フレームhide（Android 13で効果大）
+        if (!systemUiInsetsAnimationListenerAttached) {
+            ViewCompat.setWindowInsetsAnimationCallback(
+                    decorView,
+                    new WindowInsetsAnimationCompat.Callback(
+                            WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
+                    ) {
+                        @Override
+                        public WindowInsetsAnimationCompat.BoundsCompat onStart(
+                                WindowInsetsAnimationCompat animation,
+                                WindowInsetsAnimationCompat.BoundsCompat bounds
+                        ) {
+                            hideSystemBars(decorView);
+                            return bounds;
+                        }
+
+                        @Override
+                        public WindowInsetsCompat onProgress(
+                                WindowInsetsCompat insets,
+                                List<WindowInsetsAnimationCompat> runningAnimations
+                        ) {
+                            hideSystemBars(decorView);
+                            return insets;
+                        }
+
+                        @Override
+                        public void onEnd(WindowInsetsAnimationCompat animation) {
+                            forceHideNowAndSoon(decorView);
+                            scheduleHideSystemBars(decorView);
+                        }
+                    }
+            );
+            systemUiInsetsAnimationListenerAttached = true;
+        }
 
         systemUiListenersAttached = true;
     }
 
+    /**
+     * Android 13対策：hideを強化（InsetsController中心＋旧フラグ保険）
+     */
     private void hideSystemBars(View decorView) {
+        applyImmersiveFlags(decorView); // OEM保険
+
         WindowInsetsControllerCompat controller =
                 WindowCompat.getInsetsController(getWindow(), decorView);
         if (controller != null) {
-            controller.hide(WindowInsetsCompat.Type.systemBars());
             controller.setSystemBarsBehavior(
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             );
+
+            // 明示的に分けて隠す（端末依存で systemBars() だけだと効かないことがある）
+            controller.hide(WindowInsetsCompat.Type.statusBars());
+            controller.hide(WindowInsetsCompat.Type.navigationBars());
+        }
+    }
+
+    /**
+     * 「出たら出っぱなし」を潰す：今すぐ＋少し後にも数回hide
+     */
+    private void forceHideNowAndSoon(View decorView) {
+        uiHandler.post(() -> {
+            applyImmersiveFlags(decorView);
+            hideSystemBars(decorView);
+        });
+        uiHandler.postDelayed(() -> {
+            applyImmersiveFlags(decorView);
+            hideSystemBars(decorView);
+        }, 60);
+        uiHandler.postDelayed(() -> {
+            applyImmersiveFlags(decorView);
+            hideSystemBars(decorView);
+        }, 160);
+        uiHandler.postDelayed(() -> {
+            applyImmersiveFlags(decorView);
+            hideSystemBars(decorView);
+        }, 320);
+    }
+
+    private void scheduleHideSystemBars(View decorView) {
+        if (systemUiHideRunnable != null) {
+            uiHandler.removeCallbacks(systemUiHideRunnable);
+        }
+        systemUiHideRetryCount = 0;
+
+        systemUiHideRunnable = new Runnable() {
+            @Override
+            public void run() {
+                applyImmersiveFlags(decorView);
+                hideSystemBars(decorView);
+
+                // しつこく数回叩く（出っぱなし対策）
+                if (systemUiHideRetryCount < SYSTEM_UI_HIDE_RETRY_COUNT) {
+                    systemUiHideRetryCount++;
+                    uiHandler.postDelayed(this, SYSTEM_UI_HIDE_RETRY_DELAY_MS);
+                }
+            }
+        };
+        uiHandler.post(systemUiHideRunnable);
+    }
+
+    private void startSystemUiHideLoop() {
+        if (systemUiKeepHiddenRunnable != null) return;
+
+        View decorView = getWindow().getDecorView();
+        systemUiKeepHiddenRunnable = new Runnable() {
+            @Override
+            public void run() {
+                applyImmersiveFlags(decorView);
+                hideSystemBars(decorView);
+                uiHandler.postDelayed(this, SYSTEM_UI_HIDE_LOOP_DELAY_MS);
+            }
+        };
+        uiHandler.post(systemUiKeepHiddenRunnable);
+    }
+
+    private void stopSystemUiHideLoop() {
+        if (systemUiKeepHiddenRunnable == null) return;
+        uiHandler.removeCallbacks(systemUiKeepHiddenRunnable);
+        systemUiKeepHiddenRunnable = null;
+    }
+
+    // ===== ★EditText focus 対策 =====
+
+    private void attachEditTextFocusHideOnce() {
+        if (editTextFocusHookAttached) return;
+        editTextFocusHookAttached = true;
+
+        View root = findViewById(android.R.id.content);
+        if (!(root instanceof ViewGroup)) return;
+
+        View decorView = getWindow().getDecorView();
+        attachFocusRecursive((ViewGroup) root, decorView);
+    }
+
+    private void attachFocusRecursive(ViewGroup parent, View decorView) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View v = parent.getChildAt(i);
+
+            if (v instanceof android.widget.EditText) {
+                v.setOnFocusChangeListener((view, hasFocus) -> {
+                    if (hasFocus) {
+                        // フォーカス→IME表示の流れで出っぱなしになりやすいので強制hide
+                        forceHideNowAndSoon(decorView);
+                    }
+                });
+            }
+
+            if (v instanceof ViewGroup) {
+                attachFocusRecursive((ViewGroup) v, decorView);
+            }
         }
     }
 
@@ -278,15 +477,6 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressWarnings("unused")
-    private void hideBannerNow() {
-        if (bannerView == null) return;
-        runOnUiThread(() -> {
-            if (bannerHideRunnable != null) uiHandler.removeCallbacks(bannerHideRunnable);
-            bannerView.setVisibility(View.GONE);
-        });
-    }
-
     // ===== Loading overlay =====
 
     protected void showLoadingLong() {
@@ -364,12 +554,7 @@ public class BaseActivity extends AppCompatActivity {
 
     // ===== ★画面下4色ボタン連動 =====
 
-    /**
-     * 画面に下部ボタンがある場合だけ自動で拾って、タップ → onFunctionXxx に流す。
-     * frmBase の「ボタンTextが空なら反応しない」も再現。
-     */
     protected void bindBottomButtonsIfExists() {
-        // 既にバインド済みなら、文言変更に追従して押下可否だけ更新
         if (bottomButtonsBound) {
             refreshBottomButtonsEnabled();
             return;
@@ -380,7 +565,6 @@ public class BaseActivity extends AppCompatActivity {
         MaterialButton green = asMaterialButton(findViewById(R.id.btnBottomGreen));
         MaterialButton yellow = asMaterialButton(findViewById(R.id.btnBottomYellow));
 
-        // includeしてない画面でも安全にスルー
         if (red == null || blue == null || green == null || yellow == null) return;
 
         btnBottomRed = red;
@@ -388,7 +572,6 @@ public class BaseActivity extends AppCompatActivity {
         btnBottomGreen = green;
         btnBottomYellow = yellow;
 
-        // タップ → onFunctionXxx（Textが空なら反応しない）
         btnBottomRed.setOnClickListener(v -> {
             if (canRun(btnBottomRed)) onFunctionRed();
         });
@@ -406,9 +589,6 @@ public class BaseActivity extends AppCompatActivity {
         refreshBottomButtonsEnabled();
     }
 
-    /**
-     * 画面側で setText("") / setText("戻る") など変えるだけで、押せる/押せないを同期
-     */
     protected void refreshBottomButtonsEnabled() {
         if (!bottomButtonsBound) return;
 
@@ -474,7 +654,6 @@ public class BaseActivity extends AppCompatActivity {
     private TextView createBannerView() {
         TextView tv = new TextView(this);
         tv.setVisibility(View.GONE);
-        tv.setText("XXXXXXXXXX");
         tv.setTextSize(18);
         tv.setGravity(Gravity.CENTER);
         tv.setPadding(16, 16, 16, 16);
@@ -541,7 +720,8 @@ public class BaseActivity extends AppCompatActivity {
         return Math.round(dp * density);
     }
 
-    // ===== version helper（必要なら使う） =====
+    // ===== version helper =====
+
     protected String getAppVersionName() {
         try {
             PackageManager pm = getPackageManager();

@@ -82,7 +82,7 @@
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <receiver
-            android:name=".receiver.DensoScanReceiver"
+            android:name=".scanner.DensoScanReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.example.myapplication.DENSO_SCAN" />

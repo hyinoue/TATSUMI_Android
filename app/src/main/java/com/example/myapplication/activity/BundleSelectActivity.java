@@ -15,12 +15,12 @@ import androidx.annotation.Nullable;
 
 import com.evrencoskun.tableview.TableView;
 import com.example.myapplication.R;
-import com.example.myapplication.barcode.DensoScannerController;
-import com.example.myapplication.barcode.OnScanListener;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.grid.BundleSelectController;
 import com.example.myapplication.grid.BundleTableViewKit;
+import com.example.myapplication.scanner.DensoScannerController;
+import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.concurrent.ExecutorService;
