@@ -12,15 +12,25 @@ import java.util.List;
 @Dao
 public interface CommHistoryDao {
 
-    @Query("SELECT * FROM C_COMM_HISTORY ORDER BY RENBAN DESC")
+    @Query("SELECT * FROM " +
+            "C_COMM_HISTORY " +
+            "ORDER BY " +
+            "RENBAN DESC"
+    )
     List<CommHistoryEntity> findAllDesc();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(CommHistoryEntity entity);
 
-    @Query("DELETE FROM C_COMM_HISTORY WHERE START_YMDHMS < :threshold")
+    @Query("DELETE FROM " +
+            "C_COMM_HISTORY " +
+            "WHERE " +
+            "START_YMDHMS < :threshold"
+    )
     void deleteBefore(String threshold);
 
-    @Query("DELETE FROM C_COMM_HISTORY")
+    @Query("DELETE FROM " +
+            "C_COMM_HISTORY"
+    )
     void deleteAll();
 }

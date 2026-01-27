@@ -12,18 +12,32 @@ import java.util.List;
 @Dao
 public interface KakuninMeisaiWorkDao {
 
-    @Query("SELECT * FROM W_KAKUNIN_MEISAI")
+    @Query("SELECT * FROM " +
+            "W_KAKUNIN_MEISAI"
+    )
     List<KakuninMeisaiWorkEntity> findAll();
 
-    @Query("SELECT * FROM W_KAKUNIN_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
+    @Query("SELECT * FROM " +
+            "W_KAKUNIN_MEISAI " +
+            "WHERE " +
+            "HEAT_NO = :heatNo " +
+            "AND " +
+            "SOKUBAN = :sokuban"
+    )
     KakuninMeisaiWorkEntity findOne(String heatNo, String sokuban);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(KakuninMeisaiWorkEntity entity);
 
-    @Query("DELETE FROM W_KAKUNIN_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
+    @Query("DELETE FROM " +
+            "W_KAKUNIN_MEISAI " +
+            "WHERE " +
+            "HEAT_NO = :heatNo " +
+            "AND " +
+            "SOKUBAN = :sokuban")
     int deleteOne(String heatNo, String sokuban);
 
-    @Query("DELETE FROM W_KAKUNIN_MEISAI")
+    @Query("DELETE FROM" +
+            " W_KAKUNIN_MEISAI")
     void deleteAll();
 }

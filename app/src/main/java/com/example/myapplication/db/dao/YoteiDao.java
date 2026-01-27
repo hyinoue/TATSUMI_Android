@@ -12,21 +12,47 @@ import java.util.List;
 @Dao
 public interface YoteiDao {
 
-    @Query("SELECT * FROM T_YOTEI")
+    @Query("SELECT * FROM " +
+            "T_YOTEI"
+    )
     List<YoteiEntity> findAll();
 
-    @Query("SELECT * FROM T_YOTEI LIMIT 1")
+    @Query("SELECT * FROM " +
+            "T_YOTEI " +
+            "LIMIT 1"
+    )
     YoteiEntity findFirst();
 
-    @Query("SELECT * FROM T_YOTEI WHERE LAST_UPD_YMDHMS IS NULL")
+    @Query("SELECT * FROM " +
+            "T_YOTEI " +
+            "WHERE " +
+            "LAST_UPD_YMDHMS IS NULL"
+    )
     List<YoteiEntity> findWithNullLastUpd();
 
-    @Query("SELECT * FROM T_YOTEI WHERE BOOKING_NO = :bookingNo")
+    @Query("SELECT * FROM " +
+            "T_YOTEI " +
+            "WHERE " +
+            "BOOKING_NO = :bookingNo"
+    )
     YoteiEntity findByBookingNo(String bookingNo);
+
+    @Query("UPDATE " +
+            "T_YOTEI " +
+            "SET " +
+            "KANRYO_CONTAINER = KANRYO_CONTAINER + 1, " +
+            "KANRYO_BUNDOLE = KANRYO_BUNDOLE + :bundleCount, " +
+            "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
+            "WHERE " +
+            "BOOKING_NO = :bookingNo"
+    )
+    int incrementKanryo(String bookingNo, int bundleCount, int jyuryo);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(YoteiEntity entity);
 
-    @Query("DELETE FROM T_YOTEI")
+    @Query("DELETE FROM " +
+            "T_YOTEI"
+    )
     void deleteAll();
 }

@@ -87,6 +87,11 @@ public class DataSync {
         this.imageDir = resolveImageDir(context);
     }
 
+    public void sendSyukkaOnly() throws Exception {
+        Date sagyouYmd = sagyouYotei();
+        dataSousinAll(sagyouYmd);
+    }
+
     public void runSync() throws Exception {
         try {
             historyDel();

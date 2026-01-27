@@ -12,15 +12,27 @@ import java.util.List;
 @Dao
 public interface KakuninMeisaiDao {
 
-    @Query("SELECT * FROM T_KAKUNIN_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
+    @Query("SELECT * FROM " +
+            "T_KAKUNIN_MEISAI " +
+            "WHERE " +
+            "HEAT_NO = :heatNo " +
+            "AND " +
+            "SOKUBAN = :sokuban"
+    )
     KakuninMeisaiEntity findOne(String heatNo, String sokuban);
 
-    @Query("SELECT * FROM T_KAKUNIN_MEISAI WHERE CONTAINER_ID = :containerId")
+    @Query("SELECT * FROM " +
+            "T_KAKUNIN_MEISAI " +
+            "WHERE " +
+            "CONTAINER_ID = :containerId"
+    )
     List<KakuninMeisaiEntity> findByContainerId(String containerId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(KakuninMeisaiEntity entity);
 
-    @Query("DELETE FROM T_KAKUNIN_MEISAI")
+    @Query("DELETE FROM" +
+            " T_KAKUNIN_MEISAI"
+    )
     void deleteAll();
 }

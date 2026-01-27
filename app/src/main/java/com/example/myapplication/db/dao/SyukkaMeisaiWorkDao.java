@@ -12,20 +12,50 @@ import java.util.List;
 @Dao
 public interface SyukkaMeisaiWorkDao {
 
-    @Query("SELECT * FROM W_SYUKKA_MEISAI")
+    @Query("SELECT * FROM " +
+            "W_SYUKKA_MEISAI"
+    )
     List<SyukkaMeisaiWorkEntity> findAll();
 
-    @Query("SELECT * FROM W_SYUKKA_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban LIMIT 1")
+    @Query("SELECT * FROM " +
+            "W_SYUKKA_MEISAI " +
+            "WHERE " +
+            "HEAT_NO = :heatNo " +
+            "AND " +
+            "SOKUBAN = :sokuban " +
+            "LIMIT 1"
+    )
     SyukkaMeisaiWorkEntity findOne(String heatNo, String sokuban);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(SyukkaMeisaiWorkEntity entity);
 
-    @Query("DELETE FROM W_SYUKKA_MEISAI WHERE HEAT_NO = :heatNo AND SOKUBAN = :sokuban")
+    @Query("DELETE FROM " +
+            "W_SYUKKA_MEISAI " +
+            "WHERE " +
+            "HEAT_NO = :heatNo " +
+            "AND " +
+            "SOKUBAN = :sokuban"
+    )
     int deleteOne(String heatNo, String sokuban);
 
     @Query("DELETE FROM W_SYUKKA_MEISAI")
     void deleteAll();
+
+    @Query("SELECT " +
+            " count(W.HEAT_NO) AS sokusu, " +
+            " sum(T.JYURYO) AS jyuryo, " +
+            " max(T.BOOKING_NO) AS bookingNo " +
+            "FROM " +
+            "W_SYUKKA_MEISAI W " +
+            "INNER JOIN " +
+            "T_SYUKKA_MEISAI T " +
+            " ON " +
+            "W.HEAT_NO = T.HEAT_NO " +
+            "AND " +
+            "W.SOKUBAN = T.SOKUBAN"
+    )
+    WorkSummary getWorkSummary();
 
     // ========= C# readWorkTblToList 相当（WとTのJOIN） =========
     @Query("SELECT " +
@@ -35,10 +65,17 @@ public interface SyukkaMeisaiWorkDao {
             " T.BUNDLE_NO AS bundleNo, " +
             " T.JYURYO AS jyuryo, " +
             " T.BOOKING_NO AS bookingNo " +
-            "FROM W_SYUKKA_MEISAI W " +
-            "INNER JOIN T_SYUKKA_MEISAI T " +
-            " ON W.HEAT_NO = T.HEAT_NO AND W.SOKUBAN = T.SOKUBAN " +
-            "ORDER BY W.UPDATE_YMD")
+            "FROM " +
+            "W_SYUKKA_MEISAI W " +
+            "INNER JOIN " +
+            "T_SYUKKA_MEISAI T " +
+            " ON " +
+            "W.HEAT_NO = T.HEAT_NO " +
+            "AND " +
+            "W.SOKUBAN = T.SOKUBAN " +
+            "ORDER BY " +
+            "W.UPDATE_YMD"
+    )
     List<WorkJoinRow> selectWorkJoined();
 
     class WorkJoinRow {
@@ -46,6 +83,12 @@ public interface SyukkaMeisaiWorkDao {
         public String sokuban;
         public String packingNo;
         public String bundleNo;
+        public Integer jyuryo;
+        public String bookingNo;
+    }
+
+    class WorkSummary {
+        public int sokusu;
         public Integer jyuryo;
         public String bookingNo;
     }
