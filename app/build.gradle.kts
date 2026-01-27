@@ -5,6 +5,10 @@ plugins {
 android {
     namespace = "com.example.myapplication"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     // あなたの書き方に合わせて維持（カタログ側で解決できている前提）
     compileSdk {
         version = release(36)

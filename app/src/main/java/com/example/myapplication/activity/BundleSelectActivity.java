@@ -1,4 +1,3 @@
-// BundleSelectActivity.java
 package com.example.myapplication.activity;
 
 import android.content.Intent;
@@ -28,6 +27,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BundleSelectActivity extends BaseActivity {
+
+    //============================================================
+    //　処理概要　:　積載束選択 / 重量計算 画面
+    //　備　　考　:　Normalモードの確定時は MenuActivity に戻らず、
+    //　　　　　　:　ContainerInputActivity へ直接遷移する（チラ見え防止）
+    //============================================================
 
     public static final String EXTRA_MODE = "bundle_select_mode";
     public static final String MODE_NORMAL = "normal";
@@ -69,6 +74,9 @@ public class BundleSelectActivity extends BaseActivity {
         initControllerAndDefaults();
     }
 
+    //============================================================
+    //　機　能　:　View取得
+    //============================================================
     private void bindViews() {
         etContainerKg = findViewById(R.id.etContainerKg);
         etDunnageKg = findViewById(R.id.etDunnageKg);
@@ -80,28 +88,27 @@ public class BundleSelectActivity extends BaseActivity {
         tableView = findViewById(R.id.tableViewBundles);
     }
 
+    //============================================================
+    //　機　能　:　起動モード判定（Normal / JyuryoCalc）
+    //============================================================
     private void setupMode(@Nullable Intent intent) {
         String modeExtra = intent != null ? intent.getStringExtra(EXTRA_MODE) : null;
         if (MODE_JYURYO.equals(modeExtra)) {
             mode = BundleSelectController.Mode.JyuryoCalc;
-            if (tvTitle != null) {
-                tvTitle.setText("重量計算");
-            }
+            if (tvTitle != null) tvTitle.setText("重量計算");
         } else {
             mode = BundleSelectController.Mode.Normal;
-            if (tvTitle != null) {
-                tvTitle.setText("積載束選択");
-            }
+            if (tvTitle != null) tvTitle.setText("積載束選択");
         }
     }
 
+    //============================================================
+    //　機　能　:　入力イベント設定（重量変更/現品入力）
+    //============================================================
     private void setupInputHandlers() {
-        if (etContainerKg != null) {
-            etContainerKg.addTextChangedListener(weightWatcher);
-        }
-        if (etDunnageKg != null) {
-            etDunnageKg.addTextChangedListener(weightWatcher);
-        }
+        if (etContainerKg != null) etContainerKg.addTextChangedListener(weightWatcher);
+        if (etDunnageKg != null) etDunnageKg.addTextChangedListener(weightWatcher);
+
         if (etGenpinNo != null) {
             etGenpinNo.setShowSoftInputOnFocus(false);
             etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
@@ -121,19 +128,23 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
+    //============================================================
+    //　機　能　:　スキャナ初期化
+    //============================================================
     private void initScanner() {
         scanner = new DensoScannerController(this, new OnScanListener() {
             @Override
             public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
-                if (etGenpinNo != null) {
-                    etGenpinNo.setText(normalizedData);
-                }
+                if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
                 handleGenpinInput(normalizedData);
             }
         });
         scanner.onCreate();
     }
 
+    //============================================================
+    //　機　能　:　Controller初期化＋初期重量読み込み＋テーブル表示
+    //============================================================
     private void initControllerAndDefaults() {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         io.execute(() -> {
@@ -150,17 +161,12 @@ public class BundleSelectActivity extends BaseActivity {
                 maxContainerJyuryo = resolveMaxContainerWeight(system);
 
                 runOnUiThread(() -> {
-                    if (etContainerKg != null) {
+                    if (etContainerKg != null)
                         etContainerKg.setText(String.valueOf(defaultContainer));
-                    }
-                    if (etDunnageKg != null) {
-                        etDunnageKg.setText(String.valueOf(defaultDunnage));
-                    }
+                    if (etDunnageKg != null) etDunnageKg.setText(String.valueOf(defaultDunnage));
                     setupTable();
                     updateFooter();
-                    if (etGenpinNo != null) {
-                        etGenpinNo.requestFocus();
-                    }
+                    if (etGenpinNo != null) etGenpinNo.requestFocus();
                 });
             } catch (Exception ex) {
                 runOnUiThread(() -> errorProcess("BundleSelect initControllerAndDefaults", ex));
@@ -168,10 +174,17 @@ public class BundleSelectActivity extends BaseActivity {
         });
     }
 
+    //============================================================
+    //　機　能　:　コンテナ重量の初期値取得（SystemEntity優先）
+    //============================================================
     private int resolveDefaultContainerWeight(@Nullable SystemEntity system) {
+        // ※必要に応じて system.defaultContainerJyuryo 等の実装に置き換え
         return 0;
     }
 
+    //============================================================
+    //　機　能　:　ダンネージ重量の初期値取得
+    //============================================================
     private int resolveDefaultDunnageWeight(@Nullable SystemEntity system) {
         if (system != null && system.defaultDunnageJyuryo != null) {
             return system.defaultDunnageJyuryo;
@@ -179,6 +192,10 @@ public class BundleSelectActivity extends BaseActivity {
         return 0;
     }
 
+    //============================================================
+    //　機　能　:　最大積載重量の取得
+    //　説　明　:　SystemEntity があればそれを優先、なければ Spinner の 20/40ft から算出
+    //============================================================
     private int resolveMaxContainerWeight(@Nullable SystemEntity system) {
         if (system != null && system.maxContainerJyuryo != null && system.maxContainerJyuryo > 0) {
             return system.maxContainerJyuryo;
@@ -188,10 +205,11 @@ public class BundleSelectActivity extends BaseActivity {
         return "40ft".equals(size) ? 30000 : 24000;
     }
 
+    //============================================================
+    //　機　能　:　テーブル表示初期化
+    //============================================================
     private void setupTable() {
-        if (tableView == null || controller == null) {
-            return;
-        }
+        if (tableView == null || controller == null) return;
         tableBinder = new BundleTableViewKit.Binder(this, tableView, controller, this::updateFooter);
         tableBinder.bind();
     }
@@ -211,9 +229,9 @@ public class BundleSelectActivity extends BaseActivity {
         }
     };
 
-    // ==============================
-    // 下ボタン文言設定（画面ごと）
-    // ==============================
+    //============================================================
+    //　機　能　:　下ボタン文言設定（画面ごと）
+    //============================================================
     private void setupBottomButtonTexts() {
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
         MaterialButton red = findViewById(R.id.btnBottomRed);
@@ -227,34 +245,28 @@ public class BundleSelectActivity extends BaseActivity {
             if (red != null) red.setText("");
             if (blue != null) blue.setText("確定");
         }
-        if (green != null) green.setText("");      // 空なら押せない（BaseActivityで制御）
+        if (green != null) green.setText("");
         if (yellow != null) yellow.setText("終了");
 
         refreshBottomButtonsEnabled();
     }
 
-    // ==============================
-    // 4色ボタンの実処理（タップも物理キーもここに集約）
-    // ==============================
+    //============================================================
+    //　機　能　:　4色ボタン（赤＝束クリア）
+    //============================================================
     @Override
     protected void onFunctionRed() {
-        // 束クリア
-        if (controller == null) {
-            return;
-        }
+        if (controller == null) return;
+
         showQuestion("一覧の内容を全て削除します。よろしいですか？", yes -> {
             if (!yes) return;
             io.execute(() -> {
                 try {
                     controller.deleteBundles();
                     runOnUiThread(() -> {
-                        if (tableBinder != null) {
-                            tableBinder.refresh();
-                        }
+                        if (tableBinder != null) tableBinder.refresh();
                         updateFooter();
-                        if (etGenpinNo != null) {
-                            etGenpinNo.requestFocus();
-                        }
+                        if (etGenpinNo != null) etGenpinNo.requestFocus();
                     });
                 } catch (Exception ex) {
                     runOnUiThread(() -> errorProcess("BundleSelect deleteBundles", ex));
@@ -263,44 +275,68 @@ public class BundleSelectActivity extends BaseActivity {
         });
     }
 
+    //============================================================
+    //　機　能　:　4色ボタン（青＝確定）
+    //　説　明　:　Normalモード確定時は、メニューに戻らず ContainerInput へ直接遷移
+    //============================================================
     @Override
     protected void onFunctionBlue() {
-        if (mode != BundleSelectController.Mode.Normal) {
-            return;
-        }
-        if (controller == null) {
-            return;
-        }
-        if (isEmptyOrZero(etContainerKg)) {
-            showErrorMsg("コンテナ重量が未入力です", MsgDispMode.Label);
-            if (etContainerKg != null) {
-                etContainerKg.requestFocus();
-            }
-            return;
-        }
-        if (isEmptyOrZero(etDunnageKg)) {
-            showErrorMsg("ダンネージ重量が未入力です", MsgDispMode.Label);
-            if (etDunnageKg != null) {
-                etDunnageKg.requestFocus();
-            }
-            return;
-        }
-        if (controller.getBundles().isEmpty()) {
-            showErrorMsg("対象束が未選択です", MsgDispMode.Label);
-            if (etGenpinNo != null) {
-                etGenpinNo.requestFocus();
-            }
-            return;
-        }
-        if (getRemainingWeight() < 0) {
-            showErrorMsg("積載重量が超過しています", MsgDispMode.Label);
-            if (etGenpinNo != null) {
-                etGenpinNo.requestFocus();
-            }
+        if (!validateBeforeConfirm()) {
             return;
         }
 
-        setResult(RESULT_OK);
+        if (mode == BundleSelectController.Mode.Normal) {
+            // ★ここで直接遷移（MenuActivity を経由しない）
+            openContainerInputAndFinish();
+        } else {
+            // 重量計算モード：結果だけ返して戻る
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
+
+    //============================================================
+    //　機　能　:　確定前チェック（入力必須・束選択必須・重量超過チェック）
+    //　戻り値　:　[boolean] ..... true=OK / false=NG
+    //============================================================
+    private boolean validateBeforeConfirm() {
+        if (controller == null) return false;
+
+        // Normalのみ、従来通り厳密チェック（重量計算は要件に応じて調整）
+        if (mode != BundleSelectController.Mode.Normal) {
+            return true;
+        }
+
+        if (isEmptyOrZero(etContainerKg)) {
+            showErrorMsg("コンテナ重量が未入力です", MsgDispMode.Label);
+            if (etContainerKg != null) etContainerKg.requestFocus();
+            return false;
+        }
+        if (isEmptyOrZero(etDunnageKg)) {
+            showErrorMsg("ダンネージ重量が未入力です", MsgDispMode.Label);
+            if (etDunnageKg != null) etDunnageKg.requestFocus();
+            return false;
+        }
+        if (controller.getBundles().isEmpty()) {
+            showErrorMsg("対象束が未選択です", MsgDispMode.Label);
+            if (etGenpinNo != null) etGenpinNo.requestFocus();
+            return false;
+        }
+        if (getRemainingWeight() < 0) {
+            showErrorMsg("積載重量が超過しています", MsgDispMode.Label);
+            if (etGenpinNo != null) etGenpinNo.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    //============================================================
+    //　機　能　:　Normal確定後、コンテナ情報入力へ直接遷移して終了する
+    //　説　明　:　MenuActivity に戻る瞬間を作らないため（チラ見え防止）
+    //============================================================
+    private void openContainerInputAndFinish() {
+        Intent intent = new Intent(this, ContainerInputActivity.class);
+        startActivity(intent);
         finish();
     }
 
@@ -309,21 +345,23 @@ public class BundleSelectActivity extends BaseActivity {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
+    //============================================================
+    //　機　能　:　4色ボタン（黄＝終了）
+    //============================================================
     @Override
     protected void onFunctionYellow() {
-        // 終了
         finish();
     }
 
+    //============================================================
+    //　機　能　:　現品番号入力処理（バーコード/手入力）
+    //============================================================
     private void handleGenpinInput(String rawInput) {
-        if (controller == null) {
-            return;
-        }
+        if (controller == null) return;
+
         String input = rawInput != null ? rawInput.trim() : "";
         if (TextUtils.isEmpty(input)) {
-            if (etGenpinNo != null) {
-                etGenpinNo.requestFocus();
-            }
+            if (etGenpinNo != null) etGenpinNo.requestFocus();
             return;
         }
 
@@ -349,9 +387,7 @@ public class BundleSelectActivity extends BaseActivity {
                     runOnUiThread(() -> {
                         hideLoadingShort();
                         showWarningMsg("現品番号は13桁か14桁か18桁で入力してください", MsgDispMode.MsgBox);
-                        if (etGenpinNo != null) {
-                            etGenpinNo.requestFocus();
-                        }
+                        if (etGenpinNo != null) etGenpinNo.requestFocus();
                     });
                     return;
                 }
@@ -364,9 +400,7 @@ public class BundleSelectActivity extends BaseActivity {
                     runOnUiThread(() -> {
                         hideLoadingShort();
                         showWarningMsg(errMsg, MsgDispMode.MsgBox);
-                        if (etGenpinNo != null) {
-                            etGenpinNo.requestFocus();
-                        }
+                        if (etGenpinNo != null) etGenpinNo.requestFocus();
                     });
                     return;
                 }
@@ -375,9 +409,7 @@ public class BundleSelectActivity extends BaseActivity {
 
                 runOnUiThread(() -> {
                     hideLoadingShort();
-                    if (tableBinder != null) {
-                        tableBinder.refresh();
-                    }
+                    if (tableBinder != null) tableBinder.refresh();
                     updateFooter();
                     if (etGenpinNo != null) {
                         etGenpinNo.setText("");
@@ -393,10 +425,12 @@ public class BundleSelectActivity extends BaseActivity {
         });
     }
 
+    //============================================================
+    //　機　能　:　フッター集計表示更新（束数/合計/残）
+    //============================================================
     private void updateFooter() {
-        if (controller == null) {
-            return;
-        }
+        if (controller == null) return;
+
         int bundleCount = controller.getBundles().size();
         int total = controller.getJyuryoSum()
                 + getIntFromEdit(etContainerKg)
@@ -413,14 +447,14 @@ public class BundleSelectActivity extends BaseActivity {
         if (tvRemainWeight != null) {
             tvRemainWeight.setText(String.format(java.util.Locale.JAPAN, "%,d", remaining));
         }
-
-
     }
 
+    //============================================================
+    //　機　能　:　残重量取得
+    //============================================================
     private int getRemainingWeight() {
-        if (controller == null) {
-            return 0;
-        }
+        if (controller == null) return 0;
+
         int bundleCount = controller.getBundles().size();
         int total = controller.getJyuryoSum()
                 + getIntFromEdit(etContainerKg)
@@ -429,18 +463,18 @@ public class BundleSelectActivity extends BaseActivity {
         return maxContainerJyuryo - total;
     }
 
+    //============================================================
+    //　機　能　:　EditText数値取得（カンマ除去）
+    //============================================================
     private int getIntFromEdit(@Nullable EditText editText) {
-        if (editText == null || editText.getText() == null) {
-            return 0;
-        }
+        if (editText == null || editText.getText() == null) return 0;
+
         String raw = editText.getText().toString();
-        if (TextUtils.isEmpty(raw)) {
-            return 0;
-        }
+        if (TextUtils.isEmpty(raw)) return 0;
+
         String cleaned = raw.replace(",", "").trim();
-        if (TextUtils.isEmpty(cleaned)) {
-            return 0;
-        }
+        if (TextUtils.isEmpty(cleaned)) return 0;
+
         try {
             return Integer.parseInt(cleaned);
         } catch (NumberFormatException ex) {
@@ -448,6 +482,9 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
+    //============================================================
+    //　機　能　:　EditTextが未入力または0か判定
+    //============================================================
     private boolean isEmptyOrZero(@Nullable EditText editText) {
         return getIntFromEdit(editText) <= 0;
     }

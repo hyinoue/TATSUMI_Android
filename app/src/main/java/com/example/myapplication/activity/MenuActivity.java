@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.example.myapplication.BuildConfig;
 import com.example.myapplication.R;
 import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.connector.SvcHandyRepository;
@@ -31,8 +35,13 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class MenuActivity extends BaseActivity {
+
+    //============================================================
+    //　処理概要　:　メインメニュー画面
+    //　備　　考　:　積載束選定（Normal確定時）は BundleSelectActivity 側で
+    //　　　　　　:　ContainerInputActivity に直接遷移する（メニュー経由しない）
+    //============================================================
 
     private static final String TAG = "MENU";
 
@@ -46,6 +55,7 @@ public class MenuActivity extends BaseActivity {
     private static final int SEND_BUNDLE_LIMIT = 1; // 全件送りたいなら 0
 
     private ExecutorService io;
+    private ActivityResultLauncher<Intent> bundleSelectLauncher;
 
     // ===== Views =====
     private TextView tvCenterStatus;
@@ -87,8 +97,9 @@ public class MenuActivity extends BaseActivity {
             }
         });
 
-
         io = Executors.newSingleThreadExecutor();
+
+        setupActivityLaunchers();
 
         initViews();
         setupContainerSizeSpinner();
@@ -106,9 +117,25 @@ public class MenuActivity extends BaseActivity {
         refreshInformation();
     }
 
-    // ==============================
-    // View取得
-    // ==============================
+    //============================================================
+    //　機　能　:　ActivityResultLauncher の初期化
+    //　説　明　:　BundleSelectActivity から戻ったときに表示更新だけ行う
+    //　　　　　:　※Normal確定時は BundleSelectActivity 側で ContainerInput に
+    //　　　　　:　　直接遷移するため、ここで次画面遷移はしない（チラ見え防止）
+    //============================================================
+    private void setupActivityLaunchers() {
+        bundleSelectLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // 遷移はしない。表示更新のみ。
+                    refreshInformation();
+                }
+        );
+    }
+
+    //============================================================
+    //　機　能　:　View取得
+    //============================================================
     private void initViews() {
         spContainerSize = findViewById(R.id.spContainerSize);
 
@@ -132,9 +159,9 @@ public class MenuActivity extends BaseActivity {
         lblZanWeight = findViewById(R.id.lblZanWeight);
     }
 
-    // ==============================
-    // コンテナサイズSpinner（20ft/40ft）保存・復元
-    // ==============================
+    //============================================================
+    //　機　能　:　コンテナサイズSpinner（20ft/40ft）保存・復元
+    //============================================================
     private void setupContainerSizeSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
@@ -165,9 +192,9 @@ public class MenuActivity extends BaseActivity {
         });
     }
 
-    // ==============================
-    // 下ボタン文言（画面ごと）
-    // ==============================
+    //============================================================
+    //　機　能　:　下ボタン文言（画面ごと）
+    //============================================================
     private void setupBottomButtonTexts() {
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
         MaterialButton red = findViewById(R.id.btnBottomRed);
@@ -177,39 +204,63 @@ public class MenuActivity extends BaseActivity {
         if (blue != null) blue.setText("");
         if (red != null) red.setText("");
         if (green != null) green.setText("");
-        if (yellow != null) yellow.setText("再起動");
+        if (yellow != null) {
+            yellow.setText(BuildConfig.DEBUG ? "終了" : "再起動");
+        }
 
         // 空文字は無効＋薄く（BaseActivity機能）
         refreshBottomButtonsEnabled();
     }
 
-    // ==============================
-    // クリック処理（画面内ボタン）
-    // ==============================
+    //============================================================
+    //　機　能　:　クリック処理（画面内ボタン）
+    //============================================================
     private void wireActions() {
 
         // データ送受信
-        btnDataReceive.setOnClickListener(v -> {
-            startDataSync();
-        });
+        btnDataReceive.setOnClickListener(v -> startDataSync());
 
         // 画面遷移（タップ）
-        btnBundleSelect.setOnClickListener(v -> goBundleSelect(BundleSelectActivity.MODE_NORMAL));
-        btnContainerInput.setOnClickListener(v -> goContainerInput());
-        btnWeightCalc.setOnClickListener(v -> goBundleSelect(BundleSelectActivity.MODE_JYURYO));
-        btnCollateContainerSelect.setOnClickListener(v -> goCollateContainerSelect());
+        btnBundleSelect.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_NORMAL));
+        btnContainerInput.setOnClickListener(v -> openContainerInputIfWorkExists());
+        btnWeightCalc.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_JYURYO));
+        btnCollateContainerSelect.setOnClickListener(v -> openCollateContainerSelect());
     }
 
-    // ==============================
-    // 下ボタン（黄色＝再起動）タップ/物理F4 の実処理
-    // ==============================
+    //============================================================
+    //　機　能　:　下ボタン（黄色＝再起動）タップ/物理F4 の実処理
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         onRestartMenu();
     }
 
+    //============================================================
+    //　機　能　:　再起動確認～実行
+    //============================================================
     private void onRestartMenu() {
-        recreate();
+        if (BuildConfig.DEBUG) {
+            finish();
+            return;
+        }
+        showQuestion("端末の再起動を実施します。\nよろしいですか？", yes -> {
+            if (!yes) return;
+            restartApp();
+        });
+    }
+
+    //============================================================
+    //　機　能　:　アプリ再起動
+    //============================================================
+    private void restartApp() {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        if (launchIntent == null) {
+            recreate();
+            return;
+        }
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(launchIntent);
+        finish();
     }
 
     @Override
@@ -218,39 +269,61 @@ public class MenuActivity extends BaseActivity {
         refreshInformation();
     }
 
-    // ==============================
-    // 画面遷移（共通メソッド化）
-    // ==============================
+    //============================================================
+    //　機　能　:　サービスメニューへ遷移
+    //============================================================
     private void goServiceMenu() {
         startActivity(new Intent(this, ServiceMenuActivity.class));
     }
 
-    private void goBundleSelect(String mode) {
+    //============================================================
+    //　機　能　:　積載束選定/重量計算 画面へ遷移
+    //　説　明　:　MODE_NORMAL 確定時は BundleSelectActivity 側で
+    //　　　　　:　ContainerInputActivity に直接遷移する（メニュー経由しない）
+    //============================================================
+    private void openBundleSelect(String mode) {
         Intent intent = new Intent(this, BundleSelectActivity.class);
         intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
-        startActivity(intent);
+
+        if (bundleSelectLauncher != null) {
+            bundleSelectLauncher.launch(intent);
+        } else {
+            startActivity(intent);
+        }
     }
 
-    private void goContainerInput() {
-        startActivity(new Intent(this, ContainerInputActivity.class));
+    //============================================================
+    //　機　能　:　コンテナ情報入力へ遷移（Work存在チェック付き）
+    //============================================================
+    private void openContainerInputIfWorkExists() {
+        io.execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+            boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
+            runOnUiThread(() -> {
+                if (!hasWork) {
+                    showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
+                    return;
+                }
+                startActivity(new Intent(this, ContainerInputActivity.class));
+            });
+        });
     }
 
-    private void goCollateContainerSelect() {
+    //============================================================
+    //　機　能　:　照合コンテナ選定へ遷移
+    //============================================================
+    private void openCollateContainerSelect() {
         startActivity(new Intent(this, CollateContainerSelectActivity.class));
     }
 
-    // ==============================
-    // 数字キー対応（この画面固有なので残す）
-    // 0 → サービスメニュー
-    // 2 → 積載束選定
-    // 3 → コンテナ情報入力
-    // 4 → 重量計算
-    // 5 → 照合コンテナ選定
-    // ==============================
+    //============================================================
+    //　機　能　:　数字キー対応（この画面固有）
+    //　説　明　:　0=サービスメニュー / 1=送受信 / 2=束選定 / 3=コンテナ入力 / 4=重量計算 / 5=照合
+    //============================================================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        // ★長押し連打防止（数字キー側も抑止したいなら残す）
+        // ★長押し連打防止
         if (event.getRepeatCount() > 0) return true;
 
         switch (keyCode) {
@@ -263,38 +336,35 @@ public class MenuActivity extends BaseActivity {
                 return true;
 
             case KeyEvent.KEYCODE_2:
-                goBundleSelect(BundleSelectActivity.MODE_NORMAL);
+                openBundleSelect(BundleSelectActivity.MODE_NORMAL);
                 return true;
 
             case KeyEvent.KEYCODE_3:
-                goContainerInput();
+                openContainerInputIfWorkExists();
                 return true;
 
             case KeyEvent.KEYCODE_4:
-                goBundleSelect(BundleSelectActivity.MODE_JYURYO);
+                openBundleSelect(BundleSelectActivity.MODE_JYURYO);
                 return true;
 
             case KeyEvent.KEYCODE_5:
-                goCollateContainerSelect();
+                openCollateContainerSelect();
                 return true;
         }
 
-        // ★ここがポイント：BaseActivity の dispatchKeyEvent が F1-F4 を拾うので、
-        // 数字キー以外は super に流してOK
         return super.onKeyDown(keyCode, event);
     }
 
-    // ===========================================================
-    // 機　能　:　AssemblyInfoのﾀｲﾄﾙの取得
-    //'引　数　:　strCd      ..... ｺｰﾄﾞ
-    //　　　　　:　lngRow     ..... 行№(参照渡し)
-    //　　　　: (blnSetFlg) ..... True –ｾｯﾄする(ﾃﾞﾌｫﾙﾄ)、False –ｾｯﾄしない
-    //　戻り値　:　[String]  ..... ﾀｲﾄﾙ
-    // ===========================================================
+    //============================================================
+    //　機　能　:　中央ステータス表示
+    //============================================================
     private void setCenterStatus(String text) {
         if (tvCenterStatus != null) tvCenterStatus.setText(text);
     }
 
+    //============================================================
+    //　機　能　:　データ送受信開始
+    //============================================================
     private void startDataSync() {
         setCenterStatus("データ送受信中...");
         io.execute(this::runDataSync);
@@ -341,7 +411,7 @@ public class MenuActivity extends BaseActivity {
                 send.heatNo = m.heatNo;
                 send.sokuban = m.sokuban;
                 send.syukkaSashizuNo = m.syukkaSashizuNo;
-                send.bundleNo = m.bundleNo;  // ★bundleNo（小文字）重要
+                send.bundleNo = m.bundleNo;
                 send.jyuryo = m.jyuryo;
                 send.bookingNo = m.bookingNo;
 
@@ -402,6 +472,9 @@ public class MenuActivity extends BaseActivity {
         );
     }
 
+    //============================================================
+    //　機　能　:　データ送受信（実処理）
+    //============================================================
     private void runDataSync() {
         showLoadingLong();
         try {
@@ -421,6 +494,9 @@ public class MenuActivity extends BaseActivity {
         }
     }
 
+    //============================================================
+    //　機　能　:　メニュー表示情報の再取得（DB集計）
+    //============================================================
     private void refreshInformation() {
         io.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
@@ -465,12 +541,15 @@ public class MenuActivity extends BaseActivity {
 
             final boolean showUnsent = hasUnsentSyukka || hasUnsentKakunin;
             final boolean hasWorkFinal = hasWork;
+
             final long kanryoContainerFinal = kanryoContainer;
             final long kanryoBundoleFinal = kanryoBundole;
             final long kanryoJyuryoTonFinal = kanryoJyuryoTon;
+
             final long containerCountFinal = containerCount;
             final long goukeiBundoleFinal = goukeiBundole;
             final long goukeiJyuryoTonFinal = goukeiJyuryoTon;
+
             final long zanContainerFinal = zanContainer;
             final long zanBundleFinal = zanBundle;
             final long zanWeightFinal = zanWeight;
@@ -486,33 +565,21 @@ public class MenuActivity extends BaseActivity {
                     lblContainerInput.setVisibility(hasWorkFinal ? View.VISIBLE : View.INVISIBLE);
                 }
 
-                if (lblContainerFin != null) {
+                if (lblContainerFin != null)
                     lblContainerFin.setText(formatNumber(kanryoContainerFinal));
-                }
-                if (lblBundleFin != null) {
-                    lblBundleFin.setText(formatNumber(kanryoBundoleFinal));
-                }
-                if (lblWeightFin != null) {
-                    lblWeightFin.setText(formatNumber(kanryoJyuryoTonFinal));
-                }
-                if (lblContainerPlan != null) {
+                if (lblBundleFin != null) lblBundleFin.setText(formatNumber(kanryoBundoleFinal));
+                if (lblWeightFin != null) lblWeightFin.setText(formatNumber(kanryoJyuryoTonFinal));
+
+                if (lblContainerPlan != null)
                     lblContainerPlan.setText(formatNumber(containerCountFinal));
-                }
-                if (lblBundlePlan != null) {
-                    lblBundlePlan.setText(formatNumber(goukeiBundoleFinal));
-                }
-                if (lblWeightPlan != null) {
+                if (lblBundlePlan != null) lblBundlePlan.setText(formatNumber(goukeiBundoleFinal));
+                if (lblWeightPlan != null)
                     lblWeightPlan.setText(formatNumber(goukeiJyuryoTonFinal));
-                }
-                if (lblZanContainer != null) {
+
+                if (lblZanContainer != null)
                     lblZanContainer.setText(formatRemaining(zanContainerFinal));
-                }
-                if (lblZanBundle != null) {
-                    lblZanBundle.setText(formatRemaining(zanBundleFinal));
-                }
-                if (lblZanWeight != null) {
-                    lblZanWeight.setText(formatRemaining(zanWeightFinal));
-                }
+                if (lblZanBundle != null) lblZanBundle.setText(formatRemaining(zanBundleFinal));
+                if (lblZanWeight != null) lblZanWeight.setText(formatRemaining(zanWeightFinal));
             });
         });
     }
@@ -522,9 +589,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     private String formatRemaining(long value) {
-        if (value == 0) {
-            return "";
-        }
+        if (value == 0) return "";
         return formatNumber(value);
     }
 
