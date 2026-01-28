@@ -74,6 +74,7 @@ public final class BundleTableViewKit {
 
         public void bind() {
             tableView.setAdapter(adapter);
+            tableView.setRowHeaderWidth(0);
 
             tableView.setTableViewListener(new BundleTableListener(
                     context,
@@ -175,10 +176,19 @@ public final class BundleTableViewKit {
     static final class BundleTableAdapter extends AbstractTableAdapter<ColumnHeader, RowHeader, Cell> {
 
         private final Context context;
+        private final int[] columnWidthsPx;
+        private static final float[] COLUMN_WEIGHTS = {
+                0.26f, // P No
+                0.18f, // B No
+                0.20f, // Index
+                0.18f, // 重量
+                0.18f  // 削除
+        };
 
         BundleTableAdapter(@NonNull Context context) {
             super();                 // ★あなたの環境では引数なし
             this.context = context;
+            this.columnWidthsPx = calculateColumnWidthsPx();
         }
 
         static final class HeaderVH extends AbstractViewHolder {
@@ -220,8 +230,6 @@ public final class BundleTableViewKit {
             tv.setPadding(dp(8), dp(4), dp(8), dp(4));
             tv.setSingleLine(true);
             tv.setGravity(Gravity.CENTER);
-
-            tv.setMinWidth(dp(80));
             return new CellVH(tv);
         }
 
@@ -238,8 +246,6 @@ public final class BundleTableViewKit {
             tv.setGravity(Gravity.CENTER);
             tv.setPadding(dp(8), dp(4), dp(8), dp(4));
             tv.setSingleLine(true);
-
-            tv.setMinWidth(dp(80));
             return new HeaderVH(tv);
         }
 
@@ -267,12 +273,7 @@ public final class BundleTableViewKit {
         public void onBindCellViewHolder(@NonNull AbstractViewHolder holder, @NonNull Cell value, int xPosition, int yPosition) {
             CellVH vh = (CellVH) holder;
             vh.tv.setText(value.text);
-
-            if (xPosition == COL_PNO) vh.tv.setMinWidth(dp(110));
-            if (xPosition == COL_BNO) vh.tv.setMinWidth(dp(90));
-            if (xPosition == COL_INDEX) vh.tv.setMinWidth(dp(110));
-            if (xPosition == COL_JYURYO) vh.tv.setMinWidth(dp(90));
-            if (xPosition == COL_DEL) vh.tv.setMinWidth(dp(70));
+            applyColumnWidth(vh.tv, xPosition);
 
             if (xPosition == COL_JYURYO) {
                 vh.tv.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
@@ -291,12 +292,7 @@ public final class BundleTableViewKit {
         public void onBindColumnHeaderViewHolder(@NonNull AbstractViewHolder holder, @NonNull ColumnHeader value, int xPosition) {
             HeaderVH vh = (HeaderVH) holder;
             vh.tv.setText(value.title);
-
-            if (xPosition == COL_PNO) vh.tv.setMinWidth(dp(110));
-            if (xPosition == COL_BNO) vh.tv.setMinWidth(dp(90));
-            if (xPosition == COL_INDEX) vh.tv.setMinWidth(dp(110));
-            if (xPosition == COL_JYURYO) vh.tv.setMinWidth(dp(90));
-            if (xPosition == COL_DEL) vh.tv.setMinWidth(dp(70));
+            applyColumnWidth(vh.tv, xPosition);
         }
 
         @Override
@@ -325,6 +321,37 @@ public final class BundleTableViewKit {
                     dp,
                     context.getResources().getDisplayMetrics()
             );
+        }
+
+        private void applyColumnWidth(@NonNull TextView tv, int xPosition) {
+            ViewGroup.LayoutParams params = tv.getLayoutParams();
+            params.width = getColumnWidthPx(xPosition);
+            tv.setLayoutParams(params);
+        }
+
+        private int getColumnWidthPx(int columnPosition) {
+            if (columnPosition >= 0 && columnPosition < columnWidthsPx.length) {
+                return columnWidthsPx[columnPosition];
+            }
+            return columnWidthsPx[0];
+        }
+
+        private int[] calculateColumnWidthsPx() {
+            int screenWidth = context.getResources().getDisplayMetrics().widthPixels;
+            int[] widths = new int[COLUMN_WEIGHTS.length];
+            int assigned = 0;
+
+            for (int i = 0; i < COLUMN_WEIGHTS.length; i++) {
+                widths[i] = Math.round(screenWidth * COLUMN_WEIGHTS[i]);
+                assigned += widths[i];
+            }
+
+            int diff = screenWidth - assigned;
+            if (diff != 0 && widths.length > 0) {
+                widths[0] += diff;
+            }
+
+            return widths;
         }
     }
 
