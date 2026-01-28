@@ -507,18 +507,19 @@ public class BundleSelectActivity extends BaseActivity {
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_collate_container_row, parent, false);
+                    .inflate(R.layout.item_bundle_select_row, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             BundleGridRow row = rows.get(position);
-            holder.tvIndex.setText(row.pNo);
-            holder.tvContainerNo.setText(row.bNo);
-            holder.tvBundleCnt.setText(row.index);
-            holder.tvSagyouYmd.setText(row.jyuryo);
-            holder.tvSagyouYmd.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+            holder.tvPNo.setText(row.pNo);
+            holder.tvBNo.setText(row.bNo);
+            holder.tvIndex.setText(row.index);
+            holder.tvJyuryo.setText(row.jyuryo);
+            holder.tvJyuryo.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+            holder.tvDelete.setText(row.cancelText);
 
             holder.itemView.setOnClickListener(v -> {
                 int adapterPosition = holder.getAdapterPosition(); // ★ここ変更
@@ -535,17 +536,20 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
+            final TextView tvPNo;
+            final TextView tvBNo;
             final TextView tvIndex;
-            final TextView tvContainerNo;
-            final TextView tvBundleCnt;
-            final TextView tvSagyouYmd;
+            final TextView tvJyuryo;
+            final TextView tvDelete;
+
 
             ViewHolder(android.view.View itemView) {
                 super(itemView);
+                tvPNo = itemView.findViewById(R.id.tvRowPNo);
+                tvBNo = itemView.findViewById(R.id.tvRowBNo);
                 tvIndex = itemView.findViewById(R.id.tvRowIndex);
-                tvContainerNo = itemView.findViewById(R.id.tvRowContainerNo);
-                tvBundleCnt = itemView.findViewById(R.id.tvRowBundleCnt);
-                tvSagyouYmd = itemView.findViewById(R.id.tvRowSagyouYmd);
+                tvJyuryo = itemView.findViewById(R.id.tvRowJyuryo);
+                tvDelete = itemView.findViewById(R.id.tvRowDelete);
             }
         }
     }
