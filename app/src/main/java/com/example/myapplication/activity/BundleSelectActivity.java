@@ -264,6 +264,7 @@ public class BundleSelectActivity extends BaseActivity {
         if (red != null) red.setText("全削除");
         if (green != null) green.setText("");
         if (yellow != null) yellow.setText("終了");
+        refreshBottomButtonsEnabled();
     }
 
     @Override
@@ -381,7 +382,6 @@ public class BundleSelectActivity extends BaseActivity {
         io.execute(() -> {
             String heatNo;
             String sokuban;
-            String bundleNo = null;
 
             try {
                 if (input.length() == 13) {
@@ -402,9 +402,13 @@ public class BundleSelectActivity extends BaseActivity {
                         etGenpinNo.setText("");
                         etGenpinNo.requestFocus();
                     }
+                    hideLoadingShort();
                 });
             } catch (Exception ex) {
-                runOnUiThread(() -> errorProcess("BundleSelect handleGenpinInput", ex));
+                runOnUiThread(() -> {
+                    hideLoadingShort();
+                    errorProcess("BundleSelect handleGenpinInput", ex);
+                });
             }
         });
     }
