@@ -139,7 +139,6 @@ public class BaseActivity extends AppCompatActivity {
     private void afterSetContentView() {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
-        attachEditTextFocusHideOnce(); // ★今回の追加
     }
 
     @Override
@@ -345,38 +344,7 @@ public class BaseActivity extends AppCompatActivity {
         uiHandler.removeCallbacks(systemUiKeepHiddenRunnable);
         systemUiKeepHiddenRunnable = null;
     }
-
-    // ===== ★EditText focus 対策 =====
-
-    private void attachEditTextFocusHideOnce() {
-        if (editTextFocusHookAttached) return;
-        editTextFocusHookAttached = true;
-
-        View root = findViewById(android.R.id.content);
-        if (!(root instanceof ViewGroup)) return;
-
-        View decorView = getWindow().getDecorView();
-        attachFocusRecursive((ViewGroup) root, decorView);
-    }
-
-    private void attachFocusRecursive(ViewGroup parent, View decorView) {
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View v = parent.getChildAt(i);
-
-            if (v instanceof android.widget.EditText) {
-                v.setOnFocusChangeListener((view, hasFocus) -> {
-                    if (hasFocus) {
-                        // フォーカス→IME表示の流れで出っぱなしになりやすいので強制hide
-                        forceHideNowAndSoon(decorView);
-                    }
-                });
-            }
-
-            if (v instanceof ViewGroup) {
-                attachFocusRecursive((ViewGroup) v, decorView);
-            }
-        }
-    }
+    
 
     // ===== frmBase: ErrorProcess 相当 =====
 

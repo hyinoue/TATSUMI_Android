@@ -9,7 +9,6 @@ import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
 import com.example.myapplication.model.BundleInfo;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +45,6 @@ public class BundleSelectController {
     private final List<BundleGridRow> displayRows = new ArrayList<>();
 
     private static final int MAX_ROWS = 20;
-    private final DecimalFormat fmt = new DecimalFormat("#,0");
 
     public BundleSelectController(@NonNull SyukkaMeisaiDao syukkaMeisaiDao,
                                   @NonNull SyukkaMeisaiWorkDao syukkaMeisaiWorkDao,
@@ -226,7 +224,7 @@ public class BundleSelectController {
             String idx = safeStr(item.sokuban);
 
             // C#：ToString("#,0").PadLeft(6,' ')
-            String j = fmt.format(item.jyuryo);
+            String j = String.format(Locale.JAPAN, "%,d", item.jyuryo);
             if (j.length() < 6) j = repeat(" ", 6 - j.length()) + j;
 
             displayRows.add(new BundleGridRow(pNo, bNo, idx, j, "削除"));

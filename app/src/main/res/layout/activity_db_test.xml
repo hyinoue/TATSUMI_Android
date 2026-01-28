@@ -74,7 +74,7 @@
             android:id="@+id/tableView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/bg_edittext_black_border"
+            android:background="@drawable/bg_border_top_bottom"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +92,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
-        
+
     </LinearLayout>
 
     <include

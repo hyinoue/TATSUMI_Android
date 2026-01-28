@@ -50,6 +50,7 @@
                 android:background="@drawable/bg_edittext_black_border"
                 android:gravity="end|center_vertical"
                 android:inputType="number"
+                android:maxLength="3"
                 android:paddingEnd="8dp" />
         </LinearLayout>
 
