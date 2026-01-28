@@ -1,28 +1,33 @@
 package com.example.myapplication.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.evrencoskun.tableview.TableView;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
+import com.example.myapplication.grid.BundleGridRow;
 import com.example.myapplication.grid.BundleSelectController;
-import com.example.myapplication.grid.BundleTableViewKit;
 import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,11 +52,11 @@ public class BundleSelectActivity extends BaseActivity {
     private TextView tvTotalWeight;
     private TextView tvRemainWeight;
     private TextView tvTitle;
-    private TableView tableView;
+    private RecyclerView rvBundles;
 
     private ExecutorService io;
     private BundleSelectController controller;
-    private BundleTableViewKit.Binder tableBinder;
+    private BundleRowAdapter adapter;
     private DensoScannerController scanner;
 
     private int maxContainerJyuryo = 0;
@@ -68,6 +73,7 @@ public class BundleSelectActivity extends BaseActivity {
         setupMode(getIntent());
         setupBottomButtonTexts();
         setupInputHandlers();
+        setupRecycler();
         initScanner();
 
         // DB/Controller 初期化 + 初期値ロード
@@ -85,7 +91,7 @@ public class BundleSelectActivity extends BaseActivity {
         tvTotalWeight = findViewById(R.id.tvTotalWeight);
         tvRemainWeight = findViewById(R.id.tvRemainWeight);
         tvTitle = findViewById(R.id.tvTitle);
-        tableView = findViewById(R.id.tableViewBundles);
+        rvBundles = findViewById(R.id.rvBundles);
     }
 
     //============================================================
@@ -164,7 +170,7 @@ public class BundleSelectActivity extends BaseActivity {
                     if (etContainerKg != null)
                         etContainerKg.setText(String.valueOf(defaultContainer));
                     if (etDunnageKg != null) etDunnageKg.setText(String.valueOf(defaultDunnage));
-                    setupTable();
+                    refreshRows();
                     updateFooter();
                     if (etGenpinNo != null) etGenpinNo.requestFocus();
                 });
@@ -206,18 +212,26 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　テール表示初期化
+    //　機　能　:　一覧表示初期化
     //============================================================
-    private void setupTable() {
-        if (tableView == null || controller == null) return;
-        tableBinder = new BundleTableViewKit.Binder(
-                this,
-                tableView,
-                controller,
-                this::updateFooter,
-                this::deleteBundleRow
-        );
-        tableBinder.bind();
+    private void setupRecycler() {
+        if (rvBundles == null) return;
+        adapter = new BundleRowAdapter(this::confirmDeleteRow);
+        rvBundles.setLayoutManager(new LinearLayoutManager(this));
+        rvBundles.setAdapter(adapter);
+    }
+
+    private void refreshRows() {
+        if (adapter == null || controller == null) return;
+        adapter.submitList(controller.getDisplayRows());
+    }
+
+    private void confirmDeleteRow(int row) {
+        new AlertDialog.Builder(this)
+                .setMessage("行を削除します。よろしいですか？")
+                .setPositiveButton("はい", (d, w) -> deleteBundleRow(row))
+                .setNegativeButton("いいえ", null)
+                .show();
     }
 
     private void deleteBundleRow(int row) {
@@ -226,7 +240,7 @@ public class BundleSelectActivity extends BaseActivity {
             try {
                 controller.removeBundle(row);
                 runOnUiThread(() -> {
-                    if (tableBinder != null) tableBinder.refresh();
+                    refreshRows();
                     updateFooter();
                     if (etGenpinNo != null) etGenpinNo.requestFocus();
                 });
@@ -277,7 +291,7 @@ public class BundleSelectActivity extends BaseActivity {
                 try {
                     controller.deleteBundles();
                     runOnUiThread(() -> {
-                        if (tableBinder != null) tableBinder.refresh();
+                        refreshRows();
                         updateFooter();
                         if (etGenpinNo != null) etGenpinNo.requestFocus();
                     });
@@ -396,7 +410,7 @@ public class BundleSelectActivity extends BaseActivity {
 
                 controller.addBundle(heatNo, sokuban);
                 runOnUiThread(() -> {
-                    if (tableBinder != null) tableBinder.refresh();
+                    refreshRows();
                     updateFooter();
                     if (etGenpinNo != null) {
                         etGenpinNo.setText("");
@@ -470,5 +484,69 @@ public class BundleSelectActivity extends BaseActivity {
         if (scanner != null) scanner.onDestroy();
         if (io != null) io.shutdownNow();
         super.onDestroy();
+    }
+
+    private static class BundleRowAdapter extends RecyclerView.Adapter<BundleRowAdapter.ViewHolder> {
+        interface DeleteHandler {
+            void delete(int row);
+        }
+
+        private final List<BundleGridRow> rows = new ArrayList<>();
+        private final DeleteHandler deleteHandler;
+
+        BundleRowAdapter(DeleteHandler deleteHandler) {
+            this.deleteHandler = deleteHandler;
+        }
+
+        void submitList(List<BundleGridRow> newRows) {
+            rows.clear();
+            if (newRows != null) rows.addAll(newRows);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
+            android.view.View view = android.view.LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_collate_container_row, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            BundleGridRow row = rows.get(position);
+            holder.tvIndex.setText(row.pNo);
+            holder.tvContainerNo.setText(row.bNo);
+            holder.tvBundleCnt.setText(row.index);
+            holder.tvSagyouYmd.setText(row.jyuryo);
+            holder.tvSagyouYmd.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+
+            holder.itemView.setOnClickListener(v -> {
+                int adapterPosition = holder.getAdapterPosition(); // ★ここ変更
+                if (adapterPosition != RecyclerView.NO_POSITION && deleteHandler != null) {
+                    deleteHandler.delete(adapterPosition);
+                }
+            });
+        }
+
+
+        @Override
+        public int getItemCount() {
+            return rows.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            final TextView tvIndex;
+            final TextView tvContainerNo;
+            final TextView tvBundleCnt;
+            final TextView tvSagyouYmd;
+
+            ViewHolder(android.view.View itemView) {
+                super(itemView);
+                tvIndex = itemView.findViewById(R.id.tvRowIndex);
+                tvContainerNo = itemView.findViewById(R.id.tvRowContainerNo);
+                tvBundleCnt = itemView.findViewById(R.id.tvRowBundleCnt);
+                tvSagyouYmd = itemView.findViewById(R.id.tvRowSagyouYmd);
+            }
+        }
     }
 }

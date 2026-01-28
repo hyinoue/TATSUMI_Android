@@ -117,13 +117,76 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ✅ 一覧（TableView：ヘッダ＋ボディ一体） -->
-    <com.evrencoskun.tableview.TableView
-        android:id="@+id/tableViewBundles"
+    <!-- 表ヘッダ（P No / B No / Index / 重量） -->
+    <LinearLayout
+        android:id="@+id/rowTableHeader"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:background="#D0D0D0"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/areaHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="P No"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="B No"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="Index"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text="重量"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:background="@drawable/bg_menu_count"
+            android:text=""
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- ✅ 一覧（RecyclerView） -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBundles"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#888888"
-        app:layout_constraintTop_toBottomOf="@id/areaHeader"
+        app:layout_constraintTop_toBottomOf="@id/rowTableHeader"
         app:layout_constraintBottom_toTopOf="@id/areaFooter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

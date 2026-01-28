@@ -246,7 +246,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_grid_row, parent, false);
+                    .inflate(R.layout.item_collate_container_row, parent, false);
             return new ViewHolder(view);
         }
 
