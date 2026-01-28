@@ -1,0 +1,15 @@
+package com.example.myapplication.grid;
+
+public class CollateContainerRow {
+    public final String index;
+    public final String containerNo;
+    public final String bundleCnt;
+    public final String sagyouYmd;
+
+    public CollateContainerRow(String index, String containerNo, String bundleCnt, String sagyouYmd) {
+        this.index = index;
+        this.containerNo = containerNo;
+        this.bundleCnt = bundleCnt;
+        this.sagyouYmd = sagyouYmd;
+    }
+}

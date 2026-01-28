@@ -8,6 +8,12 @@ import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
 public class VanningCollationActivity extends BaseActivity {
+
+    public static final String EXTRA_CONTAINER_ID = "extra_container_id";
+    public static final String EXTRA_CONTAINER_NO = "extra_container_no";
+    public static final String EXTRA_BUNDLE_CNT = "extra_bundle_cnt";
+    public static final String EXTRA_SAGYOU_YMD = "extra_sagyou_ymd";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

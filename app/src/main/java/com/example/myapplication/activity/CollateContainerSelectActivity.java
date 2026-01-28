@@ -3,48 +3,182 @@ package com.example.myapplication.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
+import com.example.myapplication.db.AppDatabase;
+import com.example.myapplication.grid.CollateContainerRow;
+import com.example.myapplication.grid.CollateContainerSelectController;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class CollateContainerSelectActivity extends BaseActivity {
+
+    private EditText etSelectedNo;
+    private RecyclerView rvContainers;
+    private MaterialButton btnBlue;
+    private MaterialButton btnRed;
+    private MaterialButton btnGreen;
+    private MaterialButton btnYellow;
+
+    private CollateContainerSelectController controller;
+    private CollateContainerAdapter adapter;
+    private ExecutorService io;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collate_container_select);
 
-        // ▼ 下ボタン（include）を取得
-        View bottom = findViewById(R.id.includeBottomButtons);
+        io = Executors.newSingleThreadExecutor();
 
-        // ▼ 各ボタンを取得
-        MaterialButton btnBlue = bottom.findViewById(R.id.btnBottomBlue);
-        MaterialButton btnRed = bottom.findViewById(R.id.btnBottomRed);
-        MaterialButton btnGreen = bottom.findViewById(R.id.btnBottomGreen);
-        MaterialButton btnYellow = bottom.findViewById(R.id.btnBottomYellow);
-
-        // ▼ 文字設定（画面ごとにここだけ変える）
-        btnBlue.setText("決定");
-        btnRed.setText("");
-        btnGreen.setText("");
-        btnYellow.setText("終了");
-
-        btnBlue.setOnClickListener(v -> {
-            Intent intent = new Intent(CollateContainerSelectActivity.this, VanningCollationActivity.class);
-            startActivity(intent);
-        });
-        btnYellow.setOnClickListener(v -> finish());
+        bindViews();
+        setupBottomButtons();
+        setupRecycler();
+        setupInputHandlers();
+        loadContainers();
     }
 
-    // ==============================
-    // 4色ボタンの実処理（タップも物理キーもここに集約）
-    // ==============================
+    private void bindViews() {
+        etSelectedNo = findViewById(R.id.etContainerKg);
+        rvContainers = findViewById(R.id.rvBundles);
+        btnBlue = findViewById(R.id.btnBottomBlue);
+        btnRed = findViewById(R.id.btnBottomRed);
+        btnGreen = findViewById(R.id.btnBottomGreen);
+        btnYellow = findViewById(R.id.btnBottomYellow);
+    }
+
+    private void setupBottomButtons() {
+        if (btnBlue != null) btnBlue.setText("決定");
+        if (btnRed != null) btnRed.setText("");
+        if (btnGreen != null) btnGreen.setText("");
+        if (btnYellow != null) btnYellow.setText("終了");
+        refreshBottomButtonsEnabled();
+    }
+
+    private void setupRecycler() {
+        adapter = new CollateContainerAdapter();
+        rvContainers.setLayoutManager(new LinearLayoutManager(this));
+        rvContainers.setAdapter(adapter);
+        rvContainers.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && etSelectedNo != null) {
+                etSelectedNo.requestFocus();
+            }
+        });
+    }
+
+    private void setupInputHandlers() {
+        if (etSelectedNo == null) return;
+
+        etSelectedNo.setShowSoftInputOnFocus(false);
+        etSelectedNo.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+                handleSelectedNoInput();
+                return true;
+            }
+            return false;
+        });
+        etSelectedNo.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                handleSelectedNoInput();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void loadContainers() {
+        showLoadingShort();
+        io.execute(() -> {
+            try {
+                AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+                controller = new CollateContainerSelectController(db.kakuninContainerDao());
+                controller.loadContainers();
+
+                runOnUiThread(() -> {
+                    hideLoadingShort();
+                    adapter.submitList(controller.getDisplayRows());
+                    updateUiForContainers();
+                });
+            } catch (Exception ex) {
+                runOnUiThread(() -> {
+                    hideLoadingShort();
+                    errorProcess("CollateContainerSelect loadContainers", ex);
+                });
+            }
+        });
+    }
+
+    private void updateUiForContainers() {
+        boolean hasContainers = controller != null && !controller.getContainers().isEmpty();
+        if (etSelectedNo != null) {
+            etSelectedNo.setEnabled(hasContainers);
+            if (hasContainers) {
+                etSelectedNo.requestFocus();
+            }
+        }
+        if (!hasContainers && btnBlue != null) {
+            btnBlue.setText("");
+        } else if (hasContainers && btnBlue != null) {
+            btnBlue.setText("決定");
+        }
+        refreshBottomButtonsEnabled();
+    }
+
+    private void handleSelectedNoInput() {
+        if (controller == null) return;
+
+        String input = etSelectedNo != null && etSelectedNo.getText() != null
+                ? etSelectedNo.getText().toString().trim()
+                : "";
+
+        if (TextUtils.isEmpty(input)) {
+            showWarningMsg("照合対照№が未入力です", MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+            return;
+        }
+
+        int selectedNo;
+        try {
+            selectedNo = Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            showWarningMsg("照合対象№が不正です", MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+            return;
+        }
+
+        String err = controller.checkSelectedNo(selectedNo);
+        if (!TextUtils.isEmpty(err) && !"OK".equals(err)) {
+            showWarningMsg(err, MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+        }
+    }
+
     @Override
     protected void onFunctionBlue() {
-        // 確定
-        // TODO: 確定処理をここに実装
-        showInfoMsg("確定（未実装）", MsgDispMode.Label);
+        if (!validateAndSelect()) {
+            return;
+        }
+
+        Intent intent = new Intent(this, VanningCollationActivity.class);
+        intent.putExtra(VanningCollationActivity.EXTRA_CONTAINER_ID, controller.getSelectedContainerId());
+        intent.putExtra(VanningCollationActivity.EXTRA_CONTAINER_NO, controller.getSelectedContainerNo());
+        intent.putExtra(VanningCollationActivity.EXTRA_BUNDLE_CNT, controller.getSelectedBundleCnt());
+        intent.putExtra(VanningCollationActivity.EXTRA_SAGYOU_YMD, controller.getSelectedSagyouYmd());
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -59,7 +193,90 @@ public class CollateContainerSelectActivity extends BaseActivity {
 
     @Override
     protected void onFunctionYellow() {
-        // 終了
         finish();
+    }
+
+    private boolean validateAndSelect() {
+        if (controller == null) return false;
+
+        String input = etSelectedNo != null && etSelectedNo.getText() != null
+                ? etSelectedNo.getText().toString().trim()
+                : "";
+
+        if (TextUtils.isEmpty(input)) {
+            showWarningMsg("照合対照№が未入力です", MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+            return false;
+        }
+
+        int selectedNo;
+        try {
+            selectedNo = Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            showWarningMsg("照合対象№が不正です", MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+            return false;
+        }
+
+        String err = controller.selectContainer(selectedNo);
+        if (!TextUtils.isEmpty(err) && !"OK".equals(err)) {
+            showWarningMsg(err, MsgDispMode.MsgBox);
+            if (etSelectedNo != null) etSelectedNo.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (io != null) io.shutdownNow();
+        super.onDestroy();
+    }
+
+    private static class CollateContainerAdapter extends RecyclerView.Adapter<CollateContainerAdapter.ViewHolder> {
+        private final List<CollateContainerRow> rows = new ArrayList<>();
+
+        void submitList(List<CollateContainerRow> newRows) {
+            rows.clear();
+            if (newRows != null) rows.addAll(newRows);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
+            android.view.View view = android.view.LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_grid_row, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            CollateContainerRow row = rows.get(position);
+            holder.tvIndex.setText(row.index);
+            holder.tvContainerNo.setText(row.containerNo);
+            holder.tvBundleCnt.setText(row.bundleCnt);
+            holder.tvSagyouYmd.setText(row.sagyouYmd);
+        }
+
+        @Override
+        public int getItemCount() {
+            return rows.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            final TextView tvIndex;
+            final TextView tvContainerNo;
+            final TextView tvBundleCnt;
+            final TextView tvSagyouYmd;
+
+            ViewHolder(android.view.View itemView) {
+                super(itemView);
+                tvIndex = itemView.findViewById(R.id.tvRowIndex);
+                tvContainerNo = itemView.findViewById(R.id.tvRowContainerNo);
+                tvBundleCnt = itemView.findViewById(R.id.tvRowBundleCnt);
+                tvSagyouYmd = itemView.findViewById(R.id.tvRowSagyouYmd);
+            }
+        }
     }
 }

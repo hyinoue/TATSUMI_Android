@@ -45,4 +45,13 @@ public interface KakuninContainerDao {
     @Query("DELETE FROM " +
             "T_KAKUNIN_CONTAINER")
     void deleteAll();
+
+    @Query("SELECT * FROM " +
+            "T_KAKUNIN_CONTAINER " +
+            "WHERE " +
+            "CONTAINER_SYOUGO_KANRYO = 0 " +
+            "ORDER BY " +
+            "CONTAINER_ID"
+    )
+    List<KakuninContainerEntity> findUncollated();
 }

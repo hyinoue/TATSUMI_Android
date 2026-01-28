@@ -60,7 +60,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"></LinearLayout>
+            android:gravity="center_vertical">
+
+        </LinearLayout>
     </LinearLayout>
 
     <!-- 表ヘッダ（PNo / BNo / Index / 重量 / 削除） -->
@@ -76,9 +78,9 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
@@ -96,9 +98,9 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
