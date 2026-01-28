@@ -111,7 +111,9 @@
                 android:layout_width="95dp"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:paddingEnd="0dp"
+                android:paddingStart="12dp" />
         </LinearLayout>
 
         <!-- 3. コンテナ情報入力 -->

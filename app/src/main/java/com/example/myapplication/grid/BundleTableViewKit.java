@@ -10,13 +10,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.evrencoskun.tableview.ITableView;
 import com.evrencoskun.tableview.TableView;
 import com.evrencoskun.tableview.adapter.AbstractTableAdapter;
 import com.evrencoskun.tableview.adapter.recyclerview.holder.AbstractViewHolder;
-import com.evrencoskun.tableview.listener.ITableViewListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,40 +45,48 @@ public final class BundleTableViewKit {
     // ================================
 
     public static final class Binder {
+        public interface DeleteHandler {
+            void delete(int row);
+        }
+
         private final Context context;
         private final TableView tableView;
         private final BundleSelectController controller;
         private final BundleTableAdapter adapter;
         @Nullable
         private final Runnable onRefreshed;
+        @Nullable
+        private final DeleteHandler deleteHandler;
 
         public Binder(@NonNull Context context,
                       @NonNull TableView tableView,
                       @NonNull BundleSelectController controller) {
-            this(context, tableView, controller, null);
+            this(context, tableView, controller, null, null);
         }
 
         public Binder(@NonNull Context context,
                       @NonNull TableView tableView,
                       @NonNull BundleSelectController controller,
                       @Nullable Runnable onRefreshed) {
+            this(context, tableView, controller, onRefreshed, null);
+        }
+
+        public Binder(@NonNull Context context,
+                      @NonNull TableView tableView,
+                      @NonNull BundleSelectController controller,
+                      @Nullable Runnable onRefreshed,
+                      @Nullable DeleteHandler deleteHandler) {
             this.context = context;
             this.tableView = tableView;
             this.controller = controller;
-            this.adapter = new BundleTableAdapter(context);
+            this.adapter = new BundleTableAdapter(context, row -> showDeleteConfirm(row));
             this.onRefreshed = onRefreshed;
+            this.deleteHandler = deleteHandler;
         }
 
         public void bind() {
             tableView.setAdapter(adapter);
             tableView.setRowHeaderWidth(0);
-
-            tableView.setTableViewListener(new BundleTableListener(
-                    context,
-                    tableView,
-                    controller,
-                    this::refresh
-            ));
 
             refresh();
         }
@@ -93,6 +98,23 @@ public final class BundleTableViewKit {
             if (onRefreshed != null) {
                 onRefreshed.run();
             }
+        }
+
+        private void showDeleteConfirm(int row) {
+            new AlertDialog.Builder(context)
+                    .setMessage("行を削除します。よろしいですか？")
+                    .setPositiveButton("はい", (d, w) -> {
+                        if (deleteHandler != null) {
+                            deleteHandler.delete(row);
+                        } else {
+                            tableView.post(() -> {
+                                controller.removeBundle(row);
+                                refresh();
+                            });
+                        }
+                    })
+                    .setNegativeButton("いいえ", null)
+                    .show();
         }
     }
 
@@ -175,8 +197,14 @@ public final class BundleTableViewKit {
     // =========================
     static final class BundleTableAdapter extends AbstractTableAdapter<ColumnHeader, RowHeader, Cell> {
 
+        interface DeleteClickHandler {
+            void onDelete(int rowIndex);
+        }
+
         private final Context context;
         private final int[] columnWidthsPx;
+        @Nullable
+        private final DeleteClickHandler deleteClickHandler;
         private static final float[] COLUMN_WEIGHTS = {
                 0.26f, // P No
                 0.18f, // B No
@@ -185,10 +213,11 @@ public final class BundleTableViewKit {
                 0.18f  // 削除
         };
 
-        BundleTableAdapter(@NonNull Context context) {
+        BundleTableAdapter(@NonNull Context context, @Nullable DeleteClickHandler deleteClickHandler) {
             super();                 // ★あなたの環境では引数なし
             this.context = context;
             this.columnWidthsPx = calculateColumnWidthsPx();
+            this.deleteClickHandler = deleteClickHandler;
         }
 
         static final class HeaderVH extends AbstractViewHolder {
@@ -281,9 +310,17 @@ public final class BundleTableViewKit {
             } else if (xPosition == COL_DEL) {
                 vh.tv.setGravity(Gravity.CENTER);
                 vh.tv.setTypeface(Typeface.DEFAULT_BOLD);
+                vh.tv.setOnClickListener(v -> {
+                    if (deleteClickHandler != null) {
+                        deleteClickHandler.onDelete(yPosition);
+                    }
+                });
             } else {
                 vh.tv.setGravity(Gravity.CENTER);
                 vh.tv.setTypeface(Typeface.DEFAULT);
+            }
+            if (xPosition != COL_DEL) {
+                vh.tv.setOnClickListener(null);
             }
         }
 
@@ -355,75 +392,4 @@ public final class BundleTableViewKit {
         }
     }
 
-    // =========================
-    //  Listener（削除列クリック）
-    // =========================
-    static final class BundleTableListener implements ITableViewListener {
-
-        interface Refresher {
-            void refresh();
-        }
-
-        private final Context context;
-        private final ITableView tableView;
-        private final BundleSelectController controller;
-        private final Refresher refresher;
-
-        BundleTableListener(@NonNull Context context,
-                            @NonNull ITableView tableView,
-                            @NonNull BundleSelectController controller,
-                            @NonNull Refresher refresher) {
-            this.context = context;
-            this.tableView = tableView;
-            this.controller = controller;
-            this.refresher = refresher;
-        }
-
-        // ★あなたの環境：ViewHolder版
-        @Override
-        public void onCellClicked(@NonNull RecyclerView.ViewHolder cellView, int column, int row) {
-            if (column == COL_DEL) {
-                new AlertDialog.Builder(context)
-                        .setMessage("行を削除します。よろしいですか？")
-                        .setPositiveButton("はい", (d, w) -> {
-                            controller.removeBundle(row);
-                            refresher.refresh();
-                        })
-                        .setNegativeButton("いいえ", null)
-                        .show();
-            }
-        }
-
-        @Override
-        public void onCellDoubleClicked(@NonNull RecyclerView.ViewHolder cellView, int column, int row) {
-        }
-
-        @Override
-        public void onCellLongPressed(@NonNull RecyclerView.ViewHolder cellView, int column, int row) {
-        }
-
-        @Override
-        public void onColumnHeaderClicked(@NonNull RecyclerView.ViewHolder columnHeaderView, int column) {
-        }
-
-        @Override
-        public void onColumnHeaderDoubleClicked(@NonNull RecyclerView.ViewHolder columnHeaderView, int column) {
-        }
-
-        @Override
-        public void onColumnHeaderLongPressed(@NonNull RecyclerView.ViewHolder columnHeaderView, int column) {
-        }
-
-        @Override
-        public void onRowHeaderClicked(@NonNull RecyclerView.ViewHolder rowHeaderView, int row) {
-        }
-
-        @Override
-        public void onRowHeaderDoubleClicked(@NonNull RecyclerView.ViewHolder rowHeaderView, int row) {
-        }
-
-        @Override
-        public void onRowHeaderLongPressed(@NonNull RecyclerView.ViewHolder rowHeaderView, int row) {
-        }
-    }
 }

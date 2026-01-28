@@ -206,12 +206,34 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　テーブル表示初期化
+    //　機　能　:　テール表示初期化
     //============================================================
     private void setupTable() {
         if (tableView == null || controller == null) return;
-        tableBinder = new BundleTableViewKit.Binder(this, tableView, controller, this::updateFooter);
+        tableBinder = new BundleTableViewKit.Binder(
+                this,
+                tableView,
+                controller,
+                this::updateFooter,
+                this::deleteBundleRow
+        );
         tableBinder.bind();
+    }
+
+    private void deleteBundleRow(int row) {
+        if (controller == null) return;
+        io.execute(() -> {
+            try {
+                controller.removeBundle(row);
+                runOnUiThread(() -> {
+                    if (tableBinder != null) tableBinder.refresh();
+                    updateFooter();
+                    if (etGenpinNo != null) etGenpinNo.requestFocus();
+                });
+            } catch (Exception ex) {
+                runOnUiThread(() -> errorProcess("BundleSelect deleteBundleRow", ex));
+            }
+        });
     }
 
     private final TextWatcher weightWatcher = new TextWatcher() {
@@ -238,22 +260,12 @@ public class BundleSelectActivity extends BaseActivity {
         MaterialButton green = findViewById(R.id.btnBottomGreen);
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
 
-        if (mode == BundleSelectController.Mode.Normal) {
-            if (red != null) red.setText("束クリア");
-            if (blue != null) blue.setText("確定");
-        } else {
-            if (red != null) red.setText("");
-            if (blue != null) blue.setText("確定");
-        }
+        if (blue != null) blue.setText("確定");
+        if (red != null) red.setText("全削除");
         if (green != null) green.setText("");
         if (yellow != null) yellow.setText("終了");
-
-        refreshBottomButtonsEnabled();
     }
 
-    //============================================================
-    //　機　能　:　4色ボタン（赤＝束クリア）
-    //============================================================
     @Override
     protected void onFunctionRed() {
         if (controller == null) return;
@@ -332,7 +344,7 @@ public class BundleSelectActivity extends BaseActivity {
 
     //============================================================
     //　機　能　:　Normal確定後、コンテナ情報入力へ直接遷移して終了する
-    //　説　明　:　MenuActivity に戻る瞬間を作らないため（チラ見え防止）
+    //　説　明　:　MenuActivity に戻る瞬間を作らないため（ラ見え防止）
     //============================================================
     private void openContainerInputAndFinish() {
         Intent intent = new Intent(this, ContainerInputActivity.class);
@@ -378,37 +390,12 @@ public class BundleSelectActivity extends BaseActivity {
                 } else if (input.length() == 14) {
                     heatNo = input.substring(1, 7);
                     sokuban = input.substring(7, 14);
-                } else if (input.length() == 18) {
-                    heatNo = input.substring(1, 7);
-                    sokuban = input.substring(7, 14).trim();
-                    bundleNo = input.substring(14, 18);
-                    controller.addBundleNo(heatNo, sokuban, bundleNo);
                 } else {
-                    runOnUiThread(() -> {
-                        hideLoadingShort();
-                        showWarningMsg("現品番号は13桁か14桁か18桁で入力してください", MsgDispMode.MsgBox);
-                        if (etGenpinNo != null) etGenpinNo.requestFocus();
-                    });
-                    return;
-                }
-
-                int container = getIntFromEdit(etContainerKg);
-                int dunnage = getIntFromEdit(etDunnageKg);
-                String errMsg = controller.checkBundle(heatNo, sokuban, container, dunnage, maxContainerJyuryo);
-
-                if (!TextUtils.isEmpty(errMsg)) {
-                    runOnUiThread(() -> {
-                        hideLoadingShort();
-                        showWarningMsg(errMsg, MsgDispMode.MsgBox);
-                        if (etGenpinNo != null) etGenpinNo.requestFocus();
-                    });
-                    return;
+                    throw new IllegalArgumentException("現品番号の形式が不正です");
                 }
 
                 controller.addBundle(heatNo, sokuban);
-
                 runOnUiThread(() -> {
-                    hideLoadingShort();
                     if (tableBinder != null) tableBinder.refresh();
                     updateFooter();
                     if (etGenpinNo != null) {
@@ -417,83 +404,55 @@ public class BundleSelectActivity extends BaseActivity {
                     }
                 });
             } catch (Exception ex) {
-                runOnUiThread(() -> {
-                    hideLoadingShort();
-                    errorProcess("BundleSelect handleGenpinInput", ex);
-                });
+                runOnUiThread(() -> errorProcess("BundleSelect handleGenpinInput", ex));
             }
         });
     }
 
     //============================================================
-    //　機　能　:　フッター集計表示更新（束数/合計/残）
-    //============================================================
-    private void updateFooter() {
-        if (controller == null) return;
-
-        int bundleCount = controller.getBundles().size();
-        int total = controller.getJyuryoSum()
-                + getIntFromEdit(etContainerKg)
-                + getIntFromEdit(etDunnageKg)
-                + bundleCount;
-        int remaining = maxContainerJyuryo - total;
-
-        if (tvBundleCount != null) {
-            tvBundleCount.setText(String.format(java.util.Locale.JAPAN, "%,d", bundleCount));
-        }
-        if (tvTotalWeight != null) {
-            tvTotalWeight.setText(String.format(java.util.Locale.JAPAN, "%,d", total));
-        }
-        if (tvRemainWeight != null) {
-            tvRemainWeight.setText(String.format(java.util.Locale.JAPAN, "%,d", remaining));
-        }
-    }
-
-    //============================================================
-    //　機　能　:　残重量取得
+    //　機　能　:　残重量の計算
     //============================================================
     private int getRemainingWeight() {
-        if (controller == null) return 0;
-
-        int bundleCount = controller.getBundles().size();
-        int total = controller.getJyuryoSum()
-                + getIntFromEdit(etContainerKg)
-                + getIntFromEdit(etDunnageKg)
-                + bundleCount;
-        return maxContainerJyuryo - total;
+        int total = getTotalWeight();
+        int container = getIntValue(etContainerKg);
+        int dunnage = getIntValue(etDunnageKg);
+        return maxContainerJyuryo - (total + container + dunnage);
     }
 
-    //============================================================
-    //　機　能　:　EditText数値取得（カンマ除去）
-    //============================================================
-    private int getIntFromEdit(@Nullable EditText editText) {
-        if (editText == null || editText.getText() == null) return 0;
+    private int getTotalWeight() {
+        if (controller == null) return 0;
+        return controller.getJyuryoSum();
+    }
 
-        String raw = editText.getText().toString();
-        if (TextUtils.isEmpty(raw)) return 0;
-
-        String cleaned = raw.replace(",", "").trim();
-        if (TextUtils.isEmpty(cleaned)) return 0;
-
+    private int getIntValue(EditText et) {
+        if (et == null) return 0;
+        String s = et.getText() != null ? et.getText().toString() : "";
+        if (TextUtils.isEmpty(s)) return 0;
         try {
-            return Integer.parseInt(cleaned);
-        } catch (NumberFormatException ex) {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException ignored) {
             return 0;
         }
     }
 
-    //============================================================
-    //　機　能　:　EditTextが未入力または0か判定
-    //============================================================
-    private boolean isEmptyOrZero(@Nullable EditText editText) {
-        return getIntFromEdit(editText) <= 0;
+    private boolean isEmptyOrZero(EditText et) {
+        return getIntValue(et) <= 0;
+    }
+
+    private void updateFooter() {
+        int count = controller != null ? controller.getBundles().size() : 0;
+        int total = getTotalWeight();
+        int remain = getRemainingWeight();
+
+        if (tvBundleCount != null) tvBundleCount.setText(String.valueOf(count));
+        if (tvTotalWeight != null) tvTotalWeight.setText(String.valueOf(total));
+        if (tvRemainWeight != null) tvRemainWeight.setText(String.valueOf(remain));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (scanner != null) scanner.onResume();
-        if (etGenpinNo != null) etGenpinNo.requestFocus();
     }
 
     @Override
@@ -505,15 +464,7 @@ public class BundleSelectActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
-        if (io != null) io.shutdown();
+        if (io != null) io.shutdownNow();
         super.onDestroy();
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (scanner != null && scanner.handleDispatchKeyEvent(event)) {
-            return true;
-        }
-        return super.dispatchKeyEvent(event);
     }
 }
