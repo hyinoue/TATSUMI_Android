@@ -27,6 +27,7 @@ import com.example.myapplication.model.SyougoHeader;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.time.XsdDateTime;
 
 import java.io.File;
 import java.io.FileInputStream;

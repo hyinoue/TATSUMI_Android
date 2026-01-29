@@ -5,8 +5,10 @@ import androidx.annotation.Nullable;
 
 import com.example.myapplication.db.dao.KakuninContainerDao;
 import com.example.myapplication.db.dao.KakuninMeisaiDao;
+import com.example.myapplication.db.dao.KakuninMeisaiWorkDao;
 import com.example.myapplication.db.entity.KakuninContainerEntity;
 import com.example.myapplication.db.entity.KakuninMeisaiEntity;
+import com.example.myapplication.db.entity.KakuninMeisaiWorkEntity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,23 +20,27 @@ import java.util.Locale;
 public class VanningCollationController {
 
     private final KakuninMeisaiDao kakuninMeisaiDao;
-    private final List<KakuninMeisaiEntity> details = new ArrayList<>();
+    private final KakuninMeisaiWorkDao kakuninMeisaiWorkDao;
+    private final List<KakuninMeisaiWorkEntity> details = new ArrayList<>();
     private final List<VanningCollationRow> displayRows = new ArrayList<>();
 
-    public VanningCollationController(@NonNull KakuninMeisaiDao kakuninMeisaiDao) {
+    public VanningCollationController(@NonNull KakuninMeisaiDao kakuninMeisaiDao,
+                                      @NonNull KakuninMeisaiWorkDao kakuninMeisaiWorkDao) {
         this.kakuninMeisaiDao = kakuninMeisaiDao;
+        this.kakuninMeisaiWorkDao = kakuninMeisaiWorkDao;
     }
 
     public void load(@Nullable String containerId) {
         details.clear();
         if (containerId != null) {
-            details.addAll(kakuninMeisaiDao.findByContainerId(containerId));
+            setT_KAKUNIN_MEISAItoW_KAKUNIN_MEISAI(containerId);
+            readW_KAKUNIN_MEISAItoList();
         }
         refreshDisplayRows();
     }
 
     @NonNull
-    public List<KakuninMeisaiEntity> getDetails() {
+    public List<KakuninMeisaiWorkEntity> getDetails() {
         return Collections.unmodifiableList(details);
     }
 
@@ -44,36 +50,45 @@ public class VanningCollationController {
     }
 
     public String checkSokuDtl(String heatNo, String sokuban) {
+        heatNo = heatNo != null ? heatNo.trim() : "";
+        sokuban = sokuban != null ? sokuban.trim() : "";
+
         if (isBlank(heatNo) || isBlank(sokuban)) {
-            return "照合対象が見つかりません";
+            return "照合対象に存在していません";
         }
-        for (KakuninMeisaiEntity entity : details) {
-            if (heatNo.equals(safeStr(entity.heatNo)) && sokuban.equals(safeStr(entity.sokuban))) {
-                return "OK";
-            }
+
+        KakuninMeisaiWorkEntity entity =
+                kakuninMeisaiWorkDao.findOne(heatNo, sokuban);
+
+        if (entity == null) {
+            return "照合対象に存在していません";
         }
-        return "照合対象が見つかりません";
+        if (Boolean.TRUE.equals(entity.containerSyougoKakunin)) {
+            return "既に確認済みです";
+        }
+        return "OK";
     }
 
+
     public void updateSyougo(String heatNo, String sokuban) {
-        for (KakuninMeisaiEntity entity : details) {
-            if (heatNo.equals(safeStr(entity.heatNo)) && sokuban.equals(safeStr(entity.sokuban))) {
-                if (Boolean.TRUE.equals(entity.containerSyougoKakunin)) {
-                    return;
-                }
-                entity.containerSyougoKakunin = true;
-                entity.updateProcName = "VanningCollation";
-                entity.updateYmd = nowAsText();
-                kakuninMeisaiDao.upsert(entity);
-                refreshDisplayRows();
-                return;
-            }
+        KakuninMeisaiWorkEntity entity = kakuninMeisaiWorkDao.findOne(heatNo, sokuban);
+        if (entity == null) {
+            return;
         }
+        if (Boolean.TRUE.equals(entity.containerSyougoKakunin)) {
+            return;
+        }
+        entity.containerSyougoKakunin = true;
+        entity.updateProcName = "VanningCollationController";
+        entity.updateYmd = nowAsText();
+        kakuninMeisaiWorkDao.upsert(entity);
+        readW_KAKUNIN_MEISAItoList();
+        refreshDisplayRows();
     }
 
     public int getSyougouSumiCount() {
         int count = 0;
-        for (KakuninMeisaiEntity entity : details) {
+        for (KakuninMeisaiWorkEntity entity : details) {
             if (Boolean.TRUE.equals(entity.containerSyougoKakunin)) {
                 count++;
             }
@@ -83,7 +98,7 @@ public class VanningCollationController {
 
     public int getUncollatedCount() {
         int count = 0;
-        for (KakuninMeisaiEntity entity : details) {
+        for (KakuninMeisaiWorkEntity entity : details) {
             if (!Boolean.TRUE.equals(entity.containerSyougoKakunin)) {
                 count++;
             }
@@ -93,7 +108,7 @@ public class VanningCollationController {
 
     public void markContainerCollated(@NonNull KakuninContainerDao kakuninContainerDao) {
         if (details.isEmpty()) return;
-        KakuninMeisaiEntity first = details.get(0);
+        KakuninMeisaiWorkEntity first = details.get(0);
         if (first.containerId == null) return;
 
         KakuninContainerEntity container = kakuninContainerDao.findByContainerId(first.containerId);
@@ -108,15 +123,47 @@ public class VanningCollationController {
 
     private void refreshDisplayRows() {
         displayRows.clear();
-        for (KakuninMeisaiEntity entity : details) {
+        for (KakuninMeisaiWorkEntity entity : details) {
             String pNo = safeStr(entity.syukkaSashizuNo);
             String bNo = safeStr(entity.bundleNo);
             String idx = safeStr(entity.sokuban);
             String j = String.format(Locale.JAPAN, "%,d", entity.jyuryo != null ? entity.jyuryo : 0);
             if (j.length() < 6) j = repeat(" ", 6 - j.length()) + j;
-            String confirmed = Boolean.TRUE.equals(entity.containerSyougoKakunin) ? "○" : "";
+            String confirmed = Boolean.TRUE.equals(entity.containerSyougoKakunin) ? "済" : "　";
             displayRows.add(new VanningCollationRow(pNo, bNo, idx, j, confirmed));
         }
+    }
+
+    private void setT_KAKUNIN_MEISAItoW_KAKUNIN_MEISAI(@NonNull String containerId) {
+        kakuninMeisaiWorkDao.deleteAll();
+        List<KakuninMeisaiEntity> source = kakuninMeisaiDao.findByContainerId(containerId);
+        for (KakuninMeisaiEntity entity : source) {
+            kakuninMeisaiWorkDao.upsert(toWorkEntity(entity));
+        }
+    }
+
+    private void readW_KAKUNIN_MEISAItoList() {
+        details.clear();
+        details.addAll(kakuninMeisaiWorkDao.findAllOrdered());
+    }
+
+    private KakuninMeisaiWorkEntity toWorkEntity(KakuninMeisaiEntity entity) {
+        KakuninMeisaiWorkEntity work = new KakuninMeisaiWorkEntity();
+        work.heatNo = entity.heatNo != null ? entity.heatNo.trim() : null;
+        work.sokuban = entity.sokuban != null ? entity.sokuban.trim() : null;
+        work.syukkaSashizuNo = entity.syukkaSashizuNo;
+        work.bundleNo = entity.bundleNo;
+        work.jyuryo = entity.jyuryo;
+        work.containerId = entity.containerId;
+        work.containerSyougoKakunin = entity.containerSyougoKakunin;
+        work.kakuninContainerId = entity.kakuninContainerId;
+        work.kakuninStatus = entity.kakuninStatus;
+        work.insertProcName = entity.insertProcName;
+        work.insertYmd = entity.insertYmd;
+        work.updateProcName = entity.updateProcName;
+        work.updateYmd = entity.updateYmd;
+        work.deleteFlg = entity.deleteFlg;
+        return work;
     }
 
     private String safeStr(String value) {

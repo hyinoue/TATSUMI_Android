@@ -2,6 +2,7 @@ package com.example.myapplication.connector;
 
 import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.CollateDtl;
+import com.example.myapplication.time.XmlUtil;
 
 public class SendSyougoSoapBuilder {
     private static final String NS = "http://tempuri.org/";

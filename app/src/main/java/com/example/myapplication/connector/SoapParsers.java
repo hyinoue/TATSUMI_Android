@@ -6,6 +6,7 @@ import com.example.myapplication.model.SyougoHeader;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.time.XsdDateTime;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;

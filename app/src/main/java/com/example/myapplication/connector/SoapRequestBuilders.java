@@ -1,5 +1,7 @@
 package com.example.myapplication.connector;
 
+import com.example.myapplication.time.XmlUtil;
+
 import java.util.Date;
 
 public class SoapRequestBuilders {

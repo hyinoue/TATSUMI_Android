@@ -101,8 +101,8 @@ public class VanningCollationActivity extends BaseActivity {
     }
 
     private void setupBottomButtons() {
-        if (btnBlue != null) btnBlue.setText("");
-        if (btnRed != null) btnRed.setText("確定");
+        if (btnBlue != null) btnBlue.setText("確定");
+        if (btnRed != null) btnRed.setText("");
         if (btnGreen != null) btnGreen.setText("");
         if (btnYellow != null) btnYellow.setText("終了");
         refreshBottomButtonsEnabled();
@@ -172,7 +172,7 @@ public class VanningCollationActivity extends BaseActivity {
         io.execute(() -> {
             try {
                 AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-                controller = new VanningCollationController(db.kakuninMeisaiDao());
+                controller = new VanningCollationController(db.kakuninMeisaiDao(), db.kakuninMeisaiWorkDao());
                 controller.load(containerId);
 
                 runOnUiThread(() -> {
@@ -195,13 +195,13 @@ public class VanningCollationActivity extends BaseActivity {
         if (!hasRows) {
             showWarningMsg("照合対象の積載束情報がありません。", MsgDispMode.MsgBox);
             if (etGenpinNo != null) etGenpinNo.setEnabled(false);
-            if (btnRed != null) btnRed.setText("");
+            if (btnBlue != null) btnBlue.setText("");
         } else {
             if (etGenpinNo != null) {
                 etGenpinNo.setEnabled(true);
                 etGenpinNo.requestFocus();
             }
-            if (btnRed != null) btnRed.setText("確定");
+            if (btnBlue != null) btnBlue.setText("確定");
         }
         refreshBottomButtonsEnabled();
     }
@@ -282,15 +282,15 @@ public class VanningCollationActivity extends BaseActivity {
 
     @Override
     protected void onFunctionBlue() {
-        // 今は空（ボタンTextが空なので実行されない想定）
-    }
-
-    @Override
-    protected void onFunctionRed() {
         if (confirmed) {
             return;
         }
         procRegister();
+    }
+
+    @Override
+    protected void onFunctionRed() {
+        // 今は空（ボタンTextが空なので実行されない想定）
     }
 
     @Override

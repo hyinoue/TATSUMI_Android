@@ -19,6 +19,15 @@ public interface KakuninMeisaiWorkDao {
 
     @Query("SELECT * FROM " +
             "W_KAKUNIN_MEISAI " +
+            "ORDER BY " +
+            "SYUKKA_SASHIZU_NO, " +
+            "BUNDLE_NO, " +
+            "SOKUBAN"
+    )
+    List<KakuninMeisaiWorkEntity> findAllOrdered();
+
+    @Query("SELECT * FROM " +
+            "W_KAKUNIN_MEISAI " +
             "WHERE " +
             "HEAT_NO = :heatNo " +
             "AND " +

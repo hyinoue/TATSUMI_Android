@@ -20,9 +20,9 @@ public interface SyukkaMeisaiWorkDao {
     @Query("SELECT * FROM " +
             "W_SYUKKA_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "HEAT_NO =TRIM(:heatNo)" +
             "AND " +
-            "SOKUBAN = :sokuban " +
+            "SOKUBAN =TRIM(:sokuban)" +
             "LIMIT 1"
     )
     SyukkaMeisaiWorkEntity findOne(String heatNo, String sokuban);

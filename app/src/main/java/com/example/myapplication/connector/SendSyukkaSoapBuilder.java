@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.time.XmlUtil;
 
 public class SendSyukkaSoapBuilder {
     private static final String NS = "http://tempuri.org/";

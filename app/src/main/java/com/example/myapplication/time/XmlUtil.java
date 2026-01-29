@@ -1,4 +1,4 @@
-package com.example.myapplication.connector;
+package com.example.myapplication.time;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

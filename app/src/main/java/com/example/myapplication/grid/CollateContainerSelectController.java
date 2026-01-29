@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.example.myapplication.db.dao.KakuninContainerDao;
 import com.example.myapplication.db.entity.KakuninContainerEntity;
+import com.example.myapplication.time.DateTimeFormatUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +88,7 @@ public class CollateContainerSelectController {
                     String.valueOf(i + 1),
                     safeStr(entity.containerNo),
                     String.valueOf(entity.bundleCnt != null ? entity.bundleCnt : 0),
-                    safeStr(entity.sagyouYmd)
+                    DateTimeFormatUtil.formatSagyouYmdForDisplay(entity.sagyouYmd)
             ));
         }
     }
