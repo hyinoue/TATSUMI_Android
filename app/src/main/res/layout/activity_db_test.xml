@@ -61,26 +61,39 @@
     </LinearLayout>
 
     <!-- 一覧（表の中身） -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/areaTable"
+    <HorizontalScrollView
+        android:id="@+id/hsvDbTable"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="horizontal"
         app:layout_constraintTop_toBottomOf="@+id/areaHeader"
         app:layout_constraintBottom_toTopOf="@id/areaFooter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.evrencoskun.tableview.TableView
-            android:id="@+id/tableView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_border_top_bottom"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/bg_border_top_bottom">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- 表ヘッダ -->
+            <LinearLayout
+                android:id="@+id/rowTableHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDbTable"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#888888" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <!-- 下部：集計エリア -->
     <LinearLayout

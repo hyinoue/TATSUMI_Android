@@ -1,6 +1,5 @@
 package com.example.myapplication.activity;
 
-import android.app.AlertDialog;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -9,19 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.evrencoskun.tableview.TableView;
-import com.evrencoskun.tableview.adapter.AbstractTableAdapter;
-import com.evrencoskun.tableview.adapter.recyclerview.holder.AbstractViewHolder;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +29,13 @@ import java.util.concurrent.Executors;
 public class DbTestActivity extends BaseActivity {
 
     private Spinner spTables;
-    private TableView tableView;
+    private LinearLayout headerRow;
+    private RecyclerView rvDbTable;
 
     private AppDatabase roomDb;
     private ExecutorService executor;
 
-    private MyTableAdapter tableAdapter;
+    private DbTableAdapter tableAdapter;
     private volatile boolean isAlive = false;
 
     @Override
@@ -47,13 +46,19 @@ public class DbTestActivity extends BaseActivity {
         isAlive = true;
 
         spTables = findViewById(R.id.spContainerSize);
-        tableView = findViewById(R.id.tableView);
+        headerRow = findViewById(R.id.rowTableHeader);
+        rvDbTable = findViewById(R.id.rvDbTable);
 
         if (spTables == null) throw new IllegalStateException("View is null: spContainerSize");
-        if (tableView == null) throw new IllegalStateException("View is null: tableView");
+        if (headerRow == null) throw new IllegalStateException("View is null: rowTableHeader");
+        if (rvDbTable == null) throw new IllegalStateException("View is null: rvDbTable");
 
-        tableAdapter = new MyTableAdapter();
-        tableView.setAdapter(tableAdapter);
+        tableAdapter = new DbTableAdapter();
+        rvDbTable.setLayoutManager(new LinearLayoutManager(this));
+        rvDbTable.setAdapter(tableAdapter);
+        rvDbTable.setHorizontalScrollBarEnabled(true);
+
+        setupBottomButtons();
 
         roomDb = AppDatabase.getInstance(this);
         executor = Executors.newSingleThreadExecutor();
@@ -63,7 +68,14 @@ public class DbTestActivity extends BaseActivity {
         spTables.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                loadTableData((String) parent.getItemAtPosition(position));
+                String table = (String) parent.getItemAtPosition(position);
+                if (table == null || table.trim().isEmpty()) {
+                    tableAdapter.setTable(new ArrayList<>(), new ArrayList<>());
+                    updateHeaderRow(new ArrayList<>(), tableAdapter.getColumnWidthsPx(),
+                            tableAdapter.getRowHeaderWidthPx(), tableAdapter.getRowHeightPx());
+                    return;
+                }
+                loadTableData(table);
             }
 
             @Override
@@ -100,10 +112,14 @@ public class DbTestActivity extends BaseActivity {
             runOnUiThread(() -> {
                 if (!isAlive || isFinishing() || isDestroyed()) return;
 
+                List<String> displayList = new ArrayList<>();
+                displayList.add("");
+                displayList.addAll(list);
                 ArrayAdapter<String> ad = new ArrayAdapter<>(
-                        this, android.R.layout.simple_spinner_item, list);
+                        this, android.R.layout.simple_spinner_item, displayList);
                 ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spTables.setAdapter(ad);
+                spTables.setSelection(0);
             });
         });
     }
@@ -129,6 +145,7 @@ public class DbTestActivity extends BaseActivity {
             runOnUiThread(() -> {
                 if (!isAlive || isFinishing() || isDestroyed()) return;
                 tableAdapter.setTable(cols, rows);
+                updateHeaderRow(cols, tableAdapter.getColumnWidthsPx(), tableAdapter.getRowHeaderWidthPx(), tableAdapter.getRowHeightPx());
             });
         });
     }
@@ -137,36 +154,62 @@ public class DbTestActivity extends BaseActivity {
     // TableView Adapter
     // =============================================================================================
 
-    private static class Col {
-        final String v;
-
-        Col(String v) {
-            this.v = v;
+    private void updateHeaderRow(List<String> columns, List<Integer> widthsPx, int rowHeaderWidthPx, int rowHeightPx) {
+        headerRow.removeAllViews();
+        TextView rowHeader = buildHeaderCell("", rowHeaderWidthPx, rowHeightPx);
+        headerRow.addView(rowHeader);
+        for (int i = 0; i < columns.size(); i++) {
+            String column = columns.get(i);
+            int widthPx = (i < widthsPx.size()) ? widthsPx.get(i) : dp(120);
+            TextView tv = buildHeaderCell(column, widthPx, rowHeightPx);
+            headerRow.addView(tv);
         }
     }
 
-    private static class Row {
-        final String v;
-
-        Row(String v) {
-            this.v = v;
-        }
+    private TextView buildHeaderCell(String label, int widthPx, int heightPx) {
+        TextView tv = new TextView(this);
+        tv.setText(label);
+        tv.setTextColor(0xFF000000);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
+        tv.setGravity(Gravity.CENTER);
+        tv.setBackgroundResource(R.drawable.bg_menu_count);
+        tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(widthPx, heightPx);
+        tv.setLayoutParams(lp);
+        return tv;
     }
 
-    private static class Cell {
-        final String v;
-
-        Cell(String v) {
-            this.v = v;
-        }
+    private int dp(int v) {
+        return (int) (v * getResources().getDisplayMetrics().density);
     }
 
-    private class MyTableAdapter extends AbstractTableAdapter<Col, Row, Cell> {
+    private void setupBottomButtons() {
+        bindBottomButtonsIfExists();
+        MaterialButton yellow = findViewById(R.id.btnBottomYellow);
+        if (yellow != null) {
+            yellow.setText("戻る");
+        }
+        MaterialButton blue = findViewById(R.id.btnBottomBlue);
+        MaterialButton red = findViewById(R.id.btnBottomRed);
+        MaterialButton green = findViewById(R.id.btnBottomGreen);
+        if (blue != null) blue.setText("");
+        if (red != null) red.setText("");
+        if (green != null) green.setText("");
+        refreshBottomButtonsEnabled();
+    }
+
+    @Override
+    protected void onFunctionYellow() {
+        finish();
+    }
+
+    private class DbTableAdapter extends RecyclerView.Adapter<DbTableAdapter.RowViewHolder> {
 
         // 見た目
-        private final int headerColor = 0xFFC5B8FF;
         private final int rowHeaderWidthDp = 48;
-        private final int textSp = 11;
+        private final int rowHeightDp = 28;
+        private final int textSp = 15;
 
         // 列幅（px）自動調整
         private final List<Integer> colWidthsPx = new ArrayList<>();
@@ -175,176 +218,14 @@ public class DbTestActivity extends BaseActivity {
         private final List<String> currentColumns = new ArrayList<>();
         private final List<List<String>> currentRows = new ArrayList<>();
 
-        private int dp(int v) {
-            return (int) (v * getResources().getDisplayMetrics().density);
-        }
-
         private String norm(String s) {
             if (s == null) return "";
             return s.replace("\n", " ").replace("\r", " ");
         }
 
-        // ---------------- Column Header ----------------
-
-        private class HeaderVH extends AbstractViewHolder {
-            final FrameLayout root;
-            final TextView tv;
-
-            HeaderVH(FrameLayout r, TextView t) {
-                super(r);
-                root = r;
-                tv = t;
-            }
-        }
-
         @Override
-        public AbstractViewHolder onCreateColumnHeaderViewHolder(ViewGroup parent, int viewType) {
-            FrameLayout root = new FrameLayout(DbTestActivity.this);
-            root.setBackgroundColor(headerColor);
-            root.setLayoutParams(new RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-
-            TextView tv = new TextView(DbTestActivity.this);
-            FrameLayout.LayoutParams tvLp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            );
-            tvLp.gravity = Gravity.CENTER;
-            tv.setLayoutParams(tvLp);
-
-            tv.setTextColor(0xFF000000);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
-            tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
-
-            // 列幅を広げるので省略は不要
-            tv.setSingleLine(true);
-            tv.setEllipsize(null);
-
-            tv.setGravity(Gravity.CENTER);
-            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-
-            root.addView(tv);
-            return new HeaderVH(root, tv);
-        }
-
-        @Override
-        public void onBindColumnHeaderViewHolder(AbstractViewHolder holder, Col columnHeader, int columnPosition) {
-            HeaderVH h = (HeaderVH) holder;
-            h.tv.setText(columnHeader.v);
-
-            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) h.root.getLayoutParams();
-            lp.width = getColWidthPx(columnPosition);
-            h.root.setLayoutParams(lp);
-        }
-
-        // ---------------- Row Header ----------------
-
-        @Override
-        public AbstractViewHolder onCreateRowHeaderViewHolder(ViewGroup parent, int viewType) {
-            TextView tv = new TextView(DbTestActivity.this);
-            tv.setTextColor(0xFF000000);
-            tv.setGravity(Gravity.CENTER);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
-            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-
-            tv.setLayoutParams(new RecyclerView.LayoutParams(
-                    dp(rowHeaderWidthDp),
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            return new AbstractViewHolder(tv) {
-            };
-        }
-
-        @Override
-        public void onBindRowHeaderViewHolder(AbstractViewHolder holder, Row rowHeader, int rowPosition) {
-            TextView tv = (TextView) holder.itemView;
-            tv.setText(rowHeader.v);
-        }
-
-        // ---------------- Cell ----------------
-
-        @Override
-        public AbstractViewHolder onCreateCellViewHolder(ViewGroup parent, int viewType) {
-            TextView tv = new TextView(DbTestActivity.this);
-            tv.setTextColor(0xFF000000);
-
-            // 列幅を広げるので省略は不要
-            tv.setSingleLine(true);
-            tv.setEllipsize(null);
-
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
-            tv.setGravity(Gravity.CENTER_VERTICAL);
-            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-
-            tv.setLayoutParams(new RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            return new AbstractViewHolder(tv) {
-            };
-        }
-
-        @Override
-        public void onBindCellViewHolder(AbstractViewHolder holder, Cell cell, int columnPosition, int rowPosition) {
-            TextView tv = (TextView) holder.itemView;
-
-            tv.setText(norm(cell.v));
-
-            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) tv.getLayoutParams();
-            lp.width = getColWidthPx(columnPosition);
-            tv.setLayoutParams(lp);
-        }
-
-        // ---------------- Corner ----------------
-
-        @Override
-        public View onCreateCornerView(ViewGroup parent) {
-            FrameLayout root = new FrameLayout(DbTestActivity.this);
-            root.setBackgroundColor(headerColor);
-            root.setLayoutParams(new RecyclerView.LayoutParams(
-                    dp(rowHeaderWidthDp),
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            return root;
-        }
-
-        @Override
-        public int getColumnHeaderItemViewType(int columnPosition) {
-            return 0;
-        }
-
-        @Override
-        public int getRowHeaderItemViewType(int rowPosition) {
-            return 0;
-        }
-
-        @Override
-        public int getCellItemViewType(int columnPosition) {
-            return 0;
-        }
-
-        // ---------------- Data ----------------
-
-        void showFullTextDialogIfNeeded(int rowPosition, int columnPosition) {
-            if (rowPosition < 0 || columnPosition < 0) return;
-            if (rowPosition >= currentRows.size()) return;
-            List<String> row = currentRows.get(rowPosition);
-            if (columnPosition >= row.size()) return;
-
-            String value = row.get(columnPosition);
-            if (value == null) value = "";
-
-            if (value.length() <= 12) return;
-
-            String title = (columnPosition < currentColumns.size()) ? currentColumns.get(columnPosition) : "Cell";
-
-            new AlertDialog.Builder(DbTestActivity.this)
-                    .setTitle(title + " (Row " + (rowPosition + 1) + ")")
-                    .setMessage(value)
-                    .setPositiveButton("OK", null)
-                    .show();
+        public int getItemViewType(int position) {
+            return currentColumns.size();
         }
 
         void setTable(List<String> cols, List<List<String>> data) {
@@ -354,24 +235,7 @@ public class DbTestActivity extends BaseActivity {
             currentRows.addAll(data);
 
             autoAdjustColumnWidths();
-
-            List<Col> ch = new ArrayList<>();
-            for (String s : currentColumns) ch.add(new Col(s));
-
-            List<Row> rh = new ArrayList<>();
-            for (int i = 0; i < currentRows.size(); i++) rh.add(new Row(String.valueOf(i + 1)));
-
-            List<List<Cell>> ci = new ArrayList<>();
-            for (List<String> r : currentRows) {
-                List<Cell> one = new ArrayList<>();
-                for (int i = 0; i < currentColumns.size(); i++) {
-                    String v = (i < r.size()) ? r.get(i) : "";
-                    one.add(new Cell(v));
-                }
-                ci.add(one);
-            }
-
-            setAllItems(ch, rh, ci);
+            notifyDataSetChanged();
         }
 
         /**
@@ -413,11 +277,107 @@ public class DbTestActivity extends BaseActivity {
             }
         }
 
+        List<Integer> getColumnWidthsPx() {
+            return new ArrayList<>(colWidthsPx);
+        }
+
+        int getRowHeaderWidthPx() {
+            return dp(rowHeaderWidthDp);
+        }
+
+        int getRowHeightPx() {
+            return dp(rowHeightDp);
+        }
+
         private int getColWidthPx(int columnPosition) {
             if (columnPosition >= 0 && columnPosition < colWidthsPx.size()) {
                 return colWidthsPx.get(columnPosition);
             }
             return dp(120);
+        }
+
+        @Override
+        public RowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LinearLayout row = new LinearLayout(DbTestActivity.this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    dp(rowHeightDp)
+            ));
+
+            List<TextView> cells = new ArrayList<>();
+
+            TextView rowHeader = buildRowHeader();
+            row.addView(rowHeader);
+            cells.add(rowHeader);
+
+            for (int i = 0; i < viewType; i++) {
+                TextView cell = buildCell();
+                row.addView(cell);
+                cells.add(cell);
+            }
+            return new RowViewHolder(row, cells);
+        }
+
+        @Override
+        public void onBindViewHolder(RowViewHolder holder, int position) {
+            List<TextView> cells = holder.cells;
+            if (cells.isEmpty()) return;
+
+            TextView rowHeader = cells.get(0);
+            rowHeader.setText(String.valueOf(position + 1));
+            rowHeader.setLayoutParams(new LinearLayout.LayoutParams(dp(rowHeaderWidthDp), dp(rowHeightDp)));
+
+            List<String> row = currentRows.get(position);
+            for (int i = 0; i < currentColumns.size(); i++) {
+                int cellIndex = i + 1;
+                if (cellIndex >= cells.size()) break;
+                TextView tv = cells.get(cellIndex);
+                String value = (i < row.size()) ? row.get(i) : "";
+                tv.setText(norm(value));
+                tv.setLayoutParams(new LinearLayout.LayoutParams(getColWidthPx(i), dp(rowHeightDp)));
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return currentRows.size();
+        }
+
+        private TextView buildRowHeader() {
+            TextView tv = new TextView(DbTestActivity.this);
+            tv.setTextColor(0xFF000000);
+            tv.setBackgroundResource(R.drawable.bg_table_row);
+            tv.setGravity(Gravity.CENTER);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+            tv.setLayoutParams(new LinearLayout.LayoutParams(dp(rowHeaderWidthDp), dp(rowHeightDp)));
+            return tv;
+        }
+
+        private TextView buildCell() {
+            TextView tv = new TextView(DbTestActivity.this);
+            tv.setTextColor(0xFF000000);
+            tv.setBackgroundResource(R.drawable.bg_table_row);
+            tv.setSingleLine(true);
+            tv.setEllipsize(null);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+            tv.setGravity(Gravity.CENTER_VERTICAL);
+            tv.setPadding(dp(6), dp(4), dp(6), dp(4));
+            tv.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    dp(rowHeightDp)
+            ));
+            return tv;
+        }
+
+        class RowViewHolder extends RecyclerView.ViewHolder {
+            final List<TextView> cells;
+
+            RowViewHolder(View itemView, List<TextView> cells) {
+                super(itemView);
+                this.cells = cells;
+            }
         }
     }
 }
