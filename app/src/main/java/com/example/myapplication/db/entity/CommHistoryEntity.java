@@ -3,6 +3,9 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
+//===============================
+//　処理概要　:　通信履歴エンティティ
+//===============================
 @Entity(tableName = "C_COMM_HISTORY", primaryKeys = {"RENBAN"})
 public class CommHistoryEntity {
     @ColumnInfo(name = "RENBAN")

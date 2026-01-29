@@ -1,6 +1,7 @@
 package com.example.myapplication.activity;
 
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ public class DbTestActivity extends BaseActivity {
     private Spinner spTables;
     private LinearLayout headerRow;
     private RecyclerView rvDbTable;
+    private HorizontalScrollView hsvDbTable;
 
     private AppDatabase roomDb;
     private ExecutorService executor;
@@ -48,15 +51,28 @@ public class DbTestActivity extends BaseActivity {
         spTables = findViewById(R.id.spContainerSize);
         headerRow = findViewById(R.id.rowTableHeader);
         rvDbTable = findViewById(R.id.rvDbTable);
+        hsvDbTable = findViewById(R.id.hsvDbTable);
 
         if (spTables == null) throw new IllegalStateException("View is null: spContainerSize");
         if (headerRow == null) throw new IllegalStateException("View is null: rowTableHeader");
         if (rvDbTable == null) throw new IllegalStateException("View is null: rvDbTable");
+        if (hsvDbTable == null) throw new IllegalStateException("View is null: hsvDbTable");
 
         tableAdapter = new DbTableAdapter();
         rvDbTable.setLayoutManager(new LinearLayoutManager(this));
         rvDbTable.setAdapter(tableAdapter);
         rvDbTable.setHorizontalScrollBarEnabled(true);
+        rvDbTable.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
+                                       RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+                if (position > 0) {
+                    outRect.top = -2;
+                }
+            }
+        });
+        setTableVisible(false);
 
         setupBottomButtons();
 
@@ -73,6 +89,7 @@ public class DbTestActivity extends BaseActivity {
                     tableAdapter.setTable(new ArrayList<>(), new ArrayList<>());
                     updateHeaderRow(new ArrayList<>(), tableAdapter.getColumnWidthsPx(),
                             tableAdapter.getRowHeaderWidthPx(), tableAdapter.getRowHeightPx());
+                    setTableVisible(false);
                     return;
                 }
                 loadTableData(table);
@@ -146,6 +163,7 @@ public class DbTestActivity extends BaseActivity {
                 if (!isAlive || isFinishing() || isDestroyed()) return;
                 tableAdapter.setTable(cols, rows);
                 updateHeaderRow(cols, tableAdapter.getColumnWidthsPx(), tableAdapter.getRowHeaderWidthPx(), tableAdapter.getRowHeightPx());
+                setTableVisible(true);
             });
         });
     }
@@ -156,17 +174,17 @@ public class DbTestActivity extends BaseActivity {
 
     private void updateHeaderRow(List<String> columns, List<Integer> widthsPx, int rowHeaderWidthPx, int rowHeightPx) {
         headerRow.removeAllViews();
-        TextView rowHeader = buildHeaderCell("", rowHeaderWidthPx, rowHeightPx);
+        TextView rowHeader = buildHeaderCell("", rowHeaderWidthPx, rowHeightPx, 0);
         headerRow.addView(rowHeader);
         for (int i = 0; i < columns.size(); i++) {
             String column = columns.get(i);
             int widthPx = (i < widthsPx.size()) ? widthsPx.get(i) : dp(120);
-            TextView tv = buildHeaderCell(column, widthPx, rowHeightPx);
+            TextView tv = buildHeaderCell(column, widthPx, rowHeightPx, -dp(2));
             headerRow.addView(tv);
         }
     }
 
-    private TextView buildHeaderCell(String label, int widthPx, int heightPx) {
+    private TextView buildHeaderCell(String label, int widthPx, int heightPx, int leftMarginPx) {
         TextView tv = new TextView(this);
         tv.setText(label);
         tv.setTextColor(0xFF000000);
@@ -175,8 +193,7 @@ public class DbTestActivity extends BaseActivity {
         tv.setGravity(Gravity.CENTER);
         tv.setBackgroundResource(R.drawable.bg_menu_count);
         tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(widthPx, heightPx);
-        tv.setLayoutParams(lp);
+        applyCellLayoutParams(tv, widthPx, heightPx, leftMarginPx);
         return tv;
     }
 
@@ -197,6 +214,17 @@ public class DbTestActivity extends BaseActivity {
         if (red != null) red.setText("");
         if (green != null) green.setText("");
         refreshBottomButtonsEnabled();
+    }
+
+    private void setTableVisible(boolean isVisible) {
+        int visibility = isVisible ? View.VISIBLE : View.GONE;
+        hsvDbTable.setVisibility(visibility);
+    }
+
+    private void applyCellLayoutParams(TextView cell, int widthPx, int heightPx, int leftMarginPx) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(widthPx, heightPx);
+        lp.setMargins(leftMarginPx, 0, 0, 0);
+        cell.setLayoutParams(lp);
     }
 
     @Override
@@ -326,7 +354,7 @@ public class DbTestActivity extends BaseActivity {
 
             TextView rowHeader = cells.get(0);
             rowHeader.setText(String.valueOf(position + 1));
-            rowHeader.setLayoutParams(new LinearLayout.LayoutParams(dp(rowHeaderWidthDp), dp(rowHeightDp)));
+            applyCellLayoutParams(rowHeader, dp(rowHeaderWidthDp), dp(rowHeightDp), 0);
 
             List<String> row = currentRows.get(position);
             for (int i = 0; i < currentColumns.size(); i++) {
@@ -335,7 +363,7 @@ public class DbTestActivity extends BaseActivity {
                 TextView tv = cells.get(cellIndex);
                 String value = (i < row.size()) ? row.get(i) : "";
                 tv.setText(norm(value));
-                tv.setLayoutParams(new LinearLayout.LayoutParams(getColWidthPx(i), dp(rowHeightDp)));
+                applyCellLayoutParams(tv, getColWidthPx(i), dp(rowHeightDp), -dp(2));
             }
         }
 
@@ -351,7 +379,6 @@ public class DbTestActivity extends BaseActivity {
             tv.setGravity(Gravity.CENTER);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
             tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-            tv.setLayoutParams(new LinearLayout.LayoutParams(dp(rowHeaderWidthDp), dp(rowHeightDp)));
             return tv;
         }
 
@@ -364,10 +391,6 @@ public class DbTestActivity extends BaseActivity {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
             tv.setGravity(Gravity.CENTER_VERTICAL);
             tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-            tv.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    dp(rowHeightDp)
-            ));
             return tv;
         }
 

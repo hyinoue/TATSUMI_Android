@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
+//=================================
+//　処理概要　:　確認コンテナエンティティ
+//=================================
 @Entity(tableName = "T_KAKUNIN_CONTAINER", primaryKeys = {"CONTAINER_ID"})
 public class KakuninContainerEntity {
 
@@ -13,7 +16,6 @@ public class KakuninContainerEntity {
 
     @ColumnInfo(name = "CONTAINER_NO")
     public String containerNo;
-
 
     @ColumnInfo(name = "BUNDLE_CNT")
     public Integer bundleCnt;
@@ -38,5 +40,5 @@ public class KakuninContainerEntity {
 
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
-    
+
 }
