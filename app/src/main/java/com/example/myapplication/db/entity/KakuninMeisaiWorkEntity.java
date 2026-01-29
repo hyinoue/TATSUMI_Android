@@ -4,6 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
+//============================================================
+//　処理概要　:　確認明細ワークエンティティ
+//============================================================
+
 @Entity(tableName = "W_KAKUNIN_MEISAI", primaryKeys = {"HEAT_NO", "SOKUBAN"})
 public class KakuninMeisaiWorkEntity {
 
