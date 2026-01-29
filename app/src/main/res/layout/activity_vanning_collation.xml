@@ -52,7 +52,8 @@
                 android:background="@drawable/bg_menu_count"
                 android:gravity="center_vertical"
                 android:inputType="text"
-                android:paddingStart="0dp"
+                android:textColor="#000000"
+                android:paddingStart="6dp"
                 android:paddingEnd="0dp"
                 android:textSize="13sp" />
 
@@ -72,6 +73,7 @@
                 android:background="@drawable/bg_menu_count"
                 android:gravity="end|center_vertical"
                 android:inputType="number"
+                android:textColor="#000000"
                 android:paddingEnd="6dp"
                 android:textSize="14sp" />
 
@@ -102,13 +104,14 @@
 
             <EditText
                 android:id="@+id/etSagyouDateTime"
-                android:layout_width="150dp"
+                android:layout_width="160dp"
                 android:layout_height="28dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="0"
                 android:gravity="center_vertical"
                 android:background="@drawable/bg_menu_count"
                 android:inputType="text"
+                android:textColor="#000000"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
                 android:textSize="14sp" />
@@ -133,13 +136,14 @@
             <!-- ★同じIDが2回あったので修正（重要） -->
             <EditText
                 android:id="@+id/etGenpinNo"
-                android:layout_width="150dp"
+                android:layout_width="160dp"
                 android:layout_height="28dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="0"
                 android:gravity="center_vertical"
                 android:background="@drawable/bg_edittext_black_border"
                 android:inputType="text"
+                android:textColor="#000000"
                 android:maxLength="18"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
@@ -151,7 +155,7 @@
     <LinearLayout
         android:id="@+id/rowTableHeader"
         android:layout_width="0dp"
-        android:layout_height="32dp"
+        android:layout_height="28dp"
         android:background="#D0D0D0"
         android:orientation="horizontal"
         android:gravity="center_vertical"
@@ -162,30 +166,35 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2.2"
+            android:layout_weight="2.3"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
+            android:textSize="15sp"
             android:text="P No"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2.2"
+            android:layout_weight="1.3"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
+            android:textSize="15sp"
+            android:layout_marginStart="-2dp"
             android:text="B No"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.8"
+            android:layout_weight="2.3"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
+            android:textSize="15sp"
+            android:layout_marginStart="-2dp"
             android:text="Index"
             android:textStyle="bold" />
 
@@ -196,16 +205,20 @@
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
+            android:textSize="15sp"
+            android:layout_marginStart="-2dp"
             android:text="重量"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1.0"
             android:gravity="center"
             android:textColor="#000000"
             android:background="@drawable/bg_menu_count"
+            android:textSize="15sp"
+            android:layout_marginStart="-2dp"
             android:text="確"
             android:textStyle="bold" />
     </LinearLayout>

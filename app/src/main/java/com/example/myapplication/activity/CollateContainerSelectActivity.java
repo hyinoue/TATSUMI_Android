@@ -2,9 +2,11 @@ package com.example.myapplication.activity;
 
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -49,6 +51,19 @@ public class CollateContainerSelectActivity extends BaseActivity {
         setupRecycler();
         setupInputHandlers();
         loadContainers();
+
+        //表で線を重ねて細く見せる
+        RecyclerView rvBundles = findViewById(R.id.rvBundles);
+        rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
+                                       RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+                if (position > 0) {
+                    outRect.top = -2;
+                }
+            }
+        });
     }
 
     private void bindViews() {

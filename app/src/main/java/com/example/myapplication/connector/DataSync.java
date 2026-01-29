@@ -92,6 +92,10 @@ public class DataSync {
         dataSousinAll(sagyouYmd);
     }
 
+    public void sendSyougoOnly() {
+        dataSousinSyougo();
+    }
+    
     public void runSync() throws Exception {
         try {
             historyDel();
