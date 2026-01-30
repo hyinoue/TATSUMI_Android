@@ -3,9 +3,9 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-//==================================
+//=================================
 //　処理概要　:　出荷コンテナエンティティ
-//==================================
+//=================================
 @Entity(tableName = "T_SYUKKA_CONTAINER", primaryKeys = {"CONTAINER_ID"})
 public class SyukkaContainerEntity {
     @ColumnInfo(name = "CONTAINER_ID")

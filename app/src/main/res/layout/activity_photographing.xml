@@ -89,7 +89,7 @@
             android:id="@+id/btnShutter"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="@drawable/bg_menu_count"
+            android:background="@drawable/bg_blue_back"
             android:contentDescription="shutter"
             android:scaleType="center"
             android:src="@android:drawable/ic_menu_camera"

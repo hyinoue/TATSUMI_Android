@@ -17,6 +17,7 @@ public class KakuninContainerEntity {
     @ColumnInfo(name = "CONTAINER_NO")
     public String containerNo;
 
+
     @ColumnInfo(name = "BUNDLE_CNT")
     public Integer bundleCnt;
 

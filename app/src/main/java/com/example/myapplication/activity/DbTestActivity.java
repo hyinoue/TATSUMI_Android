@@ -191,7 +191,7 @@ public class DbTestActivity extends BaseActivity {
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
         tv.setGravity(Gravity.CENTER);
-        tv.setBackgroundResource(R.drawable.bg_menu_count);
+        tv.setBackgroundResource(R.drawable.bg_blue_back);
         tv.setPadding(dp(6), dp(4), dp(6), dp(4));
         applyCellLayoutParams(tv, widthPx, heightPx, leftMarginPx);
         return tv;
