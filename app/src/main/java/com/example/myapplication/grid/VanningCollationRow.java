@@ -1,8 +1,13 @@
 package com.example.myapplication.grid;
 
+//============================================================
+//　処理概要　:　VanningCollationRowクラス
+//============================================================
+
 public class VanningCollationRow {
     public final String pNo;
     public final String bNo;
+
     public final String index;
     public final String jyuryo;
     public final String confirmed;

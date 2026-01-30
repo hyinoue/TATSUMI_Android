@@ -9,6 +9,11 @@ import androidx.room.Entity;
 //============================================================
 
 @Entity(tableName = "W_KAKUNIN_MEISAI", primaryKeys = {"HEAT_NO", "SOKUBAN"})
+
+//============================================================
+//　処理概要　:　確認明細ワークエンティティ
+//============================================================
+
 public class KakuninMeisaiWorkEntity {
 
     @NonNull

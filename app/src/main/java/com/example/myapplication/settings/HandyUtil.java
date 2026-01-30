@@ -2,6 +2,11 @@ package com.example.myapplication.settings;
 
 import androidx.annotation.NonNull;
 
+
+//============================================================
+//　処理概要　:　HandyUtilクラス
+//============================================================
+
 public class HandyUtil {
 
     private HandyUtil() {

@@ -33,6 +33,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+
+//============================================================
+//　処理概要　:　CameraPreviewActivityクラス
+//============================================================
+
 public class CameraPreviewActivity extends AppCompatActivity {
 
     public static final String EXTRA_TARGET = "extra_target";      // "CONTAINER" / "SEAL"

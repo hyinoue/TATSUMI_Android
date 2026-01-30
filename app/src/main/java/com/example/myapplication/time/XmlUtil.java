@@ -5,6 +5,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+
+//============================================================
+//　処理概要　:　XmlUtilクラス
+//============================================================
+
 public class XmlUtil {
     private XmlUtil() {
     }

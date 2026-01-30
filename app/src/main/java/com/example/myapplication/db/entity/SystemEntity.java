@@ -8,6 +8,11 @@ import androidx.room.Entity;
 //============================================================
 
 @Entity(tableName = "M_SYSTEM", primaryKeys = {"RENBAN"})
+
+//============================================================
+//　処理概要　:　システム設定エンティティ
+//============================================================
+
 public class SystemEntity {
     @ColumnInfo(name = "RENBAN")
     public Integer renban;

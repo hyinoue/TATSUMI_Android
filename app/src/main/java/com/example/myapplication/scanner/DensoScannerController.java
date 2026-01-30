@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 
+
 /**
  * DENSO BHT SDK のスキャナ制御を共通化したコントローラ
  * <p>
@@ -30,6 +31,11 @@ import java.util.Locale;
  * - onBarcodeDataReceived を受信して OnScanListener へ通知
  * - C#互換寄せの設定反映（存在する項目のみを反射でON）
  */
+
+//============================================================
+//　処理概要　:　DensoScannerControllerクラス
+//============================================================
+
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 

@@ -1,5 +1,10 @@
 package com.example.myapplication.connector;
 
+
+//============================================================
+//　処理概要　:　SoapActionsクラス
+//============================================================
+
 public final class SoapActions {
 
     private SoapActions() {

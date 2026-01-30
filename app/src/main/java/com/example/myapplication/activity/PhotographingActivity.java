@@ -6,6 +6,11 @@ import android.widget.ImageButton;
 
 import com.example.myapplication.R;
 
+
+//============================================================
+//　処理概要　:　PhotographingActivityクラス
+//============================================================
+
 public class PhotographingActivity extends BaseActivity {
 
     private ImageButton btnSettings;

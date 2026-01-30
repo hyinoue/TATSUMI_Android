@@ -4,6 +4,11 @@ import android.os.Bundle;
 
 import com.example.myapplication.R;
 
+
+//============================================================
+//　処理概要　:　SystemLibActivityクラス
+//============================================================
+
 public class SystemLibActivity extends BaseActivity {
 
     @Override

@@ -11,6 +11,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
+//============================================================
+//　処理概要　:　SoapAsmxClientクラス
+//============================================================
+
 public class SoapAsmxClient {
     private static final MediaType SOAP_XML = MediaType.parse("text/xml; charset=utf-8");
     private static final String TAG_RAW = "SOAP_RAW";
