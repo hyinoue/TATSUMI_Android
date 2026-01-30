@@ -9,7 +9,13 @@ import com.example.myapplication.db.entity.SyukkaContainerEntity;
 
 import java.util.List;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　SyukkaContainerDaoクラス
+//============================================================
+
 public interface SyukkaContainerDao {
 
     @Query("SELECT * FROM " +

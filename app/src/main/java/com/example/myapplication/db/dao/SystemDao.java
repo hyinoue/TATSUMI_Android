@@ -7,7 +7,13 @@ import androidx.room.Query;
 
 import com.example.myapplication.db.entity.SystemEntity;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　SystemDaoクラス
+//============================================================
+
 public interface SystemDao {
 
     @Query("SELECT * FROM " +

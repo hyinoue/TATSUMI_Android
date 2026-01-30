@@ -9,7 +9,13 @@ import com.example.myapplication.db.entity.KakuninMeisaiEntity;
 
 import java.util.List;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　KakuninMeisaiDaoクラス
+//============================================================
+
 public interface KakuninMeisaiDao {
 
     @Query("SELECT * FROM " +

@@ -7,6 +7,11 @@ import androidx.room.Entity;
 //　処理概要　:　通信履歴エンティティ
 //===============================
 @Entity(tableName = "C_COMM_HISTORY", primaryKeys = {"RENBAN"})
+
+//============================================================
+//　処理概要　:　通信履歴エンティティ
+//============================================================
+
 public class CommHistoryEntity {
     @ColumnInfo(name = "RENBAN")
     public Integer renban;

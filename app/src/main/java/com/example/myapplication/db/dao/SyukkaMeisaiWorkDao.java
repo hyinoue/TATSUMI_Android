@@ -9,7 +9,13 @@ import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
 
 import java.util.List;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　SyukkaMeisaiWorkDaoクラス
+//============================================================
+
 public interface SyukkaMeisaiWorkDao {
 
     @Query("SELECT * FROM " +

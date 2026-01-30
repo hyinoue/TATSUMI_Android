@@ -29,6 +29,11 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+//============================================================
+//　処理概要　:　VanningCollationActivityクラス
+//============================================================
+
 public class VanningCollationActivity extends BaseActivity {
 
     public static final String EXTRA_CONTAINER_ID = "extra_container_id";

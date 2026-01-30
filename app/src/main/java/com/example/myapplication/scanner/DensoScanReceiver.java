@@ -7,6 +7,11 @@ import android.util.Log;
 
 import com.densowave.bhtsdk.barcode.OutputSettings;
 
+
+//============================================================
+//　処理概要　:　DensoScanReceiverクラス
+//============================================================
+
 public class DensoScanReceiver extends BroadcastReceiver {
 
     public static final String TAG = "DensoScanReceiver";

@@ -7,6 +7,11 @@ import com.example.myapplication.model.SyukkaData;
 
 import java.util.Date;
 
+
+//============================================================
+//　処理概要　:　SvcHandyRepositoryクラス
+//============================================================
+
 public class SvcHandyRepository {
 
     // ASMXエンドポイント（※ ?wsdl は付けない）

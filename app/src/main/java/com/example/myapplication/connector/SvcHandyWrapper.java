@@ -8,6 +8,11 @@ import com.example.myapplication.model.SyukkaData;
 import java.io.Closeable;
 import java.util.Date;
 
+
+//============================================================
+//　処理概要　:　SvcHandyWrapperクラス
+//============================================================
+
 public class SvcHandyWrapper implements Closeable {
     private final SvcHandyRepository repository;
 

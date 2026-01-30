@@ -14,11 +14,17 @@ import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
+
 /**
  * バーコードテスト画面（薄い版）
  * - 読み取り制御は DensoScannerController に委譲
  * - この画面は「表示（種別/履歴）」だけ担当
  */
+
+//============================================================
+//　処理概要　:　ImagerTestActivityクラス
+//============================================================
+
 public class ImagerTestActivity extends BaseActivity {
 
     // ===== UI =====

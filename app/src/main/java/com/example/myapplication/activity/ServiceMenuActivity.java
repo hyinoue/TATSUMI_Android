@@ -28,6 +28,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+//============================================================
+//　処理概要　:　ServiceMenuActivityクラス
+//============================================================
+
 public class ServiceMenuActivity extends BaseActivity {
 
     private static final int SYSTEM_RENBAN = 1;

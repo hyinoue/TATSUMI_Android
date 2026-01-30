@@ -43,6 +43,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
+//============================================================
+//　処理概要　:　ContainerInputActivityクラス
+//============================================================
+
 public class ContainerInputActivity extends BaseActivity {
 
     private static final String TAG = "ContainerInput";

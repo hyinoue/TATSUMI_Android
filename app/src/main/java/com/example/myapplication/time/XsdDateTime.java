@@ -5,6 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+
+//============================================================
+//　処理概要　:　XsdDateTimeクラス
+//============================================================
+
 public class XsdDateTime {
     private XsdDateTime() {
     }

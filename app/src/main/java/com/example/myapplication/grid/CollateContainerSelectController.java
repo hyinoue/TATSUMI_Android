@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+//============================================================
+//　処理概要　:　CollateContainerSelectControllerクラス
+//============================================================
+
 public class CollateContainerSelectController {
 
     private final KakuninContainerDao kakuninContainerDao;

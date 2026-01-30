@@ -39,6 +39,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
+//============================================================
+//　処理概要　:　DataSyncクラス
+//============================================================
+
 public class DataSync {
     private static final String TAG = "DataSync";
     private static final int SYSTEM_RENBAN = 1;
