@@ -107,8 +107,8 @@ public class ContainerInputActivity extends BaseActivity {
                     return;
                 }
 
-                String uriStr = result.getData().getStringExtra(CameraPreviewActivity.EXTRA_RESULT_URI);
-                String target = result.getData().getStringExtra(CameraPreviewActivity.EXTRA_TARGET);
+                String uriStr = result.getData().getStringExtra(PhotographingActivity.EXTRA_RESULT_URI);
+                String target = result.getData().getStringExtra(PhotographingActivity.EXTRA_TARGET);
 
                 if (uriStr == null) {
                     toast("画像URIが取得できませんでした");
@@ -420,8 +420,8 @@ public class ContainerInputActivity extends BaseActivity {
     //　機　能　:　カメラ起動（内部）
     //============================================================
     private void launchCameraInternal() {
-        Intent intent = new Intent(this, CameraPreviewActivity.class);
-        intent.putExtra(CameraPreviewActivity.EXTRA_TARGET,
+        Intent intent = new Intent(this, PhotographingActivity.class);
+        intent.putExtra(PhotographingActivity.EXTRA_TARGET,
                 (currentTarget == PhotoTarget.CONTAINER) ? "CONTAINER" : "SEAL");
         cameraLauncher.launch(intent);
     }

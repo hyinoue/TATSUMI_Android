@@ -51,7 +51,7 @@
         <activity android:name=".activity.CameraSettingActivity" />
 
         <activity
-            android:name=".activity.CameraPreviewActivity"
+            android:name=".activity.PhotographingActivity"
             android:exported="false" />
 
 
