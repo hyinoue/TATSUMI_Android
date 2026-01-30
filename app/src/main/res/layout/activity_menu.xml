@@ -105,16 +105,25 @@
                 android:gravity="center_vertical"
                 android:layout_marginEnd="6dp" />
 
-            <!-- コンボボックス（Spinner） -->
-            <Spinner
-                android:id="@+id/spContainerSize"
+            <!-- ★ Spinnerを黒枠で包む -->
+            <FrameLayout
                 android:layout_width="95dp"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:spinnerMode="dropdown"
-                android:paddingEnd="0dp"
-                android:paddingStart="12dp" />
+                android:background="@drawable/bg_spinner_black_border"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/spContainerSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:spinnerMode="dropdown"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="0dp" />
+            </FrameLayout>
+
         </LinearLayout>
+
 
         <!-- 3. コンテナ情報入力 -->
         <Button

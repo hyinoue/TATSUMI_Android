@@ -7,6 +7,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -32,6 +33,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.example.myapplication.R;
+import com.example.myapplication.settings.AppSettings;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -50,6 +52,27 @@ public class PhotographingActivity extends BaseActivity {
 
     private static final String TAG = "Photographing";
 
+    private static final int CAM_UXGA = 0;
+    private static final int CAM_QUADVGA = 1;
+    private static final int CAM_XGA = 2;
+    private static final int CAM_SVGA = 3;
+    private static final int CAM_VGA = 4;
+    private static final int CAM_QVGA = 5;
+
+    private static final int CAM_FLASH_AUTO = 0;
+    private static final int CAM_FLASH_ENABLE = 1;
+    private static final int CAM_FLASH_DISABLE = 2;
+
+    private static final int CAM_LIGHT_AUTO = 0;
+    private static final int CAM_OUTDOOR = 1;
+    private static final int CAM_FLUORESCENT = 2;
+    private static final int CAM_INCANDESCE = 3;
+    private static final int CAM_DIMLIGHT = 4;
+
+    private static final int AE_MODE_AUTO = CaptureRequest.CONTROL_AE_MODE_ON;
+    private static final int AE_MODE_ALWAYS_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH;
+    private static final int AE_MODE_AUTO_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH;
+
     private PreviewView previewView;
     private TextView statusBar;
     private ImageView capturedPreview;
@@ -66,6 +89,9 @@ public class PhotographingActivity extends BaseActivity {
     private String target;
     private Uri pendingPhotoUri;
     private File pendingPhotoFile;
+    private int lastImageSize;
+    private int lastFlashMode;
+    private int lastLightMode;
 
     private final ActivityResultLauncher<String> requestCameraPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
@@ -81,6 +107,12 @@ public class PhotographingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_photographing);
+
+        AppSettings.init(this);
+        AppSettings.load();
+        lastImageSize = AppSettings.CameraImageSize;
+        lastFlashMode = AppSettings.CameraFlash;
+        lastLightMode = AppSettings.CameraLightMode;
 
         btnSettings = findViewById(R.id.btnSettings);
         btnSettings.setOnClickListener(v -> {
@@ -116,6 +148,18 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppSettings.load();
+        if (hasSettingChanges()) {
+            lastImageSize = AppSettings.CameraImageSize;
+            lastFlashMode = AppSettings.CameraFlash;
+            lastLightMode = AppSettings.CameraLightMode;
+            restartCamera();
+        }
+    }
+
     private void startCamera() {
         setStatus("CAM_STARTING");
 
@@ -127,23 +171,43 @@ public class PhotographingActivity extends BaseActivity {
 
                 androidx.camera.core.Preview.Builder previewBuilder =
                         new androidx.camera.core.Preview.Builder();
+                Size targetResolution = mapTargetResolution(AppSettings.CameraImageSize);
+                if (targetResolution != null) {
+                    previewBuilder.setTargetResolution(targetResolution);
+                }
                 Camera2Interop.Extender<androidx.camera.core.Preview> previewExtender =
                         new Camera2Interop.Extender<>(previewBuilder);
                 previewExtender.setCaptureRequestOption(
                         CaptureRequest.CONTROL_AF_MODE,
                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
                 );
+                previewExtender.setCaptureRequestOption(
+                        CaptureRequest.CONTROL_AWB_MODE,
+                        mapAwbMode(AppSettings.CameraLightMode)
+                );
                 Preview preview = previewBuilder.build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 androidx.camera.core.ImageCapture.Builder captureBuilder =
                         new androidx.camera.core.ImageCapture.Builder()
-                                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY);
+                                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                                .setFlashMode(mapFlashMode(AppSettings.CameraFlash));
+                if (targetResolution != null) {
+                    captureBuilder.setTargetResolution(targetResolution);
+                }
                 Camera2Interop.Extender<androidx.camera.core.ImageCapture> captureExtender =
                         new Camera2Interop.Extender<>(captureBuilder);
                 captureExtender.setCaptureRequestOption(
                         CaptureRequest.CONTROL_AF_MODE,
                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                );
+                captureExtender.setCaptureRequestOption(
+                        CaptureRequest.CONTROL_AWB_MODE,
+                        mapAwbMode(AppSettings.CameraLightMode)
+                );
+                captureExtender.setCaptureRequestOption(
+                        CaptureRequest.CONTROL_AE_MODE,
+                        mapAeMode(AppSettings.CameraFlash)
                 );
                 imageCapture = captureBuilder.build();
 
@@ -158,6 +222,78 @@ public class PhotographingActivity extends BaseActivity {
                 setStatus("CAM_OPENERROR");
             }
         }, ContextCompat.getMainExecutor(this));
+    }
+
+    private void restartCamera() {
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
+        }
+        startCamera();
+    }
+
+    private boolean hasSettingChanges() {
+        return lastImageSize != AppSettings.CameraImageSize
+                || lastFlashMode != AppSettings.CameraFlash
+                || lastLightMode != AppSettings.CameraLightMode;
+    }
+
+    private Size mapTargetResolution(int setting) {
+        switch (setting) {
+            case CAM_UXGA:
+                return new Size(1200, 1600);
+            case CAM_QUADVGA:
+                return new Size(960, 1280);
+            case CAM_XGA:
+                return new Size(768, 1024);
+            case CAM_SVGA:
+                return new Size(600, 800);
+            case CAM_VGA:
+                return new Size(480, 640);
+            case CAM_QVGA:
+                return new Size(240, 320);
+            default:
+                return null;
+        }
+    }
+
+    private int mapFlashMode(int setting) {
+        switch (setting) {
+            case CAM_FLASH_ENABLE:
+                return ImageCapture.FLASH_MODE_ON;
+            case CAM_FLASH_DISABLE:
+                return ImageCapture.FLASH_MODE_OFF;
+            case CAM_FLASH_AUTO:
+            default:
+                return ImageCapture.FLASH_MODE_AUTO;
+        }
+    }
+
+    private int mapAeMode(int setting) {
+        switch (setting) {
+            case CAM_FLASH_ENABLE:
+                return AE_MODE_ALWAYS_FLASH;
+            case CAM_FLASH_DISABLE:
+                return AE_MODE_AUTO;
+            case CAM_FLASH_AUTO:
+            default:
+                return AE_MODE_AUTO_FLASH;
+        }
+    }
+
+    private int mapAwbMode(int setting) {
+        switch (setting) {
+            case CAM_OUTDOOR:
+                return CaptureRequest.CONTROL_AWB_MODE_DAYLIGHT;
+            case CAM_FLUORESCENT:
+                return CaptureRequest.CONTROL_AWB_MODE_FLUORESCENT;
+            case CAM_INCANDESCE:
+                return CaptureRequest.CONTROL_AWB_MODE_INCANDESCENT;
+            case CAM_DIMLIGHT:
+                return CaptureRequest.CONTROL_AWB_MODE_SHADE;
+            case CAM_LIGHT_AUTO:
+            default:
+                return CaptureRequest.CONTROL_AWB_MODE_AUTO;
+        }
     }
 
     private void takePhoto() {

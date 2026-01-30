@@ -41,24 +41,26 @@
                 android:textColor="#000000"
                 android:text="テーブル" />
 
-            <Spinner
-                android:id="@+id/spContainerSize"
+            <!-- ★ Spinnerを黒枠で包む（▼は残る） -->
+            <FrameLayout
                 android:layout_width="240dp"
-                android:layout_marginStart="2dp"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:spinnerMode="dropdown" />
+                android:layout_marginStart="2dp"
+                android:background="@drawable/bg_spinner_black_border"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/spContainerSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:paddingEnd="0dp"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
+
         </LinearLayout>
-
-        <!-- 2行目：現品番号（今は空） -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"></LinearLayout>
-
     </LinearLayout>
+
 
     <!-- 一覧（表の中身） -->
     <HorizontalScrollView

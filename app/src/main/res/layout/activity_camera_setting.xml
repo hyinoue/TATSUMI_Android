@@ -44,12 +44,20 @@
                 android:text="画像サイズ"
                 android:textColor="#000000" />
 
-            <Spinner
-                android:id="@+id/spImageSize"
+            <!-- ★ Spinner を枠で包む -->
+            <FrameLayout
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="26dp"
-                android:spinnerMode="dropdown" />
+                android:background="@drawable/bg_spinner_black_border"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/spImageSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 2行目：フラッシュ -->
@@ -66,12 +74,21 @@
                 android:text="フラッシュ"
                 android:textColor="#000000" />
 
-            <Spinner
-                android:id="@+id/spFlash"
+            <!-- ★ ここが今回の原因：Spinner背景を外して、枠で包む -->
+            <FrameLayout
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="26dp"
-                android:spinnerMode="dropdown" />
+                android:background="@drawable/bg_spinner_black_border"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/spFlash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="0dp"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 3行目：ライトモード -->
@@ -88,12 +105,20 @@
                 android:text="ライトモード"
                 android:textColor="#000000" />
 
-            <Spinner
-                android:id="@+id/spLightMode"
-                android:layout_width="200dp"
+            <FrameLayout
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:spinnerMode="dropdown" />
+                android:background="@drawable/bg_spinner_black_border"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/spLightMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="0dp"
+                    android:spinnerMode="dropdown" />
+            </FrameLayout>
         </LinearLayout>
 
     </LinearLayout>

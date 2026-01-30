@@ -99,6 +99,8 @@ public class ServiceMenuActivity extends BaseActivity {
         if (menu8 != null) {
             menu8.setOnClickListener(v -> openServerSetting());
         }
+
+        setupBottomButtonTexts();
     }
 
     /**
@@ -256,6 +258,18 @@ public class ServiceMenuActivity extends BaseActivity {
                     }
                 })
                 .show();
+    }
+
+    private void setupBottomButtonTexts() {
+        MaterialButton yellow = findViewById(R.id.btnBottomYellow);
+
+        if (yellow != null) yellow.setText("終了");
+        refreshBottomButtonsEnabled();
+    }
+
+    @Override
+    protected void onFunctionYellow() {
+        finish();
     }
 
     @Override
