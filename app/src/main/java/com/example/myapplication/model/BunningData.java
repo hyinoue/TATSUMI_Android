@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+//============================================================
+//　処理概要　:　BunningDataクラス
+//============================================================
+
 public class BunningData {
     public Date syukkaYmd;
     public String containerNo;

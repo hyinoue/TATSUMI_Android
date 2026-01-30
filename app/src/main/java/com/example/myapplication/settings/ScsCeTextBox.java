@@ -12,12 +12,18 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+
 /**
  * C# の ScsCeTextBox の挙動を Android の EditText で再現した例。
  * - フォーカス取得時に選択（HighlightText）
  * - フォーカス喪失時に値変更イベント（ValueChanged）
  * - Enter キーで次の項目へ移動（EnterNext）
  */
+
+//============================================================
+//　処理概要　:　ScsCeTextBoxクラス
+//============================================================
+
 public class ScsCeTextBox extends EditText {
     public interface OnValueChangedListener {
         void onValueChanged(ScsCeTextBox view, String beforeValue);

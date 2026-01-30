@@ -29,6 +29,7 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
+
 /**
  * 動作はそのままに、重複を削って短くした BaseActivity
  * <p>
@@ -45,6 +46,11 @@ import java.util.List;
  * (2) insetsで「barsがvisible」になった瞬間を検知→即hideを複数回
  * (3) IMEアニメ中も onProgress でhideを当て続ける
  */
+
+//============================================================
+//　処理概要　:　BaseActivityクラス
+//============================================================
+
 public class BaseActivity extends AppCompatActivity {
 
     // ===== public types =====

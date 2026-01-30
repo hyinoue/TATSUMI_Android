@@ -4,6 +4,11 @@ import com.example.myapplication.time.XmlUtil;
 
 import java.util.Date;
 
+
+//============================================================
+//　処理概要　:　SoapRequestBuildersクラス
+//============================================================
+
 public class SoapRequestBuilders {
     private static final String NS = "http://tempuri.org/";
 

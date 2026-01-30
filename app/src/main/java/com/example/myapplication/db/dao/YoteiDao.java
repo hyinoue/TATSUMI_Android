@@ -9,7 +9,13 @@ import com.example.myapplication.db.entity.YoteiEntity;
 
 import java.util.List;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　YoteiDaoクラス
+//============================================================
+
 public interface YoteiDao {
 
     @Query("SELECT * FROM " +

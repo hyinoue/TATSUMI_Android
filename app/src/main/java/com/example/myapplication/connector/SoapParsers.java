@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+//============================================================
+//　処理概要　:　SoapParsersクラス
+//============================================================
+
 public class SoapParsers {
 
     private SoapParsers() {

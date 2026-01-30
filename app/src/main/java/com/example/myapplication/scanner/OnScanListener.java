@@ -2,9 +2,15 @@ package com.example.myapplication.scanner;
 
 import androidx.annotation.Nullable;
 
+
 /**
  * スキャン結果を画面へ返すコールバック
  */
+
+//============================================================
+//　処理概要　:　OnScanListenerクラス
+//============================================================
+
 public interface OnScanListener {
 
     /**

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 
+
 /**
  * C# BundleSelectController を Room で再現（Android/Java版）
  * <p>
@@ -30,6 +31,11 @@ import java.util.Locale;
  * - JyuryoSum / Bundles
  * - Normalモード起動時に Work → List 復元
  */
+
+//============================================================
+//　処理概要　:　BundleSelectControllerクラス
+//============================================================
+
 public class BundleSelectController {
 
     public enum Mode {Normal, JyuryoCalc}

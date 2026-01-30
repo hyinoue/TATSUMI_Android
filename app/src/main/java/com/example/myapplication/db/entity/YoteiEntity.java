@@ -6,6 +6,11 @@ import androidx.room.Entity;
 
 
 @Entity(tableName = "T_YOTEI", primaryKeys = {"BOOKING_NO"})
+
+//============================================================
+//　処理概要　:　予定エンティティ
+//============================================================
+
 public class YoteiEntity {
 
     @NonNull

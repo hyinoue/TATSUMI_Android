@@ -9,7 +9,13 @@ import com.example.myapplication.db.entity.CommHistoryEntity;
 
 import java.util.List;
 
+
 @Dao
+
+//============================================================
+//　処理概要　:　CommHistoryDaoクラス
+//============================================================
+
 public interface CommHistoryDao {
 
     @Query("SELECT * FROM " +

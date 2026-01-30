@@ -3,10 +3,16 @@ package com.example.myapplication.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+
 /**
  * アプリケーション設定クラス（Android版）
  * C# WinCE AppSettings の移植
  */
+
+//============================================================
+//　処理概要　:　AppSettingsクラス
+//============================================================
+
 public final class AppSettings {
 
     // ================================

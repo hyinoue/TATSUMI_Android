@@ -25,8 +25,14 @@ import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
 
+
 @Database(
         entities = {
+
+//============================================================
+//　処理概要　:　AppDatabaseクラス
+//============================================================
+
                 SystemEntity.class,
                 YoteiEntity.class,
                 SyukkaContainerEntity.class,

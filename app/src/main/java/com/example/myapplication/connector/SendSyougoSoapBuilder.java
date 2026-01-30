@@ -4,6 +4,11 @@ import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.CollateDtl;
 import com.example.myapplication.time.XmlUtil;
 
+
+//============================================================
+//　処理概要　:　SendSyougoSoapBuilderクラス
+//============================================================
+
 public class SendSyougoSoapBuilder {
     private static final String NS = "http://tempuri.org/";
 

@@ -2,6 +2,11 @@ package com.example.myapplication.model;
 
 import java.util.Date;
 
+
+//============================================================
+//　処理概要　:　SyukkaHeaderクラス
+//============================================================
+
 public class SyukkaHeader {
     public String bookingNo;
     public Date syukkaYmd;

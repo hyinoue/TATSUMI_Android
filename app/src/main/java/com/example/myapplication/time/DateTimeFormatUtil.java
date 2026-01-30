@@ -7,6 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+
+//============================================================
+//　処理概要　:　DateTimeFormatUtilクラス
+//============================================================
+
 public final class DateTimeFormatUtil {
     private static final String OUTPUT_PATTERN = "MM-dd HH:mm";
     private static final String[] INPUT_PATTERNS = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm"};

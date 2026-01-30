@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+//============================================================
+//　処理概要　:　DbTestActivityクラス
+//============================================================
+
 public class DbTestActivity extends BaseActivity {
 
     private Spinner spTables;
