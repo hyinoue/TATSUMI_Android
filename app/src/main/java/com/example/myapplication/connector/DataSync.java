@@ -156,7 +156,8 @@ public class DataSync {
     private boolean dataSousinOnce(SyukkaContainerEntity container, Date sagyouYmd) {
         try {
             if (container.containerId == null) {
-                Log.w(TAG, "Container ID is null; skip send");
+                Log.w(TAG, "Container ID is null; skip send. containerNo="
+                        + formatContainerNo(container.containerNo));
                 return false;
             }
             BunningData data = new BunningData();
@@ -174,7 +175,8 @@ public class DataSync {
             String fallbackBookingNo = container.bookingNo != null
                     ? container.bookingNo.trim()
                     : "";
-            boolean missingBookingNo = false;
+            int missingBookingCount = 0;
+            String missingBookingSample = "";
 
             for (SyukkaMeisaiEntity row : detailRows) {
                 SyukkaMeisai detail = new SyukkaMeisai();
@@ -185,7 +187,10 @@ public class DataSync {
                     bookingNo = fallbackBookingNo;
                 }
                 if (bookingNo.isEmpty()) {
-                    missingBookingNo = true;
+                    missingBookingCount++;
+                    if (missingBookingSample.isEmpty()) {
+                        missingBookingSample = row.heatNo + "/" + row.sokuban;
+                    }
                 }
                 detail.bookingNo = bookingNo;
                 detail.bundleNo = row.bundleNo;
@@ -195,11 +200,17 @@ public class DataSync {
             }
 
             if (data.bundles.isEmpty()) {
-                Log.w(TAG, "No bundle details; skip SendSyukkaData");
+                Log.w(TAG, "No bundle details; skip SendSyukkaData. containerId="
+                        + container.containerId + " containerNo="
+                        + formatContainerNo(container.containerNo));
                 return false;
             }
-            if (missingBookingNo) {
-                Log.w(TAG, "BookingNo missing in bundle details; skip SendSyukkaData");
+            if (missingBookingCount > 0) {
+                Log.w(TAG, "BookingNo missing in bundle details; skip SendSyukkaData. containerId="
+                        + container.containerId + " containerNo="
+                        + formatContainerNo(container.containerNo)
+                        + " missingCount=" + missingBookingCount
+                        + " sampleHeatSokuban=" + missingBookingSample);
                 return false;
             }
 
@@ -211,12 +222,21 @@ public class DataSync {
                 deletePicture(container.containerId, ImageType.SEAL);
                 return true;
             }
-            Log.w(TAG, "SendSyukkaDataResult=false");
+            Log.w(TAG, "SendSyukkaDataResult=false. containerId=" + container.containerId
+                    + " containerNo=" + formatContainerNo(container.containerNo)
+                    + " bundleCount=" + data.bundles.size());
             return false;
         } catch (Exception ex) {
             Log.e(TAG, "DataSousinOnce failed", ex);
             return false;
         }
+    }
+
+    private String formatContainerNo(String containerNo) {
+        if (containerNo == null || containerNo.trim().isEmpty()) {
+            return "<empty>";
+        }
+        return containerNo.trim();
     }
 
     private void dataSousinSyougo() {

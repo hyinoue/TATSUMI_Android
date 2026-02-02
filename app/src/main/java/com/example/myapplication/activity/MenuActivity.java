@@ -39,6 +39,8 @@ public class MenuActivity extends BaseActivity {
     //============================================================
 
     private static final String TAG = "MENU";
+    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
+    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
 
     private ExecutorService io;
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
@@ -46,7 +48,7 @@ public class MenuActivity extends BaseActivity {
 
     // 積載束選定用の値保持用ディクショナリ
     private final Map<String, String> bundleValues = new HashMap<>();
-    // コンテナ情報入力用の値保持用ディクショナリ
+    // コンテナ情報入力用の値保持用ディクショナ
     private final Map<String, String> containerValues = new HashMap<>();
 
     // ===== Views =====
@@ -160,6 +162,7 @@ public class MenuActivity extends BaseActivity {
                                         containerValues.put(key.toString(), value.toString());
                                     }
                                 }
+                                syncBundleValuesFromContainer();
                             }
                         }
                     }
@@ -228,7 +231,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　下ボタン文言（画面ごと）
+    //　機能　:　下ボタン文言（画面ごと）
     //============================================================
     private void setupBottomButtonTexts() {
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
@@ -326,6 +329,17 @@ public class MenuActivity extends BaseActivity {
             bundleSelectLauncher.launch(intent);
         } else {
             startActivity(intent);
+        }
+    }
+
+    private void syncBundleValuesFromContainer() {
+        String container = containerValues.get(KEY_CONTAINER_JYURYO);
+        String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
+        if (container != null) {
+            bundleValues.put(KEY_CONTAINER_JYURYO, container);
+        }
+        if (dunnage != null) {
+            bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
         }
     }
 
@@ -519,29 +533,18 @@ public class MenuActivity extends BaseActivity {
                     lblWeightPlan.setText(formatNumber(goukeiJyuryoTonFinal));
 
                 if (lblZanContainer != null)
-                    lblZanContainer.setText(formatRemaining(zanContainerFinal));
-                if (lblZanBundle != null) lblZanBundle.setText(formatRemaining(zanBundleFinal));
-                if (lblZanWeight != null) lblZanWeight.setText(formatRemaining(zanWeightFinal));
+                    lblZanContainer.setText(formatNumber(zanContainerFinal));
+                if (lblZanBundle != null) lblZanBundle.setText(formatNumber(zanBundleFinal));
+                if (lblZanWeight != null) lblZanWeight.setText(formatNumber(zanWeightFinal));
             });
         });
     }
 
-    private String formatNumber(long value) {
-        return String.format(Locale.JAPAN, "%,d", value);
-    }
-
-    private String formatRemaining(long value) {
-        if (value == 0) return "";
-        return formatNumber(value);
-    }
-
-    private int intOrZero(Integer value) {
+    private long intOrZero(Integer value) {
         return value == null ? 0 : value;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (io != null) io.shutdownNow();
+    private String formatNumber(long value) {
+        return String.format(Locale.JAPAN, "%,d", value);
     }
 }

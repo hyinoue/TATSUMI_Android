@@ -71,21 +71,6 @@ public class DensoScannerController
     }
 
     // ----------------------------
-    // 設定（必要なら外から変更）
-    // ----------------------------
-    public void setTriggerKeyCode(int keyCode) {
-        this.triggerKeyCode = keyCode;
-    }
-
-    public void setWaitDecodeMs(long ms) {
-        this.waitDecodeMs = ms;
-    }
-
-    public void setDuplicateGuardEnabled(boolean enabled) {
-        // 互換用：必要なら拡張（今回は lastScanned を常に使うので何もしない）
-    }
-
-    // ----------------------------
     // ライフサイクル呼び出し
     // ----------------------------
 

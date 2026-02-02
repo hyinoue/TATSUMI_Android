@@ -58,6 +58,8 @@ public class ContainerInputActivity extends BaseActivity {
 
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
     private static final String KEY_CONTAINER_NO1 = "container_no1";
     private static final String KEY_CONTAINER_NO2 = "container_no2";
     private static final String KEY_SEAL_NO = "seal_no";
@@ -279,6 +281,9 @@ public class ContainerInputActivity extends BaseActivity {
 
                 String savedContainer = containerValues.get(KEY_CONTAINER_JYURYO);
                 String savedDunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
+                SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+                String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, "");
+                String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, "");
                 String savedNo1 = containerValues.get(KEY_CONTAINER_NO1);
                 String savedNo2 = containerValues.get(KEY_CONTAINER_NO2);
                 String savedSeal = containerValues.get(KEY_SEAL_NO);
@@ -291,6 +296,8 @@ public class ContainerInputActivity extends BaseActivity {
                     if (etContainerKg != null) {
                         if (!TextUtils.isEmpty(savedContainer)) {
                             etContainerKg.setText(savedContainer);
+                        } else if (!TextUtils.isEmpty(prefContainer)) {
+                            etContainerKg.setText(prefContainer);
                         } else if (!TextUtils.isEmpty(bundleContainer)) {
                             etContainerKg.setText(bundleContainer);
                         } else {
@@ -300,6 +307,8 @@ public class ContainerInputActivity extends BaseActivity {
                     if (etDunnageKg != null) {
                         if (!TextUtils.isEmpty(savedDunnage)) {
                             etDunnageKg.setText(savedDunnage);
+                        } else if (!TextUtils.isEmpty(prefDunnage)) {
+                            etDunnageKg.setText(prefDunnage);
                         } else if (!TextUtils.isEmpty(bundleDunnage)) {
                             etDunnageKg.setText(bundleDunnage);
                         } else {
@@ -428,8 +437,19 @@ public class ContainerInputActivity extends BaseActivity {
         @Override
         public void afterTextChanged(Editable s) {
             calcJyuryo();
+            persistContainerWeights();
         }
     };
+
+    private void persistContainerWeights() {
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String container = safeText(etContainerKg).trim();
+        String dunnage = safeText(etDunnageKg).trim();
+        prefs.edit()
+                .putString(PREFS_CONTAINER_JYURYO, container)
+                .putString(PREFS_DUNNAGE_JYURYO, dunnage)
+                .apply();
+    }
 
     //============================================================
     //　機　能　:　総重量＆残重量計算

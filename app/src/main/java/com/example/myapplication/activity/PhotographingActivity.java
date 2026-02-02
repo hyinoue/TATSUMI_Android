@@ -160,6 +160,7 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
+    @ExperimentalCamera2Interop
     private void startCamera() {
         setStatus("CAM_STARTING");
 
@@ -258,18 +259,19 @@ public class PhotographingActivity extends BaseActivity {
 
     private int mapFlashMode(int setting) {
         switch (setting) {
+            case CAM_FLASH_AUTO:
+                return ImageCapture.FLASH_MODE_AUTO;
             case CAM_FLASH_ENABLE:
                 return ImageCapture.FLASH_MODE_ON;
             case CAM_FLASH_DISABLE:
                 return ImageCapture.FLASH_MODE_OFF;
-            case CAM_FLASH_AUTO:
             default:
                 return ImageCapture.FLASH_MODE_AUTO;
         }
     }
 
-    private int mapAeMode(int setting) {
-        switch (setting) {
+    private int mapAeMode(int flashSetting) {
+        switch (flashSetting) {
             case CAM_FLASH_ENABLE:
                 return AE_MODE_ALWAYS_FLASH;
             case CAM_FLASH_DISABLE:
@@ -280,8 +282,8 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
-    private int mapAwbMode(int setting) {
-        switch (setting) {
+    private int mapAwbMode(int lightSetting) {
+        switch (lightSetting) {
             case CAM_OUTDOOR:
                 return CaptureRequest.CONTROL_AWB_MODE_DAYLIGHT;
             case CAM_FLUORESCENT:
@@ -289,7 +291,7 @@ public class PhotographingActivity extends BaseActivity {
             case CAM_INCANDESCE:
                 return CaptureRequest.CONTROL_AWB_MODE_INCANDESCENT;
             case CAM_DIMLIGHT:
-                return CaptureRequest.CONTROL_AWB_MODE_SHADE;
+                return CaptureRequest.CONTROL_AWB_MODE_WARM_FLUORESCENT;
             case CAM_LIGHT_AUTO:
             default:
                 return CaptureRequest.CONTROL_AWB_MODE_AUTO;
@@ -298,110 +300,110 @@ public class PhotographingActivity extends BaseActivity {
 
     private void takePhoto() {
         if (imageCapture == null) {
-            setStatus("CAM_NOT_READY");
             return;
         }
-
-        try {
-            triggerAfAeAtCenter();
-            String prefix = "CONTAINER".equals(target) ? "container_" : "seal_";
-            File photoFile = File.createTempFile(prefix, ".jpg", getCacheDir());
-
-            Uri uri = FileProvider.getUriForFile(
-                    this,
-                    getPackageName() + ".fileprovider",
-                    photoFile
-            );
-
-            ImageCapture.OutputFileOptions options =
-                    new ImageCapture.OutputFileOptions.Builder(photoFile).build();
-
-            setStatus("CAPTURING");
-
-            imageCapture.takePicture(
-                    options,
-                    ContextCompat.getMainExecutor(this),
-                    new ImageCapture.OnImageSavedCallback() {
-                        @Override
-                        public void onImageSaved(@NonNull ImageCapture.OutputFileResults output) {
-                            setStatus("CAPTURE_OK");
-                            pendingPhotoUri = uri;
-                            pendingPhotoFile = photoFile;
-                            capturedPreview.setImageURI(uri);
-                            showCaptureReview(true);
-                        }
-
-                        @Override
-                        public void onError(@NonNull ImageCaptureException exc) {
-                            Log.e(TAG, "takePicture error", exc);
-                            setStatus("CAPTURE_ERROR");
-                        }
-                    }
-            );
-
-        } catch (Exception e) {
-            Log.e(TAG, "takePhoto failed", e);
-            setStatus("CAPTURE_ERROR");
+        File file = getOutputFile();
+        if (file == null) {
+            setStatus("FILE_ERROR");
+            return;
         }
+        pendingPhotoFile = file;
+
+        ImageCapture.OutputFileOptions output =
+                new ImageCapture.OutputFileOptions.Builder(file).build();
+
+        imageCapture.takePicture(
+                output,
+                ContextCompat.getMainExecutor(this),
+                new ImageCapture.OnImageSavedCallback() {
+                    @Override
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        pendingPhotoUri = FileProvider.getUriForFile(
+                                PhotographingActivity.this,
+                                getPackageName() + ".provider",
+                                file
+                        );
+                        showCaptureReview(true);
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        Log.e(TAG, "photo capture failed", exception);
+                        setStatus("CAPTURE_ERROR");
+                    }
+                }
+        );
     }
 
     private void saveCapture() {
         if (pendingPhotoUri == null) {
-            setStatus("CAPTURE_EMPTY");
+            setStatus("SAVE_ERROR");
             return;
         }
-        Intent data = new Intent();
-        data.putExtra(EXTRA_RESULT_URI, pendingPhotoUri.toString());
-        data.putExtra(EXTRA_TARGET, target);
-        setResult(RESULT_OK, data);
+        Intent result = new Intent();
+        result.putExtra(EXTRA_RESULT_URI, pendingPhotoUri.toString());
+        result.putExtra(EXTRA_TARGET, target);
+        setResult(RESULT_OK, result);
         finish();
     }
 
     private void discardCapture() {
         if (pendingPhotoFile != null && pendingPhotoFile.exists()) {
-            if (!pendingPhotoFile.delete()) {
-                Log.w(TAG, "Failed to delete captured photo: " + pendingPhotoFile.getAbsolutePath());
-            }
+            boolean deleted = pendingPhotoFile.delete();
+            Log.d(TAG, "discard photo deleted=" + deleted);
         }
-        pendingPhotoUri = null;
         pendingPhotoFile = null;
-        capturedPreview.setImageDrawable(null);
+        pendingPhotoUri = null;
         showCaptureReview(false);
-        setStatus("CAPTURE_DISCARD");
-    }
-
-    private void triggerAfAeAtCenter() {
-        if (camera == null || previewView == null) {
-            setStatus("CAM_NOT_READY");
-            return;
-        }
-
-        float x = previewView.getWidth() / 2f;
-        float y = previewView.getHeight() / 2f;
-
-        SurfaceOrientedMeteringPointFactory factory =
-                new SurfaceOrientedMeteringPointFactory(previewView.getWidth(), previewView.getHeight());
-        MeteringPoint point = factory.createPoint(x, y);
-
-        FocusMeteringAction action =
-                new FocusMeteringAction.Builder(point,
-                        FocusMeteringAction.FLAG_AF | FocusMeteringAction.FLAG_AE)
-                        .setAutoCancelDuration(2, TimeUnit.SECONDS)
-                        .build();
-
-        camera.getCameraControl().startFocusAndMetering(action);
-        setStatus("AF_TRIGGERED");
     }
 
     private void showCaptureReview(boolean show) {
-        int visibility = show ? View.VISIBLE : View.GONE;
-        capturedPreview.setVisibility(visibility);
-        confirmButtons.setVisibility(visibility);
-        btnShutter.setVisibility(show ? View.GONE : View.VISIBLE);
-        btnSettings.setVisibility(show ? View.GONE : View.VISIBLE);
+        if (capturedPreview != null) {
+            capturedPreview.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (confirmButtons != null) {
+            confirmButtons.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (btnShutter != null) {
+            btnShutter.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+        if (btnSettings != null) {
+            btnSettings.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+        if (btnSave != null) {
+            btnSave.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (btnDiscard != null) {
+            btnDiscard.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
-    private void setStatus(@NonNull String msg) {
-        if (statusBar != null) statusBar.setText(msg);
+    private void triggerAfAeAtCenter() {
+        if (camera == null) return;
+
+        MeteringPoint point =
+                new SurfaceOrientedMeteringPointFactory(1.0f, 1.0f)
+                        .createPoint(0.5f, 0.5f);
+
+        FocusMeteringAction action = new FocusMeteringAction.Builder(point)
+                .setAutoCancelDuration(2, TimeUnit.SECONDS)
+                .build();
+
+        camera.getCameraControl().startFocusAndMetering(action);
+    }
+
+    private File getOutputFile() {
+        File dir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+        if (dir == null) {
+            dir = getFilesDir();
+        }
+        String name = "capture_" + System.currentTimeMillis() + ".jpg";
+        return new File(dir, name);
+    }
+
+    private void setStatus(String message) {
+        if (statusBar != null) {
+            statusBar.setText(message);
+        }
     }
 }

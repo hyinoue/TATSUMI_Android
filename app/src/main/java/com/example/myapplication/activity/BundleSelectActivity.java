@@ -51,6 +51,8 @@ public class BundleSelectActivity extends BaseActivity {
 
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
 
     private static final int SYSTEM_RENBAN = 1;
 
@@ -224,6 +226,9 @@ public class BundleSelectActivity extends BaseActivity {
                 maxContainerJyuryo = resolveMaxContainerWeight(system);
 
                 runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+                    String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, "");
+                    String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, "");
                     boolean hasContainer = bundleValues.containsKey(KEY_CONTAINER_JYURYO);
                     boolean hasDunnage = bundleValues.containsKey(KEY_DUNNAGE_JYURYO);
                     if (hasContainer || hasDunnage) {
@@ -244,10 +249,20 @@ public class BundleSelectActivity extends BaseActivity {
                             );
                         }
                     } else {
-                        if (etContainerKg != null)
-                            etContainerKg.setText(String.valueOf(defaultContainer));
-                        if (etDunnageKg != null)
-                            etDunnageKg.setText(String.valueOf(defaultDunnage));
+                        if (etContainerKg != null) {
+                            etContainerKg.setText(
+                                    TextUtils.isEmpty(prefContainer)
+                                            ? String.valueOf(defaultContainer)
+                                            : prefContainer
+                            );
+                        }
+                        if (etDunnageKg != null) {
+                            etDunnageKg.setText(
+                                    TextUtils.isEmpty(prefDunnage)
+                                            ? String.valueOf(defaultDunnage)
+                                            : prefDunnage
+                            );
+                        }
                     }
                     refreshRows();
                     updateFooter();
@@ -341,8 +356,23 @@ public class BundleSelectActivity extends BaseActivity {
         @Override
         public void afterTextChanged(Editable s) {
             updateFooter();
+            persistContainerWeights();
         }
     };
+
+    private void persistContainerWeights() {
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String container = etContainerKg != null && etContainerKg.getText() != null
+                ? etContainerKg.getText().toString().trim()
+                : "";
+        String dunnage = etDunnageKg != null && etDunnageKg.getText() != null
+                ? etDunnageKg.getText().toString().trim()
+                : "";
+        prefs.edit()
+                .putString(PREFS_CONTAINER_JYURYO, container)
+                .putString(PREFS_DUNNAGE_JYURYO, dunnage)
+                .apply();
+    }
 
     //============================================================
     //　機　能　:　下ボタン文言設定（画面ごと）
@@ -439,11 +469,28 @@ public class BundleSelectActivity extends BaseActivity {
     //　説　明　:　MenuActivity に戻る瞬間を作らないため（ラ見え防止）
     //============================================================
     private void openContainerInputAndFinish() {
+        saveBundleInputValues();
+        syncContainerValuesFromBundle();
         Intent intent = new Intent(this, ContainerInputActivity.class);
         intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
         intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
         startActivity(intent);
         finish();
+    }
+
+    private void syncContainerValuesFromBundle() {
+        String container = bundleValues.get(KEY_CONTAINER_JYURYO);
+        String dunnage = bundleValues.get(KEY_DUNNAGE_JYURYO);
+        if (TextUtils.isEmpty(container)) {
+            containerValues.remove(KEY_CONTAINER_JYURYO);
+        } else {
+            containerValues.put(KEY_CONTAINER_JYURYO, container);
+        }
+        if (TextUtils.isEmpty(dunnage)) {
+            containerValues.remove(KEY_DUNNAGE_JYURYO);
+        } else {
+            containerValues.put(KEY_DUNNAGE_JYURYO, dunnage);
+        }
     }
 
     @Override
@@ -642,7 +689,6 @@ public class BundleSelectActivity extends BaseActivity {
             });
         }
 
-
         @Override
         public int getItemCount() {
             return rows.size();
@@ -654,7 +700,6 @@ public class BundleSelectActivity extends BaseActivity {
             final TextView tvIndex;
             final TextView tvJyuryo;
             final TextView tvDelete;
-
 
             ViewHolder(android.view.View itemView) {
                 super(itemView);

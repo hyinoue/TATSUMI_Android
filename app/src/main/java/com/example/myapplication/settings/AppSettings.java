@@ -131,20 +131,6 @@ public final class AppSettings {
     public static String WebSvcURL_SCS;
     public static String WebSvcURL_Test;
 
-    // ================================
-    // 表示時間（C# LabelDisplayTime 再現）
-    // ================================
-    public static int getLabelDisplayTime() {
-        int wkVib = VibratorLength * VibratorCount
-                + VibratorInterval * (VibratorCount - 1);
-
-        if (BuzzerLength > wkVib) {
-            return BuzzerLength * 2;
-        } else {
-            return wkVib * 2;
-        }
-    }
-
     // インスタンス化禁止
     private AppSettings() {
     }
