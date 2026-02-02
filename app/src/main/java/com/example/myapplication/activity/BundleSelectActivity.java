@@ -30,6 +30,7 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -244,8 +245,8 @@ public class BundleSelectActivity extends BaseActivity {
     private void confirmDeleteRow(int row) {
         new AlertDialog.Builder(this)
                 .setMessage("行を削除します。よろしいですか？")
-                .setPositiveButton("はい", (d, w) -> deleteBundleRow(row))
-                .setNegativeButton("いいえ", null)
+                .setPositiveButton("いいえ", null)
+                .setNegativeButton("はい", (d, w) -> deleteBundleRow(row))
                 .show();
     }
 
@@ -289,8 +290,13 @@ public class BundleSelectActivity extends BaseActivity {
         MaterialButton green = findViewById(R.id.btnBottomGreen);
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
 
-        if (blue != null) blue.setText("確定");
-        if (red != null) red.setText("全削除");
+        if (mode == BundleSelectController.Mode.Normal) {
+            if (blue != null) blue.setText("確定");
+        } else {
+            if (blue != null) blue.setText("");
+        }
+
+        if (red != null) red.setText("束クリア");
         if (green != null) green.setText("");
         if (yellow != null) yellow.setText("終了");
         refreshBottomButtonsEnabled();
@@ -326,15 +332,8 @@ public class BundleSelectActivity extends BaseActivity {
         if (!validateBeforeConfirm()) {
             return;
         }
-
-        if (mode == BundleSelectController.Mode.Normal) {
-            // ★ここで直接遷移（MenuActivity を経由しない）
-            openContainerInputAndFinish();
-        } else {
-            // 重量計算モード：結果だけ返して戻る
-            setResult(RESULT_OK);
-            finish();
-        }
+        // ★ここで直接遷移（MenuActivity を経由しない）
+        openContainerInputAndFinish();
     }
 
     //============================================================
@@ -447,22 +446,25 @@ public class BundleSelectActivity extends BaseActivity {
     //============================================================
     private int getRemainingWeight() {
         int total = getTotalWeight();
-        int container = getIntValue(etContainerKg);
-        int dunnage = getIntValue(etDunnageKg);
-        return maxContainerJyuryo - (total + container + dunnage);
+        return maxContainerJyuryo - total;
     }
 
     private int getTotalWeight() {
-        if (controller == null) return 0;
-        return controller.getJyuryoSum();
+        int bundle = controller != null ? controller.getJyuryoSum() : 0;
+        int bundleCount = controller != null ? controller.getBundles().size() : 0;
+        int container = getIntValue(etContainerKg);
+        int dunnage = getIntValue(etDunnageKg);
+        return bundle + bundleCount + container + dunnage;
     }
 
     private int getIntValue(EditText et) {
         if (et == null) return 0;
         String s = et.getText() != null ? et.getText().toString() : "";
         if (TextUtils.isEmpty(s)) return 0;
+        String cleaned = s.replace(",", "").trim();
+        if (TextUtils.isEmpty(cleaned)) return 0;
         try {
-            return Integer.parseInt(s);
+            return Integer.parseInt(cleaned);
         } catch (NumberFormatException ignored) {
             return 0;
         }
@@ -478,8 +480,15 @@ public class BundleSelectActivity extends BaseActivity {
         int remain = getRemainingWeight();
 
         if (tvBundleCount != null) tvBundleCount.setText(String.valueOf(count));
-        if (tvTotalWeight != null) tvTotalWeight.setText(String.valueOf(total));
-        if (tvRemainWeight != null) tvRemainWeight.setText(String.valueOf(remain));
+        if (tvTotalWeight != null) tvTotalWeight.setText(formatNumber(total));
+        if (tvRemainWeight != null) tvRemainWeight.setText(formatNumber(remain));
+    }
+
+    //============================================================
+    //　機　能　:　数値表示（DecimalFormat禁止 → String.formatで統一）
+    //============================================================
+    private String formatNumber(int value) {
+        return String.format(Locale.JAPAN, "%,d", value);
     }
 
     @Override
@@ -536,8 +545,8 @@ public class BundleSelectActivity extends BaseActivity {
             holder.tvJyuryo.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
             holder.tvDelete.setText(row.cancelText);
 
-            holder.itemView.setOnClickListener(v -> {
-                int adapterPosition = holder.getAdapterPosition(); // ★ここ変更
+            holder.tvDelete.setOnClickListener(v -> {
+                int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION && deleteHandler != null) {
                     deleteHandler.delete(adapterPosition);
                 }
