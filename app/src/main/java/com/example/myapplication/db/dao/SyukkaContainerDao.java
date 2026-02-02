@@ -28,7 +28,7 @@ public interface SyukkaContainerDao {
     @Query("SELECT * FROM " +
             "T_SYUKKA_CONTAINER " +
             "WHERE " +
-            "BOOKING_NO = :bookingNo"
+            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
     List<SyukkaContainerEntity> findByBookingNo(String bookingNo);
 

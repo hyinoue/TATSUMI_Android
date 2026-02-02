@@ -21,16 +21,16 @@ public interface KakuninMeisaiDao {
     @Query("SELECT * FROM " +
             "T_KAKUNIN_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban"
+            "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
     KakuninMeisaiEntity findOne(String heatNo, String sokuban);
 
     @Query("SELECT * FROM " +
             "T_KAKUNIN_MEISAI " +
             "WHERE " +
-            "CONTAINER_ID = :containerId"
+            "TRIM(CONTAINER_ID) = TRIM(:containerId)"
     )
     List<KakuninMeisaiEntity> findByContainerId(String containerId);
 

@@ -39,7 +39,7 @@ public interface YoteiDao {
     @Query("SELECT * FROM " +
             "T_YOTEI " +
             "WHERE " +
-            "BOOKING_NO = :bookingNo"
+            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
     YoteiEntity findByBookingNo(String bookingNo);
 
@@ -50,7 +50,7 @@ public interface YoteiDao {
             "KANRYO_BUNDOLE = KANRYO_BUNDOLE + :bundleCount, " +
             "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
             "WHERE " +
-            "BOOKING_NO = :bookingNo"
+            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
     int incrementKanryo(String bookingNo, int bundleCount, int jyuryo);
 

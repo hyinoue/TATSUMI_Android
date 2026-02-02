@@ -21,7 +21,7 @@ public interface KakuninContainerDao {
     @Query("SELECT * FROM " +
             "T_KAKUNIN_CONTAINER " +
             "WHERE " +
-            "CONTAINER_ID = :containerId"
+            "TRIM(CONTAINER_ID) = TRIM(:containerId)"
     )
     KakuninContainerEntity findByContainerId(String containerId);
 
@@ -44,7 +44,7 @@ public interface KakuninContainerDao {
             "SET " +
             "DATA_SEND_YMDHMS = :dataSendYmdhms " +
             "WHERE " +
-            "CONTAINER_ID = :containerId"
+            "TRIM(CONTAINER_ID) = TRIM(:containerId)"
     )
     int markSent(String containerId, String dataSendYmdhms);
 

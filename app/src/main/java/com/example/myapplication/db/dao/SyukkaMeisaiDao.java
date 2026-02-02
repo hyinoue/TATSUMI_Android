@@ -22,16 +22,16 @@ public interface SyukkaMeisaiDao {
     @Query("SELECT * FROM " +
             "T_SYUKKA_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban LIMIT 1"
+            "TRIM(SOKUBAN) = TRIM(:sokuban) LIMIT 1"
     )
     SyukkaMeisaiEntity findOne(String heatNo, String sokuban);
 
     @Query("SELECT * FROM " +
             "T_SYUKKA_MEISAI " +
             "WHERE " +
-            "BOOKING_NO = :bookingNo"
+            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
     List<SyukkaMeisaiEntity> findByBookingNo(String bookingNo);
 
@@ -40,9 +40,9 @@ public interface SyukkaMeisaiDao {
             "SET " +
             "BUNDLE_NO = :bundleNo " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban"
+            "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
     int updateBundleNo(String heatNo, String sokuban, String bundleNo);
 
@@ -54,9 +54,9 @@ public interface SyukkaMeisaiDao {
             "JYURYO = :jyuryo, " +
             "BOOKING_NO = :bookingNo " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban"
+            "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
     int updateFromReceive(String heatNo,
                           String sokuban,
@@ -142,9 +142,9 @@ public interface SyukkaMeisaiDao {
             "SET " +
             "BUNDLE_NO = :bundleNo " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban " +
+            "TRIM(SOKUBAN) = TRIM(:sokuban) " +
             "AND " +
             "(BUNDLE_NO IS NULL OR BUNDLE_NO = '')"
     )

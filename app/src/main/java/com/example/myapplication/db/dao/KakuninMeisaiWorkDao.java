@@ -35,9 +35,9 @@ public interface KakuninMeisaiWorkDao {
     @Query("SELECT * FROM " +
             "W_KAKUNIN_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban"
+            "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
     KakuninMeisaiWorkEntity findOne(String heatNo, String sokuban);
 
@@ -47,9 +47,9 @@ public interface KakuninMeisaiWorkDao {
     @Query("DELETE FROM " +
             "W_KAKUNIN_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban")
+            "TRIM(SOKUBAN) = TRIM(:sokuban)")
     int deleteOne(String heatNo, String sokuban);
 
     @Query("DELETE FROM" +

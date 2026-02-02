@@ -26,9 +26,9 @@ public interface SyukkaMeisaiWorkDao {
     @Query("SELECT * FROM " +
             "W_SYUKKA_MEISAI " +
             "WHERE " +
-            "HEAT_NO =TRIM(:heatNo)" +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN =TRIM(:sokuban)" +
+            "TRIM(SOKUBAN) = TRIM(:sokuban) " +
             "LIMIT 1"
     )
     SyukkaMeisaiWorkEntity findOne(String heatNo, String sokuban);
@@ -39,9 +39,9 @@ public interface SyukkaMeisaiWorkDao {
     @Query("DELETE FROM " +
             "W_SYUKKA_MEISAI " +
             "WHERE " +
-            "HEAT_NO = :heatNo " +
+            "TRIM(HEAT_NO) = TRIM(:heatNo) " +
             "AND " +
-            "SOKUBAN = :sokuban"
+            "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
     int deleteOne(String heatNo, String sokuban);
 
@@ -57,9 +57,9 @@ public interface SyukkaMeisaiWorkDao {
             "INNER JOIN " +
             "T_SYUKKA_MEISAI T " +
             " ON " +
-            "W.HEAT_NO = T.HEAT_NO " +
+            "TRIM(W.HEAT_NO) = TRIM(T.HEAT_NO) " +
             "AND " +
-            "W.SOKUBAN = T.SOKUBAN"
+            "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN)"
     )
     WorkSummary getWorkSummary();
 
@@ -76,9 +76,9 @@ public interface SyukkaMeisaiWorkDao {
             "INNER JOIN " +
             "T_SYUKKA_MEISAI T " +
             " ON " +
-            "W.HEAT_NO = T.HEAT_NO " +
+            "TRIM(W.HEAT_NO) = TRIM(T.HEAT_NO) " +
             "AND " +
-            "W.SOKUBAN = T.SOKUBAN " +
+            "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN) " +
             "ORDER BY " +
             "W.UPDATE_YMD"
     )
