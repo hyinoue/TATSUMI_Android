@@ -18,20 +18,15 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.myapplication.BuildConfig;
 import com.example.myapplication.R;
 import com.example.myapplication.connector.DataSync;
-import com.example.myapplication.connector.SvcHandyRepository;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
-import com.example.myapplication.model.BunningData;
-import com.example.myapplication.model.SyukkaData;
-import com.example.myapplication.model.SyukkaHeader;
-import com.example.myapplication.model.SyukkaMeisai;
 import com.google.android.material.button.MaterialButton;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,17 +40,14 @@ public class MenuActivity extends BaseActivity {
 
     private static final String TAG = "MENU";
 
-    // ★★★ 実運用値に置き換えてください ★★★
-    private static final String REAL_CONTAINER_NO = "SESU010355";
-    private static final String REAL_SEAL_NO = "1234567";
-    private static final int REAL_CONTAINER_JYURYO = 3800;
-    private static final int REAL_DUNNAGE_JYURYO = 200;
-
-    // 送る束の数（まずは1件でDB更新を確認 → 問題なければ全部送る等）
-    private static final int SEND_BUNDLE_LIMIT = 1; // 全件送りたいなら 0
-
     private ExecutorService io;
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
+    private ActivityResultLauncher<Intent> containerInputLauncher;
+
+    // 積載束選定用の値保持用ディクショナリ
+    private final Map<String, String> bundleValues = new HashMap<>();
+    // コンテナ情報入力用の値保持用ディクショナリ
+    private final Map<String, String> containerValues = new HashMap<>();
 
     // ===== Views =====
     private TextView tvCenterStatus;
@@ -128,6 +120,49 @@ public class MenuActivity extends BaseActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     // 遷移はしない。表示更新のみ。
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            java.io.Serializable extra =
+                                    data.getSerializableExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES);
+                            if (extra instanceof Map) {
+                                bundleValues.clear();
+                                Map<?, ?> raw = (Map<?, ?>) extra;
+                                for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                                    Object key = entry.getKey();
+                                    Object value = entry.getValue();
+                                    if (key != null && value != null) {
+                                        bundleValues.put(key.toString(), value.toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    refreshInformation();
+                }
+        );
+
+        containerInputLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            java.io.Serializable extra =
+                                    data.getSerializableExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES);
+                            if (extra instanceof Map) {
+                                containerValues.clear();
+                                Map<?, ?> raw = (Map<?, ?>) extra;
+                                for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                                    Object key = entry.getKey();
+                                    Object value = entry.getValue();
+                                    if (key != null && value != null) {
+                                        containerValues.put(key.toString(), value.toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
                     refreshInformation();
                 }
         );
@@ -284,6 +319,8 @@ public class MenuActivity extends BaseActivity {
     private void openBundleSelect(String mode) {
         Intent intent = new Intent(this, BundleSelectActivity.class);
         intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
+        intent.putExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
+        intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
 
         if (bundleSelectLauncher != null) {
             bundleSelectLauncher.launch(intent);
@@ -304,7 +341,14 @@ public class MenuActivity extends BaseActivity {
                     showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
                     return;
                 }
-                startActivity(new Intent(this, ContainerInputActivity.class));
+                Intent intent = new Intent(this, ContainerInputActivity.class);
+                intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
+                intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
+                if (containerInputLauncher != null) {
+                    containerInputLauncher.launch(intent);
+                } else {
+                    startActivity(intent);
+                }
             });
         });
     }
@@ -368,108 +412,6 @@ public class MenuActivity extends BaseActivity {
     private void startDataSync() {
         setCenterStatus("データ送受信中...");
         io.execute(this::runDataSync);
-    }
-
-    /**
-     * 実運用形：サーバから取得した実在の束明細を使って SendSyukkaData を実行
-     */
-    private void sendSyukkaDataReal() {
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN);
-
-        try {
-            SvcHandyRepository repo = new SvcHandyRepository();
-
-            // 1) 作業日
-            Date sagyouYmd = repo.getSagyouYmd();
-
-            // 2) 実在の出荷データ（束明細）を取得（ログ用にBEFORE）
-            SyukkaData before = repo.getSyukkaData(sagyouYmd);
-            logSyukkaHeaderList("BEFORE", before);
-            List<SyukkaMeisai> meisai = (before == null) ? null : before.meisai;
-
-            if (meisai == null || meisai.isEmpty()) {
-                runOnUiThread(() -> setCenterStatus("NG GetSyukkaData: 明細0件"));
-                return;
-            }
-
-            // 3) 送信用データ作成（束明細は“取得した実在データ”を流用）
-            BunningData b = new BunningData();
-            b.syukkaYmd = sagyouYmd;
-
-            b.containerNo = REAL_CONTAINER_NO;
-            b.sealNo = REAL_SEAL_NO;
-            b.containerJyuryo = REAL_CONTAINER_JYURYO;
-            b.dunnageJyuryo = REAL_DUNNAGE_JYURYO;
-
-            int limit = SEND_BUNDLE_LIMIT;
-            if (limit <= 0 || limit > meisai.size()) limit = meisai.size();
-
-            for (int i = 0; i < limit; i++) {
-                SyukkaMeisai m = meisai.get(i);
-
-                SyukkaMeisai send = new SyukkaMeisai();
-                send.heatNo = m.heatNo;
-                send.sokuban = m.sokuban;
-                send.syukkaSashizuNo = m.syukkaSashizuNo;
-                send.bundleNo = m.bundleNo;
-                send.jyuryo = m.jyuryo;
-                send.bookingNo = m.bookingNo;
-
-                b.bundles.add(send);
-            }
-
-            // 4) 送信
-            boolean ok = repo.sendSyukkaData(b);
-
-            if (ok) {
-                SyukkaData after = repo.getSyukkaData(sagyouYmd);
-                logSyukkaHeaderList("AFTER", after);
-
-                String msg = "OK SendSyukkaDataResult=true"
-                        + "\n作業日=" + fmt.format(sagyouYmd)
-                        + "\ncontainerNo=" + b.containerNo
-                        + "\nsealNo=" + b.sealNo
-                        + "\n送信束数=" + b.bundles.size()
-                        + "\n先頭束 heatNo=" + b.bundles.get(0).heatNo
-                        + " sokuban=" + b.bundles.get(0).sokuban
-                        + " bookingNo=" + b.bundles.get(0).bookingNo;
-
-                Log.i(TAG, msg);
-                runOnUiThread(() -> setCenterStatus(msg));
-            } else {
-                runOnUiThread(() -> setCenterStatus("NG SendSyukkaDataResult=false（サーバ側条件NGの可能性）"));
-            }
-
-        } catch (Exception ex) {
-            Log.e(TAG, "SendSyukkaData NG", ex);
-            String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
-            runOnUiThread(() -> setCenterStatus("NG " + msg));
-        }
-    }
-
-    private void logSyukkaHeaderList(String label, SyukkaData data) {
-        if (data == null) {
-            Log.i(TAG, label + " HEADER: data=null");
-            return;
-        }
-        if (data.header == null || data.header.isEmpty()) {
-            Log.i(TAG, label + " HEADER: header list is empty");
-            return;
-        }
-
-        SyukkaHeader h = data.header.get(0);
-
-        Log.i(TAG, label + " HEADER:"
-                + " bookingNo=" + h.bookingNo
-                + " syukkaYmd=" + (h.syukkaYmd != null ? h.syukkaYmd.toString() : "null")
-                + " containerCount=" + h.containerCount
-                + " totalBundole=" + h.totalBundole
-                + " totalJyuryo=" + h.totalJyuryo
-                + " kanryoContainerCnt=" + h.kanryoContainerCnt
-                + " kanryoBundleSum=" + h.kanryoBundleSum
-                + " knaryoJyuryoSum=" + h.knaryoJyuryoSum
-                + " lastUpdYmdHms=" + (h.lastUpdYmdHms != null ? h.lastUpdYmdHms.toString() : "null")
-        );
     }
 
     //============================================================

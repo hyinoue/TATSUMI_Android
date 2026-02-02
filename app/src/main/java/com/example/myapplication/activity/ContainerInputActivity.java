@@ -53,7 +53,9 @@ public class ContainerInputActivity extends BaseActivity {
     private static final String TAG = "ContainerInput";
     private static final int SYSTEM_RENBAN = 1;
 
-    private static final String PREFS_NAME = "container_input";
+    public static final String EXTRA_BUNDLE_VALUES = "container_input_bundle_values";
+    public static final String EXTRA_CONTAINER_VALUES = "container_input_values";
+
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
     private static final String KEY_CONTAINER_NO1 = "container_no1";
@@ -87,6 +89,9 @@ public class ContainerInputActivity extends BaseActivity {
 
     private ExecutorService io;
     private AppDatabase db;
+
+    private final java.util.Map<String, String> bundleValues = new java.util.HashMap<>();
+    private final java.util.Map<String, String> containerValues = new java.util.HashMap<>();
 
     private int bundleCount = 0;        // 束数（個数）
     private int sekisaiSokuJyuryo = 0;  // 積載束重量（kg）
@@ -159,6 +164,7 @@ public class ContainerInputActivity extends BaseActivity {
         setupBottomButtons();
         setupInputHandlers();
         setupPhotoHandlers();
+        loadPassedValues(getIntent());
 
         loadInitialData();
     }
@@ -271,30 +277,39 @@ public class ContainerInputActivity extends BaseActivity {
                 sekisaiSokuJyuryo = summary != null ? safeInt(summary.jyuryo) : 0;
                 String bookingNo = summary != null ? summary.bookingNo : "";
 
-                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                String savedContainer = prefs.getString(KEY_CONTAINER_JYURYO, null);
-                String savedDunnage = prefs.getString(KEY_DUNNAGE_JYURYO, null);
-                String savedNo1 = prefs.getString(KEY_CONTAINER_NO1, "");
-                String savedNo2 = prefs.getString(KEY_CONTAINER_NO2, "");
-                String savedSeal = prefs.getString(KEY_SEAL_NO, "");
-                String savedContainerPhoto = prefs.getString(KEY_CONTAINER_PHOTO_URI, "");
-                String savedSealPhoto = prefs.getString(KEY_SEAL_PHOTO_URI, "");
+                String savedContainer = containerValues.get(KEY_CONTAINER_JYURYO);
+                String savedDunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
+                String savedNo1 = containerValues.get(KEY_CONTAINER_NO1);
+                String savedNo2 = containerValues.get(KEY_CONTAINER_NO2);
+                String savedSeal = containerValues.get(KEY_SEAL_NO);
+                String savedContainerPhoto = containerValues.get(KEY_CONTAINER_PHOTO_URI);
+                String savedSealPhoto = containerValues.get(KEY_SEAL_PHOTO_URI);
 
                 runOnUiThread(() -> {
+                    String bundleContainer = bundleValues.get(KEY_CONTAINER_JYURYO);
+                    String bundleDunnage = bundleValues.get(KEY_DUNNAGE_JYURYO);
                     if (etContainerKg != null) {
-                        etContainerKg.setText(!TextUtils.isEmpty(savedContainer)
-                                ? savedContainer
-                                : String.valueOf(defaultContainer));
+                        if (!TextUtils.isEmpty(savedContainer)) {
+                            etContainerKg.setText(savedContainer);
+                        } else if (!TextUtils.isEmpty(bundleContainer)) {
+                            etContainerKg.setText(bundleContainer);
+                        } else {
+                            etContainerKg.setText(String.valueOf(defaultContainer));
+                        }
                     }
                     if (etDunnageKg != null) {
-                        etDunnageKg.setText(!TextUtils.isEmpty(savedDunnage)
-                                ? savedDunnage
-                                : String.valueOf(defaultDunnage));
+                        if (!TextUtils.isEmpty(savedDunnage)) {
+                            etDunnageKg.setText(savedDunnage);
+                        } else if (!TextUtils.isEmpty(bundleDunnage)) {
+                            etDunnageKg.setText(bundleDunnage);
+                        } else {
+                            etDunnageKg.setText(String.valueOf(defaultDunnage));
+                        }
                     }
 
-                    if (etContainerNo1 != null) etContainerNo1.setText(savedNo1);
-                    if (etContainerNo2 != null) etContainerNo2.setText(savedNo2);
-                    if (etSealNo != null) etSealNo.setText(savedSeal);
+                    if (etContainerNo1 != null) etContainerNo1.setText(defaultString(savedNo1));
+                    if (etContainerNo2 != null) etContainerNo2.setText(defaultString(savedNo2));
+                    if (etSealNo != null) etSealNo.setText(defaultString(savedSeal));
                     restorePhoto(ivPhotoContainer, savedContainerPhoto, true);
                     restorePhoto(ivPhotoSeal, savedSealPhoto, false);
 
@@ -334,6 +349,34 @@ public class ContainerInputActivity extends BaseActivity {
         if (tvRemainKg != null) tvRemainKg.setText("");
         if (ivPhotoContainer != null) ivPhotoContainer.setImageDrawable(null);
         if (ivPhotoSeal != null) ivPhotoSeal.setImageDrawable(null);
+    }
+
+    private void loadPassedValues(@Nullable Intent intent) {
+        if (intent == null) return;
+        java.io.Serializable bundleExtra = intent.getSerializableExtra(EXTRA_BUNDLE_VALUES);
+        if (bundleExtra instanceof java.util.Map) {
+            bundleValues.clear();
+            java.util.Map<?, ?> raw = (java.util.Map<?, ?>) bundleExtra;
+            for (java.util.Map.Entry<?, ?> entry : raw.entrySet()) {
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                if (key != null && value != null) {
+                    bundleValues.put(key.toString(), value.toString());
+                }
+            }
+        }
+        java.io.Serializable containerExtra = intent.getSerializableExtra(EXTRA_CONTAINER_VALUES);
+        if (containerExtra instanceof java.util.Map) {
+            containerValues.clear();
+            java.util.Map<?, ?> raw = (java.util.Map<?, ?>) containerExtra;
+            for (java.util.Map.Entry<?, ?> entry : raw.entrySet()) {
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                if (key != null && value != null) {
+                    containerValues.put(key.toString(), value.toString());
+                }
+            }
+        }
     }
 
     //============================================================
@@ -737,6 +780,10 @@ public class ContainerInputActivity extends BaseActivity {
         return editText.getText().toString();
     }
 
+    private String defaultString(String value) {
+        return value == null ? "" : value;
+    }
+
     //============================================================
     //　機　能　:　数値表示（DecimalFormat禁止 → String.formatで統一）
     //============================================================
@@ -748,25 +795,24 @@ public class ContainerInputActivity extends BaseActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    //============================================================
-    //　機　能　:　一時保存
-    //============================================================
     @Override
-    protected void onPause() {
-        super.onPause();
-        saveFormState();
+    public void finish() {
+        saveContainerValues();
+        Intent result = new Intent();
+        result.putExtra(EXTRA_CONTAINER_VALUES, new java.util.HashMap<>(containerValues));
+        setResult(RESULT_OK, result);
+        super.finish();
     }
 
-    private void saveFormState() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        prefs.edit()
-                .putString(KEY_CONTAINER_JYURYO, safeText(etContainerKg))
-                .putString(KEY_DUNNAGE_JYURYO, safeText(etDunnageKg))
-                .putString(KEY_CONTAINER_NO1, safeText(etContainerNo1))
-                .putString(KEY_CONTAINER_NO2, safeText(etContainerNo2))
-                .putString(KEY_SEAL_NO, safeText(etSealNo))
-                .putString(KEY_CONTAINER_PHOTO_URI, containerPhotoUri != null ? containerPhotoUri.toString() : "")
-                .putString(KEY_SEAL_PHOTO_URI, sealPhotoUri != null ? sealPhotoUri.toString() : "")
-                .apply();
+    private void saveContainerValues() {
+        containerValues.put(KEY_CONTAINER_JYURYO, safeText(etContainerKg).trim());
+        containerValues.put(KEY_DUNNAGE_JYURYO, safeText(etDunnageKg).trim());
+        containerValues.put(KEY_CONTAINER_NO1, safeText(etContainerNo1).trim());
+        containerValues.put(KEY_CONTAINER_NO2, safeText(etContainerNo2).trim());
+        containerValues.put(KEY_SEAL_NO, safeText(etSealNo).trim());
+        containerValues.put(KEY_CONTAINER_PHOTO_URI,
+                containerPhotoUri != null ? containerPhotoUri.toString() : "");
+        containerValues.put(KEY_SEAL_PHOTO_URI,
+                sealPhotoUri != null ? sealPhotoUri.toString() : "");
     }
 }

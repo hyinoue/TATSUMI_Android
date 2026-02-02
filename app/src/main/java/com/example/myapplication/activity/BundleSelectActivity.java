@@ -29,8 +29,10 @@ import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,8 +45,12 @@ public class BundleSelectActivity extends BaseActivity {
     //============================================================
 
     public static final String EXTRA_MODE = "bundle_select_mode";
+    public static final String EXTRA_BUNDLE_VALUES = "bundle_select_values";
     public static final String MODE_NORMAL = "normal";
     public static final String MODE_JYURYO = "jyuryo_calc";
+
+    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
+    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
 
     private static final int SYSTEM_RENBAN = 1;
 
@@ -62,6 +68,9 @@ public class BundleSelectActivity extends BaseActivity {
     private BundleRowAdapter adapter;
     private DensoScannerController scanner;
 
+    private final Map<String, String> bundleValues = new HashMap<>();
+    private final Map<String, String> containerValues = new HashMap<>();
+
     private int maxContainerJyuryo = 0;
     private BundleSelectController.Mode mode = BundleSelectController.Mode.Normal;
 
@@ -74,6 +83,8 @@ public class BundleSelectActivity extends BaseActivity {
 
         bindViews();
         setupMode(getIntent());
+        loadBundleValues(getIntent());
+        loadContainerValues(getIntent());
         setupBottomButtonTexts();
         setupInputHandlers();
         setupRecycler();
@@ -121,6 +132,36 @@ public class BundleSelectActivity extends BaseActivity {
         } else {
             mode = BundleSelectController.Mode.Normal;
             if (tvTitle != null) tvTitle.setText("積載束選択");
+        }
+    }
+
+    private void loadBundleValues(@Nullable Intent intent) {
+        if (intent == null) return;
+        java.io.Serializable extra = intent.getSerializableExtra(EXTRA_BUNDLE_VALUES);
+        if (!(extra instanceof Map)) return;
+        bundleValues.clear();
+        Map<?, ?> raw = (Map<?, ?>) extra;
+        for (Map.Entry<?, ?> entry : raw.entrySet()) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            if (key != null && value != null) {
+                bundleValues.put(key.toString(), value.toString());
+            }
+        }
+    }
+
+    private void loadContainerValues(@Nullable Intent intent) {
+        if (intent == null) return;
+        java.io.Serializable extra = intent.getSerializableExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES);
+        if (!(extra instanceof Map)) return;
+        containerValues.clear();
+        Map<?, ?> raw = (Map<?, ?>) extra;
+        for (Map.Entry<?, ?> entry : raw.entrySet()) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            if (key != null && value != null) {
+                containerValues.put(key.toString(), value.toString());
+            }
         }
     }
 
@@ -183,9 +224,31 @@ public class BundleSelectActivity extends BaseActivity {
                 maxContainerJyuryo = resolveMaxContainerWeight(system);
 
                 runOnUiThread(() -> {
-                    if (etContainerKg != null)
-                        etContainerKg.setText(String.valueOf(defaultContainer));
-                    if (etDunnageKg != null) etDunnageKg.setText(String.valueOf(defaultDunnage));
+                    boolean hasContainer = bundleValues.containsKey(KEY_CONTAINER_JYURYO);
+                    boolean hasDunnage = bundleValues.containsKey(KEY_DUNNAGE_JYURYO);
+                    if (hasContainer || hasDunnage) {
+                        if (etContainerKg != null) {
+                            String savedContainer = bundleValues.get(KEY_CONTAINER_JYURYO);
+                            etContainerKg.setText(
+                                    TextUtils.isEmpty(savedContainer)
+                                            ? String.valueOf(defaultContainer)
+                                            : savedContainer
+                            );
+                        }
+                        if (etDunnageKg != null) {
+                            String savedDunnage = bundleValues.get(KEY_DUNNAGE_JYURYO);
+                            etDunnageKg.setText(
+                                    TextUtils.isEmpty(savedDunnage)
+                                            ? String.valueOf(defaultDunnage)
+                                            : savedDunnage
+                            );
+                        }
+                    } else {
+                        if (etContainerKg != null)
+                            etContainerKg.setText(String.valueOf(defaultContainer));
+                        if (etDunnageKg != null)
+                            etDunnageKg.setText(String.valueOf(defaultDunnage));
+                    }
                     refreshRows();
                     updateFooter();
                     if (etGenpinNo != null) etGenpinNo.requestFocus();
@@ -377,6 +440,8 @@ public class BundleSelectActivity extends BaseActivity {
     //============================================================
     private void openContainerInputAndFinish() {
         Intent intent = new Intent(this, ContainerInputActivity.class);
+        intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
+        intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
         startActivity(intent);
         finish();
     }
@@ -504,10 +569,34 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     @Override
+    public void finish() {
+        saveBundleInputValues();
+        Intent result = new Intent();
+        result.putExtra(EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
+        setResult(RESULT_OK, result);
+        super.finish();
+    }
+
+    @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
         if (io != null) io.shutdownNow();
         super.onDestroy();
+    }
+
+    private void saveBundleInputValues() {
+        String container = etContainerKg != null && etContainerKg.getText() != null
+                ? etContainerKg.getText().toString().trim()
+                : "";
+        String dunnage = etDunnageKg != null && etDunnageKg.getText() != null
+                ? etDunnageKg.getText().toString().trim()
+                : "";
+        if (TextUtils.isEmpty(container) && TextUtils.isEmpty(dunnage)) {
+            bundleValues.clear();
+            return;
+        }
+        bundleValues.put(KEY_CONTAINER_JYURYO, container);
+        bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
     }
 
     private static class BundleRowAdapter extends RecyclerView.Adapter<BundleRowAdapter.ViewHolder> {
