@@ -3,6 +3,7 @@ package com.example.myapplication.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,6 +42,9 @@ public class MenuActivity extends BaseActivity {
     private static final String TAG = "MENU";
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
+
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
 
     private ExecutorService io;
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
@@ -305,6 +309,7 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        syncContainerWeightsFromPrefs();
         refreshInformation();
     }
 
@@ -345,7 +350,7 @@ public class MenuActivity extends BaseActivity {
             containerValues.remove(KEY_DUNNAGE_JYURYO);
         }
     }
-    
+
     private void syncBundleValuesFromContainer() {
         String container = containerValues.get(KEY_CONTAINER_JYURYO);
         String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
@@ -354,6 +359,20 @@ public class MenuActivity extends BaseActivity {
         }
         if (dunnage != null) {
             bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
+        }
+    }
+
+    private void syncContainerWeightsFromPrefs() {
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, null);
+        String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, null);
+        if (!TextUtils.isEmpty(prefContainer)) {
+            containerValues.put(KEY_CONTAINER_JYURYO, prefContainer);
+            bundleValues.put(KEY_CONTAINER_JYURYO, prefContainer);
+        }
+        if (!TextUtils.isEmpty(prefDunnage)) {
+            containerValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
+            bundleValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
         }
     }
 
@@ -369,6 +388,7 @@ public class MenuActivity extends BaseActivity {
                     showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
                     return;
                 }
+                syncContainerWeightsFromPrefs();
                 Intent intent = new Intent(this, ContainerInputActivity.class);
                 intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
                 intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));

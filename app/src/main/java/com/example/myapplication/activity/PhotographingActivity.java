@@ -320,9 +320,12 @@ public class PhotographingActivity extends BaseActivity {
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         pendingPhotoUri = FileProvider.getUriForFile(
                                 PhotographingActivity.this,
-                                getPackageName() + ".provider",
+                                getPackageName() + ".fileprovider",
                                 file
                         );
+                        if (capturedPreview != null) {
+                            capturedPreview.setImageURI(pendingPhotoUri);
+                        }
                         showCaptureReview(true);
                     }
 
@@ -354,6 +357,9 @@ public class PhotographingActivity extends BaseActivity {
         }
         pendingPhotoFile = null;
         pendingPhotoUri = null;
+        if (capturedPreview != null) {
+            capturedPreview.setImageDrawable(null);
+        }
         showCaptureReview(false);
     }
 
