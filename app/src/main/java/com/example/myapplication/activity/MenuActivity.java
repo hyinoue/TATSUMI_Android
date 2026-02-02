@@ -137,6 +137,7 @@ public class MenuActivity extends BaseActivity {
                                         bundleValues.put(key.toString(), value.toString());
                                     }
                                 }
+                                syncContainerValuesFromBundle();
                             }
                         }
                     }
@@ -332,6 +333,19 @@ public class MenuActivity extends BaseActivity {
         }
     }
 
+    private void syncContainerValuesFromBundle() {
+        if (bundleValues.containsKey(KEY_CONTAINER_JYURYO)) {
+            containerValues.put(KEY_CONTAINER_JYURYO, bundleValues.get(KEY_CONTAINER_JYURYO));
+        } else {
+            containerValues.remove(KEY_CONTAINER_JYURYO);
+        }
+        if (bundleValues.containsKey(KEY_DUNNAGE_JYURYO)) {
+            containerValues.put(KEY_DUNNAGE_JYURYO, bundleValues.get(KEY_DUNNAGE_JYURYO));
+        } else {
+            containerValues.remove(KEY_DUNNAGE_JYURYO);
+        }
+    }
+    
     private void syncBundleValuesFromContainer() {
         String container = containerValues.get(KEY_CONTAINER_JYURYO);
         String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);

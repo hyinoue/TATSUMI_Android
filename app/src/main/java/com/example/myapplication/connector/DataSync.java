@@ -3,6 +3,8 @@ package com.example.myapplication.connector;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Environment;
 import android.util.Log;
 
@@ -437,15 +439,26 @@ public class DataSync {
     private byte[] downscaleJpegIfNeeded(File file, int maxBytes, int maxEdge, int startQuality)
             throws IOException {
         long length = file.length();
+        int rotationDegrees = readExifRotation(file);
         if (length <= maxBytes) {
-            try (FileInputStream stream = new FileInputStream(file)) {
-                byte[] buffer = new byte[(int) length];
-                int read = stream.read(buffer);
-                if (read < 0) {
-                    return null;
+            if (rotationDegrees == 0) {
+                try (FileInputStream stream = new FileInputStream(file)) {
+                    byte[] buffer = new byte[(int) length];
+                    int read = stream.read(buffer);
+                    if (read < 0) {
+                        return null;
+                    }
+                    return buffer;
                 }
-                return buffer;
             }
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+            if (bitmap == null) {
+                return null;
+            }
+            Bitmap rotated = rotateBitmapIfNeeded(bitmap, rotationDegrees);
+            byte[] out = compressBitmap(rotated, maxBytes, startQuality);
+            rotated.recycle();
+            return out;
         }
 
         BitmapFactory.Options bounds = new BitmapFactory.Options();
@@ -467,6 +480,56 @@ public class DataSync {
             return null;
         }
 
+        Bitmap rotated = rotateBitmapIfNeeded(bitmap, rotationDegrees);
+        byte[] out = compressBitmap(rotated, maxBytes, startQuality);
+        rotated.recycle();
+        return out;
+    }
+
+    private int readExifRotation(File file) {
+        try {
+            ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL
+            );
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
+                return 90;
+            }
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
+                return 180;
+            }
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
+                return 270;
+            }
+        } catch (IOException ex) {
+            Log.w(TAG, "Exif read failed: " + file.getAbsolutePath(), ex);
+        }
+        return 0;
+    }
+
+    private Bitmap rotateBitmapIfNeeded(Bitmap bitmap, int degrees) {
+        if (degrees == 0) {
+            return bitmap;
+        }
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        Bitmap rotated = Bitmap.createBitmap(
+                bitmap,
+                0,
+                0,
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                matrix,
+                true
+        );
+        if (rotated != bitmap) {
+            bitmap.recycle();
+        }
+        return rotated;
+    }
+
+    private byte[] compressBitmap(Bitmap bitmap, int maxBytes, int startQuality) {
         int quality = startQuality;
         byte[] out;
         do {
@@ -478,7 +541,6 @@ public class DataSync {
         if (out.length > maxBytes) {
             Log.w(TAG, "Image still oversized after compression: " + out.length + " bytes");
         }
-        bitmap.recycle();
         return out;
     }
 
