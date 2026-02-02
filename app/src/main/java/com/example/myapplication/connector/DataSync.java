@@ -101,7 +101,7 @@ public class DataSync {
     public void sendSyougoOnly() {
         dataSousinSyougo();
     }
-    
+
     public void runSync() throws Exception {
         try {
             historyDel();
@@ -237,6 +237,12 @@ public class DataSync {
             return;
         }
 
+        try {
+            svcWrapper.getSagyouYmd();
+        } catch (Exception ex) {
+            Log.e(TAG, "GetSagyouYmd failed", ex);
+        }
+
         Date lastUpd = parseDbDateOrMin(candidates.get(0).lastUpdYmdhms);
         Date getUpdate;
         try {
@@ -260,6 +266,12 @@ public class DataSync {
     }
 
     private void receiveSyukkaData(Date sagyouYmd) throws Exception {
+
+        try {
+            svcWrapper.getSagyouYmd();
+        } catch (Exception ex) {
+            Log.e(TAG, "GetSagyouYmd failed", ex);
+        }
         SyukkaData data = svcWrapper.getSyukkaData(sagyouYmd);
         if (data == null) {
             throw new IllegalStateException("出荷データの取得に失敗しました");

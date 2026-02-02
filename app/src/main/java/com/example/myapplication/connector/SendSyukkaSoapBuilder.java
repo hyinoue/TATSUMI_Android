@@ -10,7 +10,6 @@ import com.example.myapplication.time.XmlUtil;
 //============================================================
 //　処理概要　:　SendSyukkaSoapBuilderクラス
 //============================================================
-
 public class SendSyukkaSoapBuilder {
     private static final String NS = "http://tempuri.org/";
 
