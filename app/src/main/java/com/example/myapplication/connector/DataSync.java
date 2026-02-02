@@ -1,6 +1,8 @@
 package com.example.myapplication.connector;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
@@ -29,6 +31,7 @@ import com.example.myapplication.model.SyukkaHeader;
 import com.example.myapplication.model.SyukkaMeisai;
 import com.example.myapplication.time.XsdDateTime;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -167,16 +170,39 @@ public class DataSync {
 
             List<SyukkaMeisaiEntity> detailRows =
                     syukkaMeisaiDao.findByContainerId(container.containerId);
+
+            String fallbackBookingNo = container.bookingNo != null
+                    ? container.bookingNo.trim()
+                    : "";
+            boolean missingBookingNo = false;
+
             for (SyukkaMeisaiEntity row : detailRows) {
                 SyukkaMeisai detail = new SyukkaMeisai();
                 detail.heatNo = row.heatNo;
                 detail.sokuban = row.sokuban;
-                detail.bookingNo = row.bookingNo;
+                String bookingNo = row.bookingNo != null ? row.bookingNo.trim() : "";
+                if (bookingNo.isEmpty()) {
+                    bookingNo = fallbackBookingNo;
+                }
+                if (bookingNo.isEmpty()) {
+                    missingBookingNo = true;
+                }
+                detail.bookingNo = bookingNo;
                 detail.bundleNo = row.bundleNo;
                 detail.syukkaSashizuNo = row.syukkaSashizuNo;
                 detail.jyuryo = intOrZero(row.jyuryo);
                 data.bundles.add(detail);
             }
+
+            if (data.bundles.isEmpty()) {
+                Log.w(TAG, "No bundle details; skip SendSyukkaData");
+                return false;
+            }
+            if (missingBookingNo) {
+                Log.w(TAG, "BookingNo missing in bundle details; skip SendSyukkaData");
+                return false;
+            }
+
 
             if (svcWrapper.sendSyukkaData(data)) {
                 String now = formatDbDate(new Date());
@@ -379,18 +405,61 @@ public class DataSync {
         if (file == null || !file.exists()) {
             return null;
         }
+        try {
+            return downscaleJpegIfNeeded(file, 700 * 1024, 1280, 80);
 
-        try (FileInputStream stream = new FileInputStream(file)) {
-            byte[] buffer = new byte[(int) file.length()];
-            int read = stream.read(buffer);
-            if (read < 0) {
-                return null;
-            }
-            return buffer;
         } catch (IOException ex) {
             Log.e(TAG, "Image read failed: " + file.getAbsolutePath(), ex);
             return null;
         }
+    }
+
+    private byte[] downscaleJpegIfNeeded(File file, int maxBytes, int maxEdge, int startQuality)
+            throws IOException {
+        long length = file.length();
+        if (length <= maxBytes) {
+            try (FileInputStream stream = new FileInputStream(file)) {
+                byte[] buffer = new byte[(int) length];
+                int read = stream.read(buffer);
+                if (read < 0) {
+                    return null;
+                }
+                return buffer;
+            }
+        }
+
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), bounds);
+
+        int sample = 1;
+        int width = Math.max(bounds.outWidth, 1);
+        int height = Math.max(bounds.outHeight, 1);
+        int longest = Math.max(width, height);
+        while (longest / sample > maxEdge) {
+            sample *= 2;
+        }
+
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inSampleSize = sample;
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), opts);
+        if (bitmap == null) {
+            return null;
+        }
+
+        int quality = startQuality;
+        byte[] out;
+        do {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+            out = baos.toByteArray();
+            quality -= 10;
+        } while (out.length > maxBytes && quality >= 40);
+        if (out.length > maxBytes) {
+            Log.w(TAG, "Image still oversized after compression: " + out.length + " bytes");
+        }
+        bitmap.recycle();
+        return out;
     }
 
     private void deletePicture(int containerId, ImageType imgType) {

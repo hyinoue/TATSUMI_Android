@@ -96,9 +96,9 @@ public interface SyukkaMeisaiDao {
             "SELECT 1 FROM " +
             "W_SYUKKA_MEISAI W " +
             "WHERE " +
-            "W.HEAT_NO = T_SYUKKA_MEISAI.HEAT_NO " +
+            "TRIM(W.HEAT_NO) = TRIM(T_SYUKKA_MEISAI.HEAT_NO) " +
             "AND " +
-            "W.SOKUBAN = T_SYUKKA_MEISAI.SOKUBAN)"
+            "TRIM(W.SOKUBAN) = TRIM(T_SYUKKA_MEISAI.SOKUBAN))"
     )
     int updateContainerIdForWork(int containerId);
 
