@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//============================================================
+//================================
 //　処理概要　:　CameraSettingActivityクラス
-//============================================================
+//================================
 
 /**
  * カメラ設定画面Activity。
@@ -51,6 +51,11 @@ public class CameraSettingActivity extends BaseActivity {
     private List<Option> flashOptions;
     private List<Option> lightOptions;
 
+    //======================================
+    //　機　能　:　画面生成時の初期化処理
+    //　引　数　:　savedInstanceState ..... Bundle
+    //　戻り値　:　[void] ..... なし
+    //======================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +82,12 @@ public class CameraSettingActivity extends BaseActivity {
 
         setupBottomButtonTexts();
     }
+    //=================================
+    //　機　能　:　bind Spinnerの処理
+    //　引　数　:　spinner ..... Spinner
+    //　　　　　:　options ..... List<Option>
+    //　戻り値　:　[void] ..... なし
+    //=================================
 
     private void bindSpinner(Spinner spinner, List<Option> options) {
         ArrayAdapter<Option> adapter = new ArrayAdapter<>(
@@ -87,6 +98,13 @@ public class CameraSettingActivity extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
+    //=================================
+    //　機　能　:　spinner Selectionを設定する
+    //　引　数　:　spinner ..... Spinner
+    //　　　　　:　options ..... List<Option>
+    //　　　　　:　value ..... int
+    //　戻り値　:　[void] ..... なし
+    //=================================
 
     private void setSpinnerSelection(Spinner spinner, List<Option> options, int value) {
         int index = 0;
@@ -98,6 +116,11 @@ public class CameraSettingActivity extends BaseActivity {
         }
         spinner.setSelection(index);
     }
+    //==============================
+    //　機　能　:　size Optionsを生成する
+    //　引　数　:　なし
+    //　戻り値　:　[List<Option>] ..... なし
+    //==============================
 
     private List<Option> buildSizeOptions() {
         List<Option> options = new ArrayList<>();
@@ -109,6 +132,11 @@ public class CameraSettingActivity extends BaseActivity {
         options.add(new Option(CAM_QVGA, "極小(240x320)"));
         return options;
     }
+    //==============================
+    //　機　能　:　flash Optionsを生成する
+    //　引　数　:　なし
+    //　戻り値　:　[List<Option>] ..... なし
+    //==============================
 
     private List<Option> buildFlashOptions() {
         List<Option> options = new ArrayList<>();
@@ -117,6 +145,11 @@ public class CameraSettingActivity extends BaseActivity {
         options.add(new Option(CAM_FLASH_DISABLE, "オフ"));
         return options;
     }
+    //==============================
+    //　機　能　:　light Optionsを生成する
+    //　引　数　:　なし
+    //　戻り値　:　[List<Option>] ..... なし
+    //==============================
 
     private List<Option> buildLightOptions() {
         List<Option> options = new ArrayList<>();
@@ -127,6 +160,11 @@ public class CameraSettingActivity extends BaseActivity {
         options.add(new Option(CAM_DIMLIGHT, "暗所"));
         return options;
     }
+    //===============================
+    //　機　能　:　bottom Button Textsを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //===============================
 
     private void setupBottomButtonTexts() {
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
@@ -137,6 +175,11 @@ public class CameraSettingActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
+    //==========================
+    //　機　能　:　on Function Blueの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
     @Override
     protected void onFunctionBlue() {
         AppSettings.CameraImageSize = getSelectedValue(spImageSize);
@@ -148,11 +191,21 @@ public class CameraSettingActivity extends BaseActivity {
         finish();
     }
 
+    //============================
+    //　機　能　:　on Function Yellowの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================
     @Override
     protected void onFunctionYellow() {
         setResult(RESULT_CANCELED);
         finish();
     }
+    //============================
+    //　機　能　:　selected Valueを取得する
+    //　引　数　:　spinner ..... Spinner
+    //　戻り値　:　[int] ..... なし
+    //============================
 
     private int getSelectedValue(Spinner spinner) {
         Object item = spinner.getSelectedItem();
@@ -165,12 +218,23 @@ public class CameraSettingActivity extends BaseActivity {
     private static final class Option {
         private final int value;
         private final String label;
+        //=========================
+        //　機　能　:　Optionの初期化処理
+        //　引　数　:　value ..... int
+        //　　　　　:　label ..... String
+        //　戻り値　:　[Option] ..... なし
+        //=========================
 
         private Option(int value, String label) {
             this.value = value;
             this.label = label;
         }
 
+        //========================
+        //　機　能　:　to Stringの処理
+        //　引　数　:　なし
+        //　戻り値　:　[String] ..... なし
+        //========================
         @Override
         public String toString() {
             return label;

@@ -6,9 +6,9 @@ import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
 
-//============================================================
+//===========================
 //　処理概要　:　CommTestActivityクラス
-//============================================================
+//===========================
 
 /**
  * 通信テスト用のシンプルな画面Activity。
@@ -18,6 +18,11 @@ import com.google.android.material.button.MaterialButton;
  */
 public class CommTestActivity extends BaseActivity {
 
+    //======================================
+    //　機　能　:　画面生成時の初期化処理
+    //　引　数　:　savedInstanceState ..... Bundle
+    //　戻り値　:　[void] ..... なし
+    //======================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +30,11 @@ public class CommTestActivity extends BaseActivity {
         setupBottomButtons();
 
     }
+    //==========================
+    //　機　能　:　bottom Buttonsを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
 
     private void setupBottomButtons() {
         bindBottomButtonsIfExists();
@@ -41,6 +51,11 @@ public class CommTestActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
+    //============================
+    //　機　能　:　on Function Yellowの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================
     @Override
     protected void onFunctionYellow() {
         finish();

@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-//============================================================
+//==============================
 //　処理概要　:　ServiceMenuActivityクラス
-//============================================================
+//==============================
 
 /**
  * サービスメニュー画面Activity。
@@ -58,6 +58,11 @@ public class ServiceMenuActivity extends BaseActivity {
     private TextView menu8; // XMLに menu8（サーバー切替）を追加した場合
     private ExecutorService io;
 
+    //======================================
+    //　機　能　:　画面生成時の初期化処理
+    //　引　数　:　savedInstanceState ..... Bundle
+    //　戻り値　:　[void] ..... なし
+    //======================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +120,12 @@ public class ServiceMenuActivity extends BaseActivity {
      * 物理キー（1〜8/0）で遷移
      * ※端末/キー割当によって拾えるKEYCODEが異なる場合があります。
      */
+    //===========================
+    //　機　能　:　キー押下時の処理
+    //　引　数　:　keyCode ..... int
+    //　　　　　:　event ..... KeyEvent
+    //　戻り値　:　[boolean] ..... なし
+    //===========================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -162,28 +173,58 @@ public class ServiceMenuActivity extends BaseActivity {
     // -------------------------
     // 画面遷移（ここだけ置換）
     // -------------------------
+    //======================
+    //　機　能　:　db Testを開く
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void openDbTest() {
         startActivity(new Intent(this, DbTestActivity.class));
     }
+    //======================
+    //　機　能　:　comm Testを開く
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void openCommTest() {
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, CommTestActivity.class)));
     }
+    //======================
+    //　機　能　:　imager Testを開く
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void openImagerTest() {
         startActivity(new Intent(this, ImagerTestActivity.class));
     }
+    //======================
+    //　機　能　:　system Libを開く
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void openSystemLib() {
         startActivity(new Intent(this, SystemLibActivity.class));
     }
+    //========================
+    //　機　能　:　server Settingを開く
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //========================
 
     private void openServerSetting() {
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, ServerSettingActivity.class)));
     }
+    //======================
+    //　機　能　:　clear Dataの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void clearData() {
         showQuestion("端末内のデータをクリアします。（クリアすると作業中の情報が削除されます）\nよろしいですか？",
@@ -216,14 +257,29 @@ public class ServiceMenuActivity extends BaseActivity {
                     });
                 });
     }
+    //============================
+    //　機　能　:　maintenance Dataを送信する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================
 
     private void sendMaintenanceData() {
         showInfoMsg("メンテナンスデータ送信は未実装です。", MsgDispMode.MsgBox);
     }
+    //==========================
+    //　機　能　:　download Programの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
 
     private void downloadProgram() {
         showInfoMsg("プログラムダウンロードは未実装です。", MsgDispMode.MsgBox);
     }
+    //======================
+    //　機　能　:　confirm Exitの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void confirmExit() {
         showQuestion("アプリケーションを終了します。\nよろしいですか？", yes -> {
@@ -232,6 +288,11 @@ public class ServiceMenuActivity extends BaseActivity {
             }
         });
     }
+    //====================================
+    //　機　能　:　request Password If Neededの処理
+    //　引　数　:　onSuccess ..... Runnable
+    //　戻り値　:　[void] ..... なし
+    //====================================
 
     private void requestPasswordIfNeeded(Runnable onSuccess) {
         showPasswordDialog(success -> {
@@ -244,6 +305,11 @@ public class ServiceMenuActivity extends BaseActivity {
             }
         });
     }
+    //======================================
+    //　機　能　:　show Password Dialogの処理
+    //　引　数　:　callback ..... PasswordCallback
+    //　戻り値　:　[void] ..... なし
+    //======================================
 
     private void showPasswordDialog(PasswordCallback callback) {
         EditText input = new EditText(this);
@@ -267,6 +333,11 @@ public class ServiceMenuActivity extends BaseActivity {
                 })
                 .show();
     }
+    //===============================
+    //　機　能　:　bottom Button Textsを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //===============================
 
     private void setupBottomButtonTexts() {
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
@@ -275,11 +346,21 @@ public class ServiceMenuActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
+    //============================
+    //　機　能　:　on Function Yellowの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================
     @Override
     protected void onFunctionYellow() {
         finish();
     }
 
+    //======================
+    //　機　能　:　画面終了時の処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -289,6 +370,11 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     private interface PasswordCallback {
+        //============================
+        //　機　能　:　on Resultの処理
+        //　引　数　:　success ..... boolean
+        //　戻り値　:　[void] ..... なし
+        //============================
         void onResult(boolean success);
     }
 }

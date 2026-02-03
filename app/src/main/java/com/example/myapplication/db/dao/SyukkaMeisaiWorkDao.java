@@ -12,15 +12,20 @@ import java.util.List;
 
 @Dao
 
-//============================================================
+//==============================
 //　処理概要　:　SyukkaMeisaiWorkDaoクラス
-//============================================================
+//==============================
 
 public interface SyukkaMeisaiWorkDao {
 
     @Query("SELECT * FROM " +
             "W_SYUKKA_MEISAI"
     )
+    //==============================================
+    //　機　能　:　find Allの処理
+    //　引　数　:　なし
+    //　戻り値　:　[List<SyukkaMeisaiWorkEntity>] ..... なし
+    //==============================================
     List<SyukkaMeisaiWorkEntity> findAll();
 
     @Query("SELECT * FROM " +
@@ -31,8 +36,19 @@ public interface SyukkaMeisaiWorkDao {
             "TRIM(SOKUBAN) = TRIM(:sokuban) " +
             "LIMIT 1"
     )
+    //========================================
+    //　機　能　:　find Oneの処理
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　戻り値　:　[SyukkaMeisaiWorkEntity] ..... なし
+    //========================================
     SyukkaMeisaiWorkEntity findOne(String heatNo, String sokuban);
 
+    //==========================================
+    //　機　能　:　upsertの処理
+    //　引　数　:　entity ..... SyukkaMeisaiWorkEntity
+    //　戻り値　:　[void] ..... なし
+    //==========================================
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(SyukkaMeisaiWorkEntity entity);
 
@@ -43,8 +59,19 @@ public interface SyukkaMeisaiWorkDao {
             "AND " +
             "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
+    //===========================
+    //　機　能　:　oneを削除する
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　戻り値　:　[int] ..... なし
+    //===========================
     int deleteOne(String heatNo, String sokuban);
 
+    //======================
+    //　機　能　:　allを削除する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
     @Query("DELETE FROM W_SYUKKA_MEISAI")
     void deleteAll();
 
@@ -61,6 +88,11 @@ public interface SyukkaMeisaiWorkDao {
             "AND " +
             "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN)"
     )
+    //=============================
+    //　機　能　:　work Summaryを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[WorkSummary] ..... なし
+    //=============================
     WorkSummary getWorkSummary();
 
     // ========= C# readWorkTblToList 相当（WとTのJOIN） =========
@@ -82,6 +114,11 @@ public interface SyukkaMeisaiWorkDao {
             "ORDER BY " +
             "W.UPDATE_YMD"
     )
+    //===================================
+    //　機　能　:　select Work Joinedの処理
+    //　引　数　:　なし
+    //　戻り値　:　[List<WorkJoinRow>] ..... なし
+    //===================================
     List<WorkJoinRow> selectWorkJoined();
 
     class WorkJoinRow {

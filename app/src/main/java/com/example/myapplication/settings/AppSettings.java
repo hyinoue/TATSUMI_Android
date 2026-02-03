@@ -9,9 +9,9 @@ import android.content.SharedPreferences;
  * C# WinCE AppSettings の移植
  */
 
-//============================================================
+//======================
 //　処理概要　:　AppSettingsクラス
-//============================================================
+//======================
 
 public final class AppSettings {
 
@@ -50,6 +50,11 @@ public final class AppSettings {
     // ================================
     // 初期化（Application / Activityで1回）
     // ================================
+    //============================
+    //　機　能　:　initの処理
+    //　引　数　:　context ..... Context
+    //　戻り値　:　[void] ..... なし
+    //============================
     public static void init(Context context) {
         pref = context.getApplicationContext()
                 .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -58,6 +63,11 @@ public final class AppSettings {
     // ================================
     // Load / Save
     // ================================
+    //======================
+    //　機　能　:　loadの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
     public static void load() {
         BuzzerMute = pref.getBoolean(KEY_BUZZER_MUTE, false);
         BuzzerLength = pref.getInt(KEY_BUZZER_LENGTH, 1000);
@@ -81,6 +91,11 @@ public final class AppSettings {
         WebSvcURL_SCS = pref.getString(KEY_WEBSVC_SCS, "");
         WebSvcURL_Test = pref.getString(KEY_WEBSVC_TEST, "");
     }
+    //======================
+    //　機　能　:　saveの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     public static void save() {
         SharedPreferences.Editor e = pref.edit();
@@ -132,6 +147,11 @@ public final class AppSettings {
     public static String WebSvcURL_Test;
 
     // インスタンス化禁止
+    //=============================
+    //　機　能　:　AppSettingsの初期化処理
+    //　引　数　:　なし
+    //　戻り値　:　[AppSettings] ..... なし
+    //=============================
     private AppSettings() {
     }
 }

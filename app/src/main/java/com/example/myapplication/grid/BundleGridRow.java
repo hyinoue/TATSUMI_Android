@@ -6,9 +6,9 @@ package com.example.myapplication.grid;
 
  */
 
-//============================================================
+//========================
 //　処理概要　:　BundleGridRowクラス
-//============================================================
+//========================
 
 public class BundleGridRow {
     public String pNo;
@@ -16,6 +16,15 @@ public class BundleGridRow {
     public String index;
     public String jyuryo;
     public String cancelText; // "削除"
+    //===============================
+    //　機　能　:　BundleGridRowの初期化処理
+    //　引　数　:　pNo ..... String
+    //　　　　　:　bNo ..... String
+    //　　　　　:　index ..... String
+    //　　　　　:　jyuryo ..... String
+    //　　　　　:　cancelText ..... String
+    //　戻り値　:　[BundleGridRow] ..... なし
+    //===============================
 
     public BundleGridRow(String pNo, String bNo, String index, String jyuryo, String cancelText) {
         this.pNo = pNo;

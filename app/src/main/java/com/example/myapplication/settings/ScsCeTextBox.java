@@ -20,12 +20,18 @@ import androidx.annotation.Nullable;
  * - Enter キーで次の項目へ移動（EnterNext）
  */
 
-//============================================================
+//=======================
 //　処理概要　:　ScsCeTextBoxクラス
-//============================================================
+//=======================
 
 public class ScsCeTextBox extends EditText {
     public interface OnValueChangedListener {
+        //===============================
+        //　機　能　:　on Value Changedの処理
+        //　引　数　:　view ..... ScsCeTextBox
+        //　　　　　:　beforeValue ..... String
+        //　戻り値　:　[void] ..... なし
+        //===============================
         void onValueChanged(ScsCeTextBox view, String beforeValue);
     }
 
@@ -34,36 +40,80 @@ public class ScsCeTextBox extends EditText {
     private String focusedValue = "";
     private boolean isValidating;
     private OnValueChangedListener valueChangedListener;
+    //==============================
+    //　機　能　:　ScsCeTextBoxの初期化処理
+    //　引　数　:　context ..... Context
+    //　戻り値　:　[ScsCeTextBox] ..... なし
+    //==============================
 
     public ScsCeTextBox(Context context) {
         super(context);
         init();
     }
+    //===============================
+    //　機　能　:　ScsCeTextBoxの初期化処理
+    //　引　数　:　context ..... Context
+    //　　　　　:　attrs ..... AttributeSet
+    //　戻り値　:　[ScsCeTextBox] ..... なし
+    //===============================
 
     public ScsCeTextBox(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
+    //===============================
+    //　機　能　:　ScsCeTextBoxの初期化処理
+    //　引　数　:　context ..... Context
+    //　　　　　:　attrs ..... AttributeSet
+    //　　　　　:　defStyleAttr ..... int
+    //　戻り値　:　[ScsCeTextBox] ..... なし
+    //===============================
 
     public ScsCeTextBox(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
+    //======================
+    //　機　能　:　initの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void init() {
         setOnFocusChangeListener(this::handleFocusChange);
         setOnEditorActionListener(this::handleEditorAction);
         addTextChangedListener(new TextWatcher() {
+            //=============================
+            //　機　能　:　before Text Changedの処理
+            //　引　数　:　s ..... CharSequence
+            //　　　　　:　start ..... int
+            //　　　　　:　count ..... int
+            //　　　　　:　after ..... int
+            //　戻り値　:　[void] ..... なし
+            //=============================
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // no-op
             }
 
+            //===========================
+            //　機　能　:　on Text Changedの処理
+            //　引　数　:　s ..... CharSequence
+            //　　　　　:　start ..... int
+            //　　　　　:　before ..... int
+            //　　　　　:　count ..... int
+            //　戻り値　:　[void] ..... なし
+            //===========================
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // no-op
             }
 
+            //============================
+            //　機　能　:　after Text Changedの処理
+            //　引　数　:　s ..... Editable
+            //　戻り値　:　[void] ..... なし
+            //============================
             @Override
             public void afterTextChanged(Editable s) {
                 if (isSingleLine()) {
@@ -79,6 +129,12 @@ public class ScsCeTextBox extends EditText {
             }
         });
     }
+    //=============================
+    //　機　能　:　focus Changeを処理する
+    //　引　数　:　view ..... View
+    //　　　　　:　hasFocus ..... boolean
+    //　戻り値　:　[void] ..... なし
+    //=============================
 
     private void handleFocusChange(View view, boolean hasFocus) {
         if (hasFocus) {
@@ -101,6 +157,13 @@ public class ScsCeTextBox extends EditText {
             isValidating = false;
         }
     }
+    //===========================
+    //　機　能　:　editor Actionを処理する
+    //　引　数　:　v ..... TextView
+    //　　　　　:　actionId ..... int
+    //　　　　　:　event ..... KeyEvent
+    //　戻り値　:　[boolean] ..... なし
+    //===========================
 
     private boolean handleEditorAction(TextView v, int actionId, KeyEvent event) {
         if (!enterNext) {
@@ -123,22 +186,47 @@ public class ScsCeTextBox extends EditText {
         }
         return false;
     }
+    //==================================
+    //　機　能　:　highlight Textを設定する
+    //　引　数　:　highlightText ..... boolean
+    //　戻り値　:　[void] ..... なし
+    //==================================
 
     public void setHighlightText(boolean highlightText) {
         this.highlightText = highlightText;
     }
+    //==========================
+    //　機　能　:　highlight Textを判定する
+    //　引　数　:　なし
+    //　戻り値　:　[boolean] ..... なし
+    //==========================
 
     public boolean isHighlightText() {
         return highlightText;
     }
+    //==============================
+    //　機　能　:　enter Nextを設定する
+    //　引　数　:　enterNext ..... boolean
+    //　戻り値　:　[void] ..... なし
+    //==============================
 
     public void setEnterNext(boolean enterNext) {
         this.enterNext = enterNext;
     }
+    //=========================
+    //　機　能　:　enter Nextを判定する
+    //　引　数　:　なし
+    //　戻り値　:　[boolean] ..... なし
+    //=========================
 
     public boolean isEnterNext() {
         return enterNext;
     }
+    //============================================
+    //　機　能　:　on Value Changed Listenerを設定する
+    //　引　数　:　listener ..... OnValueChangedListener
+    //　戻り値　:　[void] ..... なし
+    //============================================
 
     public void setOnValueChangedListener(@Nullable OnValueChangedListener listener) {
         this.valueChangedListener = listener;

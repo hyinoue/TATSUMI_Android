@@ -27,9 +27,9 @@ import java.util.concurrent.Executors;
 
 
 
-//============================================================
+//=========================================
 //　処理概要　:　CollateContainerSelectActivityクラス
-//============================================================
+//=========================================
 
 /**
  * 積込照合用のコンテナ選択画面。
@@ -54,6 +54,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
     private CollateContainerAdapter adapter;
     private ExecutorService io;
 
+    //======================================
+    //　機　能　:　画面生成時の初期化処理
+    //　引　数　:　savedInstanceState ..... Bundle
+    //　戻り値　:　[void] ..... なし
+    //======================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +75,14 @@ public class CollateContainerSelectActivity extends BaseActivity {
         //表で線を重ねて細く見せる
         RecyclerView rvBundles = findViewById(R.id.rvBundles);
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
+            //=====================================
+            //　機　能　:　item Offsetsを取得する
+            //　引　数　:　outRect ..... Rect
+            //　　　　　:　view ..... View
+            //　　　　　:　parent ..... RecyclerView
+            //　　　　　:　state ..... RecyclerView.State
+            //　戻り値　:　[void] ..... なし
+            //=====================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -80,6 +93,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             }
         });
     }
+    //======================
+    //　機　能　:　bind Viewsの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void bindViews() {
         etSelectedNo = findViewById(R.id.etContainerKg);
@@ -89,6 +107,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         btnGreen = findViewById(R.id.btnBottomGreen);
         btnYellow = findViewById(R.id.btnBottomYellow);
     }
+    //==========================
+    //　機　能　:　bottom Buttonsを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
 
     private void setupBottomButtons() {
         if (btnBlue != null) btnBlue.setText("決定");
@@ -97,6 +120,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         if (btnYellow != null) btnYellow.setText("終了");
         refreshBottomButtonsEnabled();
     }
+    //======================
+    //　機　能　:　recyclerを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void setupRecycler() {
         adapter = new CollateContainerAdapter();
@@ -108,6 +136,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             }
         });
     }
+    //==========================
+    //　機　能　:　input Handlersを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
 
     private void setupInputHandlers() {
         if (etSelectedNo == null) return;
@@ -128,6 +161,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             return false;
         });
     }
+    //======================
+    //　機　能　:　containersを読み込む
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
 
     private void loadContainers() {
         showLoadingShort();
@@ -150,6 +188,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             }
         });
     }
+    //=============================
+    //　機　能　:　ui For Containersを更新する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //=============================
 
     private void updateUiForContainers() {
         boolean hasContainers = controller != null && !controller.getContainers().isEmpty();
@@ -166,6 +209,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
         refreshBottomButtonsEnabled();
     }
+    //=============================
+    //　機　能　:　selected No Inputを処理する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //=============================
 
     private void handleSelectedNoInput() {
         if (controller == null) return;
@@ -196,6 +244,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
     }
 
+    //==========================
+    //　機　能　:　on Function Blueの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //==========================
     @Override
     protected void onFunctionBlue() {
         if (!validateAndSelect()) {
@@ -211,20 +264,40 @@ public class CollateContainerSelectActivity extends BaseActivity {
         finish();
     }
 
+    //=========================
+    //　機　能　:　on Function Redの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //=========================
     @Override
     protected void onFunctionRed() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
+    //===========================
+    //　機　能　:　on Function Greenの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //===========================
     @Override
     protected void onFunctionGreen() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
+    //============================
+    //　機　能　:　on Function Yellowの処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================
     @Override
     protected void onFunctionYellow() {
         finish();
     }
+    //=============================
+    //　機　能　:　validate And Selectの処理
+    //　引　数　:　なし
+    //　戻り値　:　[boolean] ..... なし
+    //=============================
 
     private boolean validateAndSelect() {
         if (controller == null) return false;
@@ -258,6 +331,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         return true;
     }
 
+    //======================
+    //　機　能　:　画面終了時の処理
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
     @Override
     protected void onDestroy() {
         if (io != null) io.shutdownNow();
@@ -266,6 +344,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
 
     private static class CollateContainerAdapter extends RecyclerView.Adapter<CollateContainerAdapter.ViewHolder> {
         private final List<CollateContainerRow> rows = new ArrayList<>();
+        //==============================================
+        //　機　能　:　submit Listの処理
+        //　引　数　:　newRows ..... List<CollateContainerRow>
+        //　戻り値　:　[void] ..... なし
+        //==============================================
 
         void submitList(List<CollateContainerRow> newRows) {
             rows.clear();
@@ -273,6 +356,12 @@ public class CollateContainerSelectActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
+        //==========================================
+        //　機　能　:　on Create View Holderの処理
+        //　引　数　:　parent ..... android.view.ViewGroup
+        //　　　　　:　viewType ..... int
+        //　戻り値　:　[ViewHolder] ..... なし
+        //==========================================
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
@@ -280,6 +369,12 @@ public class CollateContainerSelectActivity extends BaseActivity {
             return new ViewHolder(view);
         }
 
+        //==============================
+        //　機　能　:　on Bind View Holderの処理
+        //　引　数　:　holder ..... ViewHolder
+        //　　　　　:　position ..... int
+        //　戻り値　:　[void] ..... なし
+        //==============================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             CollateContainerRow row = rows.get(position);
@@ -289,6 +384,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             holder.tvSagyouYmd.setText(row.sagyouYmd);
         }
 
+        //======================
+        //　機　能　:　item Countを取得する
+        //　引　数　:　なし
+        //　戻り値　:　[int] ..... なし
+        //======================
         @Override
         public int getItemCount() {
             return rows.size();

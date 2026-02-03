@@ -12,11 +12,16 @@ import android.os.Vibrator;
 import androidx.annotation.NonNull;
 
 
-//============================================================
+//====================
 //　処理概要　:　HandyUtilクラス
-//============================================================
+//====================
 
 public class HandyUtil {
+    //===========================
+    //　機　能　:　HandyUtilの初期化処理
+    //　引　数　:　なし
+    //　戻り値　:　[HandyUtil] ..... なし
+    //===========================
 
     private HandyUtil() {
     }
@@ -24,6 +29,11 @@ public class HandyUtil {
     /**
      * ISO 6346 コンテナ番号のチェックデジット計算
      */
+    //===============================
+    //　機　能　:　calc Check Digitの処理
+    //　引　数　:　containerNo ..... String
+    //　戻り値　:　[String] ..... なし
+    //===============================
     @NonNull
     public static String calcCheckDigit(String containerNo) {
         if (containerNo == null || containerNo.trim().isEmpty()) {
@@ -44,18 +54,39 @@ public class HandyUtil {
         if (check == 10) check = 0;
         return String.valueOf(check);
     }
+    //============================
+    //　機　能　:　play Error Buzzerの処理
+    //　引　数　:　context ..... Context
+    //　戻り値　:　[void] ..... なし
+    //============================
 
     public static void playErrorBuzzer(@NonNull Context context) {
         playBuzzer(context, ToneGenerator.TONE_PROP_NACK);
     }
+    //=============================
+    //　機　能　:　play Success Buzzerの処理
+    //　引　数　:　context ..... Context
+    //　戻り値　:　[void] ..... なし
+    //=============================
 
     public static void playSuccessBuzzer(@NonNull Context context) {
         playBuzzer(context, ToneGenerator.TONE_PROP_ACK);
     }
+    //============================
+    //　機　能　:　play Vibraterの処理
+    //　引　数　:　context ..... Context
+    //　戻り値　:　[void] ..... なし
+    //============================
 
     public static void playVibrater(@NonNull Context context) {
         playVibrater(context, 0);
     }
+    //============================
+    //　機　能　:　play Vibraterの処理
+    //　引　数　:　context ..... Context
+    //　　　　　:　extraCount ..... int
+    //　戻り値　:　[void] ..... なし
+    //============================
 
     public static void playVibrater(@NonNull Context context, int extraCount) {
         if (AppSettings.VibratorMute) return;
@@ -81,6 +112,12 @@ public class HandyUtil {
             vibrator.vibrate(pattern, -1);
         }
     }
+    //============================
+    //　機　能　:　play Buzzerの処理
+    //　引　数　:　context ..... Context
+    //　　　　　:　toneType ..... int
+    //　戻り値　:　[void] ..... なし
+    //============================
 
     private static void playBuzzer(@NonNull Context context, int toneType) {
         if (AppSettings.BuzzerMute) return;
@@ -91,8 +128,19 @@ public class HandyUtil {
 
         ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, toneVolume);
         tone.startTone(toneType, length);
+        //==============================================================
+        //　機　能　:　rを処理する
+        //　引　数　:　Looper.getMainLooper()).postDelayed(tone::release .....
+        //　　　　　:　50L ..... length +
+        //　戻り値　:　[new] ..... なし
+        //==============================================================
         new Handler(Looper.getMainLooper()).postDelayed(tone::release, length + 50L);
     }
+    //======================
+    //　機　能　:　char To Codeの処理
+    //　引　数　:　c ..... char
+    //　戻り値　:　[int] ..... なし
+    //======================
 
     private static int charToCode(char c) {
         if (c >= '0' && c <= '9') {

@@ -3,15 +3,15 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-//=================================
+//====================
 //　処理概要　:　システム設定エンティティ
-//=================================
+//====================
 
 @Entity(tableName = "M_SYSTEM", primaryKeys = {"RENBAN"})
 
-//============================================================
+//====================
 //　処理概要　:　システム設定エンティティ
-//============================================================
+//====================
 
 public class SystemEntity {
     @ColumnInfo(name = "RENBAN")

@@ -1,8 +1,8 @@
 package com.example.myapplication.model;
 
-//============================================================
+//=====================
 //　処理概要　:　CollateDtlクラス
-//============================================================
+//=====================
 
 public class CollateDtl {
     public String collateDtlheatNo;
