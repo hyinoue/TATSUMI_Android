@@ -443,23 +443,32 @@ public class MenuActivity extends BaseActivity {
 
     private void openContainerInputIfWorkExists() {
         io.execute(() -> {
-            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-            boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
-            runOnUiThread(() -> {
-                if (!hasWork) {
-                    showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
-                    return;
-                }
-                syncContainerWeightsFromPrefs();
-                Intent intent = new Intent(this, ContainerInputActivity.class);
-                intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
-                intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
-                if (containerInputLauncher != null) {
-                    containerInputLauncher.launch(intent);
-                } else {
-                    startActivity(intent);
-                }
-            });
+            try {
+                AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+                boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
+                runOnUiThread(() -> {
+                    if (!hasWork) {
+                        showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
+                        return;
+                    }
+                    syncContainerWeightsFromPrefs();
+                    Intent intent = new Intent(this, ContainerInputActivity.class);
+                    intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
+                    intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
+                    if (containerInputLauncher != null) {
+                        containerInputLauncher.launch(intent);
+                    } else {
+                        startActivity(intent);
+                    }
+                });
+            } catch (Exception ex) {
+                Log.e(TAG, "openContainerInputIfWorkExists failed", ex);
+                runOnUiThread(() -> showErrorMsg(
+                        "コンテナ情報入力の起動に失敗しました。\n"
+                                + ex.getClass().getSimpleName() + ": " + ex.getMessage(),
+                        MsgDispMode.MsgBox
+                ));
+            }
         });
     }
     //========================================

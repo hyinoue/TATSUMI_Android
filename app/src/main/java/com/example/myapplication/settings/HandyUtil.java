@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 //==========================
 
 public class HandyUtil {
+    private static final String TAG = "HandyUtil";
     //=================================
     //　機　能　:　HandyUtilの初期化処理
     //　引　数　:　なし
@@ -95,6 +97,10 @@ public class HandyUtil {
         int totalCount = baseCount + Math.max(0, extraCount);
         int length = Math.max(0, AppSettings.VibratorLength);
         int interval = Math.max(0, AppSettings.VibratorInterval);
+        if (length == 0) {
+            Log.w(TAG, "Vibrator length is zero; skipping vibration");
+            return;
+        }
 
         Vibrator vibrator = context.getSystemService(Vibrator.class);
         if (vibrator == null) return;

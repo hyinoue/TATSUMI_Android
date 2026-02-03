@@ -616,7 +616,7 @@ public class ContainerInputActivity extends BaseActivity {
             } else {
                 sealPhotoUri = uri;
             }
-        } catch (IOException ex) {
+        } catch (IOException | SecurityException | IllegalArgumentException ex) {
             Log.w(TAG, "restorePhoto failed: " + uriString, ex);
         }
     }
