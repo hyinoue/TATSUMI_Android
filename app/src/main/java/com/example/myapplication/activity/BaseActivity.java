@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
 import com.example.myapplication.R;
+import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
 
@@ -39,7 +40,7 @@ import com.google.android.material.button.MaterialButton;
  * (1) WindowInsetsControllerCompat を中心に hide
  * (2) insetsで「barsがvisible」になった瞬間を検知→即hideを複数回
  * (3) IMEアニメ中も onProgress でhideを当て続ける
- *
+ * <p>
  * このクラスは共通UI処理の集約点として使い、各Activityは必要なところだけオーバーライドする。
  * - setContentView後のフルスクリーン適用とボタンバインドを自動実行
  * - F1〜F4/画面下ボタンの入力を onFunctionXxx に一本化
@@ -174,7 +175,16 @@ public class BaseActivity extends AppCompatActivity {
     protected void errorProcess(String procName, Exception ex) {
         hideLoadingLong();
         hideLoadingShort();
-        showErrorMsg("エラーが発生しました\n" + safeMessage(ex), MsgDispMode.MsgBox);
+        playErrorFeedback();
+        showDialog("エラー", "エラーが発生しました\n" + safeMessage(ex));
+    }
+
+    protected void errorProcess(String procName, String message, Exception ex) {
+        hideLoadingLong();
+        hideLoadingShort();
+        playErrorFeedback();
+        String detail = "エラーが発生しました\n" + procName + "\n" + message + "\n" + safeMessage(ex);
+        showDialog("エラー", detail);
     }
 
     private String safeMessage(Exception ex) {
@@ -183,20 +193,40 @@ public class BaseActivity extends AppCompatActivity {
         return (m == null) ? ex.getClass().getSimpleName() : m;
     }
 
+    private void playErrorFeedback() {
+        HandyUtil.playErrorBuzzer(this);
+        HandyUtil.playVibrater(this);
+    }
+
     // ===== frmBase: ShowXxxMsg 相当 =====
 
     public void showErrorMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        if (mode == MsgDispMode.MsgBox) showDialog("エラー", msg);
-        else showBanner(msg, BannerType.ERROR);
+        HandyUtil.playVibrater(this);
+        if (mode == MsgDispMode.MsgBox) {
+            HandyUtil.playErrorBuzzer(this);
+            showDialog("エラー", msg);
+        } else {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this);
+            showBanner(msg, BannerType.ERROR);
+        }
     }
 
     public void showWarningMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        if (mode == MsgDispMode.MsgBox) showDialog("警告", msg);
-        else showBanner(msg, BannerType.WARNING);
+        HandyUtil.playVibrater(this);
+        if (mode == MsgDispMode.MsgBox) {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this);
+            showDialog("警告", msg);
+        } else {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this);
+            showBanner(msg, BannerType.WARNING);
+        }
     }
 
     public void showInfoMsg(String msg, MsgDispMode mode) {
@@ -205,6 +235,8 @@ public class BaseActivity extends AppCompatActivity {
             hideLoadingShort();
             showDialog("情報", msg);
         } else {
+            HandyUtil.playSuccessBuzzer(this);
+            HandyUtil.playVibrater(this);
             showBanner(msg, BannerType.INFO);
         }
     }
