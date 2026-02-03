@@ -44,6 +44,18 @@ import java.util.concurrent.TimeUnit;
 //　処理概要　:　PhotographingActivityクラス
 //============================================================
 
+/**
+ * コンテナ/シール撮影用のカメラ画面Activity。
+ *
+ * <p>CameraXでプレビュー・撮影を行い、撮影後に確認/保存/破棄を選択する。</p>
+ *
+ * <p>主な処理フロー:</p>
+ * <ul>
+ *     <li>カメラ権限確認 → プレビュー開始。</li>
+ *     <li>シャッターで撮影 → プレビュー確認画面へ切替。</li>
+ *     <li>保存時はURIを返却し、破棄時は一時ファイルを削除。</li>
+ * </ul>
+ */
 @ExperimentalCamera2Interop
 public class PhotographingActivity extends BaseActivity {
 

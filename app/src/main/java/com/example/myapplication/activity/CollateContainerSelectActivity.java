@@ -31,6 +31,16 @@ import java.util.concurrent.Executors;
 //　処理概要　:　CollateContainerSelectActivityクラス
 //============================================================
 
+/**
+ * 積込照合用のコンテナ選択画面。
+ *
+ * <p>主な責務:</p>
+ * <ul>
+ *     <li>コンテナ一覧を取得してRecyclerViewに表示。</li>
+ *     <li>コンテナ番号の入力/スキャンを受けて選択状態を切り替える。</li>
+ *     <li>決定時に選択結果を返却し、終了ボタンで前画面に戻る。</li>
+ * </ul>
+ */
 public class CollateContainerSelectActivity extends BaseActivity {
 
     private EditText etSelectedNo;

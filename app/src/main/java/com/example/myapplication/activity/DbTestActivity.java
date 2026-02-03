@@ -33,6 +33,15 @@ import java.util.concurrent.Executors;
 //　処理概要　:　DbTestActivityクラス
 //============================================================
 
+/**
+ * デバッグ用途のDB参照画面Activity。
+ *
+ * <p>Roomのテーブル一覧をSpinnerで切り替え、
+ * 選択したテーブルのデータをRecyclerViewに表示する。</p>
+ *
+ * <p>UI構成上、ヘッダ行と本体スクロールを同期させているため、
+ * カラム幅の計算/ヘッダ生成をアダプタと連携して行う。</p>
+ */
 public class DbTestActivity extends BaseActivity {
 
     private Spinner spTables;

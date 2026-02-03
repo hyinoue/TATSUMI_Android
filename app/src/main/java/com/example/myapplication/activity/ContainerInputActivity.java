@@ -48,6 +48,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　処理概要　:　ContainerInputActivityクラス
 //============================================================
 
+/**
+ * コンテナ情報入力画面のActivity。
+ *
+ * <p>コンテナ番号/シール番号/重量などの入力に加えて、
+ * コンテナ・シールの写真撮影を行い、結果をDB/画面に反映する。</p>
+ *
+ * <p>主な処理フロー:</p>
+ * <ul>
+ *     <li>前画面から渡された束情報/重量情報を受け取り、残量を表示。</li>
+ *     <li>カメラ起動 → 撮影結果URIを保持し、ImageViewにプレビュー表示。</li>
+ *     <li>確定時に入力値を保存し、結果を呼び出し元へ返却。</li>
+ * </ul>
+ */
 public class ContainerInputActivity extends BaseActivity {
 
     private static final String TAG = "ContainerInput";
@@ -109,15 +122,18 @@ public class ContainerInputActivity extends BaseActivity {
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 
                 if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                    // 撮影キャンセル/戻り時はそのまま終了
                     toast("撮影キャンセル");
                     Log.i(TAG, "Camera canceled");
                     return;
                 }
 
+                // 撮影結果のURIとターゲット(コンテナ/シール)を取得
                 String uriStr = result.getData().getStringExtra(PhotographingActivity.EXTRA_RESULT_URI);
                 String target = result.getData().getStringExtra(PhotographingActivity.EXTRA_TARGET);
 
                 if (uriStr == null) {
+                    // 取得失敗時はエラーメッセージのみ表示
                     toast("画像URIが取得できませんでした");
                     Log.e(TAG, "result uri is null");
                     return;
@@ -126,11 +142,13 @@ public class ContainerInputActivity extends BaseActivity {
                 Uri uri = Uri.parse(uriStr);
 
                 if ("CONTAINER".equals(target)) {
+                    // コンテナ写真をプレビューに表示
                     containerPhotoUri = uri;
                     ivPhotoContainer.setImageURI(null); // 同URI再描画対策
                     ivPhotoContainer.setImageURI(uri);
                     toast("コンテナNo写真を表示しました");
                 } else {
+                    // シール写真をプレビューに表示
                     sealPhotoUri = uri;
                     ivPhotoSeal.setImageURI(null);
                     ivPhotoSeal.setImageURI(uri);

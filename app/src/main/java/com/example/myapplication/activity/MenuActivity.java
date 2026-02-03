@@ -31,6 +31,17 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * メインメニュー画面のActivity。
+ *
+ * <p>主な責務は以下のとおり。</p>
+ * <ul>
+ *     <li>各機能画面への遷移ボタンを提供し、結果戻りで表示を更新する。</li>
+ *     <li>束選定/コンテナ入力で取得した値を保持し、相互に同期する。</li>
+ *     <li>コンテナサイズの選択や受信状況をUIに反映する。</li>
+ *     <li>画面下ボタン(F1〜F4/色ボタン)のラベル設定を行う。</li>
+ * </ul>
+ */
 public class MenuActivity extends BaseActivity {
 
     //============================================================
@@ -132,6 +143,7 @@ public class MenuActivity extends BaseActivity {
                             java.io.Serializable extra =
                                     data.getSerializableExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES);
                             if (extra instanceof Map) {
+                                // 受け取った束情報を保持し、表示用に同期
                                 bundleValues.clear();
                                 Map<?, ?> raw = (Map<?, ?>) extra;
                                 for (Map.Entry<?, ?> entry : raw.entrySet()) {
@@ -145,6 +157,7 @@ public class MenuActivity extends BaseActivity {
                             }
                         }
                     }
+                    // 表示の再計算/更新
                     refreshInformation();
                 }
         );
@@ -158,6 +171,7 @@ public class MenuActivity extends BaseActivity {
                             java.io.Serializable extra =
                                     data.getSerializableExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES);
                             if (extra instanceof Map) {
+                                // コンテナ入力で確定した値を保持し、束情報側へ同期
                                 containerValues.clear();
                                 Map<?, ?> raw = (Map<?, ?>) extra;
                                 for (Map.Entry<?, ?> entry : raw.entrySet()) {
@@ -171,6 +185,7 @@ public class MenuActivity extends BaseActivity {
                             }
                         }
                     }
+                    // 画面ラベル/件数等を更新
                     refreshInformation();
                 }
         );

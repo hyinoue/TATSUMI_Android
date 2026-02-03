@@ -10,6 +10,12 @@ import com.google.android.material.button.MaterialButton;
 //　処理概要　:　CommTestActivityクラス
 //============================================================
 
+/**
+ * 通信テスト用のシンプルな画面Activity。
+ *
+ * <p>画面下ボタンの「終了」だけを有効化し、
+ * 実装確認/疎通確認のための最小UIとして利用する。</p>
+ */
 public class CommTestActivity extends BaseActivity {
 
     @Override

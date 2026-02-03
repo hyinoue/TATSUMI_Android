@@ -34,6 +34,19 @@ import java.util.concurrent.Executors;
 //　処理概要　:　VanningCollationActivityクラス
 //============================================================
 
+/**
+ * 積込照合(バンニング照合)画面のActivity。
+ *
+ * <p>コンテナ情報と読み取り結果を突き合わせ、
+ * 読み取った束の件数/一覧をリアルタイムに表示する。</p>
+ *
+ * <p>主な処理フロー:</p>
+ * <ul>
+ *     <li>Intentから対象コンテナ情報を取得して画面に表示。</li>
+ *     <li>スキャナ/入力欄から原品番号を受け取り照合処理を実行。</li>
+ *     <li>確定で照合結果を保存し、終了で前画面へ戻る。</li>
+ * </ul>
+ */
 public class VanningCollationActivity extends BaseActivity {
 
     public static final String EXTRA_CONTAINER_ID = "extra_container_id";
@@ -127,9 +140,11 @@ public class VanningCollationActivity extends BaseActivity {
     private void setupInputHandlers() {
         if (etGenpinNo == null) return;
 
+        // スキャナ入力を想定し、ソフトキーボードは出さない
         etGenpinNo.setShowSoftInputOnFocus(false);
         etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+                // Enter確定で照合処理へ
                 handleGenpinInput();
                 return true;
             }
@@ -137,6 +152,7 @@ public class VanningCollationActivity extends BaseActivity {
         });
         etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                // 物理Enterキーの入力にも対応
                 handleGenpinInput();
                 return true;
             }
@@ -149,6 +165,7 @@ public class VanningCollationActivity extends BaseActivity {
             @Override
             public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
                 runOnUiThread(() -> {
+                    // スキャン結果を入力欄に入れて同一処理フローに流す
                     if (etGenpinNo != null) {
                         etGenpinNo.setText(normalizedData);
                     }
@@ -214,6 +231,7 @@ public class VanningCollationActivity extends BaseActivity {
     private void handleGenpinInput() {
         if (controller == null) return;
 
+        // 入力値を取得して整形（空白除去/未入力チェック）
         String input = etGenpinNo != null && etGenpinNo.getText() != null
                 ? etGenpinNo.getText().toString().trim()
                 : "";

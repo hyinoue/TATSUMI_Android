@@ -16,6 +16,14 @@ import java.util.List;
 //　処理概要　:　CameraSettingActivityクラス
 //============================================================
 
+/**
+ * カメラ設定画面Activity。
+ *
+ * <p>撮影解像度・フラッシュ・光源モードの設定をSpinnerで選択し、
+ * {@link AppSettings} に保存する。</p>
+ *
+ * <p>保存時は呼び出し元にRESULT_OKを返す。</p>
+ */
 public class CameraSettingActivity extends BaseActivity {
 
     private static final int CAM_UXGA = 0;
@@ -169,4 +177,3 @@ public class CameraSettingActivity extends BaseActivity {
         }
     }
 }
-
