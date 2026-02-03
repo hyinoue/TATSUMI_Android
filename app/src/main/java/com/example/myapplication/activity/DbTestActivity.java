@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-//=========================
+//===============================
 //　処理概要　:　DbTestActivityクラス
-//=========================
+//===============================
 
 /**
  * デバッグ用途のDB参照画面Activity。
@@ -55,11 +55,11 @@ public class DbTestActivity extends BaseActivity {
     private DbTableAdapter tableAdapter;
     private volatile boolean isAlive = false;
 
-    //======================================
+    //============================================
     //　機　能　:　画面生成時の初期化処理
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,14 +82,14 @@ public class DbTestActivity extends BaseActivity {
         rvDbTable.setAdapter(tableAdapter);
         rvDbTable.setHorizontalScrollBarEnabled(true);
         rvDbTable.addItemDecoration(new RecyclerView.ItemDecoration() {
-            //=====================================
+            //===========================================
             //　機　能　:　item Offsetsを取得する
             //　引　数　:　outRect ..... Rect
             //　　　　　:　view ..... View
             //　　　　　:　parent ..... RecyclerView
             //　　　　　:　state ..... RecyclerView.State
             //　戻り値　:　[void] ..... なし
-            //=====================================
+            //===========================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -109,14 +109,14 @@ public class DbTestActivity extends BaseActivity {
         loadTableNames();
 
         spTables.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            //==================================
+            //========================================
             //　機　能　:　on Item Selectedの処理
             //　引　数　:　parent ..... AdapterView<?>
             //　　　　　:　view ..... View
             //　　　　　:　position ..... int
             //　　　　　:　id ..... long
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String table = (String) parent.getItemAtPosition(position);
@@ -130,22 +130,22 @@ public class DbTestActivity extends BaseActivity {
                 loadTableData(table);
             }
 
-            //==================================
+            //========================================
             //　機　能　:　on Nothing Selectedの処理
             //　引　数　:　parent ..... AdapterView<?>
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
 
-    //======================
+    //============================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onDestroy() {
         isAlive = false;
@@ -156,11 +156,11 @@ public class DbTestActivity extends BaseActivity {
     // =============================================================================================
     // DB
     // =============================================================================================
-    //=======================
+    //=============================
     //　機　能　:　table Namesを読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     private void loadTableNames() {
         executor.execute(() -> {
@@ -190,11 +190,11 @@ public class DbTestActivity extends BaseActivity {
             });
         });
     }
-    //=========================
+    //===============================
     //　機　能　:　table Dataを読み込む
     //　引　数　:　table ..... String
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     private void loadTableData(String table) {
         executor.execute(() -> {
@@ -226,14 +226,14 @@ public class DbTestActivity extends BaseActivity {
     // =============================================================================================
     // TableView Adapter
     // =============================================================================================
-    //===================================
+    //=========================================
     //　機　能　:　header Rowを更新する
     //　引　数　:　columns ..... List<String>
     //　　　　　:　widthsPx ..... List<Integer>
     //　　　　　:　rowHeaderWidthPx ..... int
     //　　　　　:　rowHeightPx ..... int
     //　戻り値　:　[void] ..... なし
-    //===================================
+    //=========================================
 
     private void updateHeaderRow(List<String> columns, List<Integer> widthsPx, int rowHeaderWidthPx, int rowHeightPx) {
         headerRow.removeAllViews();
@@ -246,14 +246,14 @@ public class DbTestActivity extends BaseActivity {
             headerRow.addView(tv);
         }
     }
-    //=============================
+    //===================================
     //　機　能　:　header Cellを生成する
     //　引　数　:　label ..... String
     //　　　　　:　widthPx ..... int
     //　　　　　:　heightPx ..... int
     //　　　　　:　leftMarginPx ..... int
     //　戻り値　:　[TextView] ..... なし
-    //=============================
+    //===================================
 
     private TextView buildHeaderCell(String label, int widthPx, int heightPx, int leftMarginPx) {
         TextView tv = new TextView(this);
@@ -267,20 +267,20 @@ public class DbTestActivity extends BaseActivity {
         applyCellLayoutParams(tv, widthPx, heightPx, leftMarginPx);
         return tv;
     }
-    //=====================
+    //===========================
     //　機　能　:　dpの処理
     //　引　数　:　v ..... int
     //　戻り値　:　[int] ..... なし
-    //=====================
+    //===========================
 
     private int dp(int v) {
         return (int) (v * getResources().getDisplayMetrics().density);
     }
-    //==========================
+    //================================
     //　機　能　:　bottom Buttonsを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
 
     private void setupBottomButtons() {
         bindBottomButtonsIfExists();
@@ -296,24 +296,24 @@ public class DbTestActivity extends BaseActivity {
         if (green != null) green.setText("");
         refreshBottomButtonsEnabled();
     }
-    //==============================
+    //====================================
     //　機　能　:　table Visibleを設定する
     //　引　数　:　isVisible ..... boolean
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //====================================
 
     private void setTableVisible(boolean isVisible) {
         int visibility = isVisible ? View.VISIBLE : View.GONE;
         hsvDbTable.setVisibility(visibility);
     }
-    //==================================
+    //========================================
     //　機　能　:　apply Cell Layout Paramsの処理
     //　引　数　:　cell ..... TextView
     //　　　　　:　widthPx ..... int
     //　　　　　:　heightPx ..... int
     //　　　　　:　leftMarginPx ..... int
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //========================================
 
     private void applyCellLayoutParams(TextView cell, int widthPx, int heightPx, int leftMarginPx) {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(widthPx, heightPx);
@@ -321,11 +321,11 @@ public class DbTestActivity extends BaseActivity {
         cell.setLayoutParams(lp);
     }
 
-    //============================
+    //==================================
     //　機　能　:　on Function Yellowの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
     @Override
     protected void onFunctionYellow() {
         finish();
@@ -344,32 +344,32 @@ public class DbTestActivity extends BaseActivity {
         // データ保持（全文表示 & 列幅計算）
         private final List<String> currentColumns = new ArrayList<>();
         private final List<List<String>> currentRows = new ArrayList<>();
-        //========================
+        //==============================
         //　機　能　:　normの処理
         //　引　数　:　s ..... String
         //　戻り値　:　[String] ..... なし
-        //========================
+        //==============================
 
         private String norm(String s) {
             if (s == null) return "";
             return s.replace("\n", " ").replace("\r", " ");
         }
 
-        //==========================
+        //================================
         //　機　能　:　item View Typeを取得する
         //　引　数　:　position ..... int
         //　戻り値　:　[int] ..... なし
-        //==========================
+        //================================
         @Override
         public int getItemViewType(int position) {
             return currentColumns.size();
         }
-        //====================================
+        //==========================================
         //　機　能　:　tableを設定する
         //　引　数　:　cols ..... List<String>
         //　　　　　:　data ..... List<List<String>>
         //　戻り値　:　[void] ..... なし
-        //====================================
+        //==========================================
 
         void setTable(List<String> cols, List<List<String>> data) {
             currentColumns.clear();
@@ -385,11 +385,11 @@ public class DbTestActivity extends BaseActivity {
          * 列幅を「ヘッダ（太字） + セル（通常）」の最大文字幅に合わせて決める（上限なし）
          * ★最後の1文字見切れ対策で safety を少し足す
          */
-        //===================================
+        //=========================================
         //　機　能　:　auto Adjust Column Widthsの処理
         //　引　数　:　なし
         //　戻り値　:　[void] ..... なし
-        //===================================
+        //=========================================
         private void autoAdjustColumnWidths() {
             colWidthsPx.clear();
 
@@ -424,38 +424,38 @@ public class DbTestActivity extends BaseActivity {
                 colWidthsPx.add(wPx);
             }
         }
-        //===============================
+        //=====================================
         //　機　能　:　column Widths Pxを取得する
         //　引　数　:　なし
         //　戻り値　:　[List<Integer>] ..... なし
-        //===============================
+        //=====================================
 
         List<Integer> getColumnWidthsPx() {
             return new ArrayList<>(colWidthsPx);
         }
-        //===============================
+        //=====================================
         //　機　能　:　row Header Width Pxを取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... なし
-        //===============================
+        //=====================================
 
         int getRowHeaderWidthPx() {
             return dp(rowHeaderWidthDp);
         }
-        //=========================
+        //===============================
         //　機　能　:　row Height Pxを取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... なし
-        //=========================
+        //===============================
 
         int getRowHeightPx() {
             return dp(rowHeightDp);
         }
-        //===============================
+        //=====================================
         //　機　能　:　col Width Pxを取得する
         //　引　数　:　columnPosition ..... int
         //　戻り値　:　[int] ..... なし
-        //===============================
+        //=====================================
 
         private int getColWidthPx(int columnPosition) {
             if (columnPosition >= 0 && columnPosition < colWidthsPx.size()) {
@@ -464,12 +464,12 @@ public class DbTestActivity extends BaseActivity {
             return dp(120);
         }
 
-        //===============================
+        //=====================================
         //　機　能　:　on Create View Holderの処理
         //　引　数　:　parent ..... ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[RowViewHolder] ..... なし
-        //===============================
+        //=====================================
         @Override
         public RowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LinearLayout row = new LinearLayout(DbTestActivity.this);
@@ -493,12 +493,12 @@ public class DbTestActivity extends BaseActivity {
             return new RowViewHolder(row, cells);
         }
 
-        //=================================
+        //=======================================
         //　機　能　:　on Bind View Holderの処理
         //　引　数　:　holder ..... RowViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
-        //=================================
+        //=======================================
         @Override
         public void onBindViewHolder(RowViewHolder holder, int position) {
             List<TextView> cells = holder.cells;
@@ -519,20 +519,20 @@ public class DbTestActivity extends BaseActivity {
             }
         }
 
-        //======================
+        //============================
         //　機　能　:　item Countを取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... なし
-        //======================
+        //============================
         @Override
         public int getItemCount() {
             return currentRows.size();
         }
-        //==========================
+        //================================
         //　機　能　:　row Headerを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... なし
-        //==========================
+        //================================
 
         private TextView buildRowHeader() {
             TextView tv = new TextView(DbTestActivity.this);
@@ -543,11 +543,11 @@ public class DbTestActivity extends BaseActivity {
             tv.setPadding(dp(6), dp(4), dp(6), dp(4));
             return tv;
         }
-        //==========================
+        //================================
         //　機　能　:　cellを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... なし
-        //==========================
+        //================================
 
         private TextView buildCell() {
             TextView tv = new TextView(DbTestActivity.this);

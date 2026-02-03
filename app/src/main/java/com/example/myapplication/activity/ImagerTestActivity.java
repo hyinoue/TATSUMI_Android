@@ -29,9 +29,9 @@ import com.google.android.material.button.MaterialButton;
  * </ul>
  */
 
-//=============================
+//===================================
 //　処理概要　:　ImagerTestActivityクラス
-//=============================
+//===================================
 
 public class ImagerTestActivity extends BaseActivity {
 
@@ -44,11 +44,11 @@ public class ImagerTestActivity extends BaseActivity {
     // ===== Scanner common =====
     private DensoScannerController scanner;
 
-    //======================================
+    //============================================
     //　機　能　:　画面生成時の初期化処理
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,13 +77,13 @@ public class ImagerTestActivity extends BaseActivity {
 
         // 共通スキャナ（受信時の表示処理だけここで実装）
         scanner = new DensoScannerController(this, new OnScanListener() {
-            //==================================
+            //========================================
             //　機　能　:　スキャン受信時の処理
             //　引　数　:　normalizedData ..... String
             //　　　　　:　aim ..... String
             //　　　　　:　denso ..... String
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
 
@@ -119,11 +119,11 @@ public class ImagerTestActivity extends BaseActivity {
         // Manager生成開始
         scanner.onCreate();
     }
-    //==========================
+    //================================
     //　機　能　:　bottom Buttonsを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
 
     private void setupBottomButtons() {
         bindBottomButtonsIfExists();
@@ -140,21 +140,21 @@ public class ImagerTestActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //============================
+    //==================================
     //　機　能　:　on Function Yellowの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
     @Override
     protected void onFunctionYellow() {
         finish();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面再表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onResume() {
         super.onResume();
@@ -162,33 +162,33 @@ public class ImagerTestActivity extends BaseActivity {
         if (etBarcode != null) etBarcode.requestFocus();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面一時停止時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onPause() {
         if (scanner != null) scanner.onPause();
         super.onPause();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
         super.onDestroy();
     }
 
-    //============================
+    //==================================
     //　機　能　:　dispatch Key Eventの処理
     //　引　数　:　event ..... KeyEvent
     //　戻り値　:　[boolean] ..... なし
-    //============================
+    //==================================
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // トリガーキーは共通側で処理

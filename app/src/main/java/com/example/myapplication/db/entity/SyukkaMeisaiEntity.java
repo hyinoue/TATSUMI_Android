@@ -4,16 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-//==================
+//========================
 //　処理概要　:　出荷明細エンティティ
-//==================
+//========================
 
 
 @Entity(tableName = "T_SYUKKA_MEISAI", primaryKeys = {"HEAT_NO", "SOKUBAN"})
 
-//==================
+//========================
 //　処理概要　:　出荷明細エンティティ
-//==================
+//========================
 
 public class SyukkaMeisaiEntity {
 

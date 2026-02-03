@@ -30,9 +30,9 @@ import com.example.myapplication.db.entity.YoteiEntity;
 @Database(
         entities = {
 
-//======================
+//============================
 //　処理概要　:　AppDatabaseクラス
-//======================
+//============================
 
                 SystemEntity.class,
                 YoteiEntity.class,
@@ -50,76 +50,76 @@ import com.example.myapplication.db.entity.YoteiEntity;
 public abstract class AppDatabase extends RoomDatabase {
 
     // DAO
-    //===========================
+    //=================================
     //　機　能　:　system Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[SystemDao] ..... なし
-    //===========================
+    //=================================
     public abstract SystemDao systemDao();
-    //==========================
+    //================================
     //　機　能　:　yotei Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[YoteiDao] ..... なし
-    //==========================
+    //================================
 
     public abstract YoteiDao yoteiDao();
-    //====================================
+    //==========================================
     //　機　能　:　syukka Container Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[SyukkaContainerDao] ..... なし
-    //====================================
+    //==========================================
 
     public abstract SyukkaContainerDao syukkaContainerDao();
-    //=================================
+    //=======================================
     //　機　能　:　syukka Meisai Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[SyukkaMeisaiDao] ..... なし
-    //=================================
+    //=======================================
 
     public abstract SyukkaMeisaiDao syukkaMeisaiDao();
-    //=====================================
+    //===========================================
     //　機　能　:　syukka Meisai Work Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[SyukkaMeisaiWorkDao] ..... なし
-    //=====================================
+    //===========================================
 
     public abstract SyukkaMeisaiWorkDao syukkaMeisaiWorkDao();
-    //=====================================
+    //===========================================
     //　機　能　:　kakunin Container Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[KakuninContainerDao] ..... なし
-    //=====================================
+    //===========================================
 
     public abstract KakuninContainerDao kakuninContainerDao();
-    //==================================
+    //========================================
     //　機　能　:　kakunin Meisai Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[KakuninMeisaiDao] ..... なし
-    //==================================
+    //========================================
 
     public abstract KakuninMeisaiDao kakuninMeisaiDao();
-    //======================================
+    //============================================
     //　機　能　:　kakunin Meisai Work Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[KakuninMeisaiWorkDao] ..... なし
-    //======================================
+    //============================================
 
     public abstract KakuninMeisaiWorkDao kakuninMeisaiWorkDao();
-    //================================
+    //======================================
     //　機　能　:　comm History Daoの処理
     //　引　数　:　なし
     //　戻り値　:　[CommHistoryDao] ..... なし
-    //================================
+    //======================================
 
     public abstract CommHistoryDao commHistoryDao();
 
     // Singleton
     private static volatile AppDatabase INSTANCE;
-    //=============================
+    //===================================
     //　機　能　:　instanceを取得する
     //　引　数　:　なし
     //　戻り値　:　[AppDatabase] ..... なし
-    //=============================
+    //===================================
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
@@ -147,11 +147,11 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    //============================================================
+    //==================================================================
     //　機　能　:　M_SYSTEM 初期値登録（DB初回作成時のみ）
     //　備　考　:　ID=1 の1レコード運用想定
     //　　　　　:　INSERT OR IGNORE にして二重登録事故を回避
-    //============================================================
+    //==================================================================
     private static void insertDefaultSystem(@NonNull SupportSQLiteDatabase db) {
         // ★ 固定値（ここをあなたの要件値に合わせて変更）
         final int defaultContainerJyuryo = 2400;

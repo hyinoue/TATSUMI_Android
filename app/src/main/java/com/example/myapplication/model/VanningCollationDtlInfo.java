@@ -1,8 +1,8 @@
 package com.example.myapplication.model;
 
-//==================================
+//========================================
 //　処理概要　:　VanningCollationDtlInfoクラス
-//==================================
+//========================================
 
 public class VanningCollationDtlInfo {
     public String heatNo;

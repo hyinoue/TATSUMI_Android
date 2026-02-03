@@ -30,9 +30,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-//===================================
+//=========================================
 //　処理概要　:　VanningCollationActivityクラス
-//===================================
+//=========================================
 
 /**
  * 積込照合(バンニング照合)画面のActivity。
@@ -72,11 +72,11 @@ public class VanningCollationActivity extends BaseActivity {
     private String containerId;
     private boolean confirmed;
 
-    //======================================
+    //============================================
     //　機　能　:　画面生成時の初期化処理
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +95,14 @@ public class VanningCollationActivity extends BaseActivity {
         //表で線を重ねて細く見せる
         RecyclerView rvBundles = findViewById(R.id.rvBundles);
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
-            //=====================================
+            //===========================================
             //　機　能　:　item Offsetsを取得する
             //　引　数　:　outRect ..... Rect
             //　　　　　:　view ..... View
             //　　　　　:　parent ..... RecyclerView
             //　　　　　:　state ..... RecyclerView.State
             //　戻り値　:　[void] ..... なし
-            //=====================================
+            //===========================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -113,11 +113,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //======================
+    //============================
     //　機　能　:　bind Viewsの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void bindViews() {
         etContainerNo = findViewById(R.id.etContainerNo);
@@ -135,11 +135,11 @@ public class VanningCollationActivity extends BaseActivity {
         if (etBundleCount != null) etBundleCount.setEnabled(false);
         if (etSagyouYmd != null) etSagyouYmd.setEnabled(false);
     }
-    //==========================
+    //================================
     //　機　能　:　bottom Buttonsを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
 
     private void setupBottomButtons() {
         if (btnBlue != null) btnBlue.setText("確定");
@@ -148,11 +148,11 @@ public class VanningCollationActivity extends BaseActivity {
         if (btnYellow != null) btnYellow.setText("終了");
         refreshBottomButtonsEnabled();
     }
-    //======================
+    //============================
     //　機　能　:　recyclerを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void setupRecycler() {
         adapter = new VanningCollationAdapter();
@@ -164,11 +164,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //==========================
+    //================================
     //　機　能　:　input Handlersを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
 
     private void setupInputHandlers() {
         if (etGenpinNo == null) return;
@@ -192,21 +192,21 @@ public class VanningCollationActivity extends BaseActivity {
             return false;
         });
     }
-    //======================
+    //============================
     //　機　能　:　scannerを初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void initScanner() {
         scanner = new DensoScannerController(this, new OnScanListener() {
-            //==================================
+            //========================================
             //　機　能　:　スキャン受信時の処理
             //　引　数　:　normalizedData ..... String
             //　　　　　:　aim ..... String
             //　　　　　:　denso ..... String
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
                 runOnUiThread(() -> {
@@ -219,11 +219,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //=======================
+    //=============================
     //　機　能　:　from Intentを読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     private void loadFromIntent() {
         Intent intent = getIntent();
@@ -238,11 +238,11 @@ public class VanningCollationActivity extends BaseActivity {
         if (etBundleCount != null) etBundleCount.setText(String.valueOf(bundleCnt));
         if (etSagyouYmd != null) etSagyouYmd.setText(trimSagyouYmd(sagyouYmd));
     }
-    //==========================
+    //================================
     //　機　能　:　collation Dataを読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
 
     private void loadCollationData() {
         showLoadingShort();
@@ -266,11 +266,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //=============================
+    //===================================
     //　機　能　:　ui For Containersを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //===================================
 
     private void updateUiForContainers() {
         boolean hasRows = controller != null && !controller.getDetails().isEmpty();
@@ -287,11 +287,11 @@ public class VanningCollationActivity extends BaseActivity {
         }
         refreshBottomButtonsEnabled();
     }
-    //========================
+    //==============================
     //　機　能　:　genpin Inputを処理する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================
+    //==============================
 
     private void handleGenpinInput() {
         if (controller == null) return;
@@ -360,11 +360,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //======================
+    //============================
     //　機　能　:　read Countを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void updateReadCount() {
         int count = controller != null ? controller.getSyougouSumiCount() : 0;
@@ -373,11 +373,11 @@ public class VanningCollationActivity extends BaseActivity {
         }
     }
 
-    //==========================
+    //================================
     //　機　能　:　on Function Blueの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================
+    //================================
     @Override
     protected void onFunctionBlue() {
         if (confirmed) {
@@ -386,31 +386,31 @@ public class VanningCollationActivity extends BaseActivity {
         procRegister();
     }
 
-    //=========================
+    //===============================
     //　機　能　:　on Function Redの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
     @Override
     protected void onFunctionRed() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //===========================
+    //=================================
     //　機　能　:　on Function Greenの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
     @Override
     protected void onFunctionGreen() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //============================
+    //==================================
     //　機　能　:　on Function Yellowの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
     @Override
     protected void onFunctionYellow() {
         if (confirmed) {
@@ -427,11 +427,11 @@ public class VanningCollationActivity extends BaseActivity {
                     }
                 });
     }
-    //=======================
+    //=============================
     //　機　能　:　proc Registerの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     private void procRegister() {
         if (controller == null) return;
@@ -464,11 +464,11 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //==============================
+    //====================================
     //　機　能　:　check Syougou Kanryoの処理
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... なし
-    //==============================
+    //====================================
 
     private boolean checkSyougouKanryo() {
         int remaining = controller != null ? controller.getUncollatedCount() : 0;
@@ -481,64 +481,64 @@ public class VanningCollationActivity extends BaseActivity {
         }
         return true;
     }
-    //======================
+    //============================
     //　機　能　:　register Dbの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void registerDb() {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         db.runInTransaction(() -> controller.markContainerCollated(db.kakuninContainerDao()));
     }
 
-    //======================
+    //============================
     //　機　能　:　画面再表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onResume() {
         super.onResume();
         if (scanner != null) scanner.onResume();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面一時停止時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onPause() {
         if (scanner != null) scanner.onPause();
         super.onPause();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
         if (io != null) io.shutdownNow();
         super.onDestroy();
     }
-    //=========================
+    //===============================
     //　機　能　:　safe Strの処理
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... なし
-    //=========================
+    //===============================
 
     private String safeStr(String value) {
         return value == null ? "" : value;
     }
-    //=========================
+    //===============================
     //　機　能　:　trim Sagyou Ymdの処理
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... なし
-    //=========================
+    //===============================
 
     private String trimSagyouYmd(String value) {
         if (value == null) return "";
@@ -547,11 +547,11 @@ public class VanningCollationActivity extends BaseActivity {
 
     private static class VanningCollationAdapter extends RecyclerView.Adapter<VanningCollationAdapter.ViewHolder> {
         private final List<VanningCollationRow> rows = new ArrayList<>();
-        //==============================================
+        //====================================================
         //　機　能　:　submit Listの処理
         //　引　数　:　newRows ..... List<VanningCollationRow>
         //　戻り値　:　[void] ..... なし
-        //==============================================
+        //====================================================
 
         void submitList(List<VanningCollationRow> newRows) {
             rows.clear();
@@ -559,12 +559,12 @@ public class VanningCollationActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
-        //==========================================
+        //================================================
         //　機　能　:　on Create View Holderの処理
         //　引　数　:　parent ..... android.view.ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[ViewHolder] ..... なし
-        //==========================================
+        //================================================
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
@@ -572,12 +572,12 @@ public class VanningCollationActivity extends BaseActivity {
             return new ViewHolder(view);
         }
 
-        //==============================
+        //====================================
         //　機　能　:　on Bind View Holderの処理
         //　引　数　:　holder ..... ViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
-        //==============================
+        //====================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             VanningCollationRow row = rows.get(position);
@@ -588,11 +588,11 @@ public class VanningCollationActivity extends BaseActivity {
             holder.tvConfirmed.setText(row.confirmed);
         }
 
-        //======================
+        //============================
         //　機　能　:　item Countを取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... なし
-        //======================
+        //============================
         @Override
         public int getItemCount() {
             return rows.size();

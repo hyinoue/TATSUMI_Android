@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Locale;
 
 
-//=====================================
+//===========================================
 //　処理概要　:　VanningCollationControllerクラス
-//=====================================
+//===========================================
 
 public class VanningCollationController {
 
@@ -28,23 +28,23 @@ public class VanningCollationController {
     private final KakuninMeisaiWorkDao kakuninMeisaiWorkDao;
     private final List<KakuninMeisaiWorkEntity> details = new ArrayList<>();
     private final List<VanningCollationRow> displayRows = new ArrayList<>();
-    //======================================================
+    //============================================================
     //　機　能　:　VanningCollationControllerの初期化処理
     //　引　数　:　kakuninMeisaiDao ..... KakuninMeisaiDao
     //　　　　　:　kakuninMeisaiWorkDao ..... KakuninMeisaiWorkDao
     //　戻り値　:　[VanningCollationController] ..... なし
-    //======================================================
+    //============================================================
 
     public VanningCollationController(@NonNull KakuninMeisaiDao kakuninMeisaiDao,
                                       @NonNull KakuninMeisaiWorkDao kakuninMeisaiWorkDao) {
         this.kakuninMeisaiDao = kakuninMeisaiDao;
         this.kakuninMeisaiWorkDao = kakuninMeisaiWorkDao;
     }
-    //===============================
+    //=====================================
     //　機　能　:　loadの処理
     //　引　数　:　containerId ..... String
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //=====================================
 
     public void load(@Nullable String containerId) {
         details.clear();
@@ -55,31 +55,31 @@ public class VanningCollationController {
         refreshDisplayRows();
     }
 
-    //===============================================
+    //=====================================================
     //　機　能　:　detailsを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<KakuninMeisaiWorkEntity>] ..... なし
-    //===============================================
+    //=====================================================
     @NonNull
     public List<KakuninMeisaiWorkEntity> getDetails() {
         return Collections.unmodifiableList(details);
     }
 
-    //===========================================
+    //=================================================
     //　機　能　:　display Rowsを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<VanningCollationRow>] ..... なし
-    //===========================================
+    //=================================================
     @NonNull
     public List<VanningCollationRow> getDisplayRows() {
         return Collections.unmodifiableList(displayRows);
     }
-    //===========================
+    //=================================
     //　機　能　:　check Soku Dtlの処理
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[String] ..... なし
-    //===========================
+    //=================================
 
     public String checkSokuDtl(String heatNo, String sokuban) {
         heatNo = heatNo != null ? heatNo.trim() : "";
@@ -100,12 +100,12 @@ public class VanningCollationController {
         }
         return "OK";
     }
-    //===========================
+    //=================================
     //　機　能　:　syougoを更新する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
 
 
     public void updateSyougo(String heatNo, String sokuban) {
@@ -123,11 +123,11 @@ public class VanningCollationController {
         readW_KAKUNIN_MEISAItoList();
         refreshDisplayRows();
     }
-    //==============================
+    //====================================
     //　機　能　:　syougou Sumi Countを取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... なし
-    //==============================
+    //====================================
 
     public int getSyougouSumiCount() {
         int count = 0;
@@ -138,11 +138,11 @@ public class VanningCollationController {
         }
         return count;
     }
-    //============================
+    //==================================
     //　機　能　:　uncollated Countを取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... なし
-    //============================
+    //==================================
 
     public int getUncollatedCount() {
         int count = 0;
@@ -153,11 +153,11 @@ public class VanningCollationController {
         }
         return count;
     }
-    //====================================================
+    //==========================================================
     //　機　能　:　mark Container Collatedの処理
     //　引　数　:　kakuninContainerDao ..... KakuninContainerDao
     //　戻り値　:　[void] ..... なし
-    //====================================================
+    //==========================================================
 
     public void markContainerCollated(@NonNull KakuninContainerDao kakuninContainerDao) {
         if (details.isEmpty()) return;
@@ -173,11 +173,11 @@ public class VanningCollationController {
         container.updateYmd = nowAsText();
         kakuninContainerDao.upsert(container);
     }
-    //========================
+    //==============================
     //　機　能　:　display Rowsを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================
+    //==============================
 
     private void refreshDisplayRows() {
         displayRows.clear();
@@ -191,11 +191,11 @@ public class VanningCollationController {
             displayRows.add(new VanningCollationRow(pNo, bNo, idx, j, confirmed));
         }
     }
-    //===============================================
+    //=====================================================
     //　機　能　:　t_KAKUNIN_MEISAIto W_KAKUNIN_MEISAIを設定する
     //　引　数　:　containerId ..... String
     //　戻り値　:　[void] ..... なし
-    //===============================================
+    //=====================================================
 
     private void setT_KAKUNIN_MEISAItoW_KAKUNIN_MEISAI(@NonNull String containerId) {
         kakuninMeisaiWorkDao.deleteAll();
@@ -204,21 +204,21 @@ public class VanningCollationController {
             kakuninMeisaiWorkDao.upsert(toWorkEntity(entity));
         }
     }
-    //======================================
+    //============================================
     //　機　能　:　read W_KAKUNIN_MEISAIto Listの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
 
     private void readW_KAKUNIN_MEISAItoList() {
         details.clear();
         details.addAll(kakuninMeisaiWorkDao.findAllOrdered());
     }
-    //=========================================
+    //===============================================
     //　機　能　:　to Work Entityの処理
     //　引　数　:　entity ..... KakuninMeisaiEntity
     //　戻り値　:　[KakuninMeisaiWorkEntity] ..... なし
-    //=========================================
+    //===============================================
 
     private KakuninMeisaiWorkEntity toWorkEntity(KakuninMeisaiEntity entity) {
         KakuninMeisaiWorkEntity work = new KakuninMeisaiWorkEntity();
@@ -238,30 +238,30 @@ public class VanningCollationController {
         work.deleteFlg = entity.deleteFlg;
         return work;
     }
-    //=========================
+    //===============================
     //　機　能　:　safe Strの処理
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... なし
-    //=========================
+    //===============================
 
     private String safeStr(String value) {
         return value == null ? "" : value;
     }
-    //=========================
+    //===============================
     //　機　能　:　blankを判定する
     //　引　数　:　value ..... String
     //　戻り値　:　[boolean] ..... なし
-    //=========================
+    //===============================
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
-    //========================
+    //==============================
     //　機　能　:　repeatの処理
     //　引　数　:　s ..... String
     //　　　　　:　n ..... int
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String repeat(String s, int n) {
         if (n <= 0) return "";
@@ -269,11 +269,11 @@ public class VanningCollationController {
         for (int i = 0; i < n; i++) sb.append(s);
         return sb.toString();
     }
-    //========================
+    //==============================
     //　機　能　:　now As Textの処理
     //　引　数　:　なし
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String nowAsText() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN).format(new Date());

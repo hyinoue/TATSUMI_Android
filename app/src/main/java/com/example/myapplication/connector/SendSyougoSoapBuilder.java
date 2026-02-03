@@ -5,25 +5,25 @@ import com.example.myapplication.model.CollateDtl;
 import com.example.myapplication.time.XmlUtil;
 
 
-//================================
+//======================================
 //　処理概要　:　SendSyougoSoapBuilderクラス
-//================================
+//======================================
 
 public class SendSyougoSoapBuilder {
     private static final String NS = "http://tempuri.org/";
-    //=======================================
+    //=============================================
     //　機　能　:　SendSyougoSoapBuilderの初期化処理
     //　引　数　:　なし
     //　戻り値　:　[SendSyougoSoapBuilder] ..... なし
-    //=======================================
+    //=============================================
 
     private SendSyougoSoapBuilder() {
     }
-    //=============================
+    //===================================
     //　機　能　:　send Syougo Dataを生成する
     //　引　数　:　data ..... CollateData
     //　戻り値　:　[String] ..... なし
-    //=============================
+    //===================================
 
     public static String buildSendSyougoData(CollateData data) {
         StringBuilder inner = new StringBuilder();

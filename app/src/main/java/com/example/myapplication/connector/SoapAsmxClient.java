@@ -12,9 +12,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
-//=========================
+//===============================
 //　処理概要　:　SoapAsmxClientクラス
-//=========================
+//===============================
 
 public class SoapAsmxClient {
     private static final MediaType SOAP_XML = MediaType.parse("text/xml; charset=utf-8");
@@ -23,11 +23,11 @@ public class SoapAsmxClient {
 
     private final OkHttpClient http;
     private final String endpointUrl;
-    //================================
+    //======================================
     //　機　能　:　SoapAsmxClientの初期化処理
     //　引　数　:　endpointUrl ..... String
     //　戻り値　:　[SoapAsmxClient] ..... なし
-    //================================
+    //======================================
 
     public SoapAsmxClient(String endpointUrl) {
         this.endpointUrl = endpointUrl;
@@ -37,12 +37,12 @@ public class SoapAsmxClient {
                 .writeTimeout(120, TimeUnit.SECONDS)
                 .build();
     }
-    //===================================
+    //=========================================
     //　機　能　:　callの処理
     //　引　数　:　soapAction ..... String
     //　　　　　:　soapEnvelopeXml ..... String
     //　戻り値　:　[String] ..... なし
-    //===================================
+    //=========================================
 
     public String call(String soapAction, String soapEnvelopeXml) throws IOException {
         RequestBody body = RequestBody.create(soapEnvelopeXml, SOAP_XML);

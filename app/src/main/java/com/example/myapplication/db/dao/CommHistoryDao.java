@@ -12,9 +12,9 @@ import java.util.List;
 
 @Dao
 
-//=========================
+//===============================
 //　処理概要　:　CommHistoryDaoクラス
-//=========================
+//===============================
 
 public interface CommHistoryDao {
 
@@ -23,18 +23,18 @@ public interface CommHistoryDao {
             "ORDER BY " +
             "RENBAN DESC"
     )
-    //=========================================
-    //　機　能　:　find All Descの処理
-    //　引　数　:　なし
-    //　戻り値　:　[List<CommHistoryEntity>] ..... なし
-    //=========================================
+        //===============================================
+        //　機　能　:　find All Descの処理
+        //　引　数　:　なし
+        //　戻り値　:　[List<CommHistoryEntity>] ..... なし
+        //===============================================
     List<CommHistoryEntity> findAllDesc();
 
-    //=====================================
+    //===========================================
     //　機　能　:　upsertの処理
     //　引　数　:　entity ..... CommHistoryEntity
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //===========================================
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(CommHistoryEntity entity);
 
@@ -43,20 +43,20 @@ public interface CommHistoryDao {
             "WHERE " +
             "START_YMDHMS < :threshold"
     )
-    //=============================
-    //　機　能　:　beforeを削除する
-    //　引　数　:　threshold ..... String
-    //　戻り値　:　[void] ..... なし
-    //=============================
+        //===================================
+        //　機　能　:　beforeを削除する
+        //　引　数　:　threshold ..... String
+        //　戻り値　:　[void] ..... なし
+        //===================================
     void deleteBefore(String threshold);
 
     @Query("DELETE FROM " +
             "C_COMM_HISTORY"
     )
-    //======================
-    //　機　能　:　allを削除する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //======================
+        //============================
+        //　機　能　:　allを削除する
+        //　引　数　:　なし
+        //　戻り値　:　[void] ..... なし
+        //============================
     void deleteAll();
 }

@@ -4,16 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-//================
+//======================
 //　処理概要　:　予定エンティティ
-//================
+//======================
 
 
 @Entity(tableName = "T_YOTEI", primaryKeys = {"BOOKING_NO"})
 
-//================
+//======================
 //　処理概要　:　予定エンティティ
-//================
+//======================
 
 public class YoteiEntity {
 

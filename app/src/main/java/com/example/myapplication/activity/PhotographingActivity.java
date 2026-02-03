@@ -40,9 +40,9 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 
-//================================
+//======================================
 //　処理概要　:　PhotographingActivityクラス
-//================================
+//======================================
 
 /**
  * コンテナ/シール撮影用のカメラ画面Activity。
@@ -114,11 +114,11 @@ public class PhotographingActivity extends BaseActivity {
                 }
             });
 
-    //======================================
+    //============================================
     //　機　能　:　画面生成時の初期化処理
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,11 +165,11 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
-    //======================
+    //============================
     //　機　能　:　画面再表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onResume() {
         super.onResume();
@@ -182,11 +182,11 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
-    //======================
+    //============================
     //　機　能　:　cameraを開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @ExperimentalCamera2Interop
     private void startCamera() {
         setStatus("CAM_STARTING");
@@ -251,11 +251,11 @@ public class PhotographingActivity extends BaseActivity {
             }
         }, ContextCompat.getMainExecutor(this));
     }
-    //========================
+    //==============================
     //　機　能　:　restart Cameraの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================
+    //==============================
 
     private void restartCamera() {
         if (cameraProvider != null) {
@@ -263,22 +263,22 @@ public class PhotographingActivity extends BaseActivity {
         }
         startCamera();
     }
-    //===========================
+    //=================================
     //　機　能　:　setting Changesを判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... なし
-    //===========================
+    //=================================
 
     private boolean hasSettingChanges() {
         return lastImageSize != AppSettings.CameraImageSize
                 || lastFlashMode != AppSettings.CameraFlash
                 || lastLightMode != AppSettings.CameraLightMode;
     }
-    //===============================
+    //=====================================
     //　機　能　:　map Target Resolutionの処理
     //　引　数　:　setting ..... int
     //　戻り値　:　[Size] ..... なし
-    //===============================
+    //=====================================
 
     private Size mapTargetResolution(int setting) {
         switch (setting) {
@@ -298,11 +298,11 @@ public class PhotographingActivity extends BaseActivity {
                 return null;
         }
     }
-    //========================
+    //==============================
     //　機　能　:　map Flash Modeの処理
     //　引　数　:　setting ..... int
     //　戻り値　:　[int] ..... なし
-    //========================
+    //==============================
 
     private int mapFlashMode(int setting) {
         switch (setting) {
@@ -316,11 +316,11 @@ public class PhotographingActivity extends BaseActivity {
                 return ImageCapture.FLASH_MODE_AUTO;
         }
     }
-    //=============================
+    //===================================
     //　機　能　:　map Ae Modeの処理
     //　引　数　:　flashSetting ..... int
     //　戻り値　:　[int] ..... なし
-    //=============================
+    //===================================
 
     private int mapAeMode(int flashSetting) {
         switch (flashSetting) {
@@ -333,11 +333,11 @@ public class PhotographingActivity extends BaseActivity {
                 return AE_MODE_AUTO_FLASH;
         }
     }
-    //=============================
+    //===================================
     //　機　能　:　map Awb Modeの処理
     //　引　数　:　lightSetting ..... int
     //　戻り値　:　[int] ..... なし
-    //=============================
+    //===================================
 
     private int mapAwbMode(int lightSetting) {
         switch (lightSetting) {
@@ -354,11 +354,11 @@ public class PhotographingActivity extends BaseActivity {
                 return CaptureRequest.CONTROL_AWB_MODE_AUTO;
         }
     }
-    //======================
+    //============================
     //　機　能　:　take Photoの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void takePhoto() {
         if (imageCapture == null) {
@@ -378,11 +378,11 @@ public class PhotographingActivity extends BaseActivity {
                 output,
                 ContextCompat.getMainExecutor(this),
                 new ImageCapture.OnImageSavedCallback() {
-                    //=============================================================
+                    //===================================================================
                     //　機　能　:　on Image Savedの処理
                     //　引　数　:　outputFileResults ..... ImageCapture.OutputFileResults
                     //　戻り値　:　[void] ..... なし
-                    //=============================================================
+                    //===================================================================
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         pendingPhotoUri = FileProvider.getUriForFile(
@@ -396,11 +396,11 @@ public class PhotographingActivity extends BaseActivity {
                         showCaptureReview(true);
                     }
 
-                    //============================================
+                    //==================================================
                     //　機　能　:　on Errorの処理
                     //　引　数　:　exception ..... ImageCaptureException
                     //　戻り値　:　[void] ..... なし
-                    //============================================
+                    //==================================================
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
                         Log.e(TAG, "photo capture failed", exception);
@@ -409,11 +409,11 @@ public class PhotographingActivity extends BaseActivity {
                 }
         );
     }
-    //======================
+    //============================
     //　機　能　:　captureを保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void saveCapture() {
         if (pendingPhotoUri == null) {
@@ -426,11 +426,11 @@ public class PhotographingActivity extends BaseActivity {
         setResult(RESULT_OK, result);
         finish();
     }
-    //=========================
+    //===============================
     //　機　能　:　discard Captureの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     private void discardCapture() {
         if (pendingPhotoFile != null && pendingPhotoFile.exists()) {
@@ -444,11 +444,11 @@ public class PhotographingActivity extends BaseActivity {
         }
         showCaptureReview(false);
     }
-    //=============================
+    //===================================
     //　機　能　:　show Capture Reviewの処理
     //　引　数　:　show ..... boolean
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //===================================
 
     private void showCaptureReview(boolean show) {
         if (capturedPreview != null) {
@@ -470,23 +470,23 @@ public class PhotographingActivity extends BaseActivity {
             btnDiscard.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
-    //=================================
+    //=======================================
     //　機　能　:　trigger Af Ae At Centerの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================
+    //=======================================
 
     private void triggerAfAeAtCenter() {
         if (camera == null) return;
 
         MeteringPoint point =
-                //=================================================
+                //=======================================================
                 //　機　能　:　Surface Oriented Metering Point Factoryの処理
                 //　引　数　:　1.0f .....
                 //　　　　　:　.createPoint(0.5f ..... 1.0f)
                 //　　　　　:　0.5f .....
                 //　戻り値　:　[new] ..... なし
-                //=================================================
+                //=======================================================
                 new SurfaceOrientedMeteringPointFactory(1.0f, 1.0f)
                         .createPoint(0.5f, 0.5f);
 
@@ -496,11 +496,11 @@ public class PhotographingActivity extends BaseActivity {
 
         camera.getCameraControl().startFocusAndMetering(action);
     }
-    //=======================
+    //=============================
     //　機　能　:　output Fileを取得する
     //　引　数　:　なし
     //　戻り値　:　[File] ..... なし
-    //=======================
+    //=============================
 
     private File getOutputFile() {
         File dir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
@@ -510,11 +510,11 @@ public class PhotographingActivity extends BaseActivity {
         String name = "capture_" + System.currentTimeMillis() + ".jpg";
         return new File(dir, name);
     }
-    //===========================
+    //=================================
     //　機　能　:　statusを設定する
     //　引　数　:　message ..... String
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
 
     private void setStatus(String message) {
         if (statusBar != null) {

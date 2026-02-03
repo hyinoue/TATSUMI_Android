@@ -7,24 +7,24 @@ import com.example.myapplication.model.SyukkaMeisai;
 import com.example.myapplication.time.XmlUtil;
 
 
-//================================
+//======================================
 //　処理概要　:　SendSyukkaSoapBuilderクラス
-//================================
+//======================================
 public class SendSyukkaSoapBuilder {
     private static final String NS = "http://tempuri.org/";
-    //=======================================
+    //=============================================
     //　機　能　:　SendSyukkaSoapBuilderの初期化処理
     //　引　数　:　なし
     //　戻り値　:　[SendSyukkaSoapBuilder] ..... なし
-    //=======================================
+    //=============================================
 
     private SendSyukkaSoapBuilder() {
     }
-    //=============================
+    //===================================
     //　機　能　:　send Syukka Dataを生成する
     //　引　数　:　data ..... BunningData
     //　戻り値　:　[String] ..... なし
-    //=============================
+    //===================================
 
     public static String buildSendSyukkaData(BunningData data) {
         StringBuilder inner = new StringBuilder();

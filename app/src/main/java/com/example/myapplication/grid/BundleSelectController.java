@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 
 
-
 /**
  * C# BundleSelectController を Room で再現（Android/Java版）
  * <p>
@@ -32,9 +31,9 @@ import java.util.Locale;
  * - Normalモード起動時に Work → List 復元
  */
 
-//=================================
+//=======================================
 //　処理概要　:　BundleSelectControllerクラス
-//=================================
+//=======================================
 
 public class BundleSelectController {
 
@@ -51,13 +50,13 @@ public class BundleSelectController {
     private final List<BundleGridRow> displayRows = new ArrayList<>();
 
     private static final int MAX_ROWS = 20;
-    //====================================================
+    //==========================================================
     //　機　能　:　BundleSelectControllerの初期化処理
     //　引　数　:　syukkaMeisaiDao ..... SyukkaMeisaiDao
     //　　　　　:　syukkaMeisaiWorkDao ..... SyukkaMeisaiWorkDao
     //　　　　　:　mode ..... Mode
     //　戻り値　:　[BundleSelectController] ..... なし
-    //====================================================
+    //==========================================================
 
     public BundleSelectController(@NonNull SyukkaMeisaiDao syukkaMeisaiDao,
                                   @NonNull SyukkaMeisaiWorkDao syukkaMeisaiWorkDao,
@@ -84,11 +83,11 @@ public class BundleSelectController {
     /**
      * C#：JyuryoSum
      */
-    //======================
+    //============================
     //　機　能　:　jyuryo Sumを取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... なし
-    //======================
+    //============================
     public int getJyuryoSum() {
         int sum = 0;
         for (BundleInfo b : dataList.values()) sum += b.jyuryo;
@@ -98,11 +97,11 @@ public class BundleSelectController {
     /**
      * RecyclerView表示用
      */
-    //=====================================
+    //===========================================
     //　機　能　:　display Rowsを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<BundleGridRow>] ..... なし
-    //=====================================
+    //===========================================
     @NonNull
     public List<BundleGridRow> getDisplayRows() {
         return Collections.unmodifiableList(displayRows);
@@ -115,7 +114,7 @@ public class BundleSelectController {
     /**
      * @return エラーなしなら ""（C#互換）
      */
-    //===================================
+    //=========================================
     //　機　能　:　check Bundleの処理
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
@@ -123,7 +122,7 @@ public class BundleSelectController {
     //　　　　　:　dunnageJyuryo ..... int
     //　　　　　:　maxContainerJyuryo ..... int
     //　戻り値　:　[String] ..... なし
-    //===================================
+    //=========================================
     @NonNull
     public String checkBundle(@NonNull String heatNo,
                               @NonNull String sokuban,
@@ -175,13 +174,13 @@ public class BundleSelectController {
     // ============================================================
     // C#：AddBundleNo（bundleNo空のものだけ更新）
     // ============================================================
-    //===============================
+    //=====================================
     //　機　能　:　bundle Noを追加する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　　　　　:　bundleNoOrg ..... String
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //=====================================
 
     public void addBundleNo(@NonNull String heatNo,
                             @NonNull String sokuban,
@@ -194,12 +193,12 @@ public class BundleSelectController {
     // ============================================================
     // C#：AddBundle（DB→保持→Work→表示更新）
     // ============================================================
-    //===========================
+    //=================================
     //　機　能　:　bundleを追加する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
 
     public void addBundle(@NonNull String heatNo, @NonNull String sokuban) {
         SyukkaMeisaiEntity e = syukkaMeisaiDao.findOneForAdd(heatNo, sokuban);
@@ -230,11 +229,11 @@ public class BundleSelectController {
     // ============================================================
     // C#：RemoveBundle(row)
     // ============================================================
-    //=========================
+    //===============================
     //　機　能　:　bundleを削除する
     //　引　数　:　rowIndex ..... int
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     public void removeBundle(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= dataList.size()) return;
@@ -254,11 +253,11 @@ public class BundleSelectController {
     // ============================================================
     // C#：DeleteBundles()
     // ============================================================
-    //======================
+    //============================
     //　機　能　:　bundlesを削除する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     public void deleteBundles() {
         while (!dataList.isEmpty()) {
@@ -269,11 +268,11 @@ public class BundleSelectController {
     // ============================================================
     // C#：refreshDataGrid()（表示行生成）
     // ============================================================
-    //========================
+    //==============================
     //　機　能　:　display Rowsを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================
+    //==============================
 
     private void refreshDisplayRows() {
         displayRows.clear();
@@ -294,11 +293,11 @@ public class BundleSelectController {
     // ============================================================
     // C#：readWorkTblToList()
     // ============================================================
-    //===============================
+    //=====================================
     //　機　能　:　read Work Tbl To Listの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //=====================================
 
     private void readWorkTblToList() {
         List<SyukkaMeisaiWorkDao.WorkJoinRow> rows = syukkaMeisaiWorkDao.selectWorkJoined();
@@ -328,11 +327,11 @@ public class BundleSelectController {
     // Workテーブル操作（C# addWorkTable/removeWorkTable）
     // ※ WorkEntityが少カラムなので、heat/sokuban + updateYmd だけで運用
     // ============================================================
-    //============================
+    //==================================
     //　機　能　:　work Tableを追加する
     //　引　数　:　item ..... BundleInfo
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
 
     private void addWorkTable(@NonNull BundleInfo item) {
         SyukkaMeisaiWorkEntity w = new SyukkaMeisaiWorkEntity();
@@ -347,11 +346,11 @@ public class BundleSelectController {
 
         syukkaMeisaiWorkDao.upsert(w);
     }
-    //============================
+    //==================================
     //　機　能　:　work Tableを削除する
     //　引　数　:　item ..... BundleInfo
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
 
     private void removeWorkTable(@NonNull BundleInfo item) {
         syukkaMeisaiWorkDao.deleteOne(item.heatNo, item.sokuban);
@@ -360,21 +359,21 @@ public class BundleSelectController {
     // ============================================================
     // utils
     // ============================================================
-    //===========================
+    //=================================
     //　機　能　:　key Ofの処理
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[String] ..... なし
-    //===========================
+    //=================================
 
     private String keyOf(String heatNo, String sokuban) {
         return safeStr(heatNo) + safeStr(sokuban);
     }
-    //========================
+    //==============================
     //　機　能　:　safe Strの処理
     //　引　数　:　s ..... String
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String safeStr(@Nullable String s) {
         return s == null ? "" : s;
@@ -383,11 +382,11 @@ public class BundleSelectController {
     /**
      * C#：ToInt32(bundleNoOrg).ToString().PadLeft(4,' ') 相当
      */
-    //=============================
+    //===================================
     //　機　能　:　pad Left4 As Spacesの処理
     //　引　数　:　org ..... String
     //　戻り値　:　[String] ..... なし
-    //=============================
+    //===================================
     private String padLeft4AsSpaces(String org) {
         int n = 0;
         try {
@@ -399,12 +398,12 @@ public class BundleSelectController {
         if (s.length() >= 4) return s;
         return repeat(" ", 4 - s.length()) + s;
     }
-    //========================
+    //==============================
     //　機　能　:　repeatの処理
     //　引　数　:　s ..... String
     //　　　　　:　n ..... int
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String repeat(String s, int n) {
         if (n <= 0) return "";
@@ -412,11 +411,11 @@ public class BundleSelectController {
         for (int i = 0; i < n; i++) sb.append(s);
         return sb.toString();
     }
-    //========================
+    //==============================
     //　機　能　:　now As Textの処理
     //　引　数　:　なし
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String nowAsText() {
         return new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT).format(new Date());

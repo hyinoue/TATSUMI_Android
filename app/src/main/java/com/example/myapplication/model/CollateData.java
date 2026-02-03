@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//======================
+//============================
 //　処理概要　:　CollateDataクラス
-//======================
+//============================
 
 public class CollateData {
     public String containerID;     // ★要素名 containerID（先頭小文字）

@@ -8,9 +8,9 @@ import android.util.Log;
 import com.densowave.bhtsdk.barcode.OutputSettings;
 
 
-//============================
+//==================================
 //　処理概要　:　DensoScanReceiverクラス
-//============================
+//==================================
 
 public class DensoScanReceiver extends BroadcastReceiver {
 
@@ -19,12 +19,12 @@ public class DensoScanReceiver extends BroadcastReceiver {
     // Manifestで指定したAction名（SDK側の設定とも一致させる）
     public static final String ACTION_DENSO_SCAN = "com.example.myapplication.DENSO_SCAN";
 
-    //============================
+    //==================================
     //　機　能　:　受信時の処理
     //　引　数　:　context ..... Context
     //　　　　　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent == null) return;
@@ -48,11 +48,11 @@ public class DensoScanReceiver extends BroadcastReceiver {
         i.putExtra(ImagerTestActivityBridge.EXTRA_INTERNAL_DATA, data);
         context.sendBroadcast(i);
     }
-    //========================
+    //==============================
     //　機　能　:　normalizeの処理
     //　引　数　:　s ..... String
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String normalize(String s) {
         if (s == null) return "";

@@ -45,9 +45,9 @@ import java.util.List;
 import java.util.Locale;
 
 
-//===================
+//=========================
 //　処理概要　:　DataSyncクラス
-//===================
+//=========================
 
 public class DataSync {
     private static final String TAG = "DataSync";
@@ -64,12 +64,12 @@ public class DataSync {
     private final SystemDao systemDao;
     private final File imageDir;
     private final SimpleDateFormat dbDateFormat =
-            //==================================
+            //========================================
             //　機　能　:　Simple Date Formatの処理
             //　引　数　:　HH:mm:ss" ..... "yyyy-MM-dd
             //　　　　　:　Locale.JAPAN .....
             //　戻り値　:　[new] ..... なし
-            //==================================
+            //========================================
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN);
 
     public enum ImageType {
@@ -81,32 +81,32 @@ public class DataSync {
         ImageType(String suffix) {
             this.suffix = suffix;
         }
-        //========================
+        //==============================
         //　機　能　:　suffixを取得する
         //　引　数　:　なし
         //　戻り値　:　[String] ..... なし
-        //========================
+        //==============================
 
         public String getSuffix() {
             return suffix;
         }
     }
-    //============================
+    //==================================
     //　機　能　:　DataSyncの初期化処理
     //　引　数　:　context ..... Context
     //　戻り値　:　[DataSync] ..... なし
-    //============================
+    //==================================
 
     public DataSync(Context context) {
         this(context, AppDatabase.getInstance(context), new SvcHandyWrapper());
     }
-    //=======================================
+    //=============================================
     //　機　能　:　DataSyncの初期化処理
     //　引　数　:　context ..... Context
     //　　　　　:　db ..... AppDatabase
     //　　　　　:　svcWrapper ..... SvcHandyWrapper
     //　戻り値　:　[DataSync] ..... なし
-    //=======================================
+    //=============================================
 
     public DataSync(Context context, AppDatabase db, SvcHandyWrapper svcWrapper) {
         this.db = db;
@@ -120,30 +120,30 @@ public class DataSync {
         this.systemDao = db.systemDao();
         this.imageDir = resolveImageDir(context);
     }
-    //=======================
+    //=============================
     //　機　能　:　syukka Onlyを送信する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     public void sendSyukkaOnly() throws Exception {
         Date sagyouYmd = sagyouYotei();
         dataSousinAll(sagyouYmd);
     }
-    //=======================
+    //=============================
     //　機　能　:　syougo Onlyを送信する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     public void sendSyougoOnly() {
         dataSousinSyougo();
     }
-    //======================
+    //============================
     //　機　能　:　run Syncの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     public void runSync() throws Exception {
         try {
@@ -161,11 +161,11 @@ public class DataSync {
             throw ex;
         }
     }
-    //======================
+    //============================
     //　機　能　:　sagyou Yoteiの処理
     //　引　数　:　なし
     //　戻り値　:　[Date] ..... なし
-    //======================
+    //============================
 
     private Date sagyouYotei() throws Exception {
         YoteiEntity existing = yoteiDao.findFirst();
@@ -182,22 +182,22 @@ public class DataSync {
         }
         return sagyouYmd;
     }
-    //======================
+    //============================
     //　機　能　:　history Delの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void historyDel() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, -1);
         commHistoryDao.deleteBefore(formatDbDate(cal.getTime()));
     }
-    //===========================
+    //=================================
     //　機　能　:　data Sousin Allの処理
     //　引　数　:　sagyouYmd ..... Date
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
 
     private void dataSousinAll(Date sagyouYmd) {
         List<SyukkaContainerEntity> containers = syukkaContainerDao.findUnsent();
@@ -207,12 +207,12 @@ public class DataSync {
             }
         }
     }
-    //============================================
+    //==================================================
     //　機　能　:　data Sousin Onceの処理
     //　引　数　:　container ..... SyukkaContainerEntity
     //　　　　　:　sagyouYmd ..... Date
     //　戻り値　:　[boolean] ..... なし
-    //============================================
+    //==================================================
 
     private boolean dataSousinOnce(SyukkaContainerEntity container, Date sagyouYmd) {
         try {
@@ -292,11 +292,11 @@ public class DataSync {
             return false;
         }
     }
-    //===============================
+    //=====================================
     //　機　能　:　container Noを整形する
     //　引　数　:　containerNo ..... String
     //　戻り値　:　[String] ..... なし
-    //===============================
+    //=====================================
 
     private String formatContainerNo(String containerNo) {
         if (containerNo == null || containerNo.trim().isEmpty()) {
@@ -304,11 +304,11 @@ public class DataSync {
         }
         return containerNo.trim();
     }
-    //============================
+    //==================================
     //　機　能　:　data Sousin Syougoの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
 
     private void dataSousinSyougo() {
         List<KakuninContainerEntity> containers = kakuninContainerDao.findUnsentCompleted();
@@ -318,11 +318,11 @@ public class DataSync {
             }
         }
     }
-    //=============================================
+    //===================================================
     //　機　能　:　data Sousin Syougo Onceの処理
     //　引　数　:　container ..... KakuninContainerEntity
     //　戻り値　:　[boolean] ..... なし
-    //=============================================
+    //===================================================
 
     private boolean dataSousinSyougoOnce(KakuninContainerEntity container) {
         try {
@@ -352,11 +352,11 @@ public class DataSync {
             return false;
         }
     }
-    //===========================
+    //=================================
     //　機　能　:　data Updateの処理
     //　引　数　:　sagyouYmd ..... Date
     //　戻り値　:　[void] ..... なし
-    //===========================
+    //=================================
 
     private void dataUpdate(Date sagyouYmd) {
         List<YoteiEntity> candidates = yoteiDao.findWithNullLastUpd();
@@ -391,11 +391,11 @@ public class DataSync {
             systemDao.upsert(system);
         }
     }
-    //=============================
+    //===================================
     //　機　能　:　receive Syukka Dataの処理
     //　引　数　:　sagyouYmd ..... Date
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //===================================
 
     private void receiveSyukkaData(Date sagyouYmd) throws Exception {
 
@@ -461,11 +461,11 @@ public class DataSync {
             }
         });
     }
-    //=============================
+    //===================================
     //　機　能　:　receive Syougo Dataの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //===================================
 
     private void receiveSyougoData() throws Exception {
         SyougoData data = svcWrapper.getSyougoData();
@@ -510,12 +510,12 @@ public class DataSync {
             }
         });
     }
-    //==============================
+    //====================================
     //　機　能　:　pictureを取得する
     //　引　数　:　containerId ..... int
     //　　　　　:　imgType ..... ImageType
     //　戻り値　:　[byte[]] ..... なし
-    //==============================
+    //====================================
 
     private byte[] getPicture(int containerId, ImageType imgType) {
         File file = getImageFile(containerId, imgType);
@@ -530,14 +530,14 @@ public class DataSync {
             return null;
         }
     }
-    //==================================
+    //========================================
     //　機　能　:　downscale Jpeg If Neededの処理
     //　引　数　:　file ..... File
     //　　　　　:　maxBytes ..... int
     //　　　　　:　maxEdge ..... int
     //　　　　　:　startQuality ..... int
     //　戻り値　:　[byte[]] ..... なし
-    //==================================
+    //========================================
 
     private byte[] downscaleJpegIfNeeded(File file, int maxBytes, int maxEdge, int startQuality)
             throws IOException {
@@ -588,11 +588,11 @@ public class DataSync {
         rotated.recycle();
         return out;
     }
-    //============================
+    //==================================
     //　機　能　:　read Exif Rotationの処理
     //　引　数　:　file ..... File
     //　戻り値　:　[int] ..... なし
-    //============================
+    //==================================
 
     private int readExifRotation(File file) {
         try {
@@ -615,12 +615,12 @@ public class DataSync {
         }
         return 0;
     }
-    //=================================
+    //=======================================
     //　機　能　:　rotate Bitmap If Neededの処理
     //　引　数　:　bitmap ..... Bitmap
     //　　　　　:　degrees ..... int
     //　戻り値　:　[Bitmap] ..... なし
-    //=================================
+    //=======================================
 
     private Bitmap rotateBitmapIfNeeded(Bitmap bitmap, int degrees) {
         if (degrees == 0) {
@@ -642,13 +642,13 @@ public class DataSync {
         }
         return rotated;
     }
-    //=============================
+    //===================================
     //　機　能　:　compress Bitmapの処理
     //　引　数　:　bitmap ..... Bitmap
     //　　　　　:　maxBytes ..... int
     //　　　　　:　startQuality ..... int
     //　戻り値　:　[byte[]] ..... なし
-    //=============================
+    //===================================
 
     private byte[] compressBitmap(Bitmap bitmap, int maxBytes, int startQuality) {
         int quality = startQuality;
@@ -664,12 +664,12 @@ public class DataSync {
         }
         return out;
     }
-    //==============================
+    //====================================
     //　機　能　:　pictureを削除する
     //　引　数　:　containerId ..... int
     //　　　　　:　imgType ..... ImageType
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //====================================
 
     private void deletePicture(int containerId, ImageType imgType) {
         File file = getImageFile(containerId, imgType);
@@ -677,12 +677,12 @@ public class DataSync {
             Log.w(TAG, "Image delete failed: " + file.getAbsolutePath());
         }
     }
-    //==============================
+    //====================================
     //　機　能　:　image Fileを取得する
     //　引　数　:　containerId ..... int
     //　　　　　:　imgType ..... ImageType
     //　戻り値　:　[File] ..... なし
-    //==============================
+    //====================================
 
     private File getImageFile(int containerId, ImageType imgType) {
         if (imageDir == null) {
@@ -691,11 +691,11 @@ public class DataSync {
         String name = "container_" + containerId + "_" + imgType.getSuffix() + ".jpg";
         return new File(imageDir, name);
     }
-    //============================
+    //==================================
     //　機　能　:　resolve Image Dirの処理
     //　引　数　:　context ..... Context
     //　戻り値　:　[File] ..... なし
-    //============================
+    //==================================
 
     private File resolveImageDir(Context context) {
         File external = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -704,11 +704,11 @@ public class DataSync {
         }
         return context.getFilesDir();
     }
-    //========================
+    //==============================
     //　機　能　:　db Dateを整形する
     //　引　数　:　date ..... Date
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String formatDbDate(Date date) {
         if (date == null) {
@@ -716,11 +716,11 @@ public class DataSync {
         }
         return dbDateFormat.format(date);
     }
-    //=========================
+    //===============================
     //　機　能　:　db Dateを解析する
     //　引　数　:　value ..... String
     //　戻り値　:　[Date] ..... なし
-    //=========================
+    //===============================
 
     private Date parseDbDate(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -736,21 +736,21 @@ public class DataSync {
             return null;
         }
     }
-    //==========================
+    //================================
     //　機　能　:　db Date Or Minを解析する
     //　引　数　:　value ..... String
     //　戻り値　:　[Date] ..... なし
-    //==========================
+    //================================
 
     private Date parseDbDateOrMin(String value) {
         Date parsed = parseDbDate(value);
         return parsed != null ? parsed : new Date(0);
     }
-    //==========================
+    //================================
     //　機　能　:　int Or Zeroの処理
     //　引　数　:　value ..... Integer
     //　戻り値　:　[int] ..... なし
-    //==========================
+    //================================
 
     private int intOrZero(Integer value) {
         return value == null ? 0 : value;

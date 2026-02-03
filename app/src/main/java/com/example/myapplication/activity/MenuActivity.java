@@ -44,11 +44,11 @@ import java.util.concurrent.Executors;
  */
 public class MenuActivity extends BaseActivity {
 
-    //=================================================
+    //=======================================================
     //　処理概要　:　メインメニュー画面
     //　備　　考　:　積載束選定（Normal確定時）は BundleSelectActivity 側で
     //　　　　　　:　ContainerInputActivity に直接遷移する（メニュー経由しない）
-    //=================================================
+    //=======================================================
 
     private static final String TAG = "MENU";
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
@@ -89,11 +89,11 @@ public class MenuActivity extends BaseActivity {
     private TextView lblZanBundle;
     private TextView lblZanWeight;
 
-    //======================================
+    //============================================
     //　機　能　:　画面生成時の初期化処理
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,11 +122,11 @@ public class MenuActivity extends BaseActivity {
 
         refreshInformation();
     }
-    //==============================
+    //====================================
     //　機　能　:　activity Launchersを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //====================================
 
     private void setupActivityLaunchers() {
         bundleSelectLauncher = registerForActivityResult(
@@ -186,11 +186,11 @@ public class MenuActivity extends BaseActivity {
                 }
         );
     }
-    //======================
+    //============================
     //　機　能　:　viewsを初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void initViews() {
         spContainerSize = findViewById(R.id.spContainerSize);
@@ -214,11 +214,11 @@ public class MenuActivity extends BaseActivity {
         lblZanBundle = findViewById(R.id.lblZanBundle);
         lblZanWeight = findViewById(R.id.lblZanWeight);
     }
-    //==================================
+    //========================================
     //　機　能　:　container Size Spinnerを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //========================================
 
     private void setupContainerSizeSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -238,36 +238,36 @@ public class MenuActivity extends BaseActivity {
 
         // 変更されたら保存
         spContainerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            //==================================
+            //========================================
             //　機　能　:　on Item Selectedの処理
             //　引　数　:　parent ..... AdapterView<?>
             //　　　　　:　view ..... View
             //　　　　　:　position ..... int
             //　　　　　:　id ..... long
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selected = parent.getItemAtPosition(position).toString();
                 prefs.edit().putString("container_size", selected).apply();
             }
 
-            //==================================
+            //========================================
             //　機　能　:　on Nothing Selectedの処理
             //　引　数　:　parent ..... AdapterView<?>
             //　戻り値　:　[void] ..... なし
-            //==================================
+            //========================================
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
 
-    //===============================
+    //=====================================
     //　機　能　:　bottom Button Textsを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //=====================================
     private void setupBottomButtonTexts() {
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
         MaterialButton red = findViewById(R.id.btnBottomRed);
@@ -284,11 +284,11 @@ public class MenuActivity extends BaseActivity {
         // 空文字は無効＋薄く（BaseActivity機能）
         refreshBottomButtonsEnabled();
     }
-    //======================
+    //============================
     //　機　能　:　wire Actionsの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void wireActions() {
 
@@ -302,20 +302,20 @@ public class MenuActivity extends BaseActivity {
         btnCollateContainerSelect.setOnClickListener(v -> openCollateContainerSelect());
     }
 
-    //============================
+    //==================================
     //　機　能　:　on Function Yellowの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================
     @Override
     protected void onFunctionYellow() {
         onRestartMenu();
     }
-    //=========================
+    //===============================
     //　機　能　:　on Restart Menuの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     private void onRestartMenu() {
         if (BuildConfig.DEBUG) {
@@ -327,11 +327,11 @@ public class MenuActivity extends BaseActivity {
             restartApp();
         });
     }
-    //======================
+    //============================
     //　機　能　:　restart Appの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void restartApp() {
         Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
@@ -344,31 +344,31 @@ public class MenuActivity extends BaseActivity {
         finish();
     }
 
-    //======================
+    //============================
     //　機　能　:　画面再表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
     @Override
     protected void onResume() {
         super.onResume();
         syncContainerWeightsFromPrefs();
         refreshInformation();
     }
-    //=========================
+    //===============================
     //　機　能　:　go Service Menuの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     private void goServiceMenu() {
         startActivity(new Intent(this, ServiceMenuActivity.class));
     }
-    //========================
+    //==============================
     //　機　能　:　bundle Selectを開く
     //　引　数　:　mode ..... String
     //　戻り値　:　[void] ..... なし
-    //========================
+    //==============================
 
     private void openBundleSelect(String mode) {
         Intent intent = new Intent(this, BundleSelectActivity.class);
@@ -382,11 +382,11 @@ public class MenuActivity extends BaseActivity {
             startActivity(intent);
         }
     }
-    //========================================
+    //==============================================
     //　機　能　:　container Values From Bundleを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //==============================================
 
     private void syncContainerValuesFromBundle() {
         if (bundleValues.containsKey(KEY_CONTAINER_JYURYO)) {
@@ -400,11 +400,11 @@ public class MenuActivity extends BaseActivity {
             containerValues.remove(KEY_DUNNAGE_JYURYO);
         }
     }
-    //========================================
+    //==============================================
     //　機　能　:　bundle Values From Containerを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //==============================================
 
     private void syncBundleValuesFromContainer() {
         String container = containerValues.get(KEY_CONTAINER_JYURYO);
@@ -416,11 +416,11 @@ public class MenuActivity extends BaseActivity {
             bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
         }
     }
-    //========================================
+    //==============================================
     //　機　能　:　container Weights From Prefsを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //==============================================
 
     private void syncContainerWeightsFromPrefs() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
@@ -435,11 +435,11 @@ public class MenuActivity extends BaseActivity {
             bundleValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
         }
     }
-    //========================================
+    //==============================================
     //　機　能　:　container Input If Work Existsを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //==============================================
 
     private void openContainerInputIfWorkExists() {
         io.execute(() -> {
@@ -462,22 +462,22 @@ public class MenuActivity extends BaseActivity {
             });
         });
     }
-    //==================================
+    //========================================
     //　機　能　:　collate Container Selectを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //========================================
 
     private void openCollateContainerSelect() {
         startActivity(new Intent(this, CollateContainerSelectActivity.class));
     }
 
-    //===========================
+    //=================================
     //　機　能　:　キー押下時の処理
     //　引　数　:　keyCode ..... int
     //　　　　　:　event ..... KeyEvent
     //　戻り値　:　[boolean] ..... なし
-    //===========================
+    //=================================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -512,30 +512,30 @@ public class MenuActivity extends BaseActivity {
 
         return super.onKeyDown(keyCode, event);
     }
-    //=========================
+    //===============================
     //　機　能　:　center Statusを設定する
     //　引　数　:　text ..... String
     //　戻り値　:　[void] ..... なし
-    //=========================
+    //===============================
 
     private void setCenterStatus(String text) {
         if (tvCenterStatus != null) tvCenterStatus.setText(text);
     }
-    //======================
+    //============================
     //　機　能　:　data Syncを開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================
+    //============================
 
     private void startDataSync() {
         setCenterStatus("データ送受信中...");
         io.execute(this::runDataSync);
     }
-    //=======================
+    //=============================
     //　機　能　:　run Data Syncの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     private void runDataSync() {
         showLoadingLong();
@@ -555,11 +555,11 @@ public class MenuActivity extends BaseActivity {
             hideLoadingLong();
         }
     }
-    //=======================
+    //=============================
     //　機　能　:　informationを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=======================
+    //=============================
 
     private void refreshInformation() {
         io.execute(() -> {
@@ -647,20 +647,20 @@ public class MenuActivity extends BaseActivity {
             });
         });
     }
-    //==========================
+    //================================
     //　機　能　:　int Or Zeroの処理
     //　引　数　:　value ..... Integer
     //　戻り値　:　[long] ..... なし
-    //==========================
+    //================================
 
     private long intOrZero(Integer value) {
         return value == null ? 0 : value;
     }
-    //========================
+    //==============================
     //　機　能　:　numberを整形する
     //　引　数　:　value ..... long
     //　戻り値　:　[String] ..... なし
-    //========================
+    //==============================
 
     private String formatNumber(long value) {
         return String.format(Locale.JAPAN, "%,d", value);
