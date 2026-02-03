@@ -16,6 +16,16 @@ import com.example.myapplication.db.entity.SystemEntity;
 
 public interface SystemDao {
 
+    @Insert
+    void insert(SystemEntity entity);
+
+    @Query("SELECT * FROM " +
+            "M_SYSTEM " +
+            "WHERE " +
+            "RENBAN = 1"
+    )
+    SystemEntity get();
+    
     @Query("SELECT * FROM " +
             "M_SYSTEM " +
             "WHERE " +

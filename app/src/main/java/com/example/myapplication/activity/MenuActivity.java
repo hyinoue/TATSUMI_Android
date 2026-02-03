@@ -94,17 +94,9 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // ★ DB生成確認用（一時コード）
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-
-        // ★ DB生成確認用：バックグラウンドで1回だけ呼ぶ
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                db.yoteiDao().findAll();
-            } catch (Exception e) {
-                e.printStackTrace(); // Logcatに出やすくする
-            }
-        });
+        // ★ 初回起動でDBが無ければここで作成される（onCreateコールバックが走る）
+        // ★ 既にDBがあれば普通にOPENされるだけ
+        AppDatabase.getInstance(getApplicationContext());
 
         io = Executors.newSingleThreadExecutor();
 
