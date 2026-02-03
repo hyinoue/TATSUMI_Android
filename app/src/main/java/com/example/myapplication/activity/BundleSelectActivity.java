@@ -211,6 +211,7 @@ public class BundleSelectActivity extends BaseActivity {
     //　機　能　:　Controller初期化＋初期重量読み込み＋テーブル表示
     //============================================================
     private void initControllerAndDefaults() {
+        showLoadingShort();
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         io.execute(() -> {
             try {
@@ -267,9 +268,13 @@ public class BundleSelectActivity extends BaseActivity {
                     refreshRows();
                     updateFooter();
                     if (etGenpinNo != null) etGenpinNo.requestFocus();
+                    hideLoadingShort();
                 });
             } catch (Exception ex) {
-                runOnUiThread(() -> errorProcess("BundleSelect initControllerAndDefaults", ex));
+                runOnUiThread(() -> {
+                    hideLoadingShort();
+                    errorProcess("BundleSelect initControllerAndDefaults", ex);
+                });
             }
         });
     }

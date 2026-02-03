@@ -46,11 +46,7 @@ public class ImagerTestActivity extends BaseActivity {
         svKindContent = findViewById(R.id.scrollKind);
         tvKindContent = findViewById(R.id.tvKindContent);
 
-        MaterialButton btnYellow = findViewById(R.id.btnBottomYellow);
-        if (btnYellow != null) {
-            btnYellow.setText("終了");
-            btnYellow.setOnClickListener(v -> finish());
-        }
+        setupBottomButtons();
 
         // 入力欄（フォーカス固定・キーボード抑止）
         if (etBarcode != null) {
@@ -102,6 +98,26 @@ public class ImagerTestActivity extends BaseActivity {
 
         // Manager生成開始
         scanner.onCreate();
+    }
+
+    private void setupBottomButtons() {
+        bindBottomButtonsIfExists();
+        MaterialButton yellow = findViewById(R.id.btnBottomYellow);
+        if (yellow != null) {
+            yellow.setText("終了");
+        }
+        MaterialButton blue = findViewById(R.id.btnBottomBlue);
+        MaterialButton red = findViewById(R.id.btnBottomRed);
+        MaterialButton green = findViewById(R.id.btnBottomGreen);
+        if (blue != null) blue.setText("");
+        if (red != null) red.setText("");
+        if (green != null) green.setText("");
+        refreshBottomButtonsEnabled();
+    }
+
+    @Override
+    protected void onFunctionYellow() {
+        finish();
     }
 
     @Override

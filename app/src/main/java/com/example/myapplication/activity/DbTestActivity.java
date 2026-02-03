@@ -210,7 +210,7 @@ public class DbTestActivity extends BaseActivity {
         bindBottomButtonsIfExists();
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
         if (yellow != null) {
-            yellow.setText("戻る");
+            yellow.setText("終了");
         }
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
         MaterialButton red = findViewById(R.id.btnBottomRed);

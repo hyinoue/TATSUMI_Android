@@ -25,6 +25,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.myapplication.R;
+import com.example.myapplication.settings.AppSettings;
+import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -107,6 +109,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppSettings.init(this);
+        AppSettings.load();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         applyFullScreen();
     }
@@ -350,7 +354,7 @@ public class BaseActivity extends AppCompatActivity {
         uiHandler.removeCallbacks(systemUiKeepHiddenRunnable);
         systemUiKeepHiddenRunnable = null;
     }
-    
+
 
     // ===== frmBase: ErrorProcess 相当 =====
 
@@ -377,15 +381,27 @@ public class BaseActivity extends AppCompatActivity {
     public void showErrorMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        if (mode == MsgDispMode.MsgBox) showDialog("エラー", msg);
-        else showBanner(msg, BannerType.ERROR);
+        if (mode == MsgDispMode.MsgBox) {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this);
+            showDialog("エラー", msg);
+        } else {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this, 1);
+            showBanner(msg, BannerType.ERROR);
+        }
     }
 
     public void showWarningMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        if (mode == MsgDispMode.MsgBox) showDialog("警告", msg);
-        else showBanner(msg, BannerType.WARNING);
+        HandyUtil.playErrorBuzzer(this);
+        HandyUtil.playVibrater(this);
+        if (mode == MsgDispMode.MsgBox) {
+            showDialog("警告", msg);
+        } else {
+            showBanner(msg, BannerType.WARNING);
+        }
     }
 
     public void showInfoMsg(String msg, MsgDispMode mode) {
@@ -394,6 +410,8 @@ public class BaseActivity extends AppCompatActivity {
             hideLoadingShort();
             showDialog("情報", msg);
         } else {
+            HandyUtil.playSuccessBuzzer(this);
+            HandyUtil.playVibrater(this);
             showBanner(msg, BannerType.INFO);
         }
     }
