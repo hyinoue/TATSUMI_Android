@@ -39,6 +39,12 @@ import com.google.android.material.button.MaterialButton;
  * (1) WindowInsetsControllerCompat を中心に hide
  * (2) insetsで「barsがvisible」になった瞬間を検知→即hideを複数回
  * (3) IMEアニメ中も onProgress でhideを当て続ける
+ *
+ * このクラスは共通UI処理の集約点として使い、各Activityは必要なところだけオーバーライドする。
+ * - setContentView後のフルスクリーン適用とボタンバインドを自動実行
+ * - F1〜F4/画面下ボタンの入力を onFunctionXxx に一本化
+ * - バナー/Waitオーバーレイ表示のための共通APIを提供
+ * - 画面横断で使うユーティリティ（バージョン表示、フォーカス制御等）を保持
  */
 
 //============================================================

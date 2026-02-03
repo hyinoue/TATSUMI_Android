@@ -36,6 +36,22 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 積載束の選択および重量計算を行う画面Activity。
+ *
+ * <p>選択モードにより UI と遷移が変化する。</p>
+ * <ul>
+ *     <li>{@link #MODE_NORMAL}: 積載束の確定 → ContainerInputActivity へ直接遷移。</li>
+ *     <li>{@link #MODE_JYURYO}: 重量計算のみ実行。</li>
+ * </ul>
+ *
+ * <p>主な処理フロー:</p>
+ * <ul>
+ *     <li>初期値/前画面から渡された値を読み込みUIに反映。</li>
+ *     <li>スキャナ入力を受けて行を選択/解除し、重量・残量を計算。</li>
+ *     <li>確定時は選択結果を返却し、必要に応じて次画面へ遷移。</li>
+ * </ul>
+ */
 public class BundleSelectActivity extends BaseActivity {
 
     //============================================================
@@ -171,13 +187,16 @@ public class BundleSelectActivity extends BaseActivity {
     //　機　能　:　入力イベント設定（重量変更/現品入力）
     //============================================================
     private void setupInputHandlers() {
+        // 重量入力が変わったら即時に再計算するため、監視を付ける
         if (etContainerKg != null) etContainerKg.addTextChangedListener(weightWatcher);
         if (etDunnageKg != null) etDunnageKg.addTextChangedListener(weightWatcher);
 
         if (etGenpinNo != null) {
+            // キーボードは出さず、スキャナ入力を前提にする
             etGenpinNo.setShowSoftInputOnFocus(false);
             etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+                    // Enter相当で現品入力を確定させる
                     handleGenpinInput(v.getText() != null ? v.getText().toString() : "");
                     return true;
                 }
@@ -185,6 +204,7 @@ public class BundleSelectActivity extends BaseActivity {
             });
             etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                    // 物理Enterキーにも対応
                     handleGenpinInput(etGenpinNo.getText() != null ? etGenpinNo.getText().toString() : "");
                     return true;
                 }
@@ -200,6 +220,7 @@ public class BundleSelectActivity extends BaseActivity {
         scanner = new DensoScannerController(this, new OnScanListener() {
             @Override
             public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
+                // スキャン結果を入力欄に反映して同じ処理経路へ流す
                 if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
                 handleGenpinInput(normalizedData);
             }

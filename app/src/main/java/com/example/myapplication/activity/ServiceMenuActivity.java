@@ -33,6 +33,14 @@ import java.util.concurrent.Executors;
 //　処理概要　:　ServiceMenuActivityクラス
 //============================================================
 
+/**
+ * サービスメニュー画面Activity。
+ *
+ * <p>保守/診断向けの機能への入口をまとめた画面で、
+ * DB確認、データクリア、通信/バーコードテストなどを提供する。</p>
+ *
+ * <p>アクセス制限が必要な機能はパスワード確認を通して遷移する。</p>
+ */
 public class ServiceMenuActivity extends BaseActivity {
 
     private static final int SYSTEM_RENBAN = 1;

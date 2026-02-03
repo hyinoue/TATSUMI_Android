@@ -10,6 +10,12 @@ import com.google.android.material.button.MaterialButton;
 //　処理概要　:　ServerSettingActivityクラス
 //============================================================
 
+/**
+ * サーバ設定画面Activity。
+ *
+ * <p>現状は設定UI表示と終了ボタンのみを扱う。</p>
+ * <p>将来的なサーバ接続先/同期設定の入力画面として拡張される前提。</p>
+ */
 public class ServerSettingActivity extends BaseActivity {
 
     @Override
