@@ -18,18 +18,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.myapplication.R;
-import com.example.myapplication.settings.AppSettings;
-import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
-
-import java.util.List;
 
 
 /**
@@ -89,28 +81,9 @@ public class BaseActivity extends AppCompatActivity {
     private MaterialButton btnBottomYellow;
     private boolean bottomButtonsBound = false;
 
-    // System UI制御
-    private boolean systemUiListenersAttached = false;
-    private boolean systemUiLayoutListenerAttached = false;
-    private boolean systemUiInsetsAnimationListenerAttached = false;
-
-    private static final int SYSTEM_UI_HIDE_RETRY_COUNT = 5;          // ←少し増やす（出っぱなし対策）
-    private static final int SYSTEM_UI_HIDE_RETRY_DELAY_MS = 120;
-    private static final int SYSTEM_UI_HIDE_LOOP_DELAY_MS = 400;      // ←少し短く（出っぱなし対策）
-
-    private Runnable systemUiHideRunnable;
-    private int systemUiHideRetryCount = 0;
-
-    private Runnable systemUiKeepHiddenRunnable;
-
-    // EditText focus 対策（多重アタッチ防止）
-    private boolean editTextFocusHookAttached = false;
-
     @Override
     protected void onCreate(@Nullable android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppSettings.init(this);
-        AppSettings.load();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         applyFullScreen();
     }
@@ -119,12 +92,10 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         applyFullScreen();
-        startSystemUiHideLoop();
     }
 
     @Override
     protected void onPause() {
-        stopSystemUiHideLoop();
         super.onPause();
     }
 
@@ -156,14 +127,12 @@ public class BaseActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             applyFullScreen();
-            scheduleHideSystemBars(getWindow().getDecorView());
         }
     }
 
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-        scheduleHideSystemBars(getWindow().getDecorView());
     }
 
     // ===== Full screen =====
@@ -172,18 +141,15 @@ public class BaseActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
         // Edge-to-edge（InsetsControllerで制御）
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         View decorView = getWindow().getDecorView();
-        applyImmersiveFlags(decorView);  // 旧フラグ（OEM保険）
-        hideSystemBars(decorView);       // 新方式中心
-        ensureSystemUiListeners(decorView);
+        applyImmersiveFlags(decorView);
     }
 
     /**
-     * 旧方式（OEM端末の保険）
+     * ナビゲーションバー非表示
      */
     private void applyImmersiveFlags(View decorView) {
         decorView.setSystemUiVisibility(
@@ -196,165 +162,6 @@ public class BaseActivity extends AppCompatActivity {
         );
     }
 
-    private void ensureSystemUiListeners(View decorView) {
-        if (systemUiListenersAttached) return;
-
-        // 旧コールバック：表示されたら隠す（保険）
-        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
-            if ((visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0
-                    || (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                scheduleHideSystemBars(decorView);
-            }
-        });
-
-        // ★重要：insetsが来たときに「bars visible」を検知して即hide
-        ViewCompat.setOnApplyWindowInsetsListener(decorView, (view, insets) -> {
-            boolean barsVisible =
-                    insets.isVisible(WindowInsetsCompat.Type.navigationBars())
-                            || insets.isVisible(WindowInsetsCompat.Type.statusBars());
-
-            if (barsVisible) {
-                // ここで「出っぱなし」になるので、即座に複数回叩く
-                forceHideNowAndSoon(decorView);
-            }
-
-            // 通常の保険
-            scheduleHideSystemBars(decorView);
-
-            // ★insetsは改造しない（改造するとOEMで出っぱなしが悪化する例がある）
-            return insets;
-        });
-
-        // レイアウト変化でも隠す（IME表示時など）
-        if (!systemUiLayoutListenerAttached) {
-            decorView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                scheduleHideSystemBars(decorView);
-            });
-            systemUiLayoutListenerAttached = true;
-        }
-
-        // ★IMEアニメ中にも毎フレームhide（Android 13で効果大）
-        if (!systemUiInsetsAnimationListenerAttached) {
-            ViewCompat.setWindowInsetsAnimationCallback(
-                    decorView,
-                    new WindowInsetsAnimationCompat.Callback(
-                            WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
-                    ) {
-                        @Override
-                        public WindowInsetsAnimationCompat.BoundsCompat onStart(
-                                WindowInsetsAnimationCompat animation,
-                                WindowInsetsAnimationCompat.BoundsCompat bounds
-                        ) {
-                            hideSystemBars(decorView);
-                            return bounds;
-                        }
-
-                        @Override
-                        public WindowInsetsCompat onProgress(
-                                WindowInsetsCompat insets,
-                                List<WindowInsetsAnimationCompat> runningAnimations
-                        ) {
-                            hideSystemBars(decorView);
-                            return insets;
-                        }
-
-                        @Override
-                        public void onEnd(WindowInsetsAnimationCompat animation) {
-                            forceHideNowAndSoon(decorView);
-                            scheduleHideSystemBars(decorView);
-                        }
-                    }
-            );
-            systemUiInsetsAnimationListenerAttached = true;
-        }
-
-        systemUiListenersAttached = true;
-    }
-
-    /**
-     * Android 13対策：hideを強化（InsetsController中心＋旧フラグ保険）
-     */
-    private void hideSystemBars(View decorView) {
-        applyImmersiveFlags(decorView); // OEM保険
-
-        WindowInsetsControllerCompat controller =
-                WindowCompat.getInsetsController(getWindow(), decorView);
-        if (controller != null) {
-            controller.setSystemBarsBehavior(
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            );
-
-            // 明示的に分けて隠す（端末依存で systemBars() だけだと効かないことがある）
-            controller.hide(WindowInsetsCompat.Type.statusBars());
-            controller.hide(WindowInsetsCompat.Type.navigationBars());
-        }
-    }
-
-    /**
-     * 「出たら出っぱなし」を潰す：今すぐ＋少し後にも数回hide
-     */
-    private void forceHideNowAndSoon(View decorView) {
-        uiHandler.post(() -> {
-            applyImmersiveFlags(decorView);
-            hideSystemBars(decorView);
-        });
-        uiHandler.postDelayed(() -> {
-            applyImmersiveFlags(decorView);
-            hideSystemBars(decorView);
-        }, 60);
-        uiHandler.postDelayed(() -> {
-            applyImmersiveFlags(decorView);
-            hideSystemBars(decorView);
-        }, 160);
-        uiHandler.postDelayed(() -> {
-            applyImmersiveFlags(decorView);
-            hideSystemBars(decorView);
-        }, 320);
-    }
-
-    private void scheduleHideSystemBars(View decorView) {
-        if (systemUiHideRunnable != null) {
-            uiHandler.removeCallbacks(systemUiHideRunnable);
-        }
-        systemUiHideRetryCount = 0;
-
-        systemUiHideRunnable = new Runnable() {
-            @Override
-            public void run() {
-                applyImmersiveFlags(decorView);
-                hideSystemBars(decorView);
-
-                // しつこく数回叩く（出っぱなし対策）
-                if (systemUiHideRetryCount < SYSTEM_UI_HIDE_RETRY_COUNT) {
-                    systemUiHideRetryCount++;
-                    uiHandler.postDelayed(this, SYSTEM_UI_HIDE_RETRY_DELAY_MS);
-                }
-            }
-        };
-        uiHandler.post(systemUiHideRunnable);
-    }
-
-    private void startSystemUiHideLoop() {
-        if (systemUiKeepHiddenRunnable != null) return;
-
-        View decorView = getWindow().getDecorView();
-        systemUiKeepHiddenRunnable = new Runnable() {
-            @Override
-            public void run() {
-                applyImmersiveFlags(decorView);
-                hideSystemBars(decorView);
-                uiHandler.postDelayed(this, SYSTEM_UI_HIDE_LOOP_DELAY_MS);
-            }
-        };
-        uiHandler.post(systemUiKeepHiddenRunnable);
-    }
-
-    private void stopSystemUiHideLoop() {
-        if (systemUiKeepHiddenRunnable == null) return;
-        uiHandler.removeCallbacks(systemUiKeepHiddenRunnable);
-        systemUiKeepHiddenRunnable = null;
-    }
-
 
     // ===== frmBase: ErrorProcess 相当 =====
 
@@ -362,12 +169,6 @@ public class BaseActivity extends AppCompatActivity {
         hideLoadingLong();
         hideLoadingShort();
         showErrorMsg("エラーが発生しました\n" + safeMessage(ex), MsgDispMode.MsgBox);
-    }
-
-    protected void errorProcess(String procName, String message, Exception ex) {
-        hideLoadingLong();
-        hideLoadingShort();
-        showErrorMsg("エラーが発生しました\n" + procName + "\n" + message + "\n" + safeMessage(ex), MsgDispMode.MsgBox);
     }
 
     private String safeMessage(Exception ex) {
@@ -381,27 +182,15 @@ public class BaseActivity extends AppCompatActivity {
     public void showErrorMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        if (mode == MsgDispMode.MsgBox) {
-            HandyUtil.playErrorBuzzer(this);
-            HandyUtil.playVibrater(this);
-            showDialog("エラー", msg);
-        } else {
-            HandyUtil.playErrorBuzzer(this);
-            HandyUtil.playVibrater(this, 1);
-            showBanner(msg, BannerType.ERROR);
-        }
+        if (mode == MsgDispMode.MsgBox) showDialog("エラー", msg);
+        else showBanner(msg, BannerType.ERROR);
     }
 
     public void showWarningMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
-        HandyUtil.playErrorBuzzer(this);
-        HandyUtil.playVibrater(this);
-        if (mode == MsgDispMode.MsgBox) {
-            showDialog("警告", msg);
-        } else {
-            showBanner(msg, BannerType.WARNING);
-        }
+        if (mode == MsgDispMode.MsgBox) showDialog("警告", msg);
+        else showBanner(msg, BannerType.WARNING);
     }
 
     public void showInfoMsg(String msg, MsgDispMode mode) {
@@ -410,8 +199,6 @@ public class BaseActivity extends AppCompatActivity {
             hideLoadingShort();
             showDialog("情報", msg);
         } else {
-            HandyUtil.playSuccessBuzzer(this);
-            HandyUtil.playVibrater(this);
             showBanner(msg, BannerType.INFO);
         }
     }
