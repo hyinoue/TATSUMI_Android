@@ -18,14 +18,24 @@ import java.util.Date;
 import java.util.List;
 
 
-//============================================================
+//======================
 //　処理概要　:　SoapParsersクラス
-//============================================================
+//======================
 
 public class SoapParsers {
+    //=============================
+    //　機　能　:　SoapParsersの初期化処理
+    //　引　数　:　なし
+    //　戻り値　:　[SoapParsers] ..... なし
+    //=============================
 
     private SoapParsers() {
     }
+    //===============================
+    //　機　能　:　new Parserの処理
+    //　引　数　:　xml ..... String
+    //　戻り値　:　[XmlPullParser] ..... なし
+    //===============================
 
     private static XmlPullParser newParser(String xml) throws Exception {
         XmlPullParserFactory f = XmlPullParserFactory.newInstance();
@@ -34,6 +44,11 @@ public class SoapParsers {
         p.setInput(new StringReader(xml));
         return p;
     }
+    //===============================
+    //　機　能　:　throw If Soap Faultの処理
+    //　引　数　:　responseXml ..... String
+    //　戻り値　:　[void] ..... なし
+    //===============================
 
     public static void throwIfSoapFault(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
@@ -54,6 +69,12 @@ public class SoapParsers {
             e = p.next();
         }
     }
+    //=================================
+    //　機　能　:　boolean Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　　　　　:　resultTagName ..... String
+    //　戻り値　:　[boolean] ..... なし
+    //=================================
 
     public static boolean parseBooleanResult(String responseXml, String resultTagName) throws Exception {
         XmlPullParser p = newParser(responseXml);
@@ -67,6 +88,12 @@ public class SoapParsers {
         }
         throw new IllegalArgumentException("Result tag not found: " + resultTagName);
     }
+    //=================================
+    //　機　能　:　text Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　　　　　:　resultTagName ..... String
+    //　戻り値　:　[String] ..... なし
+    //=================================
 
     public static String parseTextResult(String responseXml, String resultTagName) throws Exception {
         XmlPullParser p = newParser(responseXml);
@@ -79,6 +106,12 @@ public class SoapParsers {
         }
         throw new IllegalArgumentException("Result tag not found: " + resultTagName);
     }
+    //=================================
+    //　機　能　:　date Time Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　　　　　:　resultTagName ..... String
+    //　戻り値　:　[Date] ..... なし
+    //=================================
 
     public static Date parseDateTimeResult(String responseXml, String resultTagName) throws Exception {
         String t = parseTextResult(responseXml, resultTagName);
@@ -97,6 +130,11 @@ public class SoapParsers {
     //                KanryoContainerCnt, KanryoBundleSum, KnaryoJyuryoSum, LastUpdYmdHms
     //   SyukkaMeisai: HeatNo, Sokuban, SyukkaSashizuNo, bundleNo(小文字), Jyuryo, BookingNo
     // -------------------------
+    //===============================
+    //　機　能　:　syukka Data Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　戻り値　:　[SyukkaData] ..... なし
+    //===============================
     public static SyukkaData parseSyukkaDataResult(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
 
@@ -125,6 +163,11 @@ public class SoapParsers {
 
         return data;
     }
+    //====================================
+    //　機　能　:　read Syukka Header Arrayの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[List<SyukkaHeader>] ..... なし
+    //====================================
 
     private static List<SyukkaHeader> readSyukkaHeaderArray(XmlPullParser p) throws Exception {
         // ここに来た時点で <Header> の START_TAG 上
@@ -140,6 +183,11 @@ public class SoapParsers {
         }
         return list;
     }
+    //==============================
+    //　機　能　:　read Syukka Headerの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[SyukkaHeader] ..... なし
+    //==============================
 
     private static SyukkaHeader readSyukkaHeader(XmlPullParser p) throws Exception {
         // <SyukkaHeader> START_TAG 上
@@ -166,6 +214,11 @@ public class SoapParsers {
         }
         return h;
     }
+    //====================================
+    //　機　能　:　read Syukka Meisai Arrayの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[List<SyukkaMeisai>] ..... なし
+    //====================================
 
     private static List<SyukkaMeisai> readSyukkaMeisaiArray(XmlPullParser p) throws Exception {
         // <Meisai> START_TAG 上
@@ -181,6 +234,11 @@ public class SoapParsers {
         }
         return list;
     }
+    //==============================
+    //　機　能　:　read Syukka Meisaiの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[SyukkaMeisai] ..... なし
+    //==============================
 
     private static SyukkaMeisai readSyukkaMeisai(XmlPullParser p) throws Exception {
         // <SyukkaMeisai> START_TAG 上
@@ -213,6 +271,11 @@ public class SoapParsers {
     //   SyougoDtl: syogoDtlheatNo, syogoDtlsokuban, syougoDtlsyukkaSashizuNo, syougoDtlbundleNo,
     //             syougoDtljyuryo, syougoDtlcontainerID, syougoDtlsyougoKakunin
     // -------------------------
+    //===============================
+    //　機　能　:　syougo Data Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　戻り値　:　[SyougoData] ..... なし
+    //===============================
     public static SyougoData parseSyougoDataResult(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
         SyougoData data = new SyougoData();
@@ -238,6 +301,11 @@ public class SoapParsers {
 
         return data;
     }
+    //====================================
+    //　機　能　:　read Syougo Header Arrayの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[List<SyougoHeader>] ..... なし
+    //====================================
 
     private static List<SyougoHeader> readSyougoHeaderArray(XmlPullParser p) throws Exception {
         // <syougoHeader> START_TAG
@@ -253,6 +321,11 @@ public class SoapParsers {
         }
         return list;
     }
+    //==============================
+    //　機　能　:　read Syougo Headerの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[SyougoHeader] ..... なし
+    //==============================
 
     private static SyougoHeader readSyougoHeader(XmlPullParser p) throws Exception {
         // <SyougoHeader>
@@ -275,6 +348,11 @@ public class SoapParsers {
         }
         return h;
     }
+    //=================================
+    //　機　能　:　read Syougo Dtl Arrayの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[List<SyougoDtl>] ..... なし
+    //=================================
 
     private static List<SyougoDtl> readSyougoDtlArray(XmlPullParser p) throws Exception {
         // <syogoDtl> START_TAG
@@ -290,6 +368,11 @@ public class SoapParsers {
         }
         return list;
     }
+    //============================
+    //　機　能　:　read Syougo Dtlの処理
+    //　引　数　:　p ..... XmlPullParser
+    //　戻り値　:　[SyougoDtl] ..... なし
+    //============================
 
     private static SyougoDtl readSyougoDtl(XmlPullParser p) throws Exception {
         // <SyougoDtl>
@@ -317,6 +400,11 @@ public class SoapParsers {
     }
 
     // ------- helpers -------
+    //========================
+    //　機　能　:　safe Parse Intの処理
+    //　引　数　:　t ..... String
+    //　戻り値　:　[int] ..... なし
+    //========================
     private static int safeParseInt(String t) {
         try {
             return Integer.parseInt(t.trim());
@@ -324,12 +412,22 @@ public class SoapParsers {
             return 0;
         }
     }
+    //=========================
+    //　機　能　:　safe Parse Boolの処理
+    //　引　数　:　t ..... String
+    //　戻り値　:　[boolean] ..... なし
+    //=========================
 
     private static boolean safeParseBool(String t) {
         if (t == null) return false;
         String s = t.trim();
         return "true".equalsIgnoreCase(s) || "1".equals(s);
     }
+    //=========================
+    //　機　能　:　safe Parse Dateの処理
+    //　引　数　:　t ..... String
+    //　戻り値　:　[Date] ..... なし
+    //=========================
 
     private static Date safeParseDate(String t) {
         try {

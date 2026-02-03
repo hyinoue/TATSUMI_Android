@@ -13,9 +13,9 @@ import java.util.List;
 
 @Dao
 
-//============================================================
+//==========================
 //　処理概要　:　SyukkaMeisaiDaoクラス
-//============================================================
+//==========================
 
 public interface SyukkaMeisaiDao {
 
@@ -26,6 +26,12 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "TRIM(SOKUBAN) = TRIM(:sokuban) LIMIT 1"
     )
+    //====================================
+    //　機　能　:　find Oneの処理
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　戻り値　:　[SyukkaMeisaiEntity] ..... なし
+    //====================================
     SyukkaMeisaiEntity findOne(String heatNo, String sokuban);
 
     @Query("SELECT * FROM " +
@@ -33,6 +39,11 @@ public interface SyukkaMeisaiDao {
             "WHERE " +
             "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
+    //==========================================
+    //　機　能　:　find By Booking Noの処理
+    //　引　数　:　bookingNo ..... String
+    //　戻り値　:　[List<SyukkaMeisaiEntity>] ..... なし
+    //==========================================
     List<SyukkaMeisaiEntity> findByBookingNo(String bookingNo);
 
     @Query("UPDATE " +
@@ -44,6 +55,13 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
+    //============================
+    //　機　能　:　bundle Noを更新する
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　　　　　:　bundleNo ..... String
+    //　戻り値　:　[int] ..... なし
+    //============================
     int updateBundleNo(String heatNo, String sokuban, String bundleNo);
 
     @Query("UPDATE " +
@@ -58,6 +76,16 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
+    //===================================
+    //　機　能　:　from Receiveを更新する
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　　　　　:　syukkaSashizuNo ..... String
+    //　　　　　:　bundleNo ..... String
+    //　　　　　:　jyuryo ..... Integer
+    //　　　　　:　bookingNo ..... String
+    //　戻り値　:　[int] ..... なし
+    //===================================
     int updateFromReceive(String heatNo,
                           String sokuban,
                           String syukkaSashizuNo,
@@ -65,6 +93,11 @@ public interface SyukkaMeisaiDao {
                           Integer jyuryo,
                           String bookingNo);
 
+    //======================================
+    //　機　能　:　insertの処理
+    //　引　数　:　entity ..... SyukkaMeisaiEntity
+    //　戻り値　:　[void] ..... なし
+    //======================================
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insert(SyukkaMeisaiEntity entity);
 
@@ -73,6 +106,11 @@ public interface SyukkaMeisaiDao {
             "WHERE " +
             "CONTAINER_ID = :containerId"
     )
+    //==========================================
+    //　機　能　:　find By Container Idの処理
+    //　引　数　:　containerId ..... int
+    //　戻り値　:　[List<SyukkaMeisaiEntity>] ..... なし
+    //==========================================
     List<SyukkaMeisaiEntity> findByContainerId(int containerId);
 
     @Query("DELETE FROM " +
@@ -88,6 +126,11 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "T_SYUKKA_CONTAINER.DATA_SEND_YMDHMS IS NOT NULL)"
     )
+    //=======================
+    //　機　能　:　sent Linkedを削除する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //=======================
     void deleteSentLinked();
 
     @Query("UPDATE T_SYUKKA_MEISAI SET CONTAINER_ID = :containerId " +
@@ -100,11 +143,21 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "TRIM(W.SOKUBAN) = TRIM(T_SYUKKA_MEISAI.SOKUBAN))"
     )
+    //=================================
+    //　機　能　:　container Id For Workを更新する
+    //　引　数　:　containerId ..... int
+    //　戻り値　:　[int] ..... なし
+    //=================================
     int updateContainerIdForWork(int containerId);
 
     @Query("DELETE FROM " +
             "T_SYUKKA_MEISAI"
     )
+    //======================
+    //　機　能　:　allを削除する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //======================
     void deleteAll();
 
     // ========= Controller用 =========
@@ -120,6 +173,12 @@ public interface SyukkaMeisaiDao {
                     "trim(SOKUBAN) = trim(:sokuban) " +
                     "LIMIT 1"
     )
+    //===========================================================================================
+    //　機　能　:　find One For Checkの処理
+    //　引　数　:　heatNo ..... RoomWarnings.CURSOR_MISMATCH) SyukkaMeisaiEntity findOneForCheck(String
+    //　　　　　:　sokuban ..... String
+    //　戻り値　:　[(RoomWarnings.CURSOR_MISMATCH)] ..... なし
+    //===========================================================================================
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     SyukkaMeisaiEntity findOneForCheck(String heatNo, String sokuban);
 
@@ -133,6 +192,12 @@ public interface SyukkaMeisaiDao {
                     "AND " +
                     "trim(SOKUBAN) = trim(:sokuban)"
     )
+    //====================================
+    //　機　能　:　find One For Addの処理
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　戻り値　:　[SyukkaMeisaiEntity] ..... なし
+    //====================================
     SyukkaMeisaiEntity findOneForAdd(String heatNo, String sokuban);
 
 
@@ -148,5 +213,12 @@ public interface SyukkaMeisaiDao {
             "AND " +
             "(BUNDLE_NO IS NULL OR BUNDLE_NO = '')"
     )
+    //==============================
+    //　機　能　:　bundle No If Emptyを更新する
+    //　引　数　:　heatNo ..... String
+    //　　　　　:　sokuban ..... String
+    //　　　　　:　bundleNo ..... String
+    //　戻り値　:　[int] ..... なし
+    //==============================
     int updateBundleNoIfEmpty(String heatNo, String sokuban, String bundleNo);
 }

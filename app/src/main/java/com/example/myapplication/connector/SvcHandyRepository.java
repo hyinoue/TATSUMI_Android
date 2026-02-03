@@ -8,9 +8,9 @@ import com.example.myapplication.model.SyukkaData;
 import java.util.Date;
 
 
-//============================================================
+//=============================
 //　処理概要　:　SvcHandyRepositoryクラス
-//============================================================
+//=============================
 
 public class SvcHandyRepository {
 
@@ -21,15 +21,30 @@ public class SvcHandyRepository {
     private final SoapAsmxClient client;
 
     // ★追加：デフォルトエンドポイント用コンストラクタ
+    //====================================
+    //　機　能　:　SvcHandyRepositoryの初期化処理
+    //　引　数　:　なし
+    //　戻り値　:　[SvcHandyRepository] ..... なし
+    //====================================
     public SvcHandyRepository() {
         this(DEFAULT_ENDPOINT);
     }
+    //====================================
+    //　機　能　:　SvcHandyRepositoryの初期化処理
+    //　引　数　:　endpointUrl ..... String
+    //　戻り値　:　[SvcHandyRepository] ..... なし
+    //====================================
 
     public SvcHandyRepository(String endpointUrl) {
         this.client = new SoapAsmxClient(endpointUrl);
     }
 
     // GetSysDate(): DateTime
+    //======================
+    //　機　能　:　sys Dateを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[Date] ..... なし
+    //======================
     public Date getSysDate() throws Exception {
         String req = SoapRequestBuilders.buildGetSysDate();
         String res = client.call(SoapActions.GET_SYS_DATE, req);
@@ -38,6 +53,11 @@ public class SvcHandyRepository {
     }
 
     // GetSagyouYmd(): DateTime
+    //======================
+    //　機　能　:　sagyou Ymdを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[Date] ..... なし
+    //======================
     public Date getSagyouYmd() throws Exception {
         String req = SoapRequestBuilders.buildGetSagyouYmd();
         String res = client.call(SoapActions.GET_SAGYOU_YMD, req);
@@ -46,6 +66,11 @@ public class SvcHandyRepository {
     }
 
     // GetUpdateYmdHms(DateTime): DateTime
+    //===========================
+    //　機　能　:　update Ymd Hmsを取得する
+    //　引　数　:　sagyouYmd ..... Date
+    //　戻り値　:　[Date] ..... なし
+    //===========================
     public Date getUpdateYmdHms(Date sagyouYmd) throws Exception {
         String req = SoapRequestBuilders.buildGetUpdateYmdHms(sagyouYmd);
         String res = client.call(SoapActions.GET_UPDATE_YMD_HMS, req);
@@ -54,6 +79,11 @@ public class SvcHandyRepository {
     }
 
     // GetSyukkaData(DateTime): SyukkaData
+    //============================
+    //　機　能　:　syukka Dataを取得する
+    //　引　数　:　sagyouYmd ..... Date
+    //　戻り値　:　[SyukkaData] ..... なし
+    //============================
     public SyukkaData getSyukkaData(Date sagyouYmd) throws Exception {
         String req = SoapRequestBuilders.buildGetSyukkaData(sagyouYmd);
         String res = client.call(SoapActions.GET_SYUKKA_DATA, req);
@@ -70,6 +100,11 @@ public class SvcHandyRepository {
 //        return SoapParsers.parseBooleanResult(res, "SendSyukkaDataResult");
 //    }
     // SendSyukkaData(BunningData): bool  ログ出力版
+    //=============================
+    //　機　能　:　syukka Dataを送信する
+    //　引　数　:　data ..... BunningData
+    //　戻り値　:　[boolean] ..... なし
+    //=============================
     public boolean sendSyukkaData(BunningData data) throws Exception {
         String action = "http://tempuri.org/SendSyukkaData";
 
@@ -100,6 +135,11 @@ public class SvcHandyRepository {
     }
 
     // GetSyougoData(): SyougoData
+    //============================
+    //　機　能　:　syougo Dataを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[SyougoData] ..... なし
+    //============================
     public SyougoData getSyougoData() throws Exception {
         String req = SoapRequestBuilders.buildGetSyougoData();
         String res = client.call(SoapActions.GET_SYOUGO_DATA, req);
@@ -108,6 +148,11 @@ public class SvcHandyRepository {
     }
 
     // SendSyougoData(CollateData): bool
+    //=============================
+    //　機　能　:　syougo Dataを送信する
+    //　引　数　:　data ..... CollateData
+    //　戻り値　:　[boolean] ..... なし
+    //=============================
     public boolean sendSyougoData(CollateData data) throws Exception {
         String req = SendSyougoSoapBuilder.buildSendSyougoData(data);
         String res = client.call(SoapActions.SEND_SYOUGO_DATA, req);
