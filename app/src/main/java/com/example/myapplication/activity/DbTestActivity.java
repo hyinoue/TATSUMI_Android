@@ -171,6 +171,7 @@ public class DbTestActivity extends BaseActivity {
                     "SELECT name FROM sqlite_master " +
                             "WHERE type='table' " +
                             "AND name NOT LIKE 'sqlite_%' " +
+                            "AND name NOT IN ('android_metadata', 'room_master_table') " +
                             "ORDER BY name ASC"
             )) {
                 while (c.moveToNext()) list.add(c.getString(0));

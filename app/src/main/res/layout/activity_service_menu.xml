@@ -4,7 +4,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#CCFFCC">
+    android:background="#E6F7FF">
 
     <!-- 上部タイトルバー（青） -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -183,7 +183,7 @@
                         android:id="@+id/menu5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5.  通信テスト"
+                        android:text="5.  通信設定・テスト"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"
