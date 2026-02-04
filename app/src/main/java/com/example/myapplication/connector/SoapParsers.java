@@ -1,5 +1,7 @@
 package com.example.myapplication.connector;
 
+import android.util.Base64;
+
 import com.example.myapplication.model.SyougoData;
 import com.example.myapplication.model.SyougoDtl;
 import com.example.myapplication.model.SyougoHeader;
@@ -120,6 +122,56 @@ public class SoapParsers {
         } catch (ParseException pe) {
             throw new IllegalArgumentException("Failed to parse xsd:dateTime: " + t, pe);
         }
+    }
+
+    //=======================================
+    //　機　能　:　string Array Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　　　　　:　resultTagName ..... String
+    //　戻り値　:　[String[]] ..... なし
+    //=======================================
+    public static String[] parseStringArrayResult(String responseXml, String resultTagName) throws Exception {
+        XmlPullParser p = newParser(responseXml);
+        List<String> values = new ArrayList<>();
+        int e = p.getEventType();
+        boolean inResult = false;
+        int resultDepth = 0;
+
+        while (e != XmlPullParser.END_DOCUMENT) {
+            if (e == XmlPullParser.START_TAG) {
+                String name = p.getName();
+                if (resultTagName.equals(name)) {
+                    inResult = true;
+                    resultDepth = p.getDepth();
+                } else if (inResult && "string".equals(name)) {
+                    values.add(p.nextText());
+                }
+            } else if (e == XmlPullParser.END_TAG && inResult && p.getDepth() == resultDepth
+                    && resultTagName.equals(p.getName())) {
+                break;
+            }
+            e = p.next();
+        }
+
+        return values.toArray(new String[0]);
+    }
+
+    //========================================
+    //　機　能　:　base64 Binary Resultを解析する
+    //　引　数　:　responseXml ..... String
+    //　　　　　:　resultTagName ..... String
+    //　戻り値　:　[byte[]] ..... なし
+    //========================================
+    public static byte[] parseBase64Result(String responseXml, String resultTagName) throws Exception {
+        String t = parseTextResult(responseXml, resultTagName);
+        if (t == null) {
+            return new byte[0];
+        }
+        String trimmed = t.trim();
+        if (trimmed.isEmpty()) {
+            return new byte[0];
+        }
+        return Base64.decode(trimmed, Base64.DEFAULT);
     }
 
     // -------------------------

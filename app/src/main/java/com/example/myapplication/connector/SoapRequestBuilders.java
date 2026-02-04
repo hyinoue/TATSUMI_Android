@@ -1,5 +1,7 @@
 package com.example.myapplication.connector;
 
+import android.util.Base64;
+
 import com.example.myapplication.time.XmlUtil;
 
 import java.util.Date;
@@ -80,5 +82,48 @@ public class SoapRequestBuilders {
         String body = "<GetSyougoData xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
+
+    // UploadBinaryFile(string fileName, byte[] buffer)
+    //=====================================
+    //　機　能　:　upload Binary Fileを生成する
+    //　引　数　:　fileName ..... String
+    //　　　　　:　buffer ..... byte[]
+    //　戻り値　:　[String] ..... なし
+    //=====================================
+    public static String buildUploadBinaryFile(String fileName, byte[] buffer) {
+        StringBuilder inner = new StringBuilder();
+        inner.append("<UploadBinaryFile xmlns=\"").append(NS).append("\">");
+        XmlUtil.tag(inner, "fileName", fileName);
+        String encoded = buffer == null ? "" : Base64.encodeToString(buffer, Base64.NO_WRAP);
+        XmlUtil.tagRaw(inner, "buffer", encoded);
+        inner.append("</UploadBinaryFile>");
+        return SoapEnvelope.wrapBody(inner.toString());
+    }
+
+    // GetDownloadHandyExecuteFileNames()
+    //==============================================
+    //　機　能　:　get Download Handy Execute File Namesを生成する
+    //　引　数　:　なし
+    //　戻り値　:　[String] ..... なし
+    //==============================================
+    public static String buildGetDownloadHandyExecuteFileNames() {
+        String body = "<GetDownloadHandyExecuteFileNames xmlns=\"" + NS + "\" />";
+        return SoapEnvelope.wrapBody(body);
+    }
+
+    // GetDownloadHandyExecuteFile(string fileName)
+    //=========================================
+    //　機　能　:　get Download Handy Execute Fileを生成する
+    //　引　数　:　fileName ..... String
+    //　戻り値　:　[String] ..... なし
+    //=========================================
+    public static String buildGetDownloadHandyExecuteFile(String fileName) {
+        StringBuilder inner = new StringBuilder();
+        inner.append("<GetDownloadHandyExecuteFile xmlns=\"").append(NS).append("\">");
+        XmlUtil.tag(inner, "fileName", fileName);
+        inner.append("</GetDownloadHandyExecuteFile>");
+        return SoapEnvelope.wrapBody(inner.toString());
+    }
 }
+
 

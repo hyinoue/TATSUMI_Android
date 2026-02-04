@@ -71,16 +71,16 @@ public class ServerSettingActivity extends BaseActivity {
     private void setupBottomButtons() {
         bindBottomButtonsIfExists();
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
-        MaterialButton red = findViewById(R.id.btnBottomRed);
+        MaterialButton blue = findViewById(R.id.btnBottomBlue);
         if (yellow != null) {
             yellow.setText("終了");
         }
-        if (red != null) {
-            red.setText("保存");
+        if (blue != null) {
+            blue.setText("保存");
         }
-        MaterialButton blue = findViewById(R.id.btnBottomBlue);
+        MaterialButton red = findViewById(R.id.btnBottomRed);
         MaterialButton green = findViewById(R.id.btnBottomGreen);
-        if (blue != null) blue.setText("");
+        if (red != null) red.setText("");
         if (green != null) green.setText("");
         refreshBottomButtonsEnabled();
     }
@@ -96,12 +96,12 @@ public class ServerSettingActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Redの処理
+    //　機　能　:　on Function Blueの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
     @Override
-    protected void onFunctionRed() {
+    protected void onFunctionBlue() {
         if (!testSuccess) {
             showErrorMsg("接続テストが行われていません。設定保存前に接続テストを行ってください。", MsgDispMode.MsgBox);
             return;

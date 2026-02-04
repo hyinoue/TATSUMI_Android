@@ -159,4 +159,44 @@ public class SvcHandyRepository {
         SoapParsers.throwIfSoapFault(res);
         return SoapParsers.parseBooleanResult(res, "SendSyougoDataResult");
     }
+
+    // UploadBinaryFile(string fileName, byte[] buffer): bool
+    //===========================================
+    //　機　能　:　upload Binary Fileを送信する
+    //　引　数　:　fileName ..... String
+    //　　　　　:　buffer ..... byte[]
+    //　戻り値　:　[boolean] ..... なし
+    //===========================================
+    public boolean uploadBinaryFile(String fileName, byte[] buffer) throws Exception {
+        String req = SoapRequestBuilders.buildUploadBinaryFile(fileName, buffer);
+        String res = client.call(SoapActions.UPLOAD_BINARY_FILE, req);
+        SoapParsers.throwIfSoapFault(res);
+        return SoapParsers.parseBooleanResult(res, "UploadBinaryFileResult");
+    }
+
+    // GetDownloadHandyExecuteFileNames(): string[]
+    //====================================================
+    //　機　能　:　download Handy Execute File Namesを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[String[]] ..... なし
+    //====================================================
+    public String[] getDownloadHandyExecuteFileNames() throws Exception {
+        String req = SoapRequestBuilders.buildGetDownloadHandyExecuteFileNames();
+        String res = client.call(SoapActions.GET_DOWNLOAD_HANDY_EXECUTE_FILE_NAMES, req);
+        SoapParsers.throwIfSoapFault(res);
+        return SoapParsers.parseStringArrayResult(res, "GetDownloadHandyExecuteFileNamesResult");
+    }
+
+    // GetDownloadHandyExecuteFile(string fileName): byte[]
+    //================================================
+    //　機　能　:　download Handy Execute Fileを取得する
+    //　引　数　:　fileName ..... String
+    //　戻り値　:　[byte[]] ..... なし
+    //================================================
+    public byte[] getDownloadHandyExecuteFile(String fileName) throws Exception {
+        String req = SoapRequestBuilders.buildGetDownloadHandyExecuteFile(fileName);
+        String res = client.call(SoapActions.GET_DOWNLOAD_HANDY_EXECUTE_FILE, req);
+        SoapParsers.throwIfSoapFault(res);
+        return SoapParsers.parseBase64Result(res, "GetDownloadHandyExecuteFileResult");
+    }
 }

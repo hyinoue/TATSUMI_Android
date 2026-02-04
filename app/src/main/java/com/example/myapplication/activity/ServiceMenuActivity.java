@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.myapplication.R;
+import com.example.myapplication.connector.SvcHandyWrapper;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.dao.KakuninContainerDao;
 import com.example.myapplication.db.dao.KakuninMeisaiDao;
@@ -22,6 +23,10 @@ import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
 import com.google.android.material.button.MaterialButton;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -264,7 +269,33 @@ public class ServiceMenuActivity extends BaseActivity {
     //==================================
 
     private void sendMaintenanceData() {
-        showInfoMsg("メンテナンスデータ送信は未実装です。", MsgDispMode.MsgBox);
+        io.execute(() -> {
+            try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
+                File dbFile = getDatabasePath(AppDatabase.DB_NAME);
+                if (!dbFile.exists()) {
+                    runOnUiThread(() -> showErrorMsg("DBファイルが見つかりません。", MsgDispMode.MsgBox));
+                    return;
+                }
+                byte[] dbBytes = readFileBytes(dbFile);
+                if (!svc.uploadBinaryFile(dbFile.getName(), dbBytes)) {
+                    runOnUiThread(() -> showErrorMsg("DBファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
+                    return;
+                }
+
+                File logFile = new File(getFilesDir(), "ErrorLog.txt");
+                if (logFile.exists()) {
+                    byte[] logBytes = readFileBytes(logFile);
+                    if (!svc.uploadBinaryFile(logFile.getName(), logBytes)) {
+                        runOnUiThread(() -> showErrorMsg("ログファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
+                        return;
+                    }
+                }
+
+                runOnUiThread(() -> showInfoMsg("ファイルをアップロードしました", MsgDispMode.MsgBox));
+            } catch (Exception ex) {
+                runOnUiThread(() -> showErrorMsg(ex.getMessage(), MsgDispMode.MsgBox));
+            }
+        });
     }
     //================================
     //　機　能　:　download Programの処理
@@ -273,7 +304,106 @@ public class ServiceMenuActivity extends BaseActivity {
     //================================
 
     private void downloadProgram() {
-        showInfoMsg("プログラムダウンロードは未実装です。", MsgDispMode.MsgBox);
+        io.execute(() -> {
+            File downloadDir = new File(getFilesDir(), "NEW");
+            try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
+                String[] files = svc.getDownloadHandyExecuteFileNames();
+                if (files == null || files.length == 0) {
+                    runOnUiThread(() -> showInfoMsg("更新対象のファイルがありませんでした", MsgDispMode.MsgBox));
+                    return;
+                }
+
+                if (!downloadDir.exists() && !downloadDir.mkdirs()) {
+                    throw new IOException("更新ファイルの保存先を作成できません。");
+                }
+
+                boolean reboot = false;
+                for (String fileName : files) {
+                    byte[] buffer = svc.getDownloadHandyExecuteFile(fileName);
+                    File downloadedFile = new File(downloadDir, fileName);
+                    writeFileBytes(downloadedFile, buffer);
+
+                    File currentFile = new File(getFilesDir(), fileName);
+                    if (!reboot && !isSameFile(currentFile, downloadedFile)) {
+                        reboot = true;
+                    }
+                }
+
+                if (reboot) {
+                    runOnUiThread(() -> showQuestion(
+                            "更新ファイルをダウンロードしました。\nアプリを再起動します。\nよろしいですか？",
+                            yes -> {
+                                if (yes) {
+                                    restartApp();
+                                }
+                            }));
+                } else {
+                    runOnUiThread(() -> showInfoMsg("更新ファイルをダウンロードしました", MsgDispMode.MsgBox));
+                }
+            } catch (Exception ex) {
+                runOnUiThread(() -> showErrorMsg(ex.getMessage(), MsgDispMode.MsgBox));
+            }
+        });
+    }
+
+    private byte[] readFileBytes(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buffer = new byte[(int) file.length()];
+            int offset = 0;
+            int read;
+            while (offset < buffer.length && (read = fis.read(buffer, offset, buffer.length - offset)) != -1) {
+                offset += read;
+            }
+            if (offset != buffer.length) {
+                throw new IOException("ファイルの読み込みに失敗しました。");
+            }
+            return buffer;
+        }
+    }
+
+    private void writeFileBytes(File file, byte[] buffer) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(buffer);
+            fos.flush();
+        }
+    }
+
+    private boolean isSameFile(File file1, File file2) throws IOException {
+        if (!file1.exists() || !file2.exists()) {
+            return false;
+        }
+        if (file1.length() != file2.length()) {
+            return false;
+        }
+        try (FileInputStream in1 = new FileInputStream(file1);
+             FileInputStream in2 = new FileInputStream(file2)) {
+            byte[] buf1 = new byte[4096];
+            byte[] buf2 = new byte[4096];
+            int read1;
+            while ((read1 = in1.read(buf1)) != -1) {
+                int read2 = in2.read(buf2);
+                if (read1 != read2) {
+                    return false;
+                }
+                for (int i = 0; i < read1; i++) {
+                    if (buf1[i] != buf2[i]) {
+                        return false;
+                    }
+                }
+            }
+            return in2.read() == -1;
+        }
+    }
+
+    private void restartApp() {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        if (launchIntent == null) {
+            recreate();
+            return;
+        }
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(launchIntent);
+        finish();
     }
     //============================
     //　機　能　:　confirm Exitの処理

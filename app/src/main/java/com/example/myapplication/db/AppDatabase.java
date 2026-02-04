@@ -48,6 +48,7 @@ import com.example.myapplication.db.entity.YoteiEntity;
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
+    public static final String DB_NAME = "tatsumi_handy.sqlite";
 
     // DAO
     //=================================
@@ -129,7 +130,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     AppDatabase.class,
-                                    "tatsumi_handy.sqlite" // ★拡張子.sqlite
+                                    DB_NAME // ★拡張子.sqlite
                             )
                             .addCallback(new Callback() {
                                 @Override
