@@ -70,12 +70,12 @@ public final class AppSettings {
     //============================
     public static void load() {
         BuzzerMute = pref.getBoolean(KEY_BUZZER_MUTE, false);
-        BuzzerLength = pref.getInt(KEY_BUZZER_LENGTH, 1000);
-        BuzzerVolume = pref.getInt(KEY_BUZZER_VOLUME, 5);
+        BuzzerLength = pref.getInt(KEY_BUZZER_LENGTH, 200);
+        BuzzerVolume = pref.getInt(KEY_BUZZER_VOLUME, 10);
 
         VibratorMute = pref.getBoolean(KEY_VIBRATOR_MUTE, false);
-        VibratorLength = pref.getInt(KEY_VIBRATOR_LENGTH, 500);
-        VibratorCount = pref.getInt(KEY_VIBRATOR_COUNT, 2);
+        VibratorLength = pref.getInt(KEY_VIBRATOR_LENGTH, 250);
+        VibratorCount = pref.getInt(KEY_VIBRATOR_COUNT, 3);
         VibratorInterval = pref.getInt(KEY_VIBRATOR_INTERVAL, 100);
 
         CameraImageSize = pref.getInt(KEY_CAMERA_SIZE, 0);

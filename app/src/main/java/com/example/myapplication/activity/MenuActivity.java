@@ -99,8 +99,7 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // ★ 初回起動でDBが無ければここで作成される（onCreateコールバックが走る）
-        // ★ 既にDBがあれば普通にOPENされるだけ
+        // DB
         AppDatabase.getInstance(getApplicationContext());
 
         io = Executors.newSingleThreadExecutor();

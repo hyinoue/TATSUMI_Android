@@ -21,6 +21,7 @@ import com.example.myapplication.db.dao.SyukkaContainerDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
+import com.example.myapplication.log.FileLogger;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -273,11 +274,14 @@ public class ServiceMenuActivity extends BaseActivity {
             try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
                 File dbFile = getDatabasePath(AppDatabase.DB_NAME);
                 if (!dbFile.exists()) {
+                    FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルが見つかりません。", null);
                     runOnUiThread(() -> showErrorMsg("DBファイルが見つかりません。", MsgDispMode.MsgBox));
                     return;
                 }
+
                 byte[] dbBytes = readFileBytes(dbFile);
                 if (!svc.uploadBinaryFile(dbFile.getName(), dbBytes)) {
+                    FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルのアップロードに失敗しました。", null);
                     runOnUiThread(() -> showErrorMsg("DBファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
                     return;
                 }
@@ -286,17 +290,40 @@ public class ServiceMenuActivity extends BaseActivity {
                 if (logFile.exists()) {
                     byte[] logBytes = readFileBytes(logFile);
                     if (!svc.uploadBinaryFile(logFile.getName(), logBytes)) {
+                        FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "ログファイルのアップロードに失敗しました。", null);
                         runOnUiThread(() -> showErrorMsg("ログファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
                         return;
                     }
                 }
 
+                FileLogger.info(this, "frmServiceMenu-LinkLabel_Click", "ファイルをアップロードしました");
                 runOnUiThread(() -> showInfoMsg("ファイルをアップロードしました", MsgDispMode.MsgBox));
             } catch (Exception ex) {
-                runOnUiThread(() -> showErrorMsg(ex.getMessage(), MsgDispMode.MsgBox));
+                String msg = resolveNetworkMessage(ex);
+                FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", msg, ex);
+                runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox));
             }
         });
     }
+
+    private String resolveNetworkMessage(Exception ex) {
+        Throwable t = ex;
+        while (t != null) {
+            if (t instanceof javax.net.ssl.SSLHandshakeException
+                    || t instanceof javax.net.ssl.SSLException) {
+                return "Could not establish secure channel for SSL/TLS";
+            }
+            if (t instanceof java.net.UnknownHostException) {
+                return "The remote name could not be resolved";
+            }
+            if (t instanceof java.net.SocketTimeoutException) {
+                return "The operation has timed-out.";
+            }
+            t = t.getCause();
+        }
+        return ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
+    }
+
     //================================
     //　機　能　:　download Programの処理
     //　引　数　:　なし

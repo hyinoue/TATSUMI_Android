@@ -98,7 +98,7 @@ public class DataSync {
     //==================================
 
     public DataSync(Context context) {
-        this(context, AppDatabase.getInstance(context), new SvcHandyWrapper());
+        this(context, AppDatabase.getInstance(context), null);
     }
     //=============================================
     //　機　能　:　DataSyncの初期化処理
@@ -110,8 +110,10 @@ public class DataSync {
 
     public DataSync(Context context, AppDatabase db, SvcHandyWrapper svcWrapper) {
         this.db = db;
-        this.svcWrapper = svcWrapper;
         this.commHistoryDao = db.commHistoryDao();
+        this.svcWrapper = svcWrapper != null
+                ? svcWrapper
+                : new SvcHandyWrapper(new SvcHandyRepository(), this.commHistoryDao);
         this.syukkaContainerDao = db.syukkaContainerDao();
         this.syukkaMeisaiDao = db.syukkaMeisaiDao();
         this.yoteiDao = db.yoteiDao();

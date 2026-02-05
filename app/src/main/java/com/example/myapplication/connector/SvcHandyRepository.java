@@ -171,7 +171,13 @@ public class SvcHandyRepository {
         String req = SoapRequestBuilders.buildUploadBinaryFile(fileName, buffer);
         String res = client.call(SoapActions.UPLOAD_BINARY_FILE, req);
         SoapParsers.throwIfSoapFault(res);
-        return SoapParsers.parseBooleanResult(res, "UploadBinaryFileResult");
+
+        // WebMethod が void の場合、UploadBinaryFileResult は返らない。
+        // Fault が無ければ成功扱い。
+        if (res.contains("UploadBinaryFileResult")) {
+            return SoapParsers.parseBooleanResult(res, "UploadBinaryFileResult");
+        }
+        return true;
     }
 
     // GetDownloadHandyExecuteFileNames(): string[]
