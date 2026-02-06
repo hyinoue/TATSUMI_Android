@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 
 import com.example.myapplication.BuildConfig;
 import com.example.myapplication.R;
@@ -22,12 +24,14 @@ import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
+import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -548,8 +552,7 @@ public class MenuActivity extends BaseActivity {
     private void runDataSync() {
         showLoadingLong();
         try {
-            DataSync sync = new DataSync(getApplicationContext(),
-                    msg -> runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox)));
+            DataSync sync = new DataSync(getApplicationContext(), this::showSyncErrorAndWait);
             boolean success = sync.runSync();
             runOnUiThread(() -> {
                 if (success) {
@@ -573,6 +576,38 @@ public class MenuActivity extends BaseActivity {
             hideLoadingLong();
         }
     }
+
+    private void showSyncErrorAndWait(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return;
+        }
+
+        CountDownLatch waitForOk = new CountDownLatch(1);
+        runOnUiThread(() -> {
+            HandyUtil.playErrorBuzzer(this);
+            HandyUtil.playVibrater(this);
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("エラー")
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (d, which) -> waitForOk.countDown())
+                    .create();
+            dialog.setOnShowListener(d -> {
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                }
+            });
+            dialog.show();
+        });
+
+        try {
+            waitForOk.await();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            Log.w(TAG, "Interrupted while waiting for error dialog confirmation", ex);
+        }
+    }
+
     //=============================
     //　機　能　:　informationを更新する
     //　引　数　:　なし

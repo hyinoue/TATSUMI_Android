@@ -652,7 +652,14 @@ public class BundleSelectActivity extends BaseActivity {
 
         String input = rawInput != null ? rawInput.trim() : "";
         if (TextUtils.isEmpty(input)) {
-            if (etGenpinNo != null) etGenpinNo.requestFocus();
+            if (etGenpinNo != null) {
+                View next = etGenpinNo.focusSearch(View.FOCUS_FORWARD);
+                if (next != null) {
+                    next.requestFocus();
+                } else {
+                    etGenpinNo.requestFocus();
+                }
+            }
             return;
         }
 
@@ -660,6 +667,7 @@ public class BundleSelectActivity extends BaseActivity {
         io.execute(() -> {
             String heatNo;
             String sokuban;
+            String bundleNo = null;
 
             try {
                 if (input.length() == 13) {
@@ -668,8 +676,35 @@ public class BundleSelectActivity extends BaseActivity {
                 } else if (input.length() == 14) {
                     heatNo = input.substring(1, 7);
                     sokuban = input.substring(7, 14);
+                } else if (input.length() == 18) {
+                    heatNo = input.substring(1, 7);
+                    sokuban = input.substring(7, 14).trim();
+                    bundleNo = input.substring(14, 18);
+                    controller.addBundleNo(heatNo, sokuban, bundleNo);
                 } else {
-                    throw new IllegalArgumentException("現品番号の形式が不正です");
+                    runOnUiThread(() -> {
+                        hideLoadingShort();
+                        showWarningMsg("現品番号は13桁か14桁か18桁で入力してください", MsgDispMode.MsgBox);
+                        if (etGenpinNo != null) etGenpinNo.requestFocus();
+                    });
+                    return;
+                }
+
+                String errMsg = controller.checkBundle(
+                        heatNo,
+                        sokuban,
+                        getIntValue(etContainerKg),
+                        getIntValue(etDunnageKg),
+                        maxContainerJyuryo
+                );
+
+                if (!TextUtils.isEmpty(errMsg)) {
+                    runOnUiThread(() -> {
+                        hideLoadingShort();
+                        showWarningMsg(errMsg, MsgDispMode.MsgBox);
+                        if (etGenpinNo != null) etGenpinNo.requestFocus();
+                    });
+                    return;
                 }
 
                 controller.addBundle(heatNo, sokuban);
