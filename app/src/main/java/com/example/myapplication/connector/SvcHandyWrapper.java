@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 
+
 //================================
 //　処理概要　:　SvcHandyWrapperクラス
 //================================
@@ -23,8 +24,12 @@ public class SvcHandyWrapper implements Closeable {
 
     private final SvcHandyRepository repository;
     private final CommHistoryDao commHistoryDao;
+    private static final Object LOG_ID_LOCK = new Object();
+
     private final SimpleDateFormat dbDateFormat =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN);
+    private final SimpleDateFormat logIdDateFormat =
+            new SimpleDateFormat("yyyyMMdd", Locale.JAPAN);
 
     //=======================================
     //　機　能　:　SvcHandyWrapperの初期化処理
@@ -315,6 +320,7 @@ public class SvcHandyWrapper implements Closeable {
         }
 
         CommHistoryEntity entity = new CommHistoryEntity();
+        entity.logId = createLogId(history.startYmdhms);
         entity.startYmdhms = nullSafe(formatDbDate(history.startYmdhms));
         entity.endYmdhms = nullSafe(formatDbDate(history.endYmdhms));
         entity.procName = trimToLength(nullSafe(history.procName), 100);
@@ -352,6 +358,26 @@ public class SvcHandyWrapper implements Closeable {
             return value.substring(0, maxLength);
         }
         return value;
+    }
+
+    private String createLogId(Date startDate) {
+        synchronized (LOG_ID_LOCK) {
+            Date baseDate = startDate == null ? new Date() : startDate;
+            String ymdPrefix = logIdDateFormat.format(baseDate);
+            String maxLogId = commHistoryDao.findMaxLogIdByDatePrefix(ymdPrefix);
+
+            int nextSequence = 1;
+            if (maxLogId != null && maxLogId.length() >= 11) {
+                String sequencePart = maxLogId.substring(maxLogId.length() - 3);
+                try {
+                    nextSequence = Integer.parseInt(sequencePart) + 1;
+                } catch (NumberFormatException ignored) {
+                    nextSequence = 1;
+                }
+            }
+
+            return ymdPrefix + String.format(Locale.JAPAN, "%03d", nextSequence);
+        }
     }
 
     private static class CommHistoryRow {
