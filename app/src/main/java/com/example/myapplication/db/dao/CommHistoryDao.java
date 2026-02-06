@@ -30,6 +30,14 @@ public interface CommHistoryDao {
         //===============================================
     List<CommHistoryEntity> findAllDesc();
 
+
+    @Query("SELECT MAX(LOG_ID) FROM " +
+            "C_COMM_HISTORY " +
+            "WHERE " +
+            "LOG_ID LIKE :ymdPrefix || '%'"
+    )
+    String findMaxLogIdByDatePrefix(String ymdPrefix);
+
     //===========================================
     //　機　能　:　upsertの処理
     //　引　数　:　entity ..... CommHistoryEntity

@@ -8,7 +8,7 @@ import androidx.room.Entity;
 //========================
 @Entity(
         tableName = "C_COMM_HISTORY",
-        primaryKeys = {"START_YMDHMS", "END_YMDHMS", "PROC_NAME"}
+        primaryKeys = {"LOG_ID"}
 )
 
 //========================
@@ -16,6 +16,9 @@ import androidx.room.Entity;
 //========================
 
 public class CommHistoryEntity {
+    @ColumnInfo(name = "LOG_ID")
+    public String logId;
+
     @ColumnInfo(name = "START_YMDHMS")
     public String startYmdhms;
 
