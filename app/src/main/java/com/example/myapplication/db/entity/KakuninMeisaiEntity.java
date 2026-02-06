@@ -3,6 +3,7 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 
 //========================
 //　処理概要　:　確認明細エンティティ
@@ -39,10 +40,10 @@ public class KakuninMeisaiEntity {
     @ColumnInfo(name = "CONTAINER_SYOUGO_KAKUNIN")
     public Boolean containerSyougoKakunin; // BIT→INTEGER
 
-    @ColumnInfo(name = "KAKUNIN_CONTAINER_ID")
+    @Ignore
     public Integer kakuninContainerId;
 
-    @ColumnInfo(name = "KAKUNIN_STATUS")
+    @Ignore
     public Integer kakuninStatus;
 
     @ColumnInfo(name = "INSERT_PROC_NAME")
@@ -57,6 +58,7 @@ public class KakuninMeisaiEntity {
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
 
-    @ColumnInfo(name = "DELETE_FLG")
+    @Ignore
     public Integer deleteFlg;
+
 }

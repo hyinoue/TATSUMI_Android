@@ -112,7 +112,7 @@ public interface SyukkaMeisaiWorkDao {
             "AND " +
             "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN) " +
             "ORDER BY " +
-            "W.UPDATE_YMD"
+            "W.INSERT_YMD"
     )
     //=========================================
     //　機　能　:　select Work Joinedの処理

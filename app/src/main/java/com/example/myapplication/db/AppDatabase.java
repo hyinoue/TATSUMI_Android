@@ -42,7 +42,7 @@ import com.example.myapplication.db.entity.YoteiEntity;
                 KakuninMeisaiWorkEntity.class,
                 CommHistoryEntity.class
         },
-        version = 3,
+        version = 7,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

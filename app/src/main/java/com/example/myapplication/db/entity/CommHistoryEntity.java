@@ -6,34 +6,34 @@ import androidx.room.Entity;
 //========================
 //　処理概要　:　通信履歴エンティティ
 //========================
-@Entity(tableName = "C_COMM_HISTORY", primaryKeys = {"RENBAN"})
+@Entity(
+        tableName = "C_COMM_HISTORY",
+        primaryKeys = {"START_YMDHMS", "END_YMDHMS", "PROC_NAME"}
+)
 
 //========================
 //　処理概要　:　通信履歴エンティティ
 //========================
 
 public class CommHistoryEntity {
-    @ColumnInfo(name = "RENBAN")
-    public Integer renban;
-
-    @ColumnInfo(name = "COMM_KIND")
-    public Integer commKind;
-
-    @ColumnInfo(name = "COMM_DETAIL")
-    public String commDetail;
-
-    @ColumnInfo(name = "COMM_RESULT")
-    public Integer commResult;
-
     @ColumnInfo(name = "START_YMDHMS")
     public String startYmdhms;
 
-    @ColumnInfo(name = "INSERT_PROC_NAME")
-    public String insertProcName;
+    @ColumnInfo(name = "END_YMDHMS")
+    public String endYmdhms;
 
-    @ColumnInfo(name = "INSERT_YMD")
-    public String insertYmd;
+    @ColumnInfo(name = "PROC_NAME")
+    public String procName;
 
-    @ColumnInfo(name = "UPDATE_PROC_NAME")
-    public String updateProcName;
+    @ColumnInfo(name = "ARGUMENT")
+    public String argument;
+
+    @ColumnInfo(name = "RETURN_VALUE")
+    public String returnValue;
+
+    @ColumnInfo(name = "ERR_NUMBER")
+    public String errNumber;
+
+    @ColumnInfo(name = "ERR_DESCRIPTION")
+    public String errDescription;
 }

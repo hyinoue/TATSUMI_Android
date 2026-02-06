@@ -21,7 +21,7 @@ public interface CommHistoryDao {
     @Query("SELECT * FROM " +
             "C_COMM_HISTORY " +
             "ORDER BY " +
-            "RENBAN DESC"
+            "START_YMDHMS DESC, END_YMDHMS DESC"
     )
         //===============================================
         //　機　能　:　find All Descの処理

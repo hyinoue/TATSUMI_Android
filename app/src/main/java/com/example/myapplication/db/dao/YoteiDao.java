@@ -67,7 +67,7 @@ public interface YoteiDao {
             "T_YOTEI " +
             "SET " +
             "KANRYO_CONTAINER = KANRYO_CONTAINER + 1, " +
-            "KANRYO_BUNDOLE = KANRYO_BUNDOLE + :bundleCount, " +
+            "KANRYO_BUNDLE = KANRYO_BUNDLE + :bundleCount, " +
             "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
             "WHERE " +
             "TRIM(BOOKING_NO) = TRIM(:bookingNo)"

@@ -30,10 +30,10 @@ public interface SyukkaContainerDao {
         //=============================================
     SyukkaContainerEntity findById(int containerId);
 
-    @Query("SELECT * FROM " +
-            "T_SYUKKA_CONTAINER " +
-            "WHERE " +
-            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
+    @Query("SELECT C.* FROM T_SYUKKA_CONTAINER C " +
+            "INNER JOIN T_SYUKKA_MEISAI M " +
+            " ON C.CONTAINER_ID = M.CONTAINER_ID " +
+            "WHERE TRIM(M.BOOKING_NO) = TRIM(:bookingNo)"
     )
         //===================================================
         //　機　能　:　find By Booking Noの処理
