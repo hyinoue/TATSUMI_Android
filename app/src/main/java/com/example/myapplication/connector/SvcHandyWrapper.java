@@ -10,7 +10,6 @@ import com.example.myapplication.model.SyukkaData;
 import java.io.Closeable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -20,9 +19,6 @@ import java.util.Locale;
 
 public class SvcHandyWrapper implements Closeable {
     private static final int RETRY_COUNT = 3;
-    private static final int COMM_KIND_WEB_SERVICE = 1;
-    private static final int COMM_RESULT_OK = 0;
-    private static final int COMM_RESULT_NG = 1;
     private static final int MAX_TEXT_LENGTH = 1000;
 
     private final SvcHandyRepository repository;
@@ -74,7 +70,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("作業日の取得に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -102,7 +98,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("出荷データ更新日時の取得に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -130,7 +126,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("出荷データの取得に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -157,7 +153,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("出荷データの更新に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -184,7 +180,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("照合データの取得に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -211,7 +207,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("照合データの更新に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -240,7 +236,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("ファイルのアップロードに失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -267,7 +263,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("更新対象ファイルの取得に失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -295,7 +291,7 @@ public class SvcHandyWrapper implements Closeable {
                     lastException = ex;
                 }
             }
-            history.errorDescription = (lastException != null) ? lastException.getMessage() : null;
+            setErrorInfo(history, lastException);
             throw new Exception("ファイルのダウンロードに失敗しました", lastException);
         } finally {
             saveHistoryRow(history);
@@ -314,25 +310,27 @@ public class SvcHandyWrapper implements Closeable {
             return;
         }
 
+        if (history.endYmdhms == null) {
+            history.endYmdhms = new Date();
+        }
+
         CommHistoryEntity entity = new CommHistoryEntity();
-        entity.renban = nextRenban();
-        entity.commKind = COMM_KIND_WEB_SERVICE;
-        entity.commDetail = trimToLength(history.procName + "(" + nullSafe(history.argument) + ")"
-                + " => " + nullSafe(history.returnValue), MAX_TEXT_LENGTH);
-        entity.commResult = history.errorDescription == null ? COMM_RESULT_OK : COMM_RESULT_NG;
-        entity.startYmdhms = formatDbDate(history.startYmdhms);
-        entity.insertProcName = history.procName;
-        entity.insertYmd = formatDbDate(new Date());
-        entity.updateProcName = trimToLength(nullSafe(history.errorDescription), MAX_TEXT_LENGTH);
+        entity.startYmdhms = nullSafe(formatDbDate(history.startYmdhms));
+        entity.endYmdhms = nullSafe(formatDbDate(history.endYmdhms));
+        entity.procName = trimToLength(nullSafe(history.procName), 100);
+        entity.argument = trimToLength(nullSafe(history.argument), 255);
+        entity.returnValue = trimToLength(nullSafe(history.returnValue), MAX_TEXT_LENGTH);
+        entity.errNumber = trimToLength(nullSafe(history.errorNumber), 20);
+        entity.errDescription = trimToLength(history.errorDescription, MAX_TEXT_LENGTH);
         commHistoryDao.upsert(entity);
     }
 
-    private int nextRenban() {
-        List<CommHistoryEntity> rows = commHistoryDao.findAllDesc();
-        if (rows == null || rows.isEmpty() || rows.get(0).renban == null) {
-            return 1;
+    private void setErrorInfo(CommHistoryRow history, Exception exception) {
+        if (history == null || exception == null) {
+            return;
         }
-        return rows.get(0).renban + 1;
+        history.errorNumber = exception.getClass().getSimpleName();
+        history.errorDescription = exception.getMessage();
     }
 
     private String formatDbDate(Date value) {
@@ -362,6 +360,7 @@ public class SvcHandyWrapper implements Closeable {
         private String procName;
         private String argument;
         private String returnValue;
+        private String errorNumber;
         private String errorDescription;
     }
 

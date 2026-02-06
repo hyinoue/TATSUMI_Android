@@ -2,6 +2,7 @@ package com.example.myapplication.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 
 //==========================
 //　処理概要　:　システム設定エンティティ
@@ -26,7 +27,7 @@ public class SystemEntity {
     @ColumnInfo(name = "DEFAULT_DUNNAGE_JYURYO")
     public Integer defaultDunnageJyuryo;
 
-    @ColumnInfo(name = "MAX_CONTAINER_JYURYO")
+    @Ignore
     public Integer maxContainerJyuryo;
 
     @ColumnInfo(name = "DATA_CONF_YMDHMS")

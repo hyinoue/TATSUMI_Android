@@ -27,7 +27,7 @@ public class YoteiEntity {
     @ColumnInfo(name = "CONTAINER_COUNT")
     public Integer containerCount;
 
-    @ColumnInfo(name = "GOUKEI_BUNDOLE")
+    @ColumnInfo(name = "GOUKEI_BUNDLE")
     public Integer goukeiBundole;
 
     @ColumnInfo(name = "GOUKEI_JYURYO")
@@ -36,7 +36,7 @@ public class YoteiEntity {
     @ColumnInfo(name = "KANRYO_CONTAINER")
     public Integer kanryoContainer;
 
-    @ColumnInfo(name = "KANRYO_BUNDOLE")
+    @ColumnInfo(name = "KANRYO_BUNDLE")
     public Integer kanryoBundole;
 
     @ColumnInfo(name = "KANRYO_JYURYO")
