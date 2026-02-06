@@ -548,17 +548,27 @@ public class MenuActivity extends BaseActivity {
     private void runDataSync() {
         showLoadingLong();
         try {
-            DataSync sync = new DataSync(getApplicationContext());
-            sync.runSync();
+            DataSync sync = new DataSync(getApplicationContext(),
+                    msg -> runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox)));
+            boolean success = sync.runSync();
             runOnUiThread(() -> {
-                setCenterStatus("データ送受信完了");
-                showInfoMsg("データ送受信完了", MsgDispMode.Label);
+                if (success) {
+                    setCenterStatus("データ送受信完了");
+                    showInfoMsg("データ送受信完了", MsgDispMode.Label);
+                } else {
+                    setCenterStatus("NG データ送受信に失敗しました");
+                }
             });
-            refreshInformation();
+            if (success) {
+                refreshInformation();
+            }
         } catch (Exception ex) {
             Log.e(TAG, "DataSync failed", ex);
             String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
-            runOnUiThread(() -> setCenterStatus("NG " + msg));
+            runOnUiThread(() -> {
+                setCenterStatus("NG " + msg);
+                showErrorMsg(msg, MsgDispMode.MsgBox);
+            });
         } finally {
             hideLoadingLong();
         }
