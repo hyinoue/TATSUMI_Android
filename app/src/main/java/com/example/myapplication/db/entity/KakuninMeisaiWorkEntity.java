@@ -24,12 +24,6 @@ public class KakuninMeisaiWorkEntity {
     @ColumnInfo(name = "SOKUBAN")
     public String sokuban;
 
-    @ColumnInfo(name = "KAKUNIN_CONTAINER_ID")
-    public Integer kakuninContainerId;
-
-    @ColumnInfo(name = "KAKUNIN_STATUS")
-    public Integer kakuninStatus;
-
     @ColumnInfo(name = "SYUKKA_SASHIZU_NO")
     public String syukkaSashizuNo;
 
@@ -56,6 +50,13 @@ public class KakuninMeisaiWorkEntity {
 
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
+
+    @ColumnInfo(name = "KAKUNIN_CONTAINER_ID")
+    public Integer kakuninContainerId;
+
+    @ColumnInfo(name = "KAKUNIN_STATUS")
+    public Integer kakuninStatus;
+
 
     @ColumnInfo(name = "DELETE_FLG")
     public Integer deleteFlg;
