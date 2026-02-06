@@ -3,6 +3,7 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 
 //===========================
 //　処理概要　:　確認明細ワークエンティティ
@@ -23,12 +24,6 @@ public class KakuninMeisaiWorkEntity {
     @NonNull
     @ColumnInfo(name = "SOKUBAN")
     public String sokuban;
-
-    @ColumnInfo(name = "KAKUNIN_CONTAINER_ID")
-    public Integer kakuninContainerId;
-
-    @ColumnInfo(name = "KAKUNIN_STATUS")
-    public Integer kakuninStatus;
 
     @ColumnInfo(name = "SYUKKA_SASHIZU_NO")
     public String syukkaSashizuNo;
@@ -57,9 +52,17 @@ public class KakuninMeisaiWorkEntity {
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
 
-    @ColumnInfo(name = "DELETE_FLG")
+    @Ignore
+    public Integer kakuninContainerId;
+
+    @Ignore
+    public Integer kakuninStatus;
+
+    @Ignore
     public Integer deleteFlg;
 
-    @ColumnInfo(name = "BOOKING_NO")
+    @Ignore
     public String bookingNo;
+
 }
+

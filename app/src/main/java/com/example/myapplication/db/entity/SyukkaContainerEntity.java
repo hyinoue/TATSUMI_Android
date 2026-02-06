@@ -2,6 +2,7 @@ package com.example.myapplication.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 
 //==========================
 //　処理概要　:　出荷コンテナエンティティ
@@ -15,17 +16,11 @@ public class SyukkaContainerEntity {
     @ColumnInfo(name = "CONTAINER_ID")
     public Integer containerId;
 
-    @ColumnInfo(name = "BOOKING_NO")
-    public String bookingNo;
+    @ColumnInfo(name = "SAGYOU_YOTEI_YMD")
+    public String sagyouYoteiYmd;
 
     @ColumnInfo(name = "CONTAINER_NO")
     public String containerNo;
-
-    @ColumnInfo(name = "SEAL_NO")
-    public String sealNo;
-
-    @ColumnInfo(name = "CONTAINER_SIZE")
-    public Integer containerSize;
 
     @ColumnInfo(name = "CONTAINER_JYURYO")
     public Integer containerJyuryo;
@@ -33,7 +28,16 @@ public class SyukkaContainerEntity {
     @ColumnInfo(name = "DUNNAGE_JYURYO")
     public Integer dunnageJyuryo;
 
-    @ColumnInfo(name = "SYUKKA_STATUS")
+    @ColumnInfo(name = "SEAL_NO")
+    public String sealNo;
+
+    @Ignore
+    public String bookingNo;
+
+    @Ignore
+    public Integer containerSize;
+
+    @Ignore
     public Integer syukkaStatus;
 
     @ColumnInfo(name = "DATA_SEND_YMDHMS")
