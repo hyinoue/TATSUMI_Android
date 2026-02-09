@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
-import com.example.myapplication.grid.CollateContainerRow;
 import com.example.myapplication.grid.CollateContainerSelectController;
+import com.example.myapplication.grid.CollateContainerSelectRow;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -342,14 +342,14 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     private static class CollateContainerAdapter extends RecyclerView.Adapter<CollateContainerAdapter.ViewHolder> {
-        private final List<CollateContainerRow> rows = new ArrayList<>();
+        private final List<CollateContainerSelectRow> rows = new ArrayList<>();
         //====================================================
         //　機　能　:　submit Listの処理
         //　引　数　:　newRows ..... List<CollateContainerRow>
         //　戻り値　:　[void] ..... なし
         //====================================================
 
-        void submitList(List<CollateContainerRow> newRows) {
+        void submitList(List<CollateContainerSelectRow> newRows) {
             rows.clear();
             if (newRows != null) rows.addAll(newRows);
             notifyDataSetChanged();
@@ -364,7 +364,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_collate_container_row, parent, false);
+                    .inflate(R.layout.item_collate_container_select_row, parent, false);
             return new ViewHolder(view);
         }
 
@@ -376,7 +376,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         //====================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            CollateContainerRow row = rows.get(position);
+            CollateContainerSelectRow row = rows.get(position);
             holder.tvIndex.setText(row.index);
             holder.tvContainerNo.setText(row.containerNo);
             holder.tvBundleCnt.setText(row.bundleCnt);

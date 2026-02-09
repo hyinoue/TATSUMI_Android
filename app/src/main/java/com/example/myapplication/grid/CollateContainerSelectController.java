@@ -19,7 +19,7 @@ public class CollateContainerSelectController {
 
     private final KakuninContainerDao kakuninContainerDao;
     private final List<KakuninContainerEntity> containers = new ArrayList<>();
-    private final List<CollateContainerRow> displayRows = new ArrayList<>();
+    private final List<CollateContainerSelectRow> displayRows = new ArrayList<>();
 
     private String selectedContainerId;
     private String selectedContainerNo;
@@ -62,7 +62,7 @@ public class CollateContainerSelectController {
     //　戻り値　:　[List<CollateContainerRow>] ..... なし
     //=================================================
     @NonNull
-    public List<CollateContainerRow> getDisplayRows() {
+    public List<CollateContainerSelectRow> getDisplayRows() {
         return Collections.unmodifiableList(displayRows);
     }
 
@@ -144,7 +144,7 @@ public class CollateContainerSelectController {
         displayRows.clear();
         for (int i = 0; i < containers.size(); i++) {
             KakuninContainerEntity entity = containers.get(i);
-            displayRows.add(new CollateContainerRow(
+            displayRows.add(new CollateContainerSelectRow(
                     String.valueOf(i + 1),
                     safeStr(entity.containerNo),
                     String.valueOf(entity.bundleCnt != null ? entity.bundleCnt : 0),

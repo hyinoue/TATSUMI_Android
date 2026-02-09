@@ -4,7 +4,7 @@ package com.example.myapplication.grid;
 //　処理概要　:　CollateContainerRowクラス
 //====================================
 
-public class CollateContainerRow {
+public class CollateContainerSelectRow {
     public final String index;
     public final String containerNo;
 
@@ -19,7 +19,7 @@ public class CollateContainerRow {
     //　戻り値　:　[CollateContainerRow] ..... なし
     //===========================================
 
-    public CollateContainerRow(String index, String containerNo, String bundleCnt, String sagyouYmd) {
+    public CollateContainerSelectRow(String index, String containerNo, String bundleCnt, String sagyouYmd) {
         this.index = index;
         this.containerNo = containerNo;
         this.bundleCnt = bundleCnt;

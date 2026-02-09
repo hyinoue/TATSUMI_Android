@@ -47,7 +47,7 @@ public class BundleSelectController {
     private final LinkedHashMap<String, BundleInfo> dataList = new LinkedHashMap<>();
 
     // 一覧表示用（RecyclerViewに渡す）
-    private final List<BundleGridRow> displayRows = new ArrayList<>();
+    private final List<BundleSelectRow> displayRows = new ArrayList<>();
 
     private static final int MAX_ROWS = 20;
     //==========================================================
@@ -103,7 +103,7 @@ public class BundleSelectController {
     //　戻り値　:　[List<BundleGridRow>] ..... なし
     //===========================================
     @NonNull
-    public List<BundleGridRow> getDisplayRows() {
+    public List<BundleSelectRow> getDisplayRows() {
         return Collections.unmodifiableList(displayRows);
     }
 
@@ -286,7 +286,7 @@ public class BundleSelectController {
             String j = String.format(Locale.JAPAN, "%,d", item.jyuryo);
             if (j.length() < 6) j = repeat(" ", 6 - j.length()) + j;
 
-            displayRows.add(new BundleGridRow(pNo, bNo, idx, j, "削除"));
+            displayRows.add(new BundleSelectRow(pNo, bNo, idx, j, "削除"));
         }
     }
 

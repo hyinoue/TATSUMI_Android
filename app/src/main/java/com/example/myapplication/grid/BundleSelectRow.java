@@ -9,7 +9,7 @@ package com.example.myapplication.grid;
 //　処理概要　:　BundleGridRowクラス
 //==============================
 
-public class BundleGridRow {
+public class BundleSelectRow {
     public String pNo;
     public String bNo;
     public String index;
@@ -25,7 +25,7 @@ public class BundleGridRow {
     //　戻り値　:　[BundleGridRow] ..... なし
     //=====================================
 
-    public BundleGridRow(String pNo, String bNo, String index, String jyuryo, String cancelText) {
+    public BundleSelectRow(String pNo, String bNo, String index, String jyuryo, String cancelText) {
         this.pNo = pNo;
         this.bNo = bNo;
         this.index = index;

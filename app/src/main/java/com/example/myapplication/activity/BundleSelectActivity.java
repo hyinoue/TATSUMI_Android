@@ -22,8 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
-import com.example.myapplication.grid.BundleGridRow;
 import com.example.myapplication.grid.BundleSelectController;
+import com.example.myapplication.grid.BundleSelectRow;
 import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
@@ -878,7 +878,7 @@ public class BundleSelectActivity extends BaseActivity {
             void delete(int row);
         }
 
-        private final List<BundleGridRow> rows = new ArrayList<>();
+        private final List<BundleSelectRow> rows = new ArrayList<>();
         private final DeleteHandler deleteHandler;
 
         BundleRowAdapter(DeleteHandler deleteHandler) {
@@ -890,7 +890,7 @@ public class BundleSelectActivity extends BaseActivity {
         //　戻り値　:　[void] ..... なし
         //==============================================
 
-        void submitList(List<BundleGridRow> newRows) {
+        void submitList(List<BundleSelectRow> newRows) {
             rows.clear();
             if (newRows != null) rows.addAll(newRows);
             notifyDataSetChanged();
@@ -917,7 +917,7 @@ public class BundleSelectActivity extends BaseActivity {
         //====================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            BundleGridRow row = rows.get(position);
+            BundleSelectRow row = rows.get(position);
             holder.tvPNo.setText(row.pNo);
             holder.tvBNo.setText(row.bNo);
             holder.tvIndex.setText(row.index);
