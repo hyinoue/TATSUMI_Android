@@ -1,5 +1,6 @@
 package com.example.myapplication.db.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
@@ -17,6 +18,7 @@ import androidx.room.Entity;
 
 public class CommHistoryEntity {
     @ColumnInfo(name = "LOG_ID")
+    @NonNull
     public String logId;
 
     @ColumnInfo(name = "START_YMDHMS")

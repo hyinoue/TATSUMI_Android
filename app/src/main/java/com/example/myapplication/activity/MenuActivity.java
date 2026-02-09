@@ -62,6 +62,7 @@ public class MenuActivity extends BaseActivity {
     private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
 
     private ExecutorService io;
+    
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
     private ActivityResultLauncher<Intent> containerInputLauncher;
 
@@ -103,28 +104,31 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // DB
-        AppDatabase.getInstance(getApplicationContext());
+        io = Executors.newSingleThreadExecutor();   // ★先に作る
 
-        io = Executors.newSingleThreadExecutor();
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+
+        io.execute(() -> {
+            try {
+                android.util.Log.d("DBCHK", "start");
+                db.getOpenHelper().getReadableDatabase(); // まずこれだけ
+                android.util.Log.d("DBCHK", "opened");
+            } catch (Exception e) {
+                android.util.Log.e("DBCHK", "failed", e);
+            }
+        });
 
         setupActivityLaunchers();
-
         initViews();
         setupContainerSizeSpinner();
-
-        // 下ボタン文言（クリック設定は BaseActivity が onFunctionXxx へ集約）
         setupBottomButtonTexts();
-
-        // 画面内ボタン類のクリック
         wireActions();
 
-        if (btnDataReceive != null) {
-            btnDataReceive.requestFocus();
-        }
+        if (btnDataReceive != null) btnDataReceive.requestFocus();
 
         refreshInformation();
     }
+
     //====================================
     //　機　能　:　activity Launchersを設定する
     //　引　数　:　なし

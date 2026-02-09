@@ -1,5 +1,6 @@
 package com.example.myapplication.db.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -16,6 +17,7 @@ import androidx.room.Ignore;
 
 public class SystemEntity {
     @ColumnInfo(name = "RENBAN")
+    @NonNull
     public Integer renban;
 
     @ColumnInfo(name = "WEB_SVC_URL")

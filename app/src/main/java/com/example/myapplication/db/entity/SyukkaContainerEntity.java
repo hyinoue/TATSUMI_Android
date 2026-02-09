@@ -1,5 +1,6 @@
 package com.example.myapplication.db.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -14,6 +15,7 @@ import androidx.room.Ignore;
 //==========================
 public class SyukkaContainerEntity {
     @ColumnInfo(name = "CONTAINER_ID")
+    @NonNull
     public Integer containerId;
 
     @ColumnInfo(name = "SAGYOU_YOTEI_YMD")
