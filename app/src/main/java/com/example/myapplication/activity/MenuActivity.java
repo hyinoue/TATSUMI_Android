@@ -38,21 +38,19 @@ import java.util.concurrent.Executors;
 /**
  * メインメニュー画面のActivity。
  *
- * <p>主な責務は以下のとおり。</p>
+ * <p>役割:</p>
  * <ul>
- *     <li>各機能画面への遷移ボタンを提供し、結果戻りで表示を更新する。</li>
- *     <li>束選定/コンテナ入力で取得した値を保持し、相互に同期する。</li>
- *     <li>コンテナサイズの選択や受信状況をUIに反映する。</li>
- *     <li>画面下ボタン(F1〜F4/色ボタン)のラベル設定を行う。</li>
+ *     <li>各画面への遷移と戻り時の表示更新</li>
+ *     <li>束選定/コンテナ入力の値保持と同期</li>
+ *     <li>受信状況・作業状況の表示</li>
+ *     <li>下部ファンクションボタンの設定</li>
  * </ul>
  */
 public class MenuActivity extends BaseActivity {
 
-    //=======================================================
-    //　処理概要　:　メインメニュー画面
-    //　備　　考　:　積載束選定（Normal確定時）は BundleSelectActivity 側で
-    //　　　　　　:　ContainerInputActivity に直接遷移する（メニュー経由しない）
-    //=======================================================
+    // メインメニュー画面
+    // NOTE: 積載束選定（Normal確定時）は BundleSelectActivity 側で
+    //       ContainerInputActivity に直接遷移する（メニュー経由しない）
 
     private static final String TAG = "MENU";
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
@@ -66,9 +64,9 @@ public class MenuActivity extends BaseActivity {
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
     private ActivityResultLauncher<Intent> containerInputLauncher;
 
-    // 積載束選定用の値保持用ディクショナリ
+    // 積載束選定の値保持
     private final Map<String, String> bundleValues = new HashMap<>();
-    // コンテナ情報入力用の値保持用ディクショナ
+    // コンテナ情報入力の値保持
     private final Map<String, String> containerValues = new HashMap<>();
 
     // ===== Views =====
@@ -104,17 +102,17 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        io = Executors.newSingleThreadExecutor();   // ★先に作る
+        io = Executors.newSingleThreadExecutor();
 
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
         io.execute(() -> {
             try {
-                android.util.Log.d("DBCHK", "start");
-                db.getOpenHelper().getReadableDatabase(); // まずこれだけ
-                android.util.Log.d("DBCHK", "opened");
+                Log.d("DBCHK", "start");
+                db.getOpenHelper().getReadableDatabase();
+                Log.d("DBCHK", "opened");
             } catch (Exception e) {
-                android.util.Log.e("DBCHK", "failed", e);
+                Log.e("DBCHK", "failed", e);
             }
         });
 
@@ -134,30 +132,21 @@ public class MenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //====================================
-
     private void setupActivityLaunchers() {
         bundleSelectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     // 遷移はしない。表示更新のみ。
                     if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            java.io.Serializable extra =
-                                    data.getSerializableExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES);
-                            if (extra instanceof Map) {
-                                // 受け取った束情報を保持し、表示用に同期
-                                bundleValues.clear();
-                                Map<?, ?> raw = (Map<?, ?>) extra;
-                                for (Map.Entry<?, ?> entry : raw.entrySet()) {
-                                    Object key = entry.getKey();
-                                    Object value = entry.getValue();
-                                    if (key != null && value != null) {
-                                        bundleValues.put(key.toString(), value.toString());
-                                    }
-                                }
-                                syncContainerValuesFromBundle();
-                            }
+                        Map<String, String> resultMap = readStringMap(
+                                result.getData(),
+                                BundleSelectActivity.EXTRA_BUNDLE_VALUES
+                        );
+                        if (resultMap != null) {
+                            // 受け取った束情報を保持し、表示用に同期
+                            bundleValues.clear();
+                            bundleValues.putAll(resultMap);
+                            syncContainerValuesFromBundle();
                         }
                     }
                     // 表示の再計算/更新
@@ -169,23 +158,15 @@ public class MenuActivity extends BaseActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            java.io.Serializable extra =
-                                    data.getSerializableExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES);
-                            if (extra instanceof Map) {
-                                // コンテナ入力で確定した値を保持し、束情報側へ同期
-                                containerValues.clear();
-                                Map<?, ?> raw = (Map<?, ?>) extra;
-                                for (Map.Entry<?, ?> entry : raw.entrySet()) {
-                                    Object key = entry.getKey();
-                                    Object value = entry.getValue();
-                                    if (key != null && value != null) {
-                                        containerValues.put(key.toString(), value.toString());
-                                    }
-                                }
-                                syncBundleValuesFromContainer();
-                            }
+                        Map<String, String> resultMap = readStringMap(
+                                result.getData(),
+                                ContainerInputActivity.EXTRA_CONTAINER_VALUES
+                        );
+                        if (resultMap != null) {
+                            // コンテナ入力で確定した値を保持し、束情報側へ同期
+                            containerValues.clear();
+                            containerValues.putAll(resultMap);
+                            syncBundleValuesFromContainer();
                         }
                     }
                     // 画面ラベル/件数等を更新
@@ -198,7 +179,6 @@ public class MenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void initViews() {
         spContainerSize = findViewById(R.id.spContainerSize);
 
@@ -226,7 +206,6 @@ public class MenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
-
     private void setupContainerSizeSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
@@ -245,25 +224,12 @@ public class MenuActivity extends BaseActivity {
 
         // 変更されたら保存
         spContainerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            //========================================
-            //　機　能　:　on Item Selectedの処理
-            //　引　数　:　parent ..... AdapterView<?>
-            //　　　　　:　view ..... View
-            //　　　　　:　position ..... int
-            //　　　　　:　id ..... long
-            //　戻り値　:　[void] ..... なし
-            //========================================
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selected = parent.getItemAtPosition(position).toString();
                 prefs.edit().putString("container_size", selected).apply();
             }
 
-            //========================================
-            //　機　能　:　on Nothing Selectedの処理
-            //　引　数　:　parent ..... AdapterView<?>
-            //　戻り値　:　[void] ..... なし
-            //========================================
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -291,12 +257,12 @@ public class MenuActivity extends BaseActivity {
         // 空文字は無効＋薄く（BaseActivity機能）
         refreshBottomButtonsEnabled();
     }
+
     //============================
     //　機　能　:　wire Actionsの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void wireActions() {
 
         // データ送受信
@@ -318,12 +284,12 @@ public class MenuActivity extends BaseActivity {
     protected void onFunctionYellow() {
         onRestartMenu();
     }
+
     //===============================
     //　機　能　:　on Restart Menuの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
-
     private void onRestartMenu() {
         if (BuildConfig.DEBUG) {
             finish();
@@ -334,12 +300,12 @@ public class MenuActivity extends BaseActivity {
             restartApp();
         });
     }
+
     //============================
     //　機　能　:　restart Appの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void restartApp() {
         Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (launchIntent == null) {
@@ -362,21 +328,21 @@ public class MenuActivity extends BaseActivity {
         syncContainerWeightsFromPrefs();
         refreshInformation();
     }
+
     //===============================
     //　機　能　:　go Service Menuの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
-
     private void goServiceMenu() {
         startActivity(new Intent(this, ServiceMenuActivity.class));
     }
+
     //==============================
     //　機　能　:　bundle Selectを開く
     //　引　数　:　mode ..... String
     //　戻り値　:　[void] ..... なし
     //==============================
-
     private void openBundleSelect(String mode) {
         Intent intent = new Intent(this, BundleSelectActivity.class);
         intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
@@ -389,12 +355,12 @@ public class MenuActivity extends BaseActivity {
             startActivity(intent);
         }
     }
+
     //==============================================
     //　機　能　:　container Values From Bundleを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
-
     private void syncContainerValuesFromBundle() {
         if (bundleValues.containsKey(KEY_CONTAINER_JYURYO)) {
             containerValues.put(KEY_CONTAINER_JYURYO, bundleValues.get(KEY_CONTAINER_JYURYO));
@@ -407,12 +373,12 @@ public class MenuActivity extends BaseActivity {
             containerValues.remove(KEY_DUNNAGE_JYURYO);
         }
     }
+
     //==============================================
     //　機　能　:　bundle Values From Containerを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
-
     private void syncBundleValuesFromContainer() {
         String container = containerValues.get(KEY_CONTAINER_JYURYO);
         String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
@@ -423,12 +389,12 @@ public class MenuActivity extends BaseActivity {
             bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
         }
     }
+
     //==============================================
     //　機　能　:　container Weights From Prefsを同期する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
-
     private void syncContainerWeightsFromPrefs() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, null);
@@ -442,12 +408,12 @@ public class MenuActivity extends BaseActivity {
             bundleValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
         }
     }
+
     //==============================================
     //　機　能　:　container Input If Work Existsを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
-
     private void openContainerInputIfWorkExists() {
         io.execute(() -> {
             try {
@@ -478,12 +444,12 @@ public class MenuActivity extends BaseActivity {
             }
         });
     }
+
     //========================================
     //　機　能　:　collate Container Selectを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
-
     private void openCollateContainerSelect() {
         startActivity(new Intent(this, CollateContainerSelectActivity.class));
     }
@@ -528,31 +494,31 @@ public class MenuActivity extends BaseActivity {
 
         return super.onKeyDown(keyCode, event);
     }
+
     //===============================
     //　機　能　:　center Statusを設定する
     //　引　数　:　text ..... String
     //　戻り値　:　[void] ..... なし
     //===============================
-
     private void setCenterStatus(String text) {
         if (tvCenterStatus != null) tvCenterStatus.setText(text);
     }
+
     //============================
     //　機　能　:　data Syncを開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void startDataSync() {
         setCenterStatus("データ送受信中...");
         io.execute(this::runDataSync);
     }
+
     //=============================
     //　機　能　:　run Data Syncの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
-
     private void runDataSync() {
         showLoadingLong();
         try {
@@ -581,6 +547,11 @@ public class MenuActivity extends BaseActivity {
         }
     }
 
+    //=============================
+    //　機　能　:　data Syncのエラー表示
+    //　引　数　:　message ..... String
+    //　戻り値　:　[void] ..... なし
+    //=============================
     private void showSyncErrorAndWait(String message) {
         if (message == null || message.trim().isEmpty()) {
             return;
@@ -617,7 +588,6 @@ public class MenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
-
     private void refreshInformation() {
         io.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
@@ -649,8 +619,8 @@ public class MenuActivity extends BaseActivity {
                 goukeiJyuryo += intOrZero(row.goukeiJyuryo);
             }
 
-            long kanryoJyuryoTon = Math.round(kanryoJyuryo / 1000.0);
-            long goukeiJyuryoTon = Math.round(goukeiJyuryo / 1000.0);
+            long kanryoJyuryoTon = kanryoJyuryo / 1000;
+            long goukeiJyuryoTon = goukeiJyuryo / 1000;
 
             long zanContainer = containerCount - kanryoContainer;
             long zanBundle = goukeiBundole - kanryoBundole;
@@ -698,28 +668,63 @@ public class MenuActivity extends BaseActivity {
                     lblWeightPlan.setText(formatNumber(goukeiJyuryoTonFinal));
 
                 if (lblZanContainer != null)
-                    lblZanContainer.setText(formatNumber(zanContainerFinal));
-                if (lblZanBundle != null) lblZanBundle.setText(formatNumber(zanBundleFinal));
-                if (lblZanWeight != null) lblZanWeight.setText(formatNumber(zanWeightFinal));
+                    lblZanContainer.setText(formatRemaining(zanContainerFinal));
+                if (lblZanBundle != null) lblZanBundle.setText(formatRemaining(zanBundleFinal));
+                if (lblZanWeight != null) lblZanWeight.setText(formatRemaining(zanWeightFinal));
             });
         });
     }
+
     //================================
     //　機　能　:　int Or Zeroの処理
     //　引　数　:　value ..... Integer
     //　戻り値　:　[long] ..... なし
     //================================
-
     private long intOrZero(Integer value) {
         return value == null ? 0 : value;
     }
+
     //==============================
     //　機　能　:　numberを整形する
     //　引　数　:　value ..... long
     //　戻り値　:　[String] ..... なし
     //==============================
-
     private String formatNumber(long value) {
         return String.format(Locale.JAPAN, "%,d", value);
+    }
+
+    //==============================
+    //　機　能　:　残数表示用の整形
+    //　引　数　:　value ..... long
+    //　戻り値　:　[String] ..... なし
+    //==============================
+    private String formatRemaining(long value) {
+        return value == 0 ? "" : formatNumber(value);
+    }
+
+    //============================================
+    //　機　能　:　String Mapを取り出す
+    //　引　数　:　data ..... Intent
+    //　　　　　:　key ..... String
+    //　戻り値　:　[Map<String, String>] ..... Map
+    //============================================
+    private Map<String, String> readStringMap(Intent data, String key) {
+        if (data == null) {
+            return null;
+        }
+        java.io.Serializable extra = data.getSerializableExtra(key);
+        if (!(extra instanceof Map)) {
+            return null;
+        }
+        Map<?, ?> raw = (Map<?, ?>) extra;
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<?, ?> entry : raw.entrySet()) {
+            Object rawKey = entry.getKey();
+            Object rawValue = entry.getValue();
+            if (rawKey != null && rawValue != null) {
+                result.put(rawKey.toString(), rawValue.toString());
+            }
+        }
+        return result;
     }
 }
