@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +26,7 @@ public final class AppSettings {
     // SharedPreferences
     // ================================
     private static final String PREF_NAME = "AppSettings";
-    private static final String INI_FILE_NAME = "AppSettings.ini";
+    private static final String INI_FILE_NAME = "TatsumiHandy.ini";
 
     // ================================
     // Key 定義（C#版と完全一致）
@@ -62,7 +63,47 @@ public final class AppSettings {
     public static void init(Context context) {
         appContext = context.getApplicationContext();
         pref = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        iniFile = new File(appContext.getFilesDir(), INI_FILE_NAME);
+        File baseDir = resolveIniBaseDir();
+        iniFile = new File(baseDir, INI_FILE_NAME);
+        copyIniFromAssetsIfNeeded();
+    }
+
+    private static File resolveIniBaseDir() {
+        // APK配布後の実機では、アプリ専用外部領域を優先（永続性と運用のしやすさ重視）
+        File appExternalDir = appContext.getExternalFilesDir(null);
+        if (appExternalDir != null) {
+            return appExternalDir;
+        }
+
+        // 取得不可時のみ内部領域へフォールバック
+        return appContext.getFilesDir();
+    }
+
+    /**
+     * 初回のみ assets/TatsumiHandy.ini をコピーする。
+     * 2回目以降は既存ファイルを保持して、save() で更新していく。
+     */
+    private static void copyIniFromAssetsIfNeeded() {
+        if (iniFile.exists()) {
+            return;
+        }
+
+        File parent = iniFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            parent.mkdirs();
+        }
+
+        try (InputStream in = appContext.getAssets().open(INI_FILE_NAME);
+             FileOutputStream out = new FileOutputStream(iniFile, false)) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = in.read(buffer)) >= 0) {
+                out.write(buffer, 0, read);
+            }
+        } catch (IOException ignored) {
+            // assets に無い場合やコピー失敗時は従来どおり継続
+        }
     }
 
     // ================================
