@@ -74,7 +74,7 @@ public class CollateContainerSelectController {
     @NonNull
     public String checkSelectedNo(int selectedNo) {
         if (selectedNo <= 0 || selectedNo > containers.size()) {
-            return "照合対象№が存在しません";
+            return "照合対象№が一覧に存在しません";
         }
         return "OK";
     }

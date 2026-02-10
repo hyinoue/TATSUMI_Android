@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.Locale;
 
 
-
 //================================
 //　処理概要　:　SvcHandyWrapperクラス
 //================================
@@ -326,7 +325,6 @@ public class SvcHandyWrapper implements Closeable {
         entity.procName = trimToLength(nullSafe(history.procName), 100);
         entity.argument = trimToLength(nullSafe(history.argument), 255);
         entity.returnValue = trimToLength(nullSafe(history.returnValue), MAX_TEXT_LENGTH);
-        entity.errNumber = trimToLength(nullSafe(history.errorNumber), 20);
         entity.errDescription = trimToLength(history.errorDescription, MAX_TEXT_LENGTH);
         commHistoryDao.upsert(entity);
     }

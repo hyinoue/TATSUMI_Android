@@ -36,9 +36,6 @@ public class CommHistoryEntity {
     @ColumnInfo(name = "RETURN_VALUE")
     public String returnValue;
 
-    @ColumnInfo(name = "ERR_NUMBER")
-    public String errNumber;
-
     @ColumnInfo(name = "ERR_DESCRIPTION")
     public String errDescription;
 }
