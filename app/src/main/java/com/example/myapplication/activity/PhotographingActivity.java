@@ -464,7 +464,7 @@ public class PhotographingActivity extends BaseActivity {
                 .setDuration(180)
                 .withEndAction(() -> focusIndicator.postDelayed(
                         () -> focusIndicator.setVisibility(View.GONE),
-                        450
+                        5000
                 ))
                 .start();
     }

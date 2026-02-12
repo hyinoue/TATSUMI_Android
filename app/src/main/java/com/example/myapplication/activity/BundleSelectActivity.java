@@ -11,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -223,14 +222,6 @@ public class BundleSelectActivity extends BaseActivity {
         if (etGenpinNo != null) {
             // キーボードは出さず、スキャナ入力を前提にする
             etGenpinNo.setShowSoftInputOnFocus(false);
-            etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
-                    // Enter相当で現品入力を確定させる
-                    handleGenpinInput(v.getText() != null ? v.getText().toString() : "");
-                    return true;
-                }
-                return false;
-            });
             etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     // 物理Enterキーにも対応

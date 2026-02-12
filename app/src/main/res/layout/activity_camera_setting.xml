@@ -57,6 +57,7 @@
                     android:id="@+id/spImageSize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingEnd="0dp"
                     android:spinnerMode="dropdown" />
             </FrameLayout>
         </LinearLayout>

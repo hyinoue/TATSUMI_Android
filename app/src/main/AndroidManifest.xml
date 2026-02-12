@@ -51,11 +51,14 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
-        <activity android:name=".activity.CameraSettingActivity" />
+        <activity
+            android:name=".activity.CameraSettingActivity"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
             android:name=".activity.PhotographingActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
 
 
         <activity

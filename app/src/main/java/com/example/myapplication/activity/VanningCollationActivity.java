@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -175,14 +174,6 @@ public class VanningCollationActivity extends BaseActivity {
 
         // スキャナ入力を想定し、ソフトキーボードは出さない
         etGenpinNo.setShowSoftInputOnFocus(false);
-        etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
-                // Enter確定で照合処理へ
-                handleGenpinInput();
-                return true;
-            }
-            return false;
-        });
         etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                 // 物理Enterキーの入力にも対応

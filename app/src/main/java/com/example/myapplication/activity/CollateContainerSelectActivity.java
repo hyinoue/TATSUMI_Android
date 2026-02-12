@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -145,13 +144,6 @@ public class CollateContainerSelectActivity extends BaseActivity {
         if (etSelectedNo == null) return;
 
         etSelectedNo.setShowSoftInputOnFocus(false);
-        etSelectedNo.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
-                handleSelectedNoInput();
-                return true;
-            }
-            return false;
-        });
         etSelectedNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                 handleSelectedNoInput();
