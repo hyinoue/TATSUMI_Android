@@ -4,10 +4,12 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CaptureRequest;
+import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -88,6 +90,7 @@ public class PhotographingActivity extends BaseActivity {
     private PreviewView previewView;
     private TextView statusBar;
     private ImageView capturedPreview;
+    private View focusIndicator;
     private View confirmButtons;
     private ImageButton btnSettings;
     private ImageButton btnShutter;
@@ -104,6 +107,7 @@ public class PhotographingActivity extends BaseActivity {
     private int lastImageSize;
     private int lastFlashMode;
     private int lastLightMode;
+    private MediaActionSound shutterSound;
 
     private final ActivityResultLauncher<String> requestCameraPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
@@ -143,6 +147,7 @@ public class PhotographingActivity extends BaseActivity {
         previewView = findViewById(R.id.previewView);
         statusBar = findViewById(R.id.statusBar);
         capturedPreview = findViewById(R.id.capturedPreview);
+        focusIndicator = findViewById(R.id.focusIndicator);
         confirmButtons = findViewById(R.id.confirmButtons);
 
         Button btnExit = findViewById(R.id.btnExit);
@@ -154,6 +159,10 @@ public class PhotographingActivity extends BaseActivity {
         btnShutter.setOnClickListener(v -> takePhoto());
         btnSave.setOnClickListener(v -> saveCapture());
         btnDiscard.setOnClickListener(v -> discardCapture());
+        previewView.setOnTouchListener(this::onPreviewTouched);
+
+        shutterSound = new MediaActionSound();
+        shutterSound.load(MediaActionSound.SHUTTER_CLICK);
 
         showCaptureReview(false);
 
@@ -162,6 +171,15 @@ public class PhotographingActivity extends BaseActivity {
             startCamera();
         } else {
             requestCameraPermission.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (shutterSound != null) {
+            shutterSound.release();
+            shutterSound = null;
         }
     }
 
@@ -364,6 +382,7 @@ public class PhotographingActivity extends BaseActivity {
         if (imageCapture == null) {
             return;
         }
+        playShutterSound();
         File file = getOutputFile();
         if (file == null) {
             setStatus("FILE_ERROR");
@@ -408,6 +427,53 @@ public class PhotographingActivity extends BaseActivity {
                     }
                 }
         );
+    }
+
+    private boolean onPreviewTouched(View v, MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_UP || camera == null) {
+            return true;
+        }
+
+        float touchX = event.getX();
+        float touchY = event.getY();
+        showFocusIndicator(touchX, touchY);
+
+        MeteringPoint point = previewView.getMeteringPointFactory().createPoint(touchX, touchY);
+        FocusMeteringAction action = new FocusMeteringAction.Builder(point)
+                .setAutoCancelDuration(2, TimeUnit.SECONDS)
+                .build();
+        camera.getCameraControl().startFocusAndMetering(action);
+        return true;
+    }
+
+    private void showFocusIndicator(float centerX, float centerY) {
+        if (focusIndicator == null) {
+            return;
+        }
+        float halfWidth = focusIndicator.getWidth() / 2f;
+        float halfHeight = focusIndicator.getHeight() / 2f;
+        focusIndicator.setX(centerX - halfWidth);
+        focusIndicator.setY(centerY - halfHeight);
+        focusIndicator.setScaleX(1.3f);
+        focusIndicator.setScaleY(1.3f);
+        focusIndicator.setAlpha(1f);
+        focusIndicator.setVisibility(View.VISIBLE);
+        focusIndicator.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(180)
+                .withEndAction(() -> focusIndicator.postDelayed(
+                        () -> focusIndicator.setVisibility(View.GONE),
+                        450
+                ))
+                .start();
+    }
+
+    private void playShutterSound() {
+        if (shutterSound == null) {
+            return;
+        }
+        shutterSound.play(MediaActionSound.SHUTTER_CLICK);
     }
     //============================
     //　機　能　:　captureを保存する
@@ -468,6 +534,9 @@ public class PhotographingActivity extends BaseActivity {
         }
         if (btnDiscard != null) {
             btnDiscard.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (focusIndicator != null && show) {
+            focusIndicator.setVisibility(View.GONE);
         }
     }
     //=======================================
