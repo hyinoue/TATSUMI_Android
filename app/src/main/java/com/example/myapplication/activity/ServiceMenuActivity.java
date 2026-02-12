@@ -484,9 +484,7 @@ public class ServiceMenuActivity extends BaseActivity {
                     }
                 })
                 .setNegativeButton("キャンセル", (dialog, which) -> {
-                    if (callback != null) {
-                        callback.onResult(false);
-                    }
+                    // キャンセル時はエラー表示を出さない
                 })
                 .show();
     }
