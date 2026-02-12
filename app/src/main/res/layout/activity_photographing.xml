@@ -30,6 +30,17 @@
         app:layout_constraintStart_toStartOf="@id/previewView"
         app:layout_constraintEnd_toEndOf="@id/previewView" />
 
+    <View
+        android:id="@+id/focusIndicator"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/bg_camera_focus_ring"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/previewView"
+        app:layout_constraintBottom_toBottomOf="@id/previewView"
+        app:layout_constraintStart_toStartOf="@id/previewView"
+        app:layout_constraintEnd_toEndOf="@id/previewView" />
+
     <!-- ===== 左上：設定アイコン（PreviewViewの上に重ねる） ===== -->
     <ImageButton
         android:id="@+id/btnSettings"
