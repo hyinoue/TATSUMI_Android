@@ -94,7 +94,7 @@ public class HandyUtil {
         if (AppSettings.VibratorMute) return;
 
         int baseCount = Math.max(1, AppSettings.VibratorCount);
-        int totalCount = baseCount + Math.max(0, extraCount);
+        int totalCount = Math.max(1, baseCount + extraCount);
         int length = Math.max(0, AppSettings.VibratorLength);
         int interval = Math.max(0, AppSettings.VibratorInterval);
         if (length == 0) {

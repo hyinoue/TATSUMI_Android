@@ -64,63 +64,53 @@
             android:id="@+id/btnCreateConn"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="接続を作成"
-            android:textColor="#000000"
-            style="@style/AppButton.BlackStroke"
-            app:backgroundTint="@color/menu_button_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnDeleteConn"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_weight="1"
-            app:cornerRadius="0dp" />
+            app:layout_constraintHorizontal_weight="1" />
 
         <Button
             android:id="@+id/btnDeleteConn"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="接続を削除"
-            android:textColor="#000000"
-            style="@style/AppButton.BlackStroke"
-            app:backgroundTint="@color/menu_button_bg"
             android:layout_marginStart="40dp"
             app:layout_constraintStart_toEndOf="@id/btnCreateConn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_weight="1"
-            app:cornerRadius="0dp" />
+            app:layout_constraintHorizontal_weight="1" />
 
         <Button
             android:id="@+id/btnTestConn"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="接続テスト"
-            android:textColor="#000000"
-            style="@style/AppButton.BlackStroke"
-            app:backgroundTint="@color/menu_button_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnDisconnect"
             app:layout_constraintTop_toBottomOf="@id/btnCreateConn"
             android:layout_marginTop="12dp"
-            app:layout_constraintHorizontal_weight="1"
-            app:cornerRadius="0dp" />
-
+            app:layout_constraintHorizontal_weight="1" />
 
         <Button
             android:id="@+id/btnDisconnect"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="切断"
-            android:textColor="#000000"
-            style="@style/AppButton.BlackStroke"
-            app:backgroundTint="@color/menu_button_bg"
             android:layout_marginStart="40dp"
             app:layout_constraintStart_toEndOf="@id/btnTestConn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnDeleteConn"
             android:layout_marginTop="12dp"
-            app:layout_constraintHorizontal_weight="1"
-            app:cornerRadius="0dp" />
-
+            app:layout_constraintHorizontal_weight="1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

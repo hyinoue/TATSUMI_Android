@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -219,18 +220,60 @@ public class BundleSelectActivity extends BaseActivity {
         if (etContainerKg != null) etContainerKg.addTextChangedListener(weightWatcher);
         if (etDunnageKg != null) etDunnageKg.addTextChangedListener(weightWatcher);
 
+        if (etContainerKg != null) {
+            etContainerKg.setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etDunnageKg != null) {
+                    etDunnageKg.requestFocus();
+                }
+                return true;
+            });
+            etContainerKg.setOnEditorActionListener((v, actionId, event) -> {
+                if (!isEnterAction(actionId, event)) return false;
+                if (etDunnageKg != null) etDunnageKg.requestFocus();
+                return true;
+            });
+        }
+
+        if (etDunnageKg != null) {
+            etDunnageKg.setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etGenpinNo != null) {
+                    etGenpinNo.requestFocus();
+                }
+                return true;
+            });
+            etDunnageKg.setOnEditorActionListener((v, actionId, event) -> {
+                if (!isEnterAction(actionId, event)) return false;
+                if (etGenpinNo != null) etGenpinNo.requestFocus();
+                return true;
+            });
+        }
+
         if (etGenpinNo != null) {
             // キーボードは出さず、スキャナ入力を前提にする
             etGenpinNo.setShowSoftInputOnFocus(false);
             etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN) {
                     // 物理Enterキーにも対応
                     handleGenpinInput(etGenpinNo.getText() != null ? etGenpinNo.getText().toString() : "");
-                    return true;
                 }
-                return false;
+                return true;
+            });
+            etGenpinNo.setOnEditorActionListener((v, actionId, event) -> {
+                if (!isEnterAction(actionId, event)) return false;
+                handleGenpinInput(etGenpinNo.getText() != null ? etGenpinNo.getText().toString() : "");
+                return true;
             });
         }
+    }
+
+    private boolean isEnterAction(int actionId, KeyEvent event) {
+        return actionId == EditorInfo.IME_ACTION_NEXT
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || actionId == EditorInfo.IME_ACTION_UNSPECIFIED
+                || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
     }
     //============================
     //　機　能　:　scannerを初期化する
@@ -643,10 +686,10 @@ public class BundleSelectActivity extends BaseActivity {
 
         String input = rawInput != null ? rawInput.trim() : "";
         if (TextUtils.isEmpty(input)) {
+            //現品Noが空白の場合
             if (etGenpinNo != null) {
-                View next = etGenpinNo.focusSearch(View.FOCUS_FORWARD);
-                if (next != null) {
-                    next.requestFocus();
+                if (etContainerKg != null) {
+                    etContainerKg.requestFocus();
                 } else {
                     etGenpinNo.requestFocus();
                 }

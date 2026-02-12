@@ -11,7 +11,9 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -250,10 +252,50 @@ public class ContainerInputActivity extends BaseActivity {
         if (etContainerKg != null) etContainerKg.addTextChangedListener(weightWatcher);
         if (etDunnageKg != null) etDunnageKg.addTextChangedListener(weightWatcher);
 
+        setupEnterFocus(etContainerNo1, etContainerNo2);
+        setupEnterFocus(etContainerNo2, etContainerKg);
+        setupEnterFocus(etContainerKg, etDunnageKg);
+        setupEnterFocus(etDunnageKg, etSealNo);
+        setupEnterFocus(etSealNo, etContainerNo1);
+
         if (etBookingNo != null) {
             etBookingNo.setFocusable(false);
             etBookingNo.setFocusableInTouchMode(false);
         }
+    }
+
+    //from→toにフォーカスを移動
+    private void setupEnterFocus(@Nullable EditText from, @Nullable EditText to) {
+        if (from == null) return;
+
+        from.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+            if (event != null && event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (to != null) {
+                    to.requestFocus();
+                } else {
+                    from.requestFocus();
+                }
+            }
+            return true;
+        });
+
+        from.setOnEditorActionListener((v, actionId, event) -> {
+            if (!isEnterAction(actionId, event)) return false;
+            if (to != null) {
+                to.requestFocus();
+            } else {
+                from.requestFocus();
+            }
+            return true;
+        });
+    }
+
+    private boolean isEnterAction(int actionId, KeyEvent event) {
+        return actionId == EditorInfo.IME_ACTION_NEXT
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || actionId == EditorInfo.IME_ACTION_UNSPECIFIED
+                || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
     }
     //================================
     //　機　能　:　photo Handlersを設定する
@@ -263,6 +305,8 @@ public class ContainerInputActivity extends BaseActivity {
 
     private void setupPhotoHandlers() {
         if (btnPhotoContainerNo != null) {
+            btnPhotoContainerNo.setFocusable(false);
+            btnPhotoContainerNo.setFocusableInTouchMode(false);
             btnPhotoContainerNo.setOnClickListener(v -> {
                 currentTarget = PhotoTarget.CONTAINER;
                 launchCamera();
@@ -270,6 +314,8 @@ public class ContainerInputActivity extends BaseActivity {
         }
 
         if (btnPhotoSealNo != null) {
+            btnPhotoSealNo.setFocusable(false);
+            btnPhotoSealNo.setFocusableInTouchMode(false);
             btnPhotoSealNo.setOnClickListener(v -> {
                 currentTarget = PhotoTarget.SEAL;
                 launchCamera();

@@ -15,6 +15,8 @@ import com.densowave.bhtsdk.barcode.BarcodeException;
 import com.densowave.bhtsdk.barcode.BarcodeManager;
 import com.densowave.bhtsdk.barcode.BarcodeScanner;
 import com.densowave.bhtsdk.barcode.BarcodeScannerSettings;
+import com.example.myapplication.settings.AppSettings;
+import com.example.myapplication.settings.HandyUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -315,6 +317,9 @@ public class DensoScannerController
         final String denso = String.valueOf(list.get(0).getSymbologyDenso());
 
         Log.d(TAG, "onBarcodeDataReceived data=[" + normalized + "] symDenso=" + denso + " symAim=" + aim);
+
+        // スキャン成功時は1回だけ振動
+        HandyUtil.playVibrater(activity, 1 - Math.max(1, AppSettings.VibratorCount));
 
         // UI/業務通知はメインスレッドへ
         activity.runOnUiThread(() -> {

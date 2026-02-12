@@ -87,6 +87,8 @@
             android:layout_width="120dp"
             android:layout_height="36dp"
             android:layout_marginTop="12dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="接続テスト"
             android:textSize="16sp"
             android:insetTop="0dp"
