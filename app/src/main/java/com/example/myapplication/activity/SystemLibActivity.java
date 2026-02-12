@@ -187,7 +187,6 @@ public class SystemLibActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //================================
     private void setupBottomButtons() {
-        bindBottomButtonsIfExists();
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
         MaterialButton red = findViewById(R.id.btnBottomRed);
         MaterialButton blue = findViewById(R.id.btnBottomBlue);

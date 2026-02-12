@@ -71,7 +71,6 @@ public class CommTestActivity extends BaseActivity {
     //================================
 
     private void setupBottomButtons() {
-        bindBottomButtonsIfExists();
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
         if (yellow != null) {

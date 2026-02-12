@@ -91,7 +91,6 @@ public class ServiceMenuActivity extends BaseActivity {
         btnGreen.setText("");
         btnYellow.setText("終了");
 
-        btnYellow.setOnClickListener(v -> finish());
 
         // ▼ メニューTextView取得
         menu1 = findViewById(R.id.menu1);
