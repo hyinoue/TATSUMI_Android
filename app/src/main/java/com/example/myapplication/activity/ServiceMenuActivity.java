@@ -121,6 +121,30 @@ public class ServiceMenuActivity extends BaseActivity {
         setupBottomButtonTexts();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        clearMenuFocus();
+    }
+
+    //フォーカス解除
+    private void clearMenuFocus() {
+        TextView[] menus = {menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8};
+        for (TextView menu : menus) {
+            if (menu != null) {
+                menu.clearFocus();
+                menu.setSelected(false);
+            }
+        }
+
+        View root = findViewById(R.id.root);
+        if (root != null) {
+            root.setFocusable(true);
+            root.setFocusableInTouchMode(true);
+            root.requestFocus();
+        }
+    }
+
     /**
      * 物理キー（1〜8/0）で遷移
      * ※端末/キー割当によって拾えるKEYCODEが異なる場合があります。

@@ -60,6 +60,7 @@ public class CommTestActivity extends BaseActivity {
 
         bindViews();
         loadSettings();
+        etCommName.requestFocus();
         setupInputListeners();
         setupActionButtons();
         updatePowerStatus();

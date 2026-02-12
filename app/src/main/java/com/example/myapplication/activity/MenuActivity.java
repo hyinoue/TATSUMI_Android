@@ -60,7 +60,7 @@ public class MenuActivity extends BaseActivity {
     private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
 
     private ExecutorService io;
-    
+
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
     private ActivityResultLauncher<Intent> containerInputLauncher;
 
@@ -122,8 +122,6 @@ public class MenuActivity extends BaseActivity {
         setupBottomButtonTexts();
         wireActions();
 
-        if (btnDataReceive != null) btnDataReceive.requestFocus();
-
         refreshInformation();
     }
 
@@ -174,6 +172,7 @@ public class MenuActivity extends BaseActivity {
                 }
         );
     }
+
     //============================
     //　機　能　:　viewsを初期化する
     //　引　数　:　なし
@@ -201,6 +200,7 @@ public class MenuActivity extends BaseActivity {
         lblZanBundle = findViewById(R.id.lblZanBundle);
         lblZanWeight = findViewById(R.id.lblZanWeight);
     }
+
     //========================================
     //　機　能　:　container Size Spinnerを設定する
     //　引　数　:　なし
@@ -325,8 +325,27 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        clearMainMenuFocus();
         syncContainerWeightsFromPrefs();
         refreshInformation();
+    }
+
+    //フォーカス解除
+    private void clearMainMenuFocus() {
+        View[] menuButtons = {btnDataReceive, btnBundleSelect, btnContainerInput, btnWeightCalc, btnCollateContainerSelect};
+        for (View button : menuButtons) {
+            if (button != null) {
+                button.clearFocus();
+                button.setSelected(false);
+            }
+        }
+
+        View mainArea = findViewById(R.id.mainArea);
+        if (mainArea != null) {
+            mainArea.setFocusable(true);
+            mainArea.setFocusableInTouchMode(true);
+            mainArea.requestFocus();
+        }
     }
 
     //===============================
