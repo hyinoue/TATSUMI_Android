@@ -111,16 +111,6 @@ public class BaseActivity extends AppCompatActivity {
         AppSettings.load();
     }
 
-    //============================
-    //　機　能　:　画面一時停止時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     //==================================
     //　機　能　:　content Viewを設定する
     //　引　数　:　layoutResID ..... int
@@ -160,23 +150,10 @@ public class BaseActivity extends AppCompatActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //======================================
-
     private void afterSetContentView() {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
     }
-
-
-    //===================================
-    //　機　能　:　on User Interactionの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //===================================
-    @Override
-    public void onUserInteraction() {
-        super.onUserInteraction();
-    }
-
 
     // ===== frmBase: ErrorProcess 相当 =====
     //==================================
@@ -191,38 +168,23 @@ public class BaseActivity extends AppCompatActivity {
         playErrorFeedback();
         showDialog("エラー", "エラーが発生しました\n" + safeMessage(ex));
     }
-    //==================================
-    //　機　能　:　error Processの処理
-    //　引　数　:　procName ..... String
-    //　　　　　:　message ..... String
-    //　　　　　:　ex ..... Exception
-    //　戻り値　:　[void] ..... なし
-    //==================================
 
-    protected void errorProcess(String procName, String message, Exception ex) {
-        hideLoadingLong();
-        hideLoadingShort();
-        playErrorFeedback();
-        String detail = "エラーが発生しました\n" + procName + "\n" + message + "\n" + safeMessage(ex);
-        showDialog("エラー", detail);
-    }
     //===============================
     //　機　能　:　safe Messageの処理
     //　引　数　:　ex ..... Exception
     //　戻り値　:　[String] ..... なし
     //===============================
-
     private String safeMessage(Exception ex) {
         if (ex == null) return "";
         String m = ex.getMessage();
         return (m == null) ? ex.getClass().getSimpleName() : m;
     }
+
     //===================================
     //　機　能　:　play Error Feedbackの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===================================
-
     private void playErrorFeedback() {
         HandyUtil.playErrorBuzzer(this);
         HandyUtil.playVibrater(this);
@@ -235,7 +197,6 @@ public class BaseActivity extends AppCompatActivity {
     //　　　　　:　mode ..... MsgDispMode
     //　戻り値　:　[void] ..... なし
     //===================================
-
     public void showErrorMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
@@ -249,13 +210,13 @@ public class BaseActivity extends AppCompatActivity {
             showBanner(msg, BannerType.ERROR);
         }
     }
+
     //===================================
     //　機　能　:　show Warning Msgの処理
     //　引　数　:　msg ..... String
     //　　　　　:　mode ..... MsgDispMode
     //　戻り値　:　[void] ..... なし
     //===================================
-
     public void showWarningMsg(String msg, MsgDispMode mode) {
         hideLoadingLong();
         hideLoadingShort();
@@ -270,13 +231,13 @@ public class BaseActivity extends AppCompatActivity {
             showBanner(msg, BannerType.WARNING);
         }
     }
+
     //===================================
     //　機　能　:　show Info Msgの処理
     //　引　数　:　msg ..... String
     //　　　　　:　mode ..... MsgDispMode
     //　戻り値　:　[void] ..... なし
     //===================================
-
     public void showInfoMsg(String msg, MsgDispMode mode) {
         if (mode == MsgDispMode.MsgBox) {
             hideLoadingLong();
@@ -288,13 +249,13 @@ public class BaseActivity extends AppCompatActivity {
             showBanner(msg, BannerType.INFO);
         }
     }
+
     //============================================
     //　機　能　:　show Questionの処理
     //　引　数　:　msg ..... String
     //　　　　　:　callback ..... QuestionCallback
     //　戻り値　:　[void] ..... なし
     //============================================
-
     public void showQuestion(String msg, QuestionCallback callback) {
         hideLoadingLong();
         hideLoadingShort();
@@ -311,13 +272,13 @@ public class BaseActivity extends AppCompatActivity {
                 })
                 .show());
     }
+
     //===============================
     //　機　能　:　show Dialogの処理
     //　引　数　:　title ..... String
     //　　　　　:　msg ..... String
     //　戻り値　:　[void] ..... なし
     //===============================
-
     private void showDialog(String title, String msg) {
         runOnUiThread(() -> new AlertDialog.Builder(this)
                 .setTitle(title)
@@ -329,13 +290,13 @@ public class BaseActivity extends AppCompatActivity {
     // ===== Banner（Label表示相当） =====
 
     private enum BannerType {ERROR, WARNING, INFO}
+
     //==================================
     //　機　能　:　show Bannerの処理
     //　引　数　:　msg ..... String
     //　　　　　:　type ..... BannerType
     //　戻り値　:　[void] ..... なし
     //==================================
-
     private void showBanner(String msg, BannerType type) {
         ensureBaseOverlaysAttached();
 
@@ -366,7 +327,6 @@ public class BaseActivity extends AppCompatActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
-
     protected void showLoadingLong() {
         ensureBaseOverlaysAttached();
         runOnUiThread(() -> {
@@ -374,22 +334,22 @@ public class BaseActivity extends AppCompatActivity {
             overlayLong.setVisibility(View.VISIBLE);
         });
     }
+
     //=================================
     //　機　能　:　hide Loading Longの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
-
     protected void hideLoadingLong() {
         if (overlayLong == null) return;
         runOnUiThread(() -> overlayLong.setVisibility(View.GONE));
     }
+
     //==================================
     //　機　能　:　show Loading Shortの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
-
     protected void showLoadingShort() {
         ensureBaseOverlaysAttached();
         runOnUiThread(() -> {
@@ -397,12 +357,12 @@ public class BaseActivity extends AppCompatActivity {
             overlayShort.setVisibility(View.VISIBLE);
         });
     }
+
     //==================================
     //　機　能　:　hide Loading Shortの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
-
     protected void hideLoadingShort() {
         if (overlayShort == null) return;
         runOnUiThread(() -> overlayShort.setVisibility(View.GONE));
@@ -455,28 +415,28 @@ public class BaseActivity extends AppCompatActivity {
     //===============================
     protected void onFunctionRed() {
     }
+
     //================================
     //　機　能　:　on Function Blueの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
-
     protected void onFunctionBlue() {
     }
+
     //=================================
     //　機　能　:　on Function Greenの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
-
     protected void onFunctionGreen() {
     }
+
     //==================================
     //　機　能　:　on Function Yellowの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
-
     protected void onFunctionYellow() {
     }
 
@@ -486,7 +446,6 @@ public class BaseActivity extends AppCompatActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================================
-
     protected void bindBottomButtonsIfExists() {
         if (bottomButtonsBound) {
             refreshBottomButtonsEnabled();
@@ -521,12 +480,12 @@ public class BaseActivity extends AppCompatActivity {
         bottomButtonsBound = true;
         refreshBottomButtonsEnabled();
     }
+
     //========================================
     //　機　能　:　bottom Buttons Enabledを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
-
     protected void refreshBottomButtonsEnabled() {
         if (!bottomButtonsBound) return;
 
@@ -535,56 +494,56 @@ public class BaseActivity extends AppCompatActivity {
         applyEnabled(btnBottomGreen, isActiveByText(btnBottomGreen));
         applyEnabled(btnBottomYellow, isActiveByText(btnBottomYellow));
     }
+
     //=====================================
     //　機　能　:　can Runの処理
     //　引　数　:　btn ..... MaterialButton
     //　戻り値　:　[boolean] ..... なし
     //=====================================
-
     private boolean canRun(MaterialButton btn) {
         // 「下部ボタンが無い画面」でも物理キーは通す（元仕様）
         return !bottomButtonsBound || isActive(btn);
     }
+
     //=====================================
     //　機　能　:　active By Textを判定する
     //　引　数　:　btn ..... MaterialButton
     //　戻り値　:　[boolean] ..... なし
     //=====================================
-
     private boolean isActiveByText(MaterialButton btn) {
         if (btn == null) return false;
         CharSequence t = btn.getText();
         return t != null && t.toString().trim().length() > 0;
     }
+
     //=====================================
     //　機　能　:　activeを判定する
     //　引　数　:　btn ..... MaterialButton
     //　戻り値　:　[boolean] ..... なし
     //=====================================
-
     private boolean isActive(MaterialButton btn) {
         if (btn == null) return false;
         if (btn.getVisibility() != View.VISIBLE) return false;
         if (!btn.isEnabled()) return false;
         return isActiveByText(btn);
     }
+
     //=====================================
     //　機　能　:　apply Enabledの処理
     //　引　数　:　btn ..... MaterialButton
     //　　　　　:　enabled ..... boolean
     //　戻り値　:　[void] ..... なし
     //=====================================
-
     private void applyEnabled(MaterialButton btn, boolean enabled) {
         if (btn == null) return;
         btn.setEnabled(enabled);
     }
+
     //======================================
     //　機　能　:　as Material Buttonの処理
     //　引　数　:　v ..... View
     //　戻り値　:　[MaterialButton] ..... なし
     //======================================
-
     private MaterialButton asMaterialButton(View v) {
         return (v instanceof MaterialButton) ? (MaterialButton) v : null;
     }
@@ -595,7 +554,6 @@ public class BaseActivity extends AppCompatActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================================
-
     private void ensureBaseOverlaysAttached() {
         if (bannerView != null && overlayLong != null && overlayShort != null) return;
 
@@ -619,12 +577,12 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
     }
+
     //================================
     //　機　能　:　banner Viewを作成する
     //　引　数　:　なし
     //　戻り値　:　[TextView] ..... なし
     //================================
-
     private TextView createBannerView() {
         TextView tv = new TextView(this);
         tv.setVisibility(View.GONE);
@@ -643,12 +601,12 @@ public class BaseActivity extends AppCompatActivity {
         tv.setTextColor(Color.YELLOW);
         return tv;
     }
+
     //===================================
     //　機　能　:　loading Overlayを作成する
     //　引　数　:　isLong ..... boolean
     //　戻り値　:　[FrameLayout] ..... なし
     //===================================
-
     private FrameLayout createLoadingOverlay(boolean isLong) {
         FrameLayout overlay = new FrameLayout(this);
         overlay.setVisibility(View.GONE);
@@ -693,12 +651,12 @@ public class BaseActivity extends AppCompatActivity {
         overlay.addView(box);
         return overlay;
     }
+
     //===========================
     //　機　能　:　dp To Pxの処理
     //　引　数　:　dp ..... int
     //　戻り値　:　[int] ..... なし
     //===========================
-
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
@@ -710,7 +668,6 @@ public class BaseActivity extends AppCompatActivity {
     //　引　数　:　なし
     //　戻り値　:　[String] ..... なし
     //==================================
-
     protected String getAppVersionName() {
         try {
             PackageManager pm = getPackageManager();
