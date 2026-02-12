@@ -18,7 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.WindowCompat;
 
 import com.example.myapplication.R;
 import com.example.myapplication.settings.AppSettings;
@@ -30,17 +29,11 @@ import com.google.android.material.button.MaterialButton;
  * 動作はそのままに、重複を削って短くした BaseActivity
  * <p>
  * 仕様（元のまま）：
- * - ActionBar非表示＋全画面（status/navigation bar hide、swipeで一時表示）
  * - frmBase.lblErrMsg相当のバナー表示（一定時間で自動消去）
  * - frmBase.pnlWaitLong/Short相当のローディングオーバーレイ
  * - 物理キーF1～F4 → 青/赤/緑/黄 の onFunctionXxx に集約（Text空なら動かさない）
  * - 画面下4色ボタン（存在する画面だけ）→ onFunctionXxx に集約（Text空なら動かさない）
  * <p>
- * Android 13対策：
- * - EditTextフォーカス/IME表示のタイミングでナビバーが「出っぱなし」になる端末があるため、
- * (1) WindowInsetsControllerCompat を中心に hide
- * (2) insetsで「barsがvisible」になった瞬間を検知→即hideを複数回
- * (3) IMEアニメ中も onProgress でhideを当て続ける
  * <p>
  * このクラスは共通UI処理の集約点として使い、各Activityは必要なところだけオーバーライドする。
  * - setContentView後のフルスクリーン適用とボタンバインドを自動実行
@@ -105,7 +98,6 @@ public class BaseActivity extends AppCompatActivity {
         AppSettings.init(this);
         AppSettings.load();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-        applyFullScreen();
     }
 
     //============================
@@ -117,7 +109,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         AppSettings.load();
-        applyFullScreen();
     }
 
     //============================
@@ -163,6 +154,7 @@ public class BaseActivity extends AppCompatActivity {
         super.setContentView(view, params);
         afterSetContentView();
     }
+
     //======================================
     //　機　能　:　after Set Content Viewの処理
     //　引　数　:　なし
@@ -174,18 +166,6 @@ public class BaseActivity extends AppCompatActivity {
         bindBottomButtonsIfExists();
     }
 
-    //=======================================
-    //　機　能　:　on Window Focus Changedの処理
-    //　引　数　:　hasFocus ..... boolean
-    //　戻り値　:　[void] ..... なし
-    //=======================================
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            applyFullScreen();
-        }
-    }
 
     //===================================
     //　機　能　:　on User Interactionの処理
@@ -197,43 +177,6 @@ public class BaseActivity extends AppCompatActivity {
         super.onUserInteraction();
     }
 
-    // ===== Full screen =====
-    //=================================
-    //　機　能　:　apply Full Screenの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=================================
-
-    protected void applyFullScreen() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-        // Edge-to-edge（InsetsControllerで制御）
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
-        View decorView = getWindow().getDecorView();
-        applyImmersiveFlags(decorView);
-    }
-
-    /**
-     * ナビゲーションバー非表示
-     */
-    //=====================================
-    //　機　能　:　apply Immersive Flagsの処理
-    //　引　数　:　decorView ..... View
-    //　戻り値　:　[void] ..... なし
-    //=====================================
-    private void applyImmersiveFlags(View decorView) {
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        );
-    }
-
 
     // ===== frmBase: ErrorProcess 相当 =====
     //==================================
@@ -242,7 +185,6 @@ public class BaseActivity extends AppCompatActivity {
     //　　　　　:　ex ..... Exception
     //　戻り値　:　[void] ..... なし
     //==================================
-
     protected void errorProcess(String procName, Exception ex) {
         hideLoadingLong();
         hideLoadingShort();

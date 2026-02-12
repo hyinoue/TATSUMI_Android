@@ -5,23 +5,13 @@
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <include
-        android:id="@+id/includeSystemBar"
-        layout="@layout/view_system_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
     <!-- 上部タイトルバー -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:background="#0000FF"
-        app:layout_constraintTop_toBottomOf="@id/includeSystemBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

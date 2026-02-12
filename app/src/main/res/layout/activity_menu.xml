@@ -4,15 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/includeSystemBar"
-        layout="@layout/view_system_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
 
     <!-- タイトルバー -->
     <TextView
@@ -24,7 +15,8 @@
         android:text="メインメニュー"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/includeSystemBar"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -72,9 +64,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#FF0000"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_marginTop="-6dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_marginTop="-22dp"
             android:text="未送有"
             android:textColor="#FFFF00"
             android:textSize="14sp"
@@ -144,7 +136,7 @@
             android:textColor="#000000"
             style="@style/AppButton.BlackStroke"
             android:textSize="18sp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             app:backgroundTint="@color/menu_button_bg"
             app:layout_constraintTop_toBottomOf="@id/rowContainerSize"
             app:layout_constraintStart_toStartOf="parent"
@@ -156,8 +148,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:text="選定済"
             android:layout_marginTop="-6dp"
             android:textColor="#000000"
