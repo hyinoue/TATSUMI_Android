@@ -284,7 +284,6 @@ public class DbTestActivity extends BaseActivity {
     //================================
 
     private void setupBottomButtons() {
-        bindBottomButtonsIfExists();
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
         if (yellow != null) {
             yellow.setText("終了");
