@@ -25,6 +25,7 @@ import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
 import com.example.myapplication.settings.HandyUtil;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
@@ -325,6 +326,7 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        InputConstraintUtil.setHardKeyboardNumericLocked(this);
         clearMainMenuFocus();
         syncContainerWeightsFromPrefs();
         refreshInformation();
