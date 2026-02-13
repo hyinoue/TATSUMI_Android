@@ -22,6 +22,7 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
 import com.example.myapplication.log.FileLogger;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -124,7 +125,34 @@ public class ServiceMenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        InputConstraintUtil.setHardKeyboardNumericLocked(this);
         clearMenuFocus();
+    }
+
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event != null
+                && event.getAction() == KeyEvent.ACTION_DOWN
+                && isImeModeToggleKey(event.getKeyCode())) {
+            InputConstraintUtil.setHardKeyboardNumericLocked(this);
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private boolean isImeModeToggleKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_ALT_LEFT
+                || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_FUNCTION
+                || keyCode == KeyEvent.KEYCODE_SHIFT_LEFT
+                || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_CAPS_LOCK
+                || keyCode == KeyEvent.KEYCODE_LANGUAGE_SWITCH
+                || keyCode == KeyEvent.KEYCODE_ZENKAKU_HANKAKU
+                || keyCode == KeyEvent.KEYCODE_EISU
+                || keyCode == KeyEvent.KEYCODE_KANA
+                || keyCode == KeyEvent.KEYCODE_SYM;
     }
 
     //フォーカス解除
