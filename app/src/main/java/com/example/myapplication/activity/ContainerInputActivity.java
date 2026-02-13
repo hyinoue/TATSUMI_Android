@@ -802,9 +802,14 @@ public class ContainerInputActivity extends BaseActivity {
 
                 DataSync sync = new DataSync(getApplicationContext());
                 sync.sendSyukkaOnly();
+                boolean sent = sync.sendSyukkaOnly();
 
                 runOnUiThread(() -> {
                     hideLoadingShort();
+                    if (!sent) {
+                        showErrorMsg("出荷データの更新に失敗しました", MsgDispMode.MsgBox);
+                        return;
+                    }
                     showInfoMsg("コンテナ情報を確定しました", MsgDispMode.MsgBox);
                     setResult(RESULT_OK);
                     finish();
