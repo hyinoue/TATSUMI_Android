@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,22 +15,24 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 
 import com.example.myapplication.BuildConfig;
 import com.example.myapplication.R;
-import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
-import com.example.myapplication.settings.HandyUtil;
+import com.example.myapplication.worker.DataSyncWorker;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -530,76 +531,37 @@ public class MenuActivity extends BaseActivity {
     //============================
     private void startDataSync() {
         setCenterStatus("データ送受信中...");
-        io.execute(this::runDataSync);
-    }
-
-    //=============================
-    //　機　能　:　run Data Syncの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=============================
-    private void runDataSync() {
         showLoadingLong();
-        try {
-            DataSync sync = new DataSync(getApplicationContext(), this::showSyncErrorAndWait);
-            boolean success = sync.runSync();
-            runOnUiThread(() -> {
-                if (success) {
-                    setCenterStatus("データ送受信完了");
-                    showInfoMsg("データ送受信完了", MsgDispMode.Label);
-                } else {
-                    setCenterStatus("NG データ送受信に失敗しました");
-                }
-            });
-            if (success) {
-                refreshInformation();
+
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(DataSyncWorker.class).build();
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        workManager.enqueueUniqueWork("menu_data_sync", ExistingWorkPolicy.REPLACE, request);
+
+        workManager.getWorkInfoByIdLiveData(request.getId()).observe(this, workInfo -> {
+            if (workInfo == null) {
+                return;
             }
-        } catch (Exception ex) {
-            Log.e(TAG, "DataSync failed", ex);
-            String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
-            runOnUiThread(() -> {
-                setCenterStatus("NG " + msg);
-                showErrorMsg(msg, MsgDispMode.MsgBox);
-            });
-        } finally {
+            WorkInfo.State state = workInfo.getState();
+            if (!state.isFinished()) {
+                return;
+            }
+
             hideLoadingLong();
-        }
-    }
 
-    //=============================
-    //　機　能　:　data Syncのエラー表示
-    //　引　数　:　message ..... String
-    //　戻り値　:　[void] ..... なし
-    //=============================
-    private void showSyncErrorAndWait(String message) {
-        if (message == null || message.trim().isEmpty()) {
-            return;
-        }
+            if (state == WorkInfo.State.SUCCEEDED) {
+                setCenterStatus("データ送受信完了");
+                showInfoMsg("データ送受信完了", MsgDispMode.Label);
+                refreshInformation();
+                return;
+            }
 
-        CountDownLatch waitForOk = new CountDownLatch(1);
-        runOnUiThread(() -> {
-            HandyUtil.playErrorBuzzer(this);
-            HandyUtil.playVibrater(this);
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("エラー")
-                    .setMessage(message)
-                    .setCancelable(false)
-                    .setPositiveButton("OK", (d, which) -> waitForOk.countDown())
-                    .create();
-            dialog.setOnShowListener(d -> {
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                }
-            });
-            dialog.show();
+            String msg = workInfo.getOutputData().getString(DataSyncWorker.KEY_ERROR_MESSAGE);
+            if (msg == null || msg.trim().isEmpty()) {
+                msg = "データ送受信に失敗しました";
+            }
+            setCenterStatus("NG " + msg);
+            showErrorMsg(msg, MsgDispMode.MsgBox);
         });
-
-        try {
-            waitForOk.await();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            Log.w(TAG, "Interrupted while waiting for error dialog confirmation", ex);
-        }
     }
 
     //=============================
