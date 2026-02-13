@@ -25,6 +25,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.densowave.bhtsdk.hardkeyboardsettings.INPUT_MODE;
 import com.example.myapplication.R;
 import com.example.myapplication.connector.DataSync;
 import com.example.myapplication.db.AppDatabase;
@@ -32,6 +33,7 @@ import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.SyukkaContainerEntity;
 import com.example.myapplication.settings.HandyUtil;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -262,6 +264,19 @@ public class ContainerInputActivity extends BaseActivity {
             etBookingNo.setFocusable(false);
             etBookingNo.setFocusableInTouchMode(false);
         }
+
+        applyContainerNoInputMode();
+    }
+
+    //入力モード
+    private void applyContainerNoInputMode() {
+        // No1: 英字のみ（小文字入力は大文字に変換）
+        InputConstraintUtil.applyAlphabetUpper(etContainerNo1);
+        InputConstraintUtil.applyHardKeyboardModeOnFocus(this, etContainerNo1, INPUT_MODE.MODE_ALPHA);
+
+        // No2: 数字のみ
+        InputConstraintUtil.applyDigitsOnly(etContainerNo2);
+        InputConstraintUtil.applyHardKeyboardModeOnFocus(this, etContainerNo2, INPUT_MODE.MODE_NUMERIC);
     }
 
     //from→toにフォーカスを移動

@@ -25,6 +25,7 @@ import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
 import com.example.myapplication.settings.HandyUtil;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
@@ -325,9 +326,30 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        InputConstraintUtil.setHardKeyboardNumericLocked(this);
         clearMainMenuFocus();
         syncContainerWeightsFromPrefs();
         refreshInformation();
+    }
+
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event != null
+                && event.getAction() == KeyEvent.ACTION_DOWN
+                && isImeModeToggleKey(event.getKeyCode())) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private boolean isImeModeToggleKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_ALT_LEFT
+                || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_FUNCTION
+                || keyCode == KeyEvent.KEYCODE_SHIFT_LEFT
+                || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_CAPS_LOCK;
     }
 
     //フォーカス解除

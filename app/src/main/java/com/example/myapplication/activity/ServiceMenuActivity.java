@@ -22,6 +22,7 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
 import com.example.myapplication.log.FileLogger;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -124,7 +125,28 @@ public class ServiceMenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        InputConstraintUtil.setHardKeyboardNumericLocked(this);
         clearMenuFocus();
+    }
+
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event != null
+                && event.getAction() == KeyEvent.ACTION_DOWN
+                && isImeModeToggleKey(event.getKeyCode())) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private boolean isImeModeToggleKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_ALT_LEFT
+                || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_FUNCTION
+                || keyCode == KeyEvent.KEYCODE_SHIFT_LEFT
+                || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT
+                || keyCode == KeyEvent.KEYCODE_CAPS_LOCK;
     }
 
     //フォーカス解除
