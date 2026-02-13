@@ -22,6 +22,7 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
 import com.example.myapplication.log.FileLogger;
+import com.example.myapplication.settings.InputConstraintUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -124,6 +125,7 @@ public class ServiceMenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        InputConstraintUtil.setHardKeyboardNumericLocked(this);
         clearMenuFocus();
     }
 
