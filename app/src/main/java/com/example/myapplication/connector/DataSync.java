@@ -141,26 +141,26 @@ public class DataSync {
     //=============================
     //　機　能　:　syukka Onlyを送信する
     //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
+    //　戻り値　:　[boolean] ..... 送信成否
     //=============================
-    public void sendSyukkaOnly() throws Exception {
+    public boolean sendSyukkaOnly() throws Exception {
         Date sagyouYmd = sagyouYotei();
-        dataSousinAll(sagyouYmd);
+        return dataSousinAll(sagyouYmd);
     }
 
     //=============================
     //　機　能　:　syougo Onlyを送信する
     //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
+    //　戻り値　:　[boolean] ..... 送信成否
     //=============================
-    public void sendSyougoOnly() {
-        dataSousinSyougo();
+    public boolean sendSyougoOnly() {
+        return dataSousinSyougo();
     }
 
     //============================
     //　機　能　:　run Syncの処理
     //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
+    //　戻り値　:　[boolean] ..... 同期処理にエラーがなければtrue
     //============================
     public boolean runSync() {
         historyDel();
@@ -257,13 +257,14 @@ public class DataSync {
     //　引　数　:　sagyouYmd ..... Date
     //　戻り値　:　[void] ..... なし
     //=================================
-    private void dataSousinAll(Date sagyouYmd) {
+    private boolean dataSousinAll(Date sagyouYmd) {
         List<SyukkaContainerEntity> containers = syukkaContainerDao.findUnsent();
         for (SyukkaContainerEntity container : containers) {
             if (!dataSousinOnce(container, sagyouYmd)) {
-                break;
+                return false;
             }
         }
+        return true;
     }
 
     //==================================================
@@ -368,13 +369,14 @@ public class DataSync {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
-    private void dataSousinSyougo() {
+    private boolean dataSousinSyougo() {
         List<KakuninContainerEntity> containers = kakuninContainerDao.findUnsentCompleted();
         for (KakuninContainerEntity container : containers) {
             if (!dataSousinSyougoOnce(container)) {
-                break;
+                return false;
             }
         }
+        return true;
     }
 
     //===================================================
