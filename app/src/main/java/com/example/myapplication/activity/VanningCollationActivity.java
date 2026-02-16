@@ -438,14 +438,12 @@ public class VanningCollationActivity extends BaseActivity {
                 registerDb();
 
                 DataSync sync = new DataSync(getApplicationContext());
-                sync.sendSyougoOnly();
                 boolean sent = sync.sendSyougoOnly();
 
                 runOnUiThread(() -> {
                     hideLoadingShort();
                     if (!sent) {
                         showErrorMsg("照合データの更新に失敗しました", MsgDispMode.MsgBox);
-                        return;
                     }
                     confirmed = true;
                     showInfoMsg("積載束照合を確定しました", MsgDispMode.MsgBox);

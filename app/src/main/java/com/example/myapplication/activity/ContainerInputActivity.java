@@ -23,6 +23,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.R;
@@ -80,6 +81,8 @@ public class ContainerInputActivity extends BaseActivity {
     private static final String KEY_SEAL_NO = "seal_no";
     private static final String KEY_CONTAINER_PHOTO_URI = "container_photo_uri";
     private static final String KEY_SEAL_PHOTO_URI = "seal_photo_uri";
+
+    private static final String MSG_CONTAINER_CONFIRMED = "コンテナ情報を確定しました";
 
     private Button btnPhotoContainerNo;
     private Button btnPhotoSealNo;
@@ -151,7 +154,7 @@ public class ContainerInputActivity extends BaseActivity {
                     sealPhotoUri = uri;
                     ivPhotoSeal.setImageURI(null);
                     ivPhotoSeal.setImageURI(uri);
-                    toast("シールNo写真を表示しした");
+                    toast("シールNo写真を表示しました");
                 }
             });
 
@@ -801,24 +804,69 @@ public class ContainerInputActivity extends BaseActivity {
                 saveImageFile(containerId, DataSync.ImageType.SEAL, sealPhotoUri);
 
                 DataSync sync = new DataSync(getApplicationContext());
-                sync.sendSyukkaOnly();
                 boolean sent = sync.sendSyukkaOnly();
+                String errorMessage = sync.getLastErrorMessage();
 
                 runOnUiThread(() -> {
                     hideLoadingShort();
                     if (!sent) {
-                        showErrorMsg("出荷データの更新に失敗しました", MsgDispMode.MsgBox);
+                        String msg = buildSendFailedMessage(errorMessage);
+                        showCompleteFlow(msg);
                         return;
                     }
-                    showInfoMsg("コンテナ情報を確定しました", MsgDispMode.MsgBox);
-                    setResult(RESULT_OK);
-                    finish();
+                    showCompleteFlow(null);
                 });
             } catch (Exception ex) {
                 runOnUiThread(() -> errorProcess("ContainerInput procRegister", ex));
             }
         });
     }
+
+    private void showCompleteFlow(@Nullable String sendErrorMessage) {
+        if (TextUtils.isEmpty(sendErrorMessage)) {
+            showCompleteInfoAndFinish();
+            return;
+        }
+
+        HandyUtil.playErrorBuzzer(this);
+        HandyUtil.playVibrater(this);
+        new AlertDialog.Builder(this)
+                .setTitle("エラー")
+                .setMessage(sendErrorMessage)
+                .setCancelable(false)
+                .setPositiveButton("OK", (d1, w1) -> {
+                    d1.dismiss();
+                    getWindow().getDecorView().post(this::showCompleteInfoAndFinish);
+                })
+                .show();
+    }
+
+    private void showCompleteInfoAndFinish() {
+        HandyUtil.playSuccessBuzzer(this);
+        HandyUtil.playVibrater(this);
+        new AlertDialog.Builder(this)
+                .setTitle("情報")
+                .setMessage(MSG_CONTAINER_CONFIRMED)
+                .setCancelable(false)
+                .setPositiveButton("OK", (d, w) -> {
+                    setResult(RESULT_OK);
+                    finish();
+                })
+                .show();
+    }
+
+    private String buildSendFailedMessage(@Nullable String detail) {
+        final String base = "出荷データの更新に失敗しました";
+        if (TextUtils.isEmpty(detail)) {
+            return base;
+        }
+        String trimmed = detail.trim();
+        if (base.equals(trimmed)) {
+            return base;
+        }
+        return base + "\n" + trimmed;
+    }
+
     //===========================
     //　機　能　:　register Dbの処理
     //　引　数　:　なし

@@ -69,6 +69,8 @@ public class DataSync {
     private final File imageDir;
 
     private final ErrorHandler errorHandler;
+
+    private String lastErrorMessage;
     private final SimpleDateFormat dbDateFormat =
             //========================================
             //　機　能　:　Simple Date Formatの処理
@@ -144,8 +146,14 @@ public class DataSync {
     //　戻り値　:　[boolean] ..... 送信成否
     //=============================
     public boolean sendSyukkaOnly() throws Exception {
+        clearLastError();
         Date sagyouYmd = sagyouYotei();
-        return dataSousinAll(sagyouYmd);
+        boolean sent = dataSousinAll(sagyouYmd);
+        return sent;
+    }
+
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
     }
 
     //=============================
@@ -348,8 +356,28 @@ public class DataSync {
             return false;
         } catch (Exception ex) {
             Log.e(TAG, "DataSousinOnce failed", ex);
+            lastErrorMessage = safeMessage(ex);
             return false;
         }
+    }
+
+    private void clearLastError() {
+        lastErrorMessage = null;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private String safeMessage(Exception ex) {
+        if (ex == null) {
+            return "不明なエラー";
+        }
+        String msg = ex.getMessage();
+        if (isBlank(msg)) {
+            return ex.getClass().getSimpleName();
+        }
+        return msg;
     }
 
     //=====================================
