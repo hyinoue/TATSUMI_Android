@@ -146,7 +146,7 @@ public class DataSync {
     //　戻り値　:　[boolean] ..... 送信成否
     //=============================
     public boolean sendSyukkaOnly() throws Exception {
-        clearLastError();
+        lastErrorMessage = null;
         Date sagyouYmd = sagyouYotei();
         boolean sent = dataSousinAll(sagyouYmd);
         return sent;
@@ -290,39 +290,37 @@ public class DataSync {
             }
             BunningData data = new BunningData();
             data.syukkaYmd = sagyouYmd;
-            data.containerNo = container.containerNo;
+            data.containerNo = normalizeSendKey(container.containerNo);
             data.containerJyuryo = intOrZero(container.containerJyuryo);
             data.dunnageJyuryo = intOrZero(container.dunnageJyuryo);
-            data.sealNo = container.sealNo;
+            data.sealNo = normalizeSendKey(container.sealNo);
             data.containerPhoto = getPicture(container.containerId, ImageType.CONTAINER);
             data.sealPhoto = getPicture(container.containerId, ImageType.SEAL);
 
             List<SyukkaMeisaiEntity> detailRows =
                     syukkaMeisaiDao.findByContainerId(container.containerId);
 
-            String fallbackBookingNo = container.bookingNo != null
-                    ? container.bookingNo.trim()
-                    : "";
+            String fallbackBookingNo = normalizeSendKey(container.bookingNo);
             int missingBookingCount = 0;
             String missingBookingSample = "";
 
             for (SyukkaMeisaiEntity row : detailRows) {
                 SyukkaMeisai detail = new SyukkaMeisai();
-                detail.heatNo = row.heatNo;
-                detail.sokuban = row.sokuban;
-                String bookingNo = row.bookingNo != null ? row.bookingNo.trim() : "";
+                detail.heatNo = normalizeSendKey(row.heatNo);
+                detail.sokuban = normalizeSendKey(row.sokuban);
+                String bookingNo = normalizeSendKey(row.bookingNo);
                 if (bookingNo.isEmpty()) {
                     bookingNo = fallbackBookingNo;
                 }
                 if (bookingNo.isEmpty()) {
                     missingBookingCount++;
                     if (missingBookingSample.isEmpty()) {
-                        missingBookingSample = row.heatNo + "/" + row.sokuban;
+                        missingBookingSample = detail.heatNo + "/" + detail.sokuban;
                     }
                 }
-                detail.bookingNo = bookingNo;
-                detail.bundleNo = row.bundleNo;
-                detail.syukkaSashizuNo = row.syukkaSashizuNo;
+                detail.bookingNo = normalizeSendKey(bookingNo);
+                detail.bundleNo = normalizeSendKey(row.bundleNo);
+                detail.syukkaSashizuNo = normalizeSendKey(row.syukkaSashizuNo);
                 detail.jyuryo = intOrZero(row.jyuryo);
                 data.bundles.add(detail);
             }
@@ -361,9 +359,6 @@ public class DataSync {
         }
     }
 
-    private void clearLastError() {
-        lastErrorMessage = null;
-    }
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
@@ -378,6 +373,22 @@ public class DataSync {
             return ex.getClass().getSimpleName();
         }
         return msg;
+    }
+
+    private String normalizeSendKey(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        String normalized = value.replace('\u3000', ' ').trim();
+        StringBuilder sb = new StringBuilder(normalized.length());
+        for (int i = 0; i < normalized.length(); i++) {
+            char ch = normalized.charAt(i);
+            if ((ch >= 0x20 && ch != 0x7F) || ch == '\t') {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
     }
 
     //=====================================
@@ -415,15 +426,15 @@ public class DataSync {
     private boolean dataSousinSyougoOnce(KakuninContainerEntity container) {
         try {
             CollateData collateData = new CollateData();
-            collateData.containerID = container.containerId;
+            collateData.containerID = normalizeSendKey(container.containerId);
             collateData.syogoKanryo = Boolean.TRUE.equals(container.containerSyougoKanryo);
 
             List<KakuninMeisaiEntity> detailRows =
                     kakuninMeisaiDao.findByContainerId(container.containerId);
             for (KakuninMeisaiEntity row : detailRows) {
                 CollateDtl detail = new CollateDtl();
-                detail.collateDtlheatNo = row.heatNo;
-                detail.collateDtlsokuban = row.sokuban;
+                detail.collateDtlheatNo = normalizeSendKey(row.heatNo);
+                detail.collateDtlsokuban = normalizeSendKey(row.sokuban);
                 detail.collateDtlsyougoKakunin = Boolean.TRUE.equals(row.containerSyougoKakunin);
                 collateData.collateDtls.add(detail);
             }
