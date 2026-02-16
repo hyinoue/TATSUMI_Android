@@ -740,6 +740,13 @@ public class ContainerInputActivity extends BaseActivity {
             return false;
         }
 
+        if (getIntFromEdit(etDunnageKg) >= 256) {
+            //WEBのDB（T_SYUKKA_CONTAINER.DUNNAGE_JYURYO）の型がtinyint型のため、0~255までしか登録不可
+            showErrorMsg("ダンネージ重量は255Kg以下で入力してください", MsgDispMode.Label);
+            if (etDunnageKg != null) etDunnageKg.requestFocus();
+            return false;
+        }
+
         if (getRemainingWeight() < 0) {
             showErrorMsg("積載重量が超過しています", MsgDispMode.MsgBox);
             return false;

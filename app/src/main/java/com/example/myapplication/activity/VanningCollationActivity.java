@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +21,7 @@ import com.example.myapplication.grid.VanningCollationController;
 import com.example.myapplication.grid.VanningCollationRow;
 import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
+import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -443,12 +445,10 @@ public class VanningCollationActivity extends BaseActivity {
                 runOnUiThread(() -> {
                     hideLoadingShort();
                     if (!sent) {
-                        showErrorMsg("照合データの更新に失敗しました", MsgDispMode.MsgBox);
+                        showRegisterCompleteFlow("照合データの更新に失敗しました");
+                        return;
                     }
-                    confirmed = true;
-                    showInfoMsg("積載束照合を確定しました", MsgDispMode.MsgBox);
-                    setResult(RESULT_OK);
-                    finish();
+                    showRegisterCompleteFlow(null);
                 });
             } catch (Exception ex) {
                 runOnUiThread(() -> {
@@ -458,6 +458,41 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
+
+    private void showRegisterCompleteFlow(@Nullable String sendErrorMessage) {
+        if (TextUtils.isEmpty(sendErrorMessage)) {
+            showRegisterCompleteInfoAndFinish();
+            return;
+        }
+
+        HandyUtil.playErrorBuzzer(this);
+        HandyUtil.playVibrater(this);
+        new AlertDialog.Builder(this)
+                .setTitle("エラー")
+                .setMessage(sendErrorMessage)
+                .setCancelable(false)
+                .setPositiveButton("OK", (d1, w1) -> {
+                    d1.dismiss();
+                    getWindow().getDecorView().post(this::showRegisterCompleteInfoAndFinish);
+                })
+                .show();
+    }
+
+    private void showRegisterCompleteInfoAndFinish() {
+        HandyUtil.playSuccessBuzzer(this);
+        HandyUtil.playVibrater(this);
+        new AlertDialog.Builder(this)
+                .setTitle("情報")
+                .setMessage("積載束照合を確定しました")
+                .setCancelable(false)
+                .setPositiveButton("OK", (d, w) -> {
+                    confirmed = true;
+                    setResult(RESULT_OK);
+                    finish();
+                })
+                .show();
+    }
+
     //====================================
     //　機　能　:　check Syougou Kanryoの処理
     //　引　数　:　なし
