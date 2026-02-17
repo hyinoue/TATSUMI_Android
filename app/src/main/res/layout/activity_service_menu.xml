@@ -154,7 +154,7 @@
                         android:id="@+id/menu4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4.  プログラムダウンロード"
+                        android:text="4.  通信設定・テスト"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"
@@ -178,7 +178,7 @@
                         android:id="@+id/menu5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5.  通信設定・テスト"
+                        android:text="5.  バーコードテスト"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"
@@ -202,7 +202,7 @@
                         android:id="@+id/menu6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="6.  バーコードテスト"
+                        android:text="6.  振動設定"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"
@@ -226,31 +226,7 @@
                         android:id="@+id/menu7"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7.  振動設定"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 8 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu8"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8.  サーバー切替"
+                        android:text="7.  サーバー切替"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"

@@ -26,7 +26,6 @@ import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -61,7 +60,6 @@ public class ServiceMenuActivity extends BaseActivity {
     private TextView menu5;
     private TextView menu6;
     private TextView menu7;
-    private TextView menu8; // XMLに menu8（サーバー切替）を追加した場合
     private ExecutorService io;
 
     //============================================
@@ -100,23 +98,15 @@ public class ServiceMenuActivity extends BaseActivity {
         menu5 = findViewById(R.id.menu5);
         menu6 = findViewById(R.id.menu6);
         menu7 = findViewById(R.id.menu7);
-        // menu8 は XMLに追加している場合のみ存在
-        View v8 = findViewById(R.id.menu8);
-        if (v8 instanceof TextView) {
-            menu8 = (TextView) v8;
-        }
 
         // ▼ 画面タップで遷移
         menu1.setOnClickListener(v -> openDbTest());
         menu2.setOnClickListener(v -> clearData());
         menu3.setOnClickListener(v -> sendMaintenanceData());
-        menu4.setOnClickListener(v -> downloadProgram());
-        menu5.setOnClickListener(v -> openCommTest());
-        menu6.setOnClickListener(v -> openImagerTest());
-        menu7.setOnClickListener(v -> openSystemLib());
-        if (menu8 != null) {
-            menu8.setOnClickListener(v -> openServerSetting());
-        }
+        menu4.setOnClickListener(v -> openCommTest());
+        menu5.setOnClickListener(v -> openImagerTest());
+        menu6.setOnClickListener(v -> openSystemLib());
+        menu7.setOnClickListener(v -> openServerSetting());
 
         setupBottomButtonTexts();
     }
@@ -129,7 +119,7 @@ public class ServiceMenuActivity extends BaseActivity {
 
     //フォーカス解除
     private void clearMenuFocus() {
-        TextView[] menus = {menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8};
+        TextView[] menus = {menu1, menu2, menu3, menu4, menu5, menu6, menu7};
         for (TextView menu : menus) {
             if (menu != null) {
                 menu.clearFocus();
@@ -171,22 +161,18 @@ public class ServiceMenuActivity extends BaseActivity {
                 return true;
 
             case KeyEvent.KEYCODE_4:
-                downloadProgram();
-                return true;
-
-            case KeyEvent.KEYCODE_5:
                 openCommTest();
                 return true;
 
-            case KeyEvent.KEYCODE_6:
+            case KeyEvent.KEYCODE_5:
                 openImagerTest();
                 return true;
 
-            case KeyEvent.KEYCODE_7:
+            case KeyEvent.KEYCODE_6:
                 openSystemLib();
                 return true;
 
-            case KeyEvent.KEYCODE_8:
+            case KeyEvent.KEYCODE_7:
                 openServerSetting();
                 return true;
 
@@ -207,54 +193,53 @@ public class ServiceMenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void openDbTest() {
         startActivity(new Intent(this, DbTestActivity.class));
     }
+
     //============================
     //　機　能　:　comm Testを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void openCommTest() {
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, CommTestActivity.class)));
     }
+
     //============================
     //　機　能　:　imager Testを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void openImagerTest() {
         startActivity(new Intent(this, ImagerTestActivity.class));
     }
+
     //============================
     //　機　能　:　system Libを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void openSystemLib() {
         startActivity(new Intent(this, SystemLibActivity.class));
     }
+
     //==============================
     //　機　能　:　server Settingを開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
-
     private void openServerSetting() {
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, ServerSettingActivity.class)));
     }
+
     //============================
     //　機　能　:　clear Dataの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void clearData() {
         showQuestion("端末内のデータをクリアします。（クリアすると作業中の情報が削除されます）\nよろしいですか？",
                 yes -> {
@@ -286,12 +271,12 @@ public class ServiceMenuActivity extends BaseActivity {
                     });
                 });
     }
+
     //==================================
     //　機　能　:　maintenance Dataを送信する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
-
     private void sendMaintenanceData() {
         io.execute(() -> {
             try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
@@ -347,55 +332,6 @@ public class ServiceMenuActivity extends BaseActivity {
         return ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
     }
 
-    //================================
-    //　機　能　:　download Programの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //================================
-
-    private void downloadProgram() {
-        io.execute(() -> {
-            File downloadDir = new File(getFilesDir(), "NEW");
-            try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
-                String[] files = svc.getDownloadHandyExecuteFileNames();
-                if (files == null || files.length == 0) {
-                    runOnUiThread(() -> showInfoMsg("更新対象のファイルがありませんでした", MsgDispMode.MsgBox));
-                    return;
-                }
-
-                if (!downloadDir.exists() && !downloadDir.mkdirs()) {
-                    throw new IOException("更新ファイルの保存先を作成できません。");
-                }
-
-                boolean reboot = false;
-                for (String fileName : files) {
-                    byte[] buffer = svc.getDownloadHandyExecuteFile(fileName);
-                    File downloadedFile = new File(downloadDir, fileName);
-                    writeFileBytes(downloadedFile, buffer);
-
-                    File currentFile = new File(getFilesDir(), fileName);
-                    if (!reboot && !isSameFile(currentFile, downloadedFile)) {
-                        reboot = true;
-                    }
-                }
-
-                if (reboot) {
-                    runOnUiThread(() -> showQuestion(
-                            "更新ファイルをダウンロードしました。\nアプリを再起動します。\nよろしいですか？",
-                            yes -> {
-                                if (yes) {
-                                    restartApp();
-                                }
-                            }));
-                } else {
-                    runOnUiThread(() -> showInfoMsg("更新ファイルをダウンロードしました", MsgDispMode.MsgBox));
-                }
-            } catch (Exception ex) {
-                runOnUiThread(() -> showErrorMsg(ex.getMessage(), MsgDispMode.MsgBox));
-            }
-        });
-    }
-
     private byte[] readFileBytes(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] buffer = new byte[(int) file.length()];
@@ -411,56 +347,11 @@ public class ServiceMenuActivity extends BaseActivity {
         }
     }
 
-    private void writeFileBytes(File file, byte[] buffer) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(buffer);
-            fos.flush();
-        }
-    }
-
-    private boolean isSameFile(File file1, File file2) throws IOException {
-        if (!file1.exists() || !file2.exists()) {
-            return false;
-        }
-        if (file1.length() != file2.length()) {
-            return false;
-        }
-        try (FileInputStream in1 = new FileInputStream(file1);
-             FileInputStream in2 = new FileInputStream(file2)) {
-            byte[] buf1 = new byte[4096];
-            byte[] buf2 = new byte[4096];
-            int read1;
-            while ((read1 = in1.read(buf1)) != -1) {
-                int read2 = in2.read(buf2);
-                if (read1 != read2) {
-                    return false;
-                }
-                for (int i = 0; i < read1; i++) {
-                    if (buf1[i] != buf2[i]) {
-                        return false;
-                    }
-                }
-            }
-            return in2.read() == -1;
-        }
-    }
-
-    private void restartApp() {
-        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        if (launchIntent == null) {
-            recreate();
-            return;
-        }
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(launchIntent);
-        finish();
-    }
     //============================
     //　機　能　:　confirm Exitの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void confirmExit() {
         showQuestion("アプリケーションを終了します。\nよろしいですか？", yes -> {
             if (yes) {
@@ -468,12 +359,12 @@ public class ServiceMenuActivity extends BaseActivity {
             }
         });
     }
+
     //==========================================
     //　機　能　:　request Password If Neededの処理
     //　引　数　:　onSuccess ..... Runnable
     //　戻り値　:　[void] ..... なし
     //==========================================
-
     private void requestPasswordIfNeeded(Runnable onSuccess) {
         showPasswordDialog(success -> {
             if (!success) {
@@ -485,12 +376,12 @@ public class ServiceMenuActivity extends BaseActivity {
             }
         });
     }
+
     //============================================
     //　機　能　:　show Password Dialogの処理
     //　引　数　:　callback ..... PasswordCallback
     //　戻り値　:　[void] ..... なし
     //============================================
-
     private void showPasswordDialog(PasswordCallback callback) {
         EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -511,12 +402,12 @@ public class ServiceMenuActivity extends BaseActivity {
                 })
                 .show();
     }
+
     //=====================================
     //　機　能　:　bottom Button Textsを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
-
     private void setupBottomButtonTexts() {
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
 
