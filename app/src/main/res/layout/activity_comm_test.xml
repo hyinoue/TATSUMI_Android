@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="通信設定・テスト"
+            android:text="通信テスト"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -42,19 +42,87 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 見出し：GPRS通信設定（タイトルの下） -->
-    <TextView
-        android:id="@+id/tvSectionTitle"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/areaStatus"
         android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:gravity="left|center_vertical"
-        android:paddingStart="8dp"
-        android:text="GPRS通信設定"
-        android:textColor="#000000"
-        android:textSize="16sp"
+        android:layout_height="120dp"
+        android:padding="16dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/areaActions"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/lblWanPower"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:gravity="left|center_vertical"
+            android:text="WAN電源状態"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvWanPowerValue" />
+
+        <TextView
+            android:id="@+id/tvWanPowerValue"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="#FFFFFF"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="@id/lblWanPower"
+            app:layout_constraintBottom_toBottomOf="@id/lblWanPower"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lblGprs"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:gravity="left|center_vertical"
+            android:text="通信状態"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/lblWanPower"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvGprsValue" />
+
+        <TextView
+            android:id="@+id/tvGprsValue"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="#FFFFFF"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="@id/lblGprs"
+            app:layout_constraintBottom_toBottomOf="@id/lblGprs"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/areaActions"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/areaStatus"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
+
+        <Button
+            android:id="@+id/btnTestConn"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:text="接続テスト"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- 下固定ボタン（共通部品） -->
     <include
@@ -66,243 +134,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- 操作ボタンエリア（左右12dp空けて、下部ボタンの上） -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/areaActions"
-        android:layout_width="0dp"
-        android:layout_height="160dp"
-        android:padding="8dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
-        app:layout_constraintTop_toBottomOf="@id/areaInputs">
-
-        <Button
-            android:id="@+id/btnCreateConn"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="接続を作成"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnDeleteConn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_weight="1" />
-
-        <Button
-            android:id="@+id/btnDeleteConn"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="接続を削除"
-            android:layout_marginStart="40dp"
-            app:layout_constraintStart_toEndOf="@id/btnCreateConn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_weight="1" />
-
-        <Button
-            android:id="@+id/btnTestConn"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="接続テスト"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnDisconnect"
-            app:layout_constraintTop_toBottomOf="@id/btnCreateConn"
-            android:layout_marginTop="12dp"
-            app:layout_constraintHorizontal_weight="1" />
-
-        <Button
-            android:id="@+id/btnDisconnect"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="切断"
-            android:layout_marginStart="40dp"
-            app:layout_constraintStart_toEndOf="@id/btnTestConn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnDeleteConn"
-            android:layout_marginTop="12dp"
-            app:layout_constraintHorizontal_weight="1" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- 入力エリア：上下を均等配置 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/areaInputs"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="3dp"
-        app:layout_constraintTop_toBottomOf="@id/tvSectionTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/areaActions">
-
-        <!-- 接続名 -->
-        <TextView
-            android:id="@+id/lblCommName"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="接続名"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/lblApn"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/etCommName"
-            app:layout_constraintVertical_chainStyle="spread" />
-
-        <EditText
-            android:id="@+id/etCommName"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:background="@drawable/bg_edittext_black_border"
-            android:singleLine="true"
-            android:paddingStart="8dp"
-            app:layout_constraintTop_toTopOf="@id/lblCommName"
-            app:layout_constraintBottom_toBottomOf="@id/lblCommName"
-            app:layout_constraintStart_toEndOf="@id/lblCommName"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- APN -->
-        <TextView
-            android:id="@+id/lblApn"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="アクセスポイント名"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/lblCommName"
-            app:layout_constraintBottom_toTopOf="@id/lblUser"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/etApn" />
-
-        <EditText
-            android:id="@+id/etApn"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:background="@drawable/bg_edittext_black_border"
-            android:singleLine="true"
-            android:paddingStart="8dp"
-            app:layout_constraintTop_toTopOf="@id/lblApn"
-            app:layout_constraintBottom_toBottomOf="@id/lblApn"
-            app:layout_constraintStart_toEndOf="@id/lblApn"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- ユーザー名 -->
-        <TextView
-            android:id="@+id/lblUser"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="ユーザー名"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/lblApn"
-            app:layout_constraintBottom_toTopOf="@id/lblPass"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/etUser" />
-
-        <EditText
-            android:id="@+id/etUser"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:background="@drawable/bg_edittext_black_border"
-            android:singleLine="true"
-            android:paddingStart="8dp"
-            app:layout_constraintTop_toTopOf="@id/lblUser"
-            app:layout_constraintBottom_toBottomOf="@id/lblUser"
-            app:layout_constraintStart_toEndOf="@id/lblUser"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- パスワード -->
-        <TextView
-            android:id="@+id/lblPass"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="パスワード"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/lblUser"
-            app:layout_constraintBottom_toTopOf="@id/lblWanPower"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/etPass" />
-
-        <EditText
-            android:id="@+id/etPass"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:background="@drawable/bg_edittext_black_border"
-            android:nextFocusDown="@id/etCommName"
-            android:nextFocusForward="@id/etCommName"
-            android:singleLine="true"
-            android:paddingStart="8dp"
-            app:layout_constraintTop_toTopOf="@id/lblPass"
-            app:layout_constraintBottom_toBottomOf="@id/lblPass"
-            app:layout_constraintStart_toEndOf="@id/lblPass"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- WAN電源状態 -->
-        <TextView
-            android:id="@+id/lblWanPower"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="WAN電源状態"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/lblPass"
-            app:layout_constraintBottom_toTopOf="@id/lblGprs"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvWanPowerValue" />
-
-        <TextView
-            android:id="@+id/tvWanPowerValue"
-            android:layout_width="60dp"
-            android:layout_height="20dp"
-            android:background="#FFFFFF"
-            android:gravity="center"
-            android:textColor="#000000"
-            app:layout_constraintTop_toTopOf="@id/lblWanPower"
-            app:layout_constraintBottom_toBottomOf="@id/lblWanPower"
-            app:layout_constraintStart_toStartOf="@id/etPass" />
-
-        <!-- GPRS通信状態 -->
-        <TextView
-            android:id="@+id/lblGprs"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:gravity="left|center_vertical"
-            android:text="GPRS通信状態"
-            android:paddingStart="8dp"
-            android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/lblWanPower"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvGprsValue" />
-
-        <TextView
-            android:id="@+id/tvGprsValue"
-            android:layout_width="60dp"
-            android:layout_height="20dp"
-            android:background="#FFFFFF"
-            android:gravity="center"
-            android:textColor="#000000"
-            app:layout_constraintTop_toTopOf="@id/lblGprs"
-            app:layout_constraintBottom_toBottomOf="@id/lblGprs"
-            app:layout_constraintStart_toStartOf="@id/etPass" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

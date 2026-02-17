@@ -154,7 +154,7 @@
                         android:id="@+id/menu4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4.  通信設定・テスト"
+                        android:text="4.  通信テスト"
                         android:textColor="#0000FF"
                         android:textSize="18sp"
                         android:clickable="true"
