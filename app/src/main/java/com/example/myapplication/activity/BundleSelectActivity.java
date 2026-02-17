@@ -55,7 +55,7 @@ import java.util.concurrent.Executors;
 public class BundleSelectActivity extends BaseActivity {
 
     //====================================================
-    //　処理概要　:　積載束選択 / 重量計算 画面
+    //　処理概要　:　積載束選定 / 重量計算 画面
     //　備　　考　:　Normalモードの確定時は MenuActivity に戻らず、
     //　　　　　　:　ContainerInputActivity へ直接遷移する（チラ見え防止）
     //====================================================
@@ -166,7 +166,7 @@ public class BundleSelectActivity extends BaseActivity {
             if (tvTitle != null) tvTitle.setText("重量計算");
         } else {
             mode = BundleSelectController.Mode.Normal;
-            if (tvTitle != null) tvTitle.setText("積載束選択");
+            if (tvTitle != null) tvTitle.setText("積載束選定");
         }
     }
     //================================

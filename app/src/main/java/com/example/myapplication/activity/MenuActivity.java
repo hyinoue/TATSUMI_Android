@@ -440,7 +440,7 @@ public class MenuActivity extends BaseActivity {
                 boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
                 runOnUiThread(() -> {
                     if (!hasWork) {
-                        showErrorMsg("積載束選択が行われていません。先に積載束選択を実施してください。", MsgDispMode.Label);
+                        showErrorMsg("積載束選定が行われていません。先に積載束選定を実施してください。", MsgDispMode.Label);
                         return;
                     }
                     syncContainerWeightsFromPrefs();

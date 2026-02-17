@@ -153,6 +153,20 @@ public class BaseActivity extends AppCompatActivity {
     private void afterSetContentView() {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
+        bindVersionNameIfExists();
+    }
+
+    //========================================
+    //　機　能　:　version Nameを画面にバインドする
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //========================================
+    private void bindVersionNameIfExists() {
+        TextView tvVersion = findViewById(R.id.tvVersion);
+        if (tvVersion != null) {
+            String versionName = getAppVersionName();
+            tvVersion.setText(versionName.isEmpty() ? "" : "Ver " + versionName);
+        }
     }
 
     // ===== frmBase: ErrorProcess 相当 =====

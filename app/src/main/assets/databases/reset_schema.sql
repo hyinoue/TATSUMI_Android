@@ -21,7 +21,7 @@ INSERT INTO M_SYSTEM (
     DEFAULT_DUNNAGE_JYURYO
 ) VALUES (
     1,
-    'http://scstestvanningreport.azurewebsites.net//websvc/svchandy.asmx',
+    'https://scstestvanningreport.azurewebsites.net//websvc/svchandy.asmx',
     0,
     32
 );

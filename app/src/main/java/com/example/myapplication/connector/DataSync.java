@@ -185,14 +185,22 @@ public class DataSync {
 
         if (sagyouYmd != null) {
             try {
-                dataSousinAll(sagyouYmd);
+                boolean syukkaSent = dataSousinAll(sagyouYmd);
+                if (!syukkaSent) {
+                    hasError = true;
+                    reportError(buildSendFailedMessage("出荷データの更新に失敗しました", lastErrorMessage));
+                }
             } catch (Exception ex) {
                 hasError = true;
                 reportError(ex);
             }
         }
 
-        dataSousinSyougo();
+        boolean syougoSent = dataSousinSyougo();
+        if (!syougoSent) {
+            hasError = true;
+            reportError(buildSendFailedMessage("照合データの更新に失敗しました", lastErrorMessage));
+        }
 
         if (sagyouYmd != null) {
             try {
@@ -266,6 +274,7 @@ public class DataSync {
     //　戻り値　:　[void] ..... なし
     //=================================
     private boolean dataSousinAll(Date sagyouYmd) {
+        lastErrorMessage = null;
         List<SyukkaContainerEntity> containers = syukkaContainerDao.findUnsent();
         for (SyukkaContainerEntity container : containers) {
             if (!dataSousinOnce(container, sagyouYmd)) {
@@ -351,6 +360,7 @@ public class DataSync {
             Log.w(TAG, "SendSyukkaDataResult=false. containerId=" + container.containerId
                     + " containerNo=" + formatContainerNo(container.containerNo)
                     + " bundleCount=" + data.bundles.size());
+            lastErrorMessage = "出荷データの更新に失敗しました";
             return false;
         } catch (Exception ex) {
             Log.e(TAG, "DataSousinOnce failed", ex);
@@ -373,6 +383,17 @@ public class DataSync {
             return ex.getClass().getSimpleName();
         }
         return msg;
+    }
+
+    private String buildSendFailedMessage(String baseMessage, String detail) {
+        if (isBlank(detail)) {
+            return baseMessage;
+        }
+        String trimmed = detail.trim();
+        if (baseMessage.equals(trimmed)) {
+            return baseMessage;
+        }
+        return baseMessage + "\n" + trimmed;
     }
 
     private String normalizeSendKey(String value) {
@@ -409,6 +430,7 @@ public class DataSync {
     //　戻り値　:　[void] ..... なし
     //==================================
     private boolean dataSousinSyougo() {
+        lastErrorMessage = null;
         List<KakuninContainerEntity> containers = kakuninContainerDao.findUnsentCompleted();
         for (KakuninContainerEntity container : containers) {
             if (!dataSousinSyougoOnce(container)) {
@@ -445,9 +467,11 @@ public class DataSync {
                 return true;
             }
             Log.w(TAG, "SendSyougoDataResult=false");
+            lastErrorMessage = "照合データの更新に失敗しました";
             return false;
         } catch (Exception ex) {
             Log.e(TAG, "DataSousinSyougoOnce failed", ex);
+            lastErrorMessage = safeMessage(ex);
             return false;
         }
     }
