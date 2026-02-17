@@ -265,7 +265,7 @@ public class ServiceMenuActivity extends BaseActivity {
                             kakuninMeisaiWorkDao.deleteAll();
                             kakuninMeisaiDao.deleteAll();
                             kakuninContainerDao.deleteAll();
-                            systemDao.updateDataSync(SYSTEM_RENBAN, null, null);
+                            systemDao.updateDataSync(SYSTEM_RENBAN, null, null, "ServiceMenu#clearData", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN).format(new java.util.Date()));
                         });
                         runOnUiThread(() -> showInfoMsg("削除しました", MsgDispMode.MsgBox));
                     });

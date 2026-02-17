@@ -49,7 +49,9 @@ public interface SystemDao {
     @Query("UPDATE " +
             "M_SYSTEM " +
             "SET " +
-            "DATA_CONF_YMDHMS = :dataConfYmdhms " +
+            "DATA_CONF_YMDHMS = :dataConfYmdhms, " +
+            "UPDATE_PROC_NAME = :updateProcName, " +
+            "UPDATE_YMD = :updateYmd " +
             "WHERE " +
             "RENBAN = :renban"
     )
@@ -59,13 +61,15 @@ public interface SystemDao {
         //　　　　　:　dataConfYmdhms ..... String
         //　戻り値　:　[int] ..... なし
         //========================================
-    int updateDataConf(int renban, String dataConfYmdhms);
+    int updateDataConf(int renban, String dataConfYmdhms, String updateProcName, String updateYmd);
 
     @Query("UPDATE " +
             "M_SYSTEM " +
             "SET " +
             "DATA_CONF_YMDHMS = :dataConfYmdhms, " +
-            "DATA_RECV_YMDHMS = :dataRecvYmdhms " +
+            "DATA_RECV_YMDHMS = :dataRecvYmdhms, " +
+            "UPDATE_PROC_NAME = :updateProcName, " +
+            "UPDATE_YMD = :updateYmd " +
             "WHERE " +
             "RENBAN = :renban"
     )
@@ -74,9 +78,11 @@ public interface SystemDao {
         //　引　数　:　renban ..... int
         //　　　　　:　dataConfYmdhms ..... String
         //　　　　　:　dataRecvYmdhms ..... String
+        //　　　　　:　updateProcName ..... String
+        //　　　　　:　updateYmd　　　 ..... String
         //　戻り値　:　[int] ..... なし
         //========================================
-    int updateDataSync(int renban, String dataConfYmdhms, String dataRecvYmdhms);
+    int updateDataSync(int renban, String dataConfYmdhms, String dataRecvYmdhms, String updateProcName, String updateYmd);
 
     @Query("DELETE FROM " +
             "M_SYSTEM"

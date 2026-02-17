@@ -507,10 +507,12 @@ public class DataSync {
         }
 
         String now = formatDbDate(new Date());
-        if (systemDao.updateDataConf(SYSTEM_RENBAN, now) == 0) {
+        if (systemDao.updateDataConf(SYSTEM_RENBAN, now, "DataSync#dataUpdate", now) == 0) {
             SystemEntity system = new SystemEntity();
             system.renban = SYSTEM_RENBAN;
             system.dataConfYmdhms = now;
+            system.updateProcName = "DataSync#dataUpdate";
+            system.updateYmd = now;
             systemDao.upsert(system);
         }
     }
@@ -575,11 +577,13 @@ public class DataSync {
             }
 
             String now = formatDbDate(new Date());
-            if (systemDao.updateDataSync(SYSTEM_RENBAN, now, now) == 0) {
+            if (systemDao.updateDataSync(SYSTEM_RENBAN, now, now, "DataSync#receiveSyukkaData", now) == 0) {
                 SystemEntity system = new SystemEntity();
                 system.renban = SYSTEM_RENBAN;
                 system.dataConfYmdhms = now;
                 system.dataRecvYmdhms = now;
+                system.updateProcName = "DataSync#receiveSyukkaData";
+                system.updateYmd = now;
                 systemDao.upsert(system);
             }
         });

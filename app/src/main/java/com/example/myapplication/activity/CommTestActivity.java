@@ -112,7 +112,7 @@ public class CommTestActivity extends BaseActivity {
             return;
         }
 
-        if (!isCellularConnected()) {
+        if (!isNetworkConnected()) {
             showErrorMsg("通信に接続できませんでした。", MsgDispMode.MsgBox);
             gprsConnected = false;
             updateGprsStatus();
@@ -142,16 +142,16 @@ public class CommTestActivity extends BaseActivity {
             return false;
         }
 
-        boolean hasCellular = false;
+        boolean hasAvailableTransport = false;
         Network active = manager.getActiveNetwork();
         if (active != null) {
             NetworkCapabilities capabilities = manager.getNetworkCapabilities(active);
             if (capabilities != null) {
-                hasCellular = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
+                hasAvailableTransport = hasSupportedTransport(capabilities);
             }
         }
 
-        if (hasCellular) {
+        if (hasAvailableTransport) {
             tvWanPowerValue.setText(STATUS_ON);
             tvWanPowerValue.setTextColor(Color.parseColor("#006400"));
             return true;
@@ -162,7 +162,7 @@ public class CommTestActivity extends BaseActivity {
         return false;
     }
 
-    private boolean isCellularConnected() {
+    private boolean isNetworkConnected() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (manager == null) {
             return false;
@@ -175,7 +175,12 @@ public class CommTestActivity extends BaseActivity {
         if (capabilities == null) {
             return false;
         }
-        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        return hasSupportedTransport(capabilities)
                 && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    }
+
+    private boolean hasSupportedTransport(NetworkCapabilities capabilities) {
+        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
     }
 }

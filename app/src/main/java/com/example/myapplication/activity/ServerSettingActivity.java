@@ -122,7 +122,11 @@ public class ServerSettingActivity extends BaseActivity {
             }
 
             if (!equalsIgnoreCase(selectedUrl, currentUrl)) {
+                String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN)
+                        .format(new java.util.Date());
                 system.webSvcUrl = selectedUrl;
+                system.updateProcName = "ServerSetting#onFunctionBlue";
+                system.updateYmd = now;
                 db.systemDao().upsert(system);
             }
 

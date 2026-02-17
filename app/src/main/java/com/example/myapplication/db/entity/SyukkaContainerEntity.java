@@ -39,9 +39,6 @@ public class SyukkaContainerEntity {
     @Ignore
     public Integer containerSize;
 
-    @Ignore
-    public Integer syukkaStatus;
-
     @ColumnInfo(name = "DATA_SEND_YMDHMS")
     public String dataSendYmdhms; // DATE→TEXT(ISO)
 
