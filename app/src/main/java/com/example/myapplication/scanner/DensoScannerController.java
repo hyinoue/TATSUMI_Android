@@ -3,6 +3,7 @@ package com.example.myapplication.scanner;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -17,24 +18,44 @@ import com.densowave.bhtsdk.barcode.BarcodeScanner;
 import com.densowave.bhtsdk.barcode.BarcodeScannerSettings;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * DENSO BHT SDK スキャナ制御（最小版）
- * - 画面が必要なときだけ生成して使う
- * - focus ONの間だけ Code39 デコードをON、OFF時はデコードOFF（アプリに入ってこない）
+ * DENSO BHT SDK スキャナ制御（BHT-M70向け強化版）
  * <p>
- * ※光/マーカー制御はしない（端末既定）
- * ※SCANキー制御もしない（端末既定）
+ * 要件：
+ * - BundleSelect画面でのみ使用する
+ * - etGenpinNo にフォーカスがある時だけスキャン（照射）できる
+ * - etGenpinNo フォーカス時にSCAN押下で 5秒照射維持（読めなくても消えないようにする）
+ * - etGenpinNo 以外フォーカス時はSCAN押しても照射しない
+ * <p>
+ * ポイント：
+ * - フォーカス外は「Symbology OFF」だけでなく、claim解除＋closeで“照射させない”方向に寄せる
+ * - BHT-M70 ではソフトトリガが維持できず瞬断することがあるため、keep-aliveで一定間隔再トリガする
  */
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
-    private static final String TAG = "DensoScannerMin";
+    private static final String TAG = "DensoScannerM70";
+
+    /**
+     * SCAN押下後、照射維持時間
+     */
     private static final long SCAN_EMIT_DURATION_MS = 5000L;
 
-    // 端末によってSCANトリガーのキーコードが違うので、必要分を列挙
+    /**
+     * keep-alive 再トリガ間隔（M70で瞬断するケース対策）
+     */
+    private static final long KEEP_ALIVE_INTERVAL_MS = 120L;
+
+    /**
+     * 連続同一データの弾き（短時間だけ）
+     */
+    private static final long DUP_GUARD_MS = 300L;
+
+    // 端末によってSCANトリガーのキーコードが違うので列挙（必要に応じて追加）
     private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234};
 
     public enum SymbologyProfile {
@@ -45,7 +66,7 @@ public class DensoScannerController
 
     public interface ScanPolicy {
         /**
-         * 受信したデータをアプリ処理して良いか（例：EditTextフォーカス時のみ）
+         * 受信/照射を許可するか（例：EditTextフォーカス時のみ）
          */
         boolean canAcceptResult();
 
@@ -94,13 +115,50 @@ public class DensoScannerController
     private BarcodeScannerSettings settings;
 
     private boolean resumed = false;
+
+    /**
+     * 現在 claim しているか
+     */
+    private boolean claimed = false;
+
+    /**
+     * 最後に適用したプロファイル（無駄なclose/claimを減らす）
+     */
+    @Nullable
+    private SymbologyProfile appliedProfile = null;
+
+    /**
+     * 5秒照射制御中か
+     */
     private boolean timedScanRunning = false;
+
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
     private final Runnable timedStopRunnable = this::stopScanProgrammatically;
 
+    /**
+     * 瞬断対策：一定間隔でソフトトリガONを再送
+     */
+    private final Runnable keepAliveRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!timedScanRunning || scanner == null) return;
 
-    // 任意：重複ガード
+            if (!policy.canAcceptResult()) {
+                stopTimedScan();
+                return;
+            }
+
+            // 読めなくても勝手にOFFになる端末対策：定期的にONを再送
+            invokeNoArgAny(scanner, "softTriggerOn", "pressTrigger", "triggerOn", "startScan", "startRead");
+
+            uiHandler.postDelayed(this, KEEP_ALIVE_INTERVAL_MS);
+        }
+    };
+
+    // 重複ガード（短時間のみ）
     private String last = "";
+    private long lastAt = 0L;
 
     public DensoScannerController(@NonNull Activity activity,
                                   @NonNull OnScanListener listener,
@@ -126,6 +184,8 @@ public class DensoScannerController
     public void onPause() {
         resumed = false;
         stopTimedScan();
+        disableScannerHard("onPause");
+
         try {
             if (scanner != null) {
                 try {
@@ -143,6 +203,8 @@ public class DensoScannerController
 
     public void onDestroy() {
         stopTimedScan();
+        disableScannerHard("onDestroy");
+
         try {
             if (scanner != null) {
                 try {
@@ -175,66 +237,85 @@ public class DensoScannerController
     }
 
     /**
-     * Activity.dispatchKeyEvent から呼ぶ想定（SCANトリガーキーをSDKに渡す）
+     * Activity.dispatchKeyEvent から呼ぶ想定
      * <p>
-     * ※ここではSCANキーを「握りつぶさない」方針に寄せるため、
-     * 実際のキー処理は端末既定に任せる。
-     * （ただし必要なら、将来ここでSDKに渡す処理を追加）
+     * 要件に合わせて：
+     * - 現品Noフォーカス時：SCAN押下で5秒照射維持（アプリが握る）
+     * - それ以外：SCAN押しても照射させない（アプリが握って停止）
      */
     public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
         int keyCode = event.getKeyCode();
         if (!isScanTriggerKey(keyCode)) return false;
 
-        // 現品No入力欄が非フォーカス時はスキャンキーを握りつぶし、レーザー照射を抑止する
+        int action = event.getAction();
+
+        // フォーカス外：端末の照射を許さない（強制OFF）
         if (!policy.canAcceptResult()) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            if (action == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                // 念のため、スキャナを無効化しておく（照射抑止）
+                applyProfileIfReady("SCAN_DOWN_noAccept");
                 stopTimedScan();
             }
+            if (action == KeyEvent.ACTION_UP) {
+                stopScanProgrammatically();
+            }
+            return true; // ★ここで握る（端末側の押しっぱなし照射を防ぐ）
+        }
+
+        // フォーカス中：5秒照射
+        if (action == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            startTimedScan();
+            return true; // ★握る
+        }
+
+        if (action == KeyEvent.ACTION_UP) {
+            // 5秒維持したいのでUPでは止めない（タイマーで止める）
             return true;
         }
 
-        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
-            return startTimedScan();
-        }
-
-        // timed scanを使っている場合はキーUPも消費する
-        if (event.getAction() == KeyEvent.ACTION_UP && timedScanRunning) {
-            return true;
-        }
-
-        // 端末既定に委譲
-        return false;
+        return true;
     }
 
     private boolean startTimedScan() {
         if (scanner == null) return false;
 
-        // 設定反映とclaim状態を整える
         applyProfileIfReady("startTimedScan");
+        if (!policy.canAcceptResult()) return false;
 
         boolean started = invokeNoArgAny(scanner,
-                "startScan", "startRead", "softTriggerOn", "pressTrigger", "triggerOn");
-        if (!started) return false;
+                "softTriggerOn", "pressTrigger", "triggerOn", "startScan", "startRead");
+        if (!started) {
+            Log.w(TAG, "startTimedScan: trigger method not found/failed");
+            return false;
+        }
 
         timedScanRunning = true;
+
+        // 5秒停止タイマー
         uiHandler.removeCallbacks(timedStopRunnable);
         uiHandler.postDelayed(timedStopRunnable, SCAN_EMIT_DURATION_MS);
+
+        // 瞬断対策 keep-alive
+        uiHandler.removeCallbacks(keepAliveRunnable);
+        uiHandler.post(keepAliveRunnable);
+
         return true;
     }
 
     private void stopTimedScan() {
         uiHandler.removeCallbacks(timedStopRunnable);
+        uiHandler.removeCallbacks(keepAliveRunnable);
         stopScanProgrammatically();
     }
 
     private void stopScanProgrammatically() {
-        if (!timedScanRunning || scanner == null) {
+        if (scanner == null) {
             timedScanRunning = false;
             return;
         }
 
         invokeNoArgAny(scanner,
-                "stopScan", "stopRead", "softTriggerOff", "releaseTrigger", "triggerOff");
+                "softTriggerOff", "releaseTrigger", "triggerOff", "stopScan", "stopRead");
         timedScanRunning = false;
     }
 
@@ -242,7 +323,7 @@ public class DensoScannerController
         Class<?> cls = target.getClass();
         for (String methodName : methodNames) {
             try {
-                java.lang.reflect.Method method = cls.getMethod(methodName);
+                Method method = cls.getMethod(methodName);
                 method.setAccessible(true);
                 method.invoke(target);
                 return true;
@@ -276,15 +357,34 @@ public class DensoScannerController
     }
 
     /**
-     * ★重要：端末/SDKによって setSettings だけだとデコード設定が反映されないことがある。
-     * close→setSettings→claim の順で、毎回確実に反映させる。
+     * フォーカス状態に応じて、確実に「照射可能/不可能」を切り替える。
+     * <p>
+     * - フォーカス外：claim解除＋close（照射させない）
+     * - フォーカス中：CODE39_ONLYを適用してclaim（照射可能）
      */
     private void applyProfileIfReady(@NonNull String from) {
         if (!resumed) return;
         if (scanner == null || settings == null) return;
 
+        final boolean accept = policy.canAcceptResult();
+        final SymbologyProfile want = policy.getSymbologyProfile();
+
         try {
-            // listener付け直し
+            // フォーカス外：確実に無効化（照射させない）
+            if (!accept || want == SymbologyProfile.NONE) {
+                if (claimed || appliedProfile != SymbologyProfile.NONE) {
+                    disableScannerHard("applyProfile(noAccept) from=" + from);
+                    appliedProfile = SymbologyProfile.NONE;
+                }
+                return;
+            }
+
+            // フォーカス中：必要なときだけ適用
+            if (want == appliedProfile && claimed) {
+                return; // 既に適用済み
+            }
+
+            // listener付与
             try {
                 scanner.removeDataListener(this);
             } catch (Exception ignored) {
@@ -294,31 +394,56 @@ public class DensoScannerController
             } catch (Exception ignored) {
             }
 
-            // ★設定反映が効かない端末があるため、いったんcloseしてから適用
+            // 設定反映が機種依存で効かない対策：必要時だけ close→setSettings→claim
             try {
                 scanner.close();
             } catch (Exception ignored) {
             }
 
-            // プロファイル反映（Code39だけ/全部OFF/ALL）
-            applySymbology(settings, policy.getSymbologyProfile());
-
+            applySymbology(settings, want);
             try {
                 scanner.setSettings(settings);
             } catch (Exception ignored) {
             }
 
-            // claim() で有効化
             try {
                 scanner.claim();
             } catch (Exception ignored) {
             }
+            claimed = true;
+            appliedProfile = want;
 
-            Log.d(TAG, "applyProfile=" + policy.getSymbologyProfile() + " from=" + from);
+            Log.d(TAG, "applyProfile=" + want + " from=" + from);
 
         } catch (Exception e) {
             Log.e(TAG, "applyProfileIfReady failed from=" + from, e);
         }
+    }
+
+    /**
+     * 解除を強めに行う（端末設定OFFを尊重して“照射させない”方向へ）
+     */
+    private void disableScannerHard(@NonNull String from) {
+        try {
+            stopTimedScan();
+
+            // claim解除系（SDK/機種で名前が違うことがあるので総当たり）
+            if (scanner != null) {
+                invokeNoArgAny(scanner, "release", "unclaim", "releaseClaim");
+                try {
+                    scanner.removeDataListener(this);
+                } catch (Exception ignored) {
+                }
+                try {
+                    scanner.close();
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        claimed = false;
+        Log.d(TAG, "scanner disabled from=" + from);
     }
 
     @Override
@@ -336,16 +461,19 @@ public class DensoScannerController
         final String denso = safeToString(first.getSymbologyDenso());
         final String displayName = getBarcodeDisplayName(aim, denso);
 
-        // フォーカスOFF等なら無視（アプリ処理しない）
+        // フォーカスOFF等なら無視
         if (!policy.canAcceptResult()) return;
 
-        // 念のため Code39 以外は弾く等
+        // 念のため Code39 以外は弾く
         if (!policy.isSymbologyAllowed(aim, denso, displayName)) return;
 
-        // 重複ガード
         if (TextUtils.isEmpty(normalized)) return;
-        if (normalized.equals(last)) return;
+
+        // 短時間重複ガード
+        long now = SystemClock.elapsedRealtime();
+        if (normalized.equals(last) && (now - lastAt) < DUP_GUARD_MS) return;
         last = normalized;
+        lastAt = now;
 
         activity.runOnUiThread(() -> listener.onScan(normalized, aim, denso));
     }
@@ -360,22 +488,18 @@ public class DensoScannerController
     }
 
     // ============================
-    // ★追加：Code39 判定（外部から呼べる）
+    // Code39 判定
     // ============================
 
-    /**
-     * aim/denso/displayName から Code39 かどうか判定する（Activity / View から呼べる）
-     */
     public static boolean isCode39(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
         if ("Code39".equals(displayName)) return true;
 
         String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
         String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
 
-        // AIM優先：]A は Code39
+        // AIM：]A は Code39
         if (a.startsWith("]A")) return true;
 
-        // fallback
         return a.contains("CODE39") || d.contains("CODE39");
     }
 
@@ -403,7 +527,6 @@ public class DensoScannerController
     private void applySymbology(Object settingsRoot, @NonNull SymbologyProfile profile) {
         final String root = "decode.symbologies";
 
-        // 使う可能性があるものだけ（最小）
         final String[] all = new String[]{
                 "code39",
                 "ean8", "ean13UpcA", "upcE",

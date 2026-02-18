@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -182,7 +183,28 @@ public class BundleSelectActivity extends BaseActivity {
                         });
                     }
                 },
-                DensoScannerController.createFocusCode39Policy(etGenpinNo)
+                new DensoScannerController.ScanPolicy() {
+                    @Override
+                    public boolean canAcceptResult() {
+                        return etGenpinNo != null
+                                && etGenpinNo.isEnabled()
+                                && etGenpinNo.hasFocus()
+                                && getCurrentFocus() == etGenpinNo;
+                    }
+
+                    @NonNull
+                    @Override
+                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
+                        return canAcceptResult()
+                                ? DensoScannerController.SymbologyProfile.CODE39_ONLY
+                                : DensoScannerController.SymbologyProfile.NONE;
+                    }
+
+                    @Override
+                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                        return DensoScannerController.isCode39(aim, denso, displayName);
+                    }
+                }
         );
         scanner.onCreate();
         scannerCreated = true;
@@ -194,6 +216,10 @@ public class BundleSelectActivity extends BaseActivity {
         if (etDunnageKg != null) etDunnageKg.addTextChangedListener(weightWatcher);
 
         if (etContainerKg != null) {
+            etContainerKg.setOnFocusChangeListener((v, hasFocus) -> {
+                if (scanner != null) scanner.refreshProfile("ContainerFocus=" + hasFocus);
+            });
+
             etContainerKg.setOnKeyListener((v, keyCode, event) -> {
                 if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
                 if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etDunnageKg != null) {
@@ -209,6 +235,9 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         if (etDunnageKg != null) {
+            etDunnageKg.setOnFocusChangeListener((v, hasFocus) -> {
+                if (scanner != null) scanner.refreshProfile("DunnageFocus=" + hasFocus);
+            });
             etDunnageKg.setOnKeyListener((v, keyCode, event) -> {
                 if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
                 if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etGenpinNo != null) {

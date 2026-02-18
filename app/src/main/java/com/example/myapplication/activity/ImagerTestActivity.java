@@ -20,8 +20,8 @@ import java.util.Locale;
  * バーコードテスト画面（簡易版）Activity。
  * <p>
  * 方針：
+ * * - 対象入力欄（etBarcode）にフォーカス中のみ読み取りを有効化
  * - 読み取り種別は全許可（ALL）
- * - 受信データは常にアプリ処理する（フォーカス条件なし）
  * - 端末によっては dispatchKeyEvent 経由が必要なので scanner に渡す
  */
 public class ImagerTestActivity extends BaseActivity {
@@ -100,14 +100,16 @@ public class ImagerTestActivity extends BaseActivity {
 
                     @Override
                     public boolean canAcceptResult() {
-                        // この画面は常に受ける
-                        return true;
+                        // 対象入力欄フォーカス中のみ受ける
+                        return etBarcode != null && etBarcode.hasFocus() && etBarcode.isEnabled();
                     }
 
                     @Override
                     public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                        // 何でもOK
-                        return DensoScannerController.SymbologyProfile.ALL;
+                        // 対象入力欄フォーカス中のみ 何でもOK
+                        return canAcceptResult()
+                                ? DensoScannerController.SymbologyProfile.ALL
+                                : DensoScannerController.SymbologyProfile.NONE;
                     }
 
                     @Override
