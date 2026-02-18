@@ -9,19 +9,18 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 
 /**
- * C#版 ImageScanTextBox 相当の Android 実装。
+ * フォーカス中だけ Code39 をアプリ処理する EditText
  * <p>
- * 方針：
- * - フォーカス中だけ Code39 をアプリ処理する
- * - 光/マーカーは端末既定（制御しない）
- * - SCANキー制御もしない（ここでは「アプリに入れる/入れない」だけを制御）
+ * ポイント:
+ * - SCANキーはこのViewで消費しない（端末に渡す）
+ * - フォーカスON: デコード Code39_ONLY + アプリ処理ON
+ * - フォーカスOFF: デコード NONE + アプリ処理OFF
  */
 public class ImageScanTextBox extends AppCompatEditText {
 
@@ -59,16 +58,13 @@ public class ImageScanTextBox extends AppCompatEditText {
 
         if (focused) {
             ensureScannerReady();
-            if (scannerController != null) {
-                // フォーカスONになったので decode=CODE39_ONLY を即反映
-                scannerController.refreshProfile("ImageScanTextBoxFocusOn");
-            }
         } else {
-            if (scannerController != null) {
-                // フォーカスOFFになったので decode=NONE を即反映
-                scannerController.refreshProfile("ImageScanTextBoxFocusOff");
-            }
             pauseScanner();
+        }
+
+        // ★フォーカス変化直後に設定反映（CODE39_ONLY / NONE 切替）
+        if (scannerController != null) {
+            scannerController.refreshProfile("ImageScanTextBox.onFocusChanged");
         }
     }
 
@@ -78,24 +74,12 @@ public class ImageScanTextBox extends AppCompatEditText {
         super.onDetachedFromWindow();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // SCANキー押下はここで握りつぶす（アプリ側の他処理を起こさない）
-        if (isTriggerKey(keyCode)) {
-            // ここで何もせずtrue。端末側は光を出すかもしれないが、
-            // decode=NONE の時はアプリに結果が入ってこない。
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (isTriggerKey(keyCode)) {
-            return true;
-        }
-        return super.onKeyUp(keyCode, event);
-    }
+    /**
+     * ★重要：SCANキーをここで消費しない
+     * （消費すると端末側のトリガー処理が動かず「反応しない」になりがち）
+     * <p>
+     * ※なので onKeyDown/onKeyUp はオーバーライドしない（=端末に渡す）
+     */
 
     private void ensureScannerReady() {
         Activity activity = findActivity(getContext());
@@ -119,12 +103,30 @@ public class ImageScanTextBox extends AppCompatEditText {
                         setText(value);
                         setSelection(value.length());
 
-                        // Enterを疑似送出（既存仕様）
-                        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
-                        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
+                        // 既存処理に流したい場合：Enterを擬似発火
+                        dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_ENTER));
+                        dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_ENTER));
                     },
-                    // ★このEditTextがフォーカス中だけ Code39 を許可
-                    DensoScannerController.createCode39OnFocusPolicy(this)
+                    new DensoScannerController.ScanPolicy() {
+                        @Override
+                        public boolean canAcceptResult() {
+                            return hasFocus() && isEnabled();
+                        }
+
+                        @NonNull
+                        @Override
+                        public DensoScannerController.SymbologyProfile getSymbologyProfile() {
+                            return (hasFocus() && isEnabled())
+                                    ? DensoScannerController.SymbologyProfile.CODE39_ONLY
+                                    : DensoScannerController.SymbologyProfile.NONE;
+                        }
+
+                        @Override
+                        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                            // 念のため Code39 以外は弾く
+                            return DensoScannerController.isCode39(aim, denso, displayName);
+                        }
+                    }
             );
         }
 
@@ -133,6 +135,7 @@ public class ImageScanTextBox extends AppCompatEditText {
             scannerCreated = true;
         }
         scannerController.onResume();
+        scannerController.refreshProfile("ImageScanTextBox.ensureScannerReady");
     }
 
     private void pauseScanner() {
@@ -149,11 +152,6 @@ public class ImageScanTextBox extends AppCompatEditText {
         scannerCreated = false;
     }
 
-    private boolean isTriggerKey(int keyCode) {
-        // 端末依存キー（必要なら 501 も追加）
-        return keyCode == 234 || keyCode == 230 || keyCode == 233 || keyCode == 501;
-    }
-
     private int resolveMaxLength() {
         InputFilter[] filters = getFilters();
         if (filters == null) return 0;
@@ -163,12 +161,11 @@ public class ImageScanTextBox extends AppCompatEditText {
                 Editable current = getText(); // Editable は Spanned
                 Spanned dest = (current != null) ? current : new SpannableStringBuilder("");
 
-                // 「1文字追加しようとした時に弾かれるか」で maxLength 到達を推定
                 CharSequence out = filter.filter(
-                        "A",          // source
+                        "A",
                         0,
                         1,
-                        dest,         // ★Spannedを渡す
+                        dest,
                         0,
                         dest.length()
                 );
@@ -191,22 +188,5 @@ public class ImageScanTextBox extends AppCompatEditText {
             current = ((ContextWrapper) current).getBaseContext();
         }
         return null;
-    }
-
-    public int getMinLength() {
-        return minLength;
-    }
-
-    public void setMinLength(int minLength) {
-        this.minLength = Math.max(0, minLength);
-    }
-
-    public long getWaitDecodeMs() {
-        return waitDecodeMs;
-    }
-
-    public void setWaitDecodeMs(long waitDecodeMs) {
-        this.waitDecodeMs = waitDecodeMs <= 0 ? DEFAULT_WAIT_DECODE_MS : waitDecodeMs;
-        // ※ waitDecode は現状未使用（残しておくだけ）
     }
 }

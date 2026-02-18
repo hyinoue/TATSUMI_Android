@@ -3,6 +3,7 @@ package com.example.myapplication.scanner;
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,21 +18,20 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * DENSO BHT SDK スキャナ制御（最小・統一版）
+ * DENSO BHT SDK スキャナ制御（最小版）
+ * - 画面が必要なときだけ生成して使う
+ * - focus ONの間だけ Code39 デコードをON、OFF時はデコードOFF（アプリに入ってこない）
  * <p>
- * 方針：
- * - 光/マーカー制御はしない（端末既定）
- * - SCANキー制御もしない（端末既定）
- * - 「アプリに入ってくるかどうか」だけを decode 設定で制御する
- * <p>
- * 使い分け：
- * - 何でも読める画面（テスト画面など）: ALLOW_ALL_POLICY
- * - 特定EditTextフォーカス時だけCode39: createCode39OnFocusPolicy(etGenpinNo)
+ * ※光/マーカー制御はしない（端末既定）
+ * ※SCANキー制御もしない（端末既定）
  */
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
     private static final String TAG = "DensoScannerMin";
+
+    // 端末によってSCANトリガーのキーコードが違うので、必要分を列挙
+    private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234};
 
     public enum SymbologyProfile {
         NONE,
@@ -47,7 +47,6 @@ public class DensoScannerController
 
         /**
          * デコードとして有効化したいプロファイル
-         * （ここが NONE ならアプリに基本入ってこない）
          */
         @NonNull
         SymbologyProfile getSymbologyProfile();
@@ -56,77 +55,6 @@ public class DensoScannerController
          * 念のためのフィルタ（Code39以外を弾く等）
          */
         boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
-    }
-
-    /**
-     * 何でもOK（テスト画面等）
-     */
-    public static final ScanPolicy ALLOW_ALL_POLICY = new ScanPolicy() {
-        @Override
-        public boolean canAcceptResult() {
-            return true;
-        }
-
-        @NonNull
-        @Override
-        public SymbologyProfile getSymbologyProfile() {
-            return SymbologyProfile.ALL;
-        }
-
-        @Override
-        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-            return true;
-        }
-    };
-
-    /**
-     * 全拒否（decodeもOFF）
-     */
-    public static final ScanPolicy DENY_ALL_POLICY = new ScanPolicy() {
-        @Override
-        public boolean canAcceptResult() {
-            return false;
-        }
-
-        @NonNull
-        @Override
-        public SymbologyProfile getSymbologyProfile() {
-            return SymbologyProfile.NONE;
-        }
-
-        @Override
-        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-            return false;
-        }
-    };
-
-    /**
-     * EditText がフォーカス中のときだけ Code39 をアプリ処理するポリシーを作る
-     * - フォーカス外：decode=NONE（アプリに入れない）
-     * - フォーカス中：decode=CODE39_ONLY（アプリに入れる）
-     */
-    @NonNull
-    public static ScanPolicy createCode39OnFocusPolicy(@NonNull final android.view.View focusView) {
-        return new ScanPolicy() {
-            @Override
-            public boolean canAcceptResult() {
-                return focusView.hasFocus() && focusView.isEnabled();
-            }
-
-            @NonNull
-            @Override
-            public SymbologyProfile getSymbologyProfile() {
-                return canAcceptResult() ? SymbologyProfile.CODE39_ONLY : SymbologyProfile.NONE;
-            }
-
-            @Override
-            public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                if ("Code39".equals(displayName)) return true;
-                String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
-                String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
-                return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
-            }
-        };
     }
 
     private final Activity activity;
@@ -171,7 +99,10 @@ public class DensoScannerController
                     scanner.removeDataListener(this);
                 } catch (Exception ignored) {
                 }
-                scanner.close();
+                try {
+                    scanner.close();
+                } catch (Exception ignored) {
+                }
             }
         } catch (Exception ignored) {
         }
@@ -204,10 +135,32 @@ public class DensoScannerController
 
     /**
      * フォーカス変化などでプロファイルを即時反映したいときに呼ぶ
-     * 例：etGenpinNo の onFocusChange で呼ぶ
      */
     public void refreshProfile(@NonNull String from) {
         applyProfileIfReady(from);
+    }
+
+    /**
+     * Activity.dispatchKeyEvent から呼ぶ想定（SCANトリガーキーをSDKに渡す）
+     * <p>
+     * ※ここではSCANキーを「握りつぶさない」方針に寄せるため、
+     * 実際のキー処理は端末既定に任せる。
+     * （ただし必要なら、将来ここでSDKに渡す処理を追加）
+     */
+    public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (!isScanTriggerKey(keyCode)) return false;
+
+        // 端末側でスキャン動作(光/マーカー)は出るが、アプリに取り込む/弾くはpolicyで制御
+        // ここでは「受け取った」扱いだけにする（＝trueにするとActivity側が止めるので注意）
+        return false;
+    }
+
+    private boolean isScanTriggerKey(int keyCode) {
+        for (int code : SCAN_TRIGGER_KEY_CODES) {
+            if (code == keyCode) return true;
+        }
+        return false;
     }
 
     @Override
@@ -226,24 +179,46 @@ public class DensoScannerController
         }
     }
 
+    /**
+     * ★重要：端末/SDKによって setSettings だけだとデコード設定が反映されないことがある。
+     * close→setSettings→claim の順で、毎回確実に反映させる。
+     */
     private void applyProfileIfReady(@NonNull String from) {
         if (!resumed) return;
         if (scanner == null || settings == null) return;
 
         try {
+            // listener付け直し
             try {
                 scanner.removeDataListener(this);
             } catch (Exception ignored) {
             }
-            scanner.addDataListener(this);
+            try {
+                scanner.addDataListener(this);
+            } catch (Exception ignored) {
+            }
 
-            // ★ここが肝：フォーカス状態に応じて decode を NONE / CODE39_ONLY / ALL に切替
+            // ★設定反映が効かない端末があるため、いったんcloseしてから適用
+            try {
+                scanner.close();
+            } catch (Exception ignored) {
+            }
+
+            // プロファイル反映（Code39だけ/全部OFF/ALL）
             applySymbology(settings, policy.getSymbologyProfile());
 
-            scanner.setSettings(settings);
-            scanner.claim();
+            try {
+                scanner.setSettings(settings);
+            } catch (Exception ignored) {
+            }
 
-            Log.d(TAG, "applyProfile " + policy.getSymbologyProfile() + " from=" + from);
+            // claim() で有効化
+            try {
+                scanner.claim();
+            } catch (Exception ignored) {
+            }
+
+            Log.d(TAG, "applyProfile=" + policy.getSymbologyProfile() + " from=" + from);
 
         } catch (Exception e) {
             Log.e(TAG, "applyProfileIfReady failed from=" + from, e);
@@ -255,19 +230,23 @@ public class DensoScannerController
         List<BarcodeDataReceivedEvent.BarcodeData> list = event.getBarcodeData();
         if (list == null || list.isEmpty()) return;
 
-        String data = list.get(0).getData();
+        BarcodeDataReceivedEvent.BarcodeData first = list.get(0);
+
+        String data = first.getData();
         if (data == null) data = "";
         final String normalized = normalize(data);
 
-        final String aim = safeToString(list.get(0).getSymbologyAim());
-        final String denso = safeToString(list.get(0).getSymbologyDenso());
+        final String aim = safeToString(first.getSymbologyAim());
+        final String denso = safeToString(first.getSymbologyDenso());
         final String displayName = getBarcodeDisplayName(aim, denso);
 
-        // フォーカスOFF等なら無視
+        // フォーカスOFF等なら無視（アプリ処理しない）
         if (!policy.canAcceptResult()) return;
+
+        // 念のため Code39 以外は弾く等
         if (!policy.isSymbologyAllowed(aim, denso, displayName)) return;
 
-        // 任意：重複ガード
+        // 重複ガード
         if (TextUtils.isEmpty(normalized)) return;
         if (normalized.equals(last)) return;
         last = normalized;
@@ -284,11 +263,28 @@ public class DensoScannerController
         return v == null ? "" : String.valueOf(v);
     }
 
+    // ============================
+    // ★追加：Code39 判定（外部から呼べる）
+    // ============================
+
     /**
-     * ★public に変更：画面側で種別表示に使える
+     * aim/denso/displayName から Code39 かどうか判定する（Activity / View から呼べる）
      */
+    public static boolean isCode39(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+        if ("Code39".equals(displayName)) return true;
+
+        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
+        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
+
+        // AIM優先：]A は Code39
+        if (a.startsWith("]A")) return true;
+
+        // fallback
+        return a.contains("CODE39") || d.contains("CODE39");
+    }
+
     @Nullable
-    public String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
+    private String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
         String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
 
@@ -311,6 +307,7 @@ public class DensoScannerController
     private void applySymbology(Object settingsRoot, @NonNull SymbologyProfile profile) {
         final String root = "decode.symbologies";
 
+        // 使う可能性があるものだけ（最小）
         final String[] all = new String[]{
                 "code39",
                 "ean8", "ean13UpcA", "upcE",

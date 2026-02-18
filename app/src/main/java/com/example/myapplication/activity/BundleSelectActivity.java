@@ -208,8 +208,10 @@ public class BundleSelectActivity extends BaseActivity {
                     }
                 }
         );
-
         scanner.onCreate();
+        scanner.onResume();
+        scanner.refreshProfile("initScanner");
+
     }
 
     private void setupInputHandlers() {
