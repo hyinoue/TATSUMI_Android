@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,6 +56,30 @@ public class DensoScannerController
          * 念のためのフィルタ（Code39以外を弾く等）
          */
         boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
+    }
+
+    /**
+     * 現品No入力欄など、フォーカス中だけ Code39 を受け付ける標準ポリシー。
+     */
+    @NonNull
+    public static ScanPolicy createFocusCode39Policy(@Nullable EditText target) {
+        return new ScanPolicy() {
+            @Override
+            public boolean canAcceptResult() {
+                return target != null && target.hasFocus() && target.isEnabled();
+            }
+
+            @NonNull
+            @Override
+            public SymbologyProfile getSymbologyProfile() {
+                return canAcceptResult() ? SymbologyProfile.CODE39_ONLY : SymbologyProfile.NONE;
+            }
+
+            @Override
+            public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                return isCode39(aim, denso, displayName);
+            }
+        };
     }
 
     private final Activity activity;

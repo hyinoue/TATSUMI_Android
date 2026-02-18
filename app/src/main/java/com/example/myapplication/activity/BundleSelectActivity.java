@@ -15,7 +15,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -182,36 +181,9 @@ public class BundleSelectActivity extends BaseActivity {
                         });
                     }
                 },
-                new DensoScannerController.ScanPolicy() {
-
-                    @Override
-                    public boolean canAcceptResult() {
-                        return etGenpinNo != null && etGenpinNo.hasFocus() && etGenpinNo.isEnabled();
-                    }
-
-                    @NonNull
-                    @Override
-                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                        // ★フォーカス中だけCode39、フォーカス外はNONE（アプリに入ってこない）
-                        return canAcceptResult()
-                                ? DensoScannerController.SymbologyProfile.CODE39_ONLY
-                                : DensoScannerController.SymbologyProfile.NONE;
-                    }
-
-                    @Override
-                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                        // 念のためCode39以外は弾く
-                        if ("Code39".equals(displayName)) return true;
-                        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
-                        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
-                        return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
-                    }
-                }
+                DensoScannerController.createFocusCode39Policy(etGenpinNo)
         );
         scanner.onCreate();
-        scanner.onResume();
-        scanner.refreshProfile("initScanner");
-
     }
 
     private void setupInputHandlers() {

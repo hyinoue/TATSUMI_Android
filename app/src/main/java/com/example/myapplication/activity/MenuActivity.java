@@ -335,27 +335,8 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        clearMainMenuFocus();
         syncContainerWeightsFromPrefs();
         refreshInformation();
-    }
-
-    //フォーカス解除
-    private void clearMainMenuFocus() {
-        View[] menuButtons = {btnDataReceive, btnBundleSelect, btnContainerInput, btnWeightCalc, btnCollateContainerSelect};
-        for (View button : menuButtons) {
-            if (button != null) {
-                button.clearFocus();
-                button.setSelected(false);
-            }
-        }
-
-        View mainArea = findViewById(R.id.mainArea);
-        if (mainArea != null) {
-            mainArea.setFocusable(true);
-            mainArea.setFocusableInTouchMode(true);
-            mainArea.requestFocus();
-        }
     }
 
     //===============================

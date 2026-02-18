@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -143,31 +142,7 @@ public class VanningCollationActivity extends BaseActivity {
                         });
                     }
                 },
-                new DensoScannerController.ScanPolicy() {
-
-                    @Override
-                    public boolean canAcceptResult() {
-                        return etGenpinNo != null && etGenpinNo.hasFocus() && etGenpinNo.isEnabled();
-                    }
-
-                    @NonNull
-                    @Override
-                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                        // フォーカスONの間だけCode39をデコード
-                        return canAcceptResult()
-                                ? DensoScannerController.SymbologyProfile.CODE39_ONLY
-                                : DensoScannerController.SymbologyProfile.NONE;
-                    }
-
-                    @Override
-                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                        // 念のため：Code39以外は弾く
-                        if ("Code39".equals(displayName)) return true;
-                        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
-                        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
-                        return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
-                    }
-                }
+                DensoScannerController.createFocusCode39Policy(etGenpinNo)
         );
 
         scanner.onCreate();
@@ -442,6 +417,7 @@ public class VanningCollationActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         if (scanner != null) scanner.onResume();
+        if (scanner != null) scanner.refreshProfile("onResume");
     }
 
     @Override
