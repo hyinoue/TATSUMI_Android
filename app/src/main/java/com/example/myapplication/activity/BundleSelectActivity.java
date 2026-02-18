@@ -305,7 +305,10 @@ public class BundleSelectActivity extends BaseActivity {
 
             @Override
             public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                return "Code39".equals(displayName);
+                if ("Code39".equals(displayName)) return true;
+                String a = aim == null ? "" : aim.toUpperCase(java.util.Locale.ROOT);
+                String d = denso == null ? "" : denso.toUpperCase(java.util.Locale.ROOT);
+                return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
             }
 
             @NonNull

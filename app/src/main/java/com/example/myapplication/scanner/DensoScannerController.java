@@ -1,8 +1,6 @@
 package com.example.myapplication.scanner;
 
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,7 +27,7 @@ import java.util.Locale;
  * 【責務】
  * - BarcodeManager生成、Scanner取得
  * - onResume: claim / onPause: close
- * - triggerキー(501)で wait-decode風制御
+ * - claim()/close() をライフサイクル連動で制御
  * - onBarcodeDataReceived を受信して OnScanListener へ通知
  * - C#互換寄せの設定反映（存在する項目のみを反射でON）
  */
@@ -53,16 +51,12 @@ public class DensoScannerController
     private BarcodeScanner mBarcodeScanner = null;
     private BarcodeScannerSettings mSettings = null;
 
-    // ===== Trigger / WaitForDecode =====
+    // ===== Trigger =====
     private int triggerKeyCode = 501;
-    private long waitDecodeMs = 5000;
 
-    private boolean triggerDown = false;
     private boolean resumed = false;
 
-    private boolean waitingDecode = false;
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable timeoutRunnable;
+    private boolean scannerClaimed = false;
 
     // ===== Duplicate guard (optional) =====
     private String lastScanned = "";
@@ -139,7 +133,7 @@ public class DensoScannerController
     }
 
     public void setWaitDecodeMs(long waitDecodeMs) {
-        this.waitDecodeMs = waitDecodeMs <= 0 ? 5000 : waitDecodeMs;
+        // 旧実装互換のためAPIは残す（現在は使用しない）
     }
 
     // ----------------------------
@@ -175,14 +169,7 @@ public class DensoScannerController
     //============================
     public void onResume() {
         resumed = true;
-
-        if (mBarcodeScanner != null) {
-            if (scanPolicy.canStartScan()) {
-                setupScannerIfPossible("onResume");
-            } else {
-                safeCloseScanner("onResumePolicyDenied");
-            }
-        }
+        updateScannerClaimState("onResume");
     }
 
     /**
@@ -195,12 +182,10 @@ public class DensoScannerController
     //============================
     public void onPause() {
         resumed = false;
-
-        cancelWaitForDecode("onPause");
+        scannerClaimed = false;
 
         try {
             if (mBarcodeScanner != null) {
-                safePressTrigger(false);
                 try {
                     mBarcodeScanner.removeDataListener(this);
                 } catch (Exception ignored) {
@@ -220,11 +205,10 @@ public class DensoScannerController
     //　戻り値　:　[void] ..... なし
     //============================
     public void onDestroy() {
-        cancelWaitForDecode("onDestroy");
+        scannerClaimed = false;
 
         try {
             if (mBarcodeScanner != null) {
-                safePressTrigger(false);
                 safeCloseScanner("onDestroy");
 
                 try {
@@ -259,32 +243,14 @@ public class DensoScannerController
     //　戻り値　:　[boolean] ..... なし
     //====================================
     public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getKeyCode() == triggerKeyCode) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                if (event.getRepeatCount() > 0) return true;
-
-                if (!triggerDown) {
-                    if (!scanPolicy.canStartScan()) {
-                        safePressTrigger(false);
-                        safeCloseScanner("triggerDownDenied");
-                        Log.d(TAG, "TRIGGER DOWN ignored by policy");
-                        return true;
-                    }
-                    setupScannerIfPossible("triggerDownAllowed");
-                    triggerDown = true;
-                    Log.d(TAG, "TRIGGER DOWN -> startWaitForDecode(" + waitDecodeMs + ")");
-                    startWaitForDecode(waitDecodeMs);
-                }
-                return true;
-
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                triggerDown = false;
-                Log.d(TAG, "TRIGGER UP -> cancelWaitForDecode");
-                cancelWaitForDecode("keyUp");
-                return true;
-            }
+        if (event.getKeyCode() != triggerKeyCode) {
+            return false;
         }
-        return false;
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            updateScannerClaimState("triggerDown");
+        }
+        // ハードウェアトリガーの押下自体はSDK側に任せる
+        return true;
     }
 
     // ----------------------------
@@ -355,7 +321,10 @@ public class DensoScannerController
             applyCSharpLikeSettingsReflective(mSettings, scanPolicy.getSymbologyProfile());
             mBarcodeScanner.setSettings(mSettings);
 
-            mBarcodeScanner.claim();
+            if (!scannerClaimed) {
+                mBarcodeScanner.claim();
+                scannerClaimed = true;
+            }
 
             Log.d(TAG, "Scanner READY in " + from);
 
@@ -384,12 +353,8 @@ public class DensoScannerController
         if (data == null) data = "";
         final String normalized = normalize(data);
 
-        if (waitingDecode) {
-            stopWaitForDecodeSuccess();
-        }
-
-        final String aim = String.valueOf(list.get(0).getSymbologyAim());
-        final String denso = String.valueOf(list.get(0).getSymbologyDenso());
+        final String aim = safeToString(list.get(0).getSymbologyAim());
+        final String denso = safeToString(list.get(0).getSymbologyDenso());
         final String displayName = getBarcodeDisplayName(aim, denso);
 
         if (!scanPolicy.canStartScan()) {
@@ -422,89 +387,20 @@ public class DensoScannerController
         });
     }
 
-    // ----------------------------
-    // WaitForDecode
-    // ----------------------------
-    //=================================
-    //　機　能　:　wait For Decodeを開始する
-    //　引　数　:　timeoutMs ..... long
-    //　戻り値　:　[void] ..... なし
-    //=================================
-
-    private void startWaitForDecode(long timeoutMs) {
-        if (mBarcodeScanner == null) {
-            Log.e(TAG, "startWaitForDecode skipped: scanner is null");
+    private void updateScannerClaimState(@NonNull String from) {
+        if (mBarcodeScanner == null) return;
+        if (!resumed || !scanPolicy.canStartScan()) {
+            safeCloseScanner(from + "PolicyDenied");
             return;
         }
-        if (waitingDecode) return;
-
-        waitingDecode = true;
-
-        timeoutRunnable = () -> {
-            if (!waitingDecode) return;
-            waitingDecode = false;
-            timeoutRunnable = null;
-
-            safePressTrigger(false);
-            Log.d(TAG, "WAIT_FOR_DECODE timeout (" + timeoutMs + "ms)");
-        };
-
-        handler.postDelayed(timeoutRunnable, timeoutMs);
-        safePressTrigger(true);
+        setupScannerIfPossible(from);
     }
-    //=========================================
-    //　機　能　:　wait For Decode Successを停止する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=========================================
 
-    private void stopWaitForDecodeSuccess() {
-        waitingDecode = false;
-
-        if (timeoutRunnable != null) {
-            handler.removeCallbacks(timeoutRunnable);
-            timeoutRunnable = null;
-        }
-
-        safePressTrigger(false);
-        Log.d(TAG, "WAIT_FOR_DECODE success");
+    @NonNull
+    private String safeToString(@Nullable Object value) {
+        return value == null ? "" : String.valueOf(value);
     }
-    //======================================
-    //　機　能　:　cancel Wait For Decodeの処理
-    //　引　数　:　reason ..... String
-    //　戻り値　:　[void] ..... なし
-    //======================================
 
-    private void cancelWaitForDecode(String reason) {
-        waitingDecode = false;
-
-        if (timeoutRunnable != null) {
-            handler.removeCallbacks(timeoutRunnable);
-            timeoutRunnable = null;
-        }
-
-        safePressTrigger(false);
-        Log.d(TAG, "WAIT_FOR_DECODE cancelled: " + reason);
-    }
-    //==================================
-    //　機　能　:　safe Press Triggerの処理
-    //　引　数　:　on ..... boolean
-    //　戻り値　:　[void] ..... なし
-    //==================================
-
-    private void safePressTrigger(boolean on) {
-        if (mBarcodeScanner == null) {
-            Log.e(TAG, "pressSoftwareTrigger(" + on + ") skipped: scanner is null");
-            return;
-        }
-        try {
-            mBarcodeScanner.pressSoftwareTrigger(on);
-        } catch (BarcodeException e) {
-            Log.e(TAG, "pressSoftwareTrigger(" + on + ") failed. ErrorCode=" + e.getErrorCode(), e);
-        } catch (Exception e) {
-            Log.e(TAG, "pressSoftwareTrigger(" + on + ") failed (unexpected)", e);
-        }
-    }
     //==================================
     //　機　能　:　safe Close Scannerの処理
     //　引　数　:　from ..... String
@@ -515,6 +411,7 @@ public class DensoScannerController
         if (mBarcodeScanner == null) return;
         try {
             mBarcodeScanner.close();
+            scannerClaimed = false;
             Log.d(TAG, "Scanner CLOSE in " + from);
         } catch (BarcodeException e) {
             Log.e(TAG, "Scanner close failed in " + from + ". ErrorCode=" + e.getErrorCode(), e);
@@ -676,7 +573,7 @@ public class DensoScannerController
         final String[] enablePaths = profile == SymbologyProfile.CODE39_ONLY
                 ? new String[]{"code39"}
                 : allPaths;
-        
+
         for (String rootPath : decodeRoots) {
             for (String sym : enablePaths) {
                 setBoolean(settingsRoot, rootPath + "." + sym + ".enabled", true);
