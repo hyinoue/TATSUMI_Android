@@ -1,8 +1,6 @@
 package com.example.myapplication.scanner;
 
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,27 +26,15 @@ import java.util.Locale;
  * 要件：
  * - BundleSelect画面でのみ使用する
  * - etGenpinNo にフォーカスがある時だけスキャン（照射）できる
- * - etGenpinNo フォーカス時にSCAN押下で 5秒照射維持（読めなくても消えないようにする）
  * - etGenpinNo 以外フォーカス時はSCAN押しても照射しない
  * <p>
  * ポイント：
  * - フォーカス外は「Symbology OFF」だけでなく、claim解除＋closeで“照射させない”方向に寄せる
- * - BHT-M70 ではソフトトリガが維持できず瞬断することがあるため、keep-aliveで一定間隔再トリガする
  */
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
     private static final String TAG = "DensoScannerM70";
-
-    /**
-     * SCAN押下後、照射維持時間
-     */
-    private static final long SCAN_EMIT_DURATION_MS = 5000L;
-
-    /**
-     * keep-alive 再トリガ間隔（M70で瞬断するケース対策）
-     */
-    private static final long KEEP_ALIVE_INTERVAL_MS = 120L;
 
     /**
      * 連続同一データの弾き（短時間だけ）
@@ -126,35 +112,6 @@ public class DensoScannerController
      */
     @Nullable
     private SymbologyProfile appliedProfile = null;
-
-    /**
-     * 5秒照射制御中か
-     */
-    private boolean timedScanRunning = false;
-
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
-
-    private final Runnable timedStopRunnable = this::stopScanProgrammatically;
-
-    /**
-     * 瞬断対策：一定間隔でソフトトリガONを再送
-     */
-    private final Runnable keepAliveRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (!timedScanRunning || scanner == null) return;
-
-            if (!policy.canAcceptResult()) {
-                stopTimedScan();
-                return;
-            }
-
-            // 読めなくても勝手にOFFになる端末対策：定期的にONを再送
-            invokeNoArgAny(scanner, "softTriggerOn", "pressTrigger", "triggerOn", "startScan", "startRead");
-
-            uiHandler.postDelayed(this, KEEP_ALIVE_INTERVAL_MS);
-        }
-    };
 
     // 重複ガード（短時間のみ）
     private String last = "";
@@ -240,7 +197,7 @@ public class DensoScannerController
      * Activity.dispatchKeyEvent から呼ぶ想定
      * <p>
      * 要件に合わせて：
-     * - 現品Noフォーカス時：SCAN押下で5秒照射維持（アプリが握る）
+     * - 現品Noフォーカス時：SCAN押下で5秒照射
      * - それ以外：SCAN押しても照射させない（アプリが握って停止）
      */
     public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
@@ -264,59 +221,41 @@ public class DensoScannerController
 
         // フォーカス中：5秒照射
         if (action == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
-            startTimedScan();
             return true; // ★握る
         }
 
         if (action == KeyEvent.ACTION_UP) {
-            // 5秒維持したいのでUPでは止めない（タイマーで止める）
+            stopScanProgrammatically();
             return true;
         }
 
         return true;
     }
 
-    private boolean startTimedScan() {
+    private boolean startScanWhilePressed() {
         if (scanner == null) return false;
 
-        applyProfileIfReady("startTimedScan");
+        applyProfileIfReady("startScanWhilePressed");
         if (!policy.canAcceptResult()) return false;
 
         boolean started = invokeNoArgAny(scanner,
                 "softTriggerOn", "pressTrigger", "triggerOn", "startScan", "startRead");
         if (!started) {
-            Log.w(TAG, "startTimedScan: trigger method not found/failed");
+            Log.w(TAG, "startScanWhilePressed: trigger method not found/failed");
             return false;
         }
-
-        timedScanRunning = true;
-
-        // 5秒停止タイマー
-        uiHandler.removeCallbacks(timedStopRunnable);
-        uiHandler.postDelayed(timedStopRunnable, SCAN_EMIT_DURATION_MS);
-
-        // 瞬断対策 keep-alive
-        uiHandler.removeCallbacks(keepAliveRunnable);
-        uiHandler.post(keepAliveRunnable);
-
         return true;
     }
 
     private void stopTimedScan() {
-        uiHandler.removeCallbacks(timedStopRunnable);
-        uiHandler.removeCallbacks(keepAliveRunnable);
         stopScanProgrammatically();
     }
 
     private void stopScanProgrammatically() {
-        if (scanner == null) {
-            timedScanRunning = false;
-            return;
-        }
+        if (scanner == null) return;
 
         invokeNoArgAny(scanner,
                 "softTriggerOff", "releaseTrigger", "triggerOff", "stopScan", "stopRead");
-        timedScanRunning = false;
     }
 
     private boolean invokeNoArgAny(@NonNull Object target, @NonNull String... methodNames) {
