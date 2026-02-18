@@ -1,6 +1,8 @@
 package com.example.myapplication.scanner;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,6 +32,7 @@ public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
     private static final String TAG = "DensoScannerMin";
+    private static final long SCAN_EMIT_DURATION_MS = 5000L;
 
     // 端末によってSCANトリガーのキーコードが違うので、必要分を列挙
     private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234};
@@ -91,6 +94,10 @@ public class DensoScannerController
     private BarcodeScannerSettings settings;
 
     private boolean resumed = false;
+    private boolean timedScanRunning = false;
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Runnable timedStopRunnable = this::stopScanProgrammatically;
+
 
     // 任意：重複ガード
     private String last = "";
@@ -118,6 +125,7 @@ public class DensoScannerController
 
     public void onPause() {
         resumed = false;
+        stopTimedScan();
         try {
             if (scanner != null) {
                 try {
@@ -134,6 +142,7 @@ public class DensoScannerController
     }
 
     public void onDestroy() {
+        stopTimedScan();
         try {
             if (scanner != null) {
                 try {
@@ -176,8 +185,70 @@ public class DensoScannerController
         int keyCode = event.getKeyCode();
         if (!isScanTriggerKey(keyCode)) return false;
 
-        // 端末側でスキャン動作(光/マーカー)は出るが、アプリに取り込む/弾くはpolicyで制御
-        // ここでは「受け取った」扱いだけにする（＝trueにするとActivity側が止めるので注意）
+        // 現品No入力欄が非フォーカス時はスキャンキーを握りつぶし、レーザー照射を抑止する
+        if (!policy.canAcceptResult()) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                stopTimedScan();
+            }
+            return true;
+        }
+
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            return startTimedScan();
+        }
+
+        // timed scanを使っている場合はキーUPも消費する
+        if (event.getAction() == KeyEvent.ACTION_UP && timedScanRunning) {
+            return true;
+        }
+
+        // 端末既定に委譲
+        return false;
+    }
+
+    private boolean startTimedScan() {
+        if (scanner == null) return false;
+
+        // 設定反映とclaim状態を整える
+        applyProfileIfReady("startTimedScan");
+
+        boolean started = invokeNoArgAny(scanner,
+                "startScan", "startRead", "softTriggerOn", "pressTrigger", "triggerOn");
+        if (!started) return false;
+
+        timedScanRunning = true;
+        uiHandler.removeCallbacks(timedStopRunnable);
+        uiHandler.postDelayed(timedStopRunnable, SCAN_EMIT_DURATION_MS);
+        return true;
+    }
+
+    private void stopTimedScan() {
+        uiHandler.removeCallbacks(timedStopRunnable);
+        stopScanProgrammatically();
+    }
+
+    private void stopScanProgrammatically() {
+        if (!timedScanRunning || scanner == null) {
+            timedScanRunning = false;
+            return;
+        }
+
+        invokeNoArgAny(scanner,
+                "stopScan", "stopRead", "softTriggerOff", "releaseTrigger", "triggerOff");
+        timedScanRunning = false;
+    }
+
+    private boolean invokeNoArgAny(@NonNull Object target, @NonNull String... methodNames) {
+        Class<?> cls = target.getClass();
+        for (String methodName : methodNames) {
+            try {
+                java.lang.reflect.Method method = cls.getMethod(methodName);
+                method.setAccessible(true);
+                method.invoke(target);
+                return true;
+            } catch (Exception ignored) {
+            }
+        }
         return false;
     }
 

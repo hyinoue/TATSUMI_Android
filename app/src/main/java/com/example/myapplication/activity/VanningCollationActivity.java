@@ -61,6 +61,7 @@ public class VanningCollationActivity extends BaseActivity {
 
     // ★この画面専用スキャナ
     private DensoScannerController scanner;
+    private boolean scannerCreated = false;
 
     private String containerId;
     private boolean confirmed;
@@ -75,7 +76,6 @@ public class VanningCollationActivity extends BaseActivity {
         bindViews();
         setupBottomButtons();
         setupRecycler();
-        initScanner();          // ★先に作る
         setupInputHandlers();   // ★フォーカスイベントでprofile更新
         loadFromIntent();
         loadCollationData();
@@ -131,6 +131,7 @@ public class VanningCollationActivity extends BaseActivity {
 
     // ★この画面だけCode39受け取り
     private void initScanner() {
+        if (scannerCreated) return;
         scanner = new DensoScannerController(
                 this,
                 new OnScanListener() {
@@ -146,6 +147,7 @@ public class VanningCollationActivity extends BaseActivity {
         );
 
         scanner.onCreate();
+        scannerCreated = true;
     }
 
     private void setupInputHandlers() {
@@ -416,8 +418,11 @@ public class VanningCollationActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (scanner != null) scanner.onResume();
-        if (scanner != null) scanner.refreshProfile("onResume");
+        getWindow().getDecorView().post(() -> {
+            initScanner();
+            if (scanner != null) scanner.onResume();
+            if (scanner != null) scanner.refreshProfile("onResume");
+        });
     }
 
     @Override
@@ -429,8 +434,17 @@ public class VanningCollationActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
+        scannerCreated = false;
         if (io != null) io.shutdownNow();
         super.onDestroy();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (scanner != null && scanner.handleDispatchKeyEvent(event)) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     private String safeStr(String value) {

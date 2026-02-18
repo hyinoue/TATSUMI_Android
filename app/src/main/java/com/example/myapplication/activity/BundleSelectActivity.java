@@ -72,6 +72,7 @@ public class BundleSelectActivity extends BaseActivity {
 
     // ★この画面専用：フォーカス中だけCode39
     private DensoScannerController scanner;
+    private boolean scannerCreated = false;
 
     private final Map<String, String> bundleValues = new HashMap<>();
     private final Map<String, String> containerValues = new HashMap<>();
@@ -92,7 +93,6 @@ public class BundleSelectActivity extends BaseActivity {
         loadContainerValues(getIntent());
         setupBottomButtonTexts();
 
-        initScanner();        // ★先に作る
         setupInputHandlers(); // ★フォーカスイベントでprofile更新
         setupRecycler();
 
@@ -169,6 +169,7 @@ public class BundleSelectActivity extends BaseActivity {
     // スキャナ：フォーカス中だけCode39
     //============================
     private void initScanner() {
+        if (scannerCreated) return;
         scanner = new DensoScannerController(
                 this,
                 new OnScanListener() {
@@ -184,6 +185,7 @@ public class BundleSelectActivity extends BaseActivity {
                 DensoScannerController.createFocusCode39Policy(etGenpinNo)
         );
         scanner.onCreate();
+        scannerCreated = true;
     }
 
     private void setupInputHandlers() {
@@ -649,8 +651,11 @@ public class BundleSelectActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (scanner != null) scanner.onResume();
-        if (scanner != null) scanner.refreshProfile("onResume");
+        getWindow().getDecorView().post(() -> {
+            initScanner();
+            if (scanner != null) scanner.onResume();
+            if (scanner != null) scanner.refreshProfile("onResume");
+        });
     }
 
     @Override
@@ -671,8 +676,17 @@ public class BundleSelectActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
+        scannerCreated = false;
         if (io != null) io.shutdownNow();
         super.onDestroy();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (scanner != null && scanner.handleDispatchKeyEvent(event)) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     private void saveBundleInputValues() {
