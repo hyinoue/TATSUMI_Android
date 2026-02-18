@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 //====================================
@@ -61,6 +62,7 @@ public class ServiceMenuActivity extends BaseActivity {
     private TextView menu6;
     private TextView menu7;
     private ExecutorService io;
+    private final AtomicBoolean isMaintenanceSendRunning = new AtomicBoolean(false);
 
     //============================================
     //　機　能　:　画面生成時の初期化処理
@@ -147,6 +149,10 @@ public class ServiceMenuActivity extends BaseActivity {
     //=================================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getRepeatCount() > 0) {
+            return true;
+        }
+
         switch (keyCode) {
             case KeyEvent.KEYCODE_1:
                 openDbTest();
@@ -278,6 +284,9 @@ public class ServiceMenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==================================
     private void sendMaintenanceData() {
+        if (!isMaintenanceSendRunning.compareAndSet(false, true)) {
+            return;
+        }
         io.execute(() -> {
             try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
                 File dbFile = getDatabasePath(AppDatabase.DB_NAME);
@@ -310,6 +319,8 @@ public class ServiceMenuActivity extends BaseActivity {
                 String msg = resolveNetworkMessage(ex);
                 FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", msg, ex);
                 runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox));
+            } finally {
+                isMaintenanceSendRunning.set(false);
             }
         });
     }

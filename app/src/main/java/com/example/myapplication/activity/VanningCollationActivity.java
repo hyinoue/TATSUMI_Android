@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -209,6 +210,22 @@ public class VanningCollationActivity extends BaseActivity {
                     }
                     handleGenpinInput();
                 });
+            }
+        }, new DensoScannerController.ScanPolicy() {
+            @Override
+            public boolean canStartScan() {
+                return etGenpinNo != null && etGenpinNo.hasFocus() && etGenpinNo.isEnabled();
+            }
+
+            @Override
+            public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                return "Code39".equals(displayName);
+            }
+
+            @NonNull
+            @Override
+            public DensoScannerController.SymbologyProfile getSymbologyProfile() {
+                return DensoScannerController.SymbologyProfile.CODE39_ONLY;
             }
         });
     }

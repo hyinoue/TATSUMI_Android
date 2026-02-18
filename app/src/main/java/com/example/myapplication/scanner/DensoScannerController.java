@@ -46,6 +46,7 @@ public class DensoScannerController
     // ===== Activity / callback =====
     private final Activity activity;
     private final OnScanListener scanListener;
+    private final ScanPolicy scanPolicy;
 
     // ===== SDK =====
     private BarcodeManager mBarcodeManager = null;
@@ -65,6 +66,58 @@ public class DensoScannerController
 
     // ===== Duplicate guard (optional) =====
     private String lastScanned = "";
+
+    public enum SymbologyProfile {
+        NONE,
+        CODE39_ONLY,
+        ALL
+    }
+
+    public interface ScanPolicy {
+        boolean canStartScan();
+
+        boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
+
+        @NonNull
+        SymbologyProfile getSymbologyProfile();
+    }
+
+    private static final ScanPolicy DENY_ALL_POLICY = new ScanPolicy() {
+        @Override
+        public boolean canStartScan() {
+            return false;
+        }
+
+        @Override
+        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+            return false;
+        }
+
+        @NonNull
+        @Override
+        public SymbologyProfile getSymbologyProfile() {
+            return SymbologyProfile.NONE;
+        }
+    };
+
+    public static final ScanPolicy ALLOW_ALL_POLICY = new ScanPolicy() {
+        @Override
+        public boolean canStartScan() {
+            return true;
+        }
+
+        @Override
+        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+            return true;
+        }
+
+        @NonNull
+        @Override
+        public SymbologyProfile getSymbologyProfile() {
+            return SymbologyProfile.ALL;
+        }
+    };
+
     //==============================================
     //　機　能　:　DensoScannerControllerの初期化処理
     //　引　数　:　activity ..... Activity
@@ -74,8 +127,19 @@ public class DensoScannerController
 
     public DensoScannerController(@NonNull Activity activity,
                                   @NonNull OnScanListener scanListener) {
+        this(activity, scanListener, DENY_ALL_POLICY);
+    }
+
+    public DensoScannerController(@NonNull Activity activity,
+                                  @NonNull OnScanListener scanListener,
+                                  @Nullable ScanPolicy scanPolicy) {
         this.activity = activity;
         this.scanListener = scanListener;
+        this.scanPolicy = scanPolicy != null ? scanPolicy : DENY_ALL_POLICY;
+    }
+
+    public void setWaitDecodeMs(long waitDecodeMs) {
+        this.waitDecodeMs = waitDecodeMs <= 0 ? 5000 : waitDecodeMs;
     }
 
     // ----------------------------
@@ -113,7 +177,11 @@ public class DensoScannerController
         resumed = true;
 
         if (mBarcodeScanner != null) {
-            setupScannerIfPossible("onResume");
+            if (scanPolicy.canStartScan()) {
+                setupScannerIfPossible("onResume");
+            } else {
+                safeCloseScanner("onResumePolicyDenied");
+            }
         }
     }
 
@@ -196,6 +264,13 @@ public class DensoScannerController
                 if (event.getRepeatCount() > 0) return true;
 
                 if (!triggerDown) {
+                    if (!scanPolicy.canStartScan()) {
+                        safePressTrigger(false);
+                        safeCloseScanner("triggerDownDenied");
+                        Log.d(TAG, "TRIGGER DOWN ignored by policy");
+                        return true;
+                    }
+                    setupScannerIfPossible("triggerDownAllowed");
                     triggerDown = true;
                     Log.d(TAG, "TRIGGER DOWN -> startWaitForDecode(" + waitDecodeMs + ")");
                     startWaitForDecode(waitDecodeMs);
@@ -242,7 +317,7 @@ public class DensoScannerController
             Log.d(TAG, "scanner class=" + mBarcodeScanner.getClass().getName());
             Log.d(TAG, "settings class=" + (mSettings != null ? mSettings.getClass().getName() : "null"));
 
-            if (resumed) {
+            if (resumed && scanPolicy.canStartScan()) {
                 setupScannerIfPossible("onBarcodeManagerCreated");
             }
 
@@ -277,7 +352,7 @@ public class DensoScannerController
                 mSettings = mBarcodeScanner.getSettings();
             }
 
-            applyCSharpLikeSettingsReflective(mSettings);
+            applyCSharpLikeSettingsReflective(mSettings, scanPolicy.getSymbologyProfile());
             mBarcodeScanner.setSettings(mSettings);
 
             mBarcodeScanner.claim();
@@ -315,6 +390,17 @@ public class DensoScannerController
 
         final String aim = String.valueOf(list.get(0).getSymbologyAim());
         final String denso = String.valueOf(list.get(0).getSymbologyDenso());
+        final String displayName = getBarcodeDisplayName(aim, denso);
+
+        if (!scanPolicy.canStartScan()) {
+            Log.d(TAG, "onBarcodeDataReceived ignored by focus policy. sym=" + displayName + " data=[" + normalized + "]");
+            return;
+        }
+
+        if (!scanPolicy.isSymbologyAllowed(aim, denso, displayName)) {
+            Log.d(TAG, "onBarcodeDataReceived ignored by symbology policy. sym=" + displayName + " data=[" + normalized + "]");
+            return;
+        }
 
         Log.d(TAG, "onBarcodeDataReceived data=[" + normalized + "] symDenso=" + denso + " symAim=" + aim);
 
@@ -527,7 +613,7 @@ public class DensoScannerController
     //　戻り値　:　[void] ..... なし
     //=====================================================
 
-    private void applyCSharpLikeSettingsReflective(Object settingsRoot) {
+    private void applyCSharpLikeSettingsReflective(Object settingsRoot, @NonNull SymbologyProfile profile) {
         if (settingsRoot == null) return;
 
         // 任意：音など（存在する場合のみ）
@@ -535,7 +621,7 @@ public class DensoScannerController
         setBoolean(settingsRoot, "output.intent.enabled", false);
         setBoolean(settingsRoot, "output.keyboard.enabled", false);
 
-        final String[] enablePaths = new String[]{
+        final String[] allPaths = new String[]{
                 // 1D
                 "ean8",
                 "ean13UpcA",
@@ -577,6 +663,20 @@ public class DensoScannerController
                 "decode.symbologies"
         };
 
+        for (String rootPath : decodeRoots) {
+            for (String sym : allPaths) {
+                setBoolean(settingsRoot, rootPath + "." + sym + ".enabled", false);
+            }
+        }
+
+        if (profile == SymbologyProfile.NONE) {
+            return;
+        }
+
+        final String[] enablePaths = profile == SymbologyProfile.CODE39_ONLY
+                ? new String[]{"code39"}
+                : allPaths;
+        
         for (String rootPath : decodeRoots) {
             for (String sym : enablePaths) {
                 setBoolean(settingsRoot, rootPath + "." + sym + ".enabled", true);

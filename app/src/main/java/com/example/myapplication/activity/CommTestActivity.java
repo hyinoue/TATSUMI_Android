@@ -30,8 +30,15 @@ public class CommTestActivity extends BaseActivity {
     private static final String STATUS_CONNECTED = "接続";
     private static final String STATUS_DISCONNECTED = "未接続";
 
-    private TextView tvWanPowerValue;
-    private TextView tvGprsValue;
+    private static final String STATUS_CELLULAR = "モバイル";
+    private static final String STATUS_WIFI = "Wi-Fi";
+    private static final String STATUS_NONE = "なし";
+    private static final String STATUS_OTHER = "その他";
+
+    private TextView tvMobilePowerValue;
+    private TextView tvWifiValue;
+    private TextView tvActiveNetworkValue;
+    private TextView tvInternetValue;
     private boolean gprsConnected;
 
     //============================================
@@ -47,8 +54,9 @@ public class CommTestActivity extends BaseActivity {
 
         bindViews();
         setupActionButtons();
-        updatePowerStatus();
-        updateGprsStatus();
+        NetworkSnapshot snapshot = updateNetworkStatus();
+        gprsConnected = snapshot.hasInternet;
+        updateInternetStatus();
     }
     //================================
     //　機　能　:　bottom Buttonsを設定する
@@ -73,8 +81,10 @@ public class CommTestActivity extends BaseActivity {
     }
 
     private void bindViews() {
-        tvWanPowerValue = findViewById(R.id.tvWanPowerValue);
-        tvGprsValue = findViewById(R.id.tvGprsValue);
+        tvMobilePowerValue = findViewById(R.id.tvMobilePowerValue);
+        tvWifiValue = findViewById(R.id.tvWifiValue);
+        tvActiveNetworkValue = findViewById(R.id.tvActiveNetworkValue);
+        tvInternetValue = findViewById(R.id.tvInternetValue);
     }
 
     private void setupActionButtons() {
@@ -107,80 +117,118 @@ public class CommTestActivity extends BaseActivity {
     }
 
     private void testConnection() {
-        if (!updatePowerStatus()) {
-            showErrorMsg("WAN電源がOFFです。", MsgDispMode.MsgBox);
-            return;
-        }
+        NetworkSnapshot snapshot = updateNetworkStatus();
 
-        if (!isNetworkConnected()) {
-            showErrorMsg("通信に接続できませんでした。", MsgDispMode.MsgBox);
+        if (!snapshot.hasInternet) {
+            showErrorMsg("接続できませんでした。", MsgDispMode.MsgBox);
             gprsConnected = false;
-            updateGprsStatus();
+            updateInternetStatus();
             return;
         }
 
         gprsConnected = true;
-        updateGprsStatus();
+        updateInternetStatus();
+
+        if (STATUS_CELLULAR.equals(snapshot.activeNetworkName)) {
+            showInfoMsg("モバイル回線で接続できています", MsgDispMode.MsgBox);
+            return;
+        }
+
+        if (STATUS_WIFI.equals(snapshot.activeNetworkName)) {
+            showInfoMsg("Wi-Fiで接続できています", MsgDispMode.MsgBox);
+            return;
+        }
+
         showInfoMsg("接続しました", MsgDispMode.MsgBox);
     }
 
-    private void updateGprsStatus() {
+    private void updateInternetStatus() {
         if (gprsConnected) {
-            tvGprsValue.setText(STATUS_CONNECTED);
-            tvGprsValue.setBackgroundColor(Color.parseColor("#9ACD32"));
+            tvInternetValue.setText(STATUS_CONNECTED);
+            tvInternetValue.setBackgroundColor(Color.parseColor("#9ACD32"));
         } else {
-            tvGprsValue.setText(STATUS_DISCONNECTED);
-            tvGprsValue.setBackgroundColor(Color.WHITE);
+            tvInternetValue.setText(STATUS_DISCONNECTED);
+            tvInternetValue.setBackgroundColor(Color.WHITE);
         }
     }
 
-    private boolean updatePowerStatus() {
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (manager == null) {
-            tvWanPowerValue.setText(STATUS_ERROR);
-            tvWanPowerValue.setTextColor(Color.BLUE);
-            return false;
+    private NetworkSnapshot updateNetworkStatus() {
+        NetworkSnapshot snapshot = getNetworkSnapshot();
+
+        if (snapshot.hasCellular) {
+            tvMobilePowerValue.setText(STATUS_ON);
+            tvMobilePowerValue.setTextColor(Color.parseColor("#006400"));
+        } else {
+            tvMobilePowerValue.setText(STATUS_OFF);
+            tvMobilePowerValue.setTextColor(Color.BLACK);
         }
 
-        boolean hasAvailableTransport = false;
+        if (snapshot.hasWifi) {
+            tvWifiValue.setText(STATUS_CONNECTED);
+            tvWifiValue.setTextColor(Color.parseColor("#006400"));
+        } else {
+            tvWifiValue.setText(STATUS_DISCONNECTED);
+            tvWifiValue.setTextColor(Color.BLACK);
+        }
+
+        tvActiveNetworkValue.setText(snapshot.activeNetworkName);
+        return snapshot;
+    }
+
+    private NetworkSnapshot getNetworkSnapshot() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (manager == null) {
+            tvMobilePowerValue.setText(STATUS_ERROR);
+            tvMobilePowerValue.setTextColor(Color.BLUE);
+            tvWifiValue.setText(STATUS_ERROR);
+            tvWifiValue.setTextColor(Color.BLUE);
+            tvActiveNetworkValue.setText(STATUS_ERROR);
+            return new NetworkSnapshot(false, false, false, STATUS_ERROR);
+        }
+
+        boolean hasCellular = false;
+        boolean hasWifi = false;
+
+        for (Network network : manager.getAllNetworks()) {
+            NetworkCapabilities networkCapabilities = manager.getNetworkCapabilities(network);
+            if (networkCapabilities == null) {
+                continue;
+            }
+            hasCellular = hasCellular || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
+            hasWifi = hasWifi || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+        }
+
+        String activeNetworkName = STATUS_NONE;
+        boolean hasInternet = false;
         Network active = manager.getActiveNetwork();
         if (active != null) {
             NetworkCapabilities capabilities = manager.getNetworkCapabilities(active);
             if (capabilities != null) {
-                hasAvailableTransport = hasSupportedTransport(capabilities);
+                hasInternet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    activeNetworkName = STATUS_CELLULAR;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    activeNetworkName = STATUS_WIFI;
+                } else {
+                    activeNetworkName = STATUS_OTHER;
+                }
             }
         }
 
-        if (hasAvailableTransport) {
-            tvWanPowerValue.setText(STATUS_ON);
-            tvWanPowerValue.setTextColor(Color.parseColor("#006400"));
-            return true;
-        }
-
-        tvWanPowerValue.setText(STATUS_OFF);
-        tvWanPowerValue.setTextColor(Color.BLACK);
-        return false;
+        return new NetworkSnapshot(hasCellular, hasWifi, hasInternet, activeNetworkName);
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (manager == null) {
-            return false;
-        }
-        Network active = manager.getActiveNetwork();
-        if (active == null) {
-            return false;
-        }
-        NetworkCapabilities capabilities = manager.getNetworkCapabilities(active);
-        if (capabilities == null) {
-            return false;
-        }
-        return hasSupportedTransport(capabilities)
-                && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-    }
+    private static final class NetworkSnapshot {
+        private final boolean hasCellular;
+        private final boolean hasWifi;
+        private final boolean hasInternet;
+        private final String activeNetworkName;
 
-    private boolean hasSupportedTransport(NetworkCapabilities capabilities) {
-        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-                || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+        private NetworkSnapshot(boolean hasCellular, boolean hasWifi, boolean hasInternet, String activeNetworkName) {
+            this.hasCellular = hasCellular;
+            this.hasWifi = hasWifi;
+            this.hasInternet = hasInternet;
+            this.activeNetworkName = activeNetworkName;
+        }
     }
 }

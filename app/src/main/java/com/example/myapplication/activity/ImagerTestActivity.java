@@ -114,7 +114,7 @@ public class ImagerTestActivity extends BaseActivity {
                     etBarcode.requestFocus();
                 }
             }
-        });
+        }, DensoScannerController.ALLOW_ALL_POLICY);
 
         // Manager生成開始
         scanner.onCreate();

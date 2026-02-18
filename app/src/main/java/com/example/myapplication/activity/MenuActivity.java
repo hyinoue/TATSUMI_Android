@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * メインメニュー画面のActivity。
@@ -53,6 +54,10 @@ public class MenuActivity extends BaseActivity {
     //       ContainerInputActivity に直接遷移する（メニュー経由しない）
 
     private static final String TAG = "MENU";
+
+    private static final String DENSO_POWER_MANAGER_PACKAGE = "com.densowave.powermanagerservice";
+    private static final String DENSO_POWER_MANAGER_SERVICE = "com.densowave.powermanagerservice.PowerManagerService";
+    private static final String DENSO_REBOOT_ACTION = "com.densowave.powermanagerservice.action.REBOOT";
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
 
@@ -78,6 +83,7 @@ public class MenuActivity extends BaseActivity {
     private Button btnContainerInput;
     private Button btnWeightCalc;
     private Button btnCollateContainerSelect;
+    private final AtomicBoolean isDataSyncRunning = new AtomicBoolean(false);
 
     private TextView lblDataReceiveTime;
     private TextView lblDataReceive;
@@ -297,24 +303,28 @@ public class MenuActivity extends BaseActivity {
         }
         showQuestion("端末の再起動を実施します。\nよろしいですか？", yes -> {
             if (!yes) return;
-            restartApp();
+            if (!requestDeviceReboot()) {
+                showErrorMsg("再起動に失敗しました。", MsgDispMode.Label);
+            }
         });
     }
 
-    //============================
-    //　機　能　:　restart Appの処理
+    //==========================================
+    //　機　能　:　端末再起動サービスを呼び出す
     //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
-    private void restartApp() {
-        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        if (launchIntent == null) {
-            recreate();
-            return;
+    //　戻り値　:　[boolean] ..... 起動要求成功ならtrue
+    //==========================================
+    private boolean requestDeviceReboot() {
+        Intent intent = new Intent();
+        intent.setClassName(DENSO_POWER_MANAGER_PACKAGE, DENSO_POWER_MANAGER_SERVICE);
+        intent.setAction(DENSO_REBOOT_ACTION);
+        try {
+            startService(intent);
+            return true;
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to request device reboot via DENSO power manager service", e);
+            return false;
         }
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(launchIntent);
-        finish();
     }
 
     //============================
@@ -529,6 +539,9 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================
     private void startDataSync() {
+        if (!isDataSyncRunning.compareAndSet(false, true)) {
+            return;
+        }
         setCenterStatus("データ送受信中...");
         io.execute(this::runDataSync);
     }
@@ -562,6 +575,7 @@ public class MenuActivity extends BaseActivity {
                 showErrorMsg(msg, MsgDispMode.MsgBox);
             });
         } finally {
+            isDataSyncRunning.set(false);
             hideLoadingLong();
         }
     }

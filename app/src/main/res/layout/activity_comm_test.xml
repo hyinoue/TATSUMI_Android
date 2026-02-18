@@ -46,7 +46,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/areaStatus"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="220dp"
         android:padding="16dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/areaActions"
@@ -54,51 +54,99 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:id="@+id/lblWanPower"
+            android:id="@+id/lblMobilePower"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:gravity="left|center_vertical"
-            android:text="WAN電源状態"
+            android:text="モバイル回線状態"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvWanPowerValue" />
+            app:layout_constraintEnd_toStartOf="@id/tvMobilePowerValue" />
 
         <TextView
-            android:id="@+id/tvWanPowerValue"
+            android:id="@+id/tvMobilePowerValue"
             android:layout_width="80dp"
             android:layout_height="30dp"
             android:background="#FFFFFF"
             android:gravity="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            app:layout_constraintTop_toTopOf="@id/lblWanPower"
-            app:layout_constraintBottom_toBottomOf="@id/lblWanPower"
+            app:layout_constraintTop_toTopOf="@id/lblMobilePower"
+            app:layout_constraintBottom_toBottomOf="@id/lblMobilePower"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/lblGprs"
+            android:id="@+id/lblWifi"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:gravity="left|center_vertical"
-            android:text="通信状態"
+            android:text="Wi-Fi状態"
             android:textColor="#000000"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/lblWanPower"
+            app:layout_constraintTop_toBottomOf="@id/lblMobilePower"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvGprsValue" />
+            app:layout_constraintEnd_toStartOf="@id/tvWifiValue" />
 
         <TextView
-            android:id="@+id/tvGprsValue"
+            android:id="@+id/tvWifiValue"
             android:layout_width="80dp"
             android:layout_height="30dp"
             android:background="#FFFFFF"
             android:gravity="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            app:layout_constraintTop_toTopOf="@id/lblGprs"
-            app:layout_constraintBottom_toBottomOf="@id/lblGprs"
+            app:layout_constraintTop_toTopOf="@id/lblWifi"
+            app:layout_constraintBottom_toBottomOf="@id/lblWifi"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lblActiveNetwork"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:gravity="left|center_vertical"
+            android:text="使用中回線"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/lblWifi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvActiveNetworkValue" />
+
+        <TextView
+            android:id="@+id/tvActiveNetworkValue"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="#FFFFFF"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="@id/lblActiveNetwork"
+            app:layout_constraintBottom_toBottomOf="@id/lblActiveNetwork"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lblInternet"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:gravity="left|center_vertical"
+            android:text="インターネット疎通"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/lblActiveNetwork"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvInternetValue" />
+
+        <TextView
+            android:id="@+id/tvInternetValue"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="#FFFFFF"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="@id/lblInternet"
+            app:layout_constraintBottom_toBottomOf="@id/lblInternet"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
