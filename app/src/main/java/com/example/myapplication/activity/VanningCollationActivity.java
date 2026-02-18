@@ -31,23 +31,12 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-//=========================================
-//　処理概要　:　VanningCollationActivityクラス
-//=========================================
-
 /**
  * 積込照合(バンニング照合)画面のActivity。
- *
- * <p>コンテナ情報と読み取り結果を突き合わせ、
- * 読み取った束の件数/一覧をリアルタイムに表示する。</p>
- *
- * <p>主な処理フロー:</p>
- * <ul>
- *     <li>Intentから対象コンテナ情報を取得して画面に表示。</li>
- *     <li>スキャナ/入力欄から原品番号を受け取り照合処理を実行。</li>
- *     <li>確定で照合結果を保存し、終了で前画面へ戻る。</li>
- * </ul>
+ * <p>
+ * 仕様変更：
+ * - SCANキーの全画面制御はしない
+ * - この画面だけ、etGenpinNoフォーカス中は Code39 のみデコードして受け取る
  */
 public class VanningCollationActivity extends BaseActivity {
 
@@ -70,15 +59,13 @@ public class VanningCollationActivity extends BaseActivity {
     private ExecutorService io;
     private VanningCollationController controller;
     private VanningCollationAdapter adapter;
+
+    // ★この画面専用スキャナ
     private DensoScannerController scanner;
+
     private String containerId;
     private boolean confirmed;
 
-    //============================================
-    //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
-    //　戻り値　:　[void] ..... なし
-    //============================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,22 +76,13 @@ public class VanningCollationActivity extends BaseActivity {
         bindViews();
         setupBottomButtons();
         setupRecycler();
-        setupInputHandlers();
-        initScanner();
+        initScanner();          // ★先に作る
+        setupInputHandlers();   // ★フォーカスイベントでprofile更新
         loadFromIntent();
         loadCollationData();
 
-        //表で線を重ねて細く見せる
         RecyclerView rvBundles = findViewById(R.id.rvBundles);
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
-            //===========================================
-            //　機　能　:　item Offsetsを取得する
-            //　引　数　:　outRect ..... Rect
-            //　　　　　:　view ..... View
-            //　　　　　:　parent ..... RecyclerView
-            //　　　　　:　state ..... RecyclerView.State
-            //　戻り値　:　[void] ..... なし
-            //===========================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -115,11 +93,6 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //============================
-    //　機　能　:　bind Viewsの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
 
     private void bindViews() {
         etContainerNo = findViewById(R.id.etContainerNo);
@@ -137,11 +110,6 @@ public class VanningCollationActivity extends BaseActivity {
         if (etBundleCount != null) etBundleCount.setEnabled(false);
         if (etSagyouYmd != null) etSagyouYmd.setEnabled(false);
     }
-    //================================
-    //　機　能　:　bottom Buttonsを設定する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //================================
 
     private void setupBottomButtons() {
         if (btnBlue != null) btnBlue.setText("確定");
@@ -150,11 +118,6 @@ public class VanningCollationActivity extends BaseActivity {
         if (btnYellow != null) btnYellow.setText("終了");
         refreshBottomButtonsEnabled();
     }
-    //============================
-    //　機　能　:　recyclerを設定する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
 
     private void setupRecycler() {
         adapter = new VanningCollationAdapter();
@@ -166,77 +129,69 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //================================
-    //　機　能　:　input Handlersを設定する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //================================
+
+    // ★この画面だけCode39受け取り
+    private void initScanner() {
+        scanner = new DensoScannerController(
+                this,
+                new OnScanListener() {
+                    @Override
+                    public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
+                        runOnUiThread(() -> {
+                            if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
+                            handleGenpinInput();
+                        });
+                    }
+                },
+                new DensoScannerController.ScanPolicy() {
+
+                    @Override
+                    public boolean canAcceptResult() {
+                        return etGenpinNo != null && etGenpinNo.hasFocus() && etGenpinNo.isEnabled();
+                    }
+
+                    @NonNull
+                    @Override
+                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
+                        // フォーカスONの間だけCode39をデコード
+                        return canAcceptResult()
+                                ? DensoScannerController.SymbologyProfile.CODE39_ONLY
+                                : DensoScannerController.SymbologyProfile.NONE;
+                    }
+
+                    @Override
+                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                        // 念のため：Code39以外は弾く
+                        if ("Code39".equals(displayName)) return true;
+                        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
+                        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
+                        return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
+                    }
+                }
+        );
+
+        scanner.onCreate();
+    }
 
     private void setupInputHandlers() {
         if (etGenpinNo == null) return;
 
         // スキャナ入力を想定し、ソフトキーボードは出さない
         etGenpinNo.setShowSoftInputOnFocus(false);
+
+        // ★フォーカス変化時に、プロファイルを即時反映（NONE⇔CODE39_ONLY）
+        etGenpinNo.setOnFocusChangeListener((v, hasFocus) -> {
+            if (scanner != null) scanner.refreshProfile("GenpinFocus=" + hasFocus);
+        });
+
         etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                // 物理Enterキーの入力にも対応
                 handleGenpinInput();
                 return true;
             }
             return false;
         });
     }
-    //============================
-    //　機　能　:　scannerを初期化する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
-
-    private void initScanner() {
-        scanner = new DensoScannerController(this, new OnScanListener() {
-            //========================================
-            //　機　能　:　スキャン受信時の処理
-            //　引　数　:　normalizedData ..... String
-            //　　　　　:　aim ..... String
-            //　　　　　:　denso ..... String
-            //　戻り値　:　[void] ..... なし
-            //========================================
-            @Override
-            public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
-                runOnUiThread(() -> {
-                    // スキャン結果を入力欄に入れて同一処理フローに流す
-                    if (etGenpinNo != null) {
-                        etGenpinNo.setText(normalizedData);
-                    }
-                    handleGenpinInput();
-                });
-            }
-        }, new DensoScannerController.ScanPolicy() {
-            @Override
-            public boolean canStartScan() {
-                return etGenpinNo != null && etGenpinNo.hasFocus() && etGenpinNo.isEnabled();
-            }
-
-            @Override
-            public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                if ("Code39".equals(displayName)) return true;
-                String a = aim == null ? "" : aim.toUpperCase(java.util.Locale.ROOT);
-                String d = denso == null ? "" : denso.toUpperCase(java.util.Locale.ROOT);
-                return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
-            }
-
-            @NonNull
-            @Override
-            public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                return DensoScannerController.SymbologyProfile.CODE39_ONLY;
-            }
-        });
-    }
-    //=============================
-    //　機　能　:　from Intentを読み込む
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=============================
 
     private void loadFromIntent() {
         Intent intent = getIntent();
@@ -251,11 +206,6 @@ public class VanningCollationActivity extends BaseActivity {
         if (etBundleCount != null) etBundleCount.setText(String.valueOf(bundleCnt));
         if (etSagyouYmd != null) etSagyouYmd.setText(trimSagyouYmd(sagyouYmd));
     }
-    //================================
-    //　機　能　:　collation Dataを読み込む
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //================================
 
     private void loadCollationData() {
         showLoadingShort();
@@ -279,11 +229,6 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //===================================
-    //　機　能　:　ui For Containersを更新する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //===================================
 
     private void updateUiForContainers() {
         boolean hasRows = controller != null && !controller.getDetails().isEmpty();
@@ -299,17 +244,14 @@ public class VanningCollationActivity extends BaseActivity {
             if (btnBlue != null) btnBlue.setText("確定");
         }
         refreshBottomButtonsEnabled();
+
+        // ★有効/無効が変わったのでprofile再反映
+        if (scanner != null) scanner.refreshProfile("updateUiForContainers");
     }
-    //==============================
-    //　機　能　:　genpin Inputを処理する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //==============================
 
     private void handleGenpinInput() {
         if (controller == null) return;
 
-        // 入力値を取得して整形（空白除去/未入力チェック）
         String input = etGenpinNo != null && etGenpinNo.getText() != null
                 ? etGenpinNo.getText().toString().trim()
                 : "";
@@ -373,11 +315,6 @@ public class VanningCollationActivity extends BaseActivity {
             }
         });
     }
-    //============================
-    //　機　能　:　read Countを更新する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
 
     private void updateReadCount() {
         int count = controller != null ? controller.getSyougouSumiCount() : 0;
@@ -386,44 +323,20 @@ public class VanningCollationActivity extends BaseActivity {
         }
     }
 
-    //================================
-    //　機　能　:　on Function Blueの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //================================
     @Override
     protected void onFunctionBlue() {
-        if (confirmed) {
-            return;
-        }
+        if (confirmed) return;
         procRegister();
     }
 
-    //===============================
-    //　機　能　:　on Function Redの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //===============================
     @Override
     protected void onFunctionRed() {
-        // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //=================================
-    //　機　能　:　on Function Greenの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=================================
     @Override
     protected void onFunctionGreen() {
-        // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //==================================
-    //　機　能　:　on Function Yellowの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //==================================
     @Override
     protected void onFunctionYellow() {
         if (confirmed) {
@@ -440,11 +353,6 @@ public class VanningCollationActivity extends BaseActivity {
                     }
                 });
     }
-    //=============================
-    //　機　能　:　proc Registerの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=============================
 
     private void procRegister() {
         if (controller == null) return;
@@ -453,7 +361,7 @@ public class VanningCollationActivity extends BaseActivity {
         io.execute(() -> {
             try {
                 if (!checkSyougouKanryo()) {
-                    runOnUiThread(() -> hideLoadingShort());
+                    runOnUiThread(this::hideLoadingShort);
                     return;
                 }
 
@@ -513,12 +421,6 @@ public class VanningCollationActivity extends BaseActivity {
                 .show();
     }
 
-    //====================================
-    //　機　能　:　check Syougou Kanryoの処理
-    //　引　数　:　なし
-    //　戻り値　:　[boolean] ..... なし
-    //====================================
-
     private boolean checkSyougouKanryo() {
         int remaining = controller != null ? controller.getUncollatedCount() : 0;
         if (remaining != 0) {
@@ -530,64 +432,34 @@ public class VanningCollationActivity extends BaseActivity {
         }
         return true;
     }
-    //============================
-    //　機　能　:　register Dbの処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
 
     private void registerDb() {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         db.runInTransaction(() -> controller.markContainerCollated(db.kakuninContainerDao()));
     }
 
-    //============================
-    //　機　能　:　画面再表示時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     @Override
     protected void onResume() {
         super.onResume();
         if (scanner != null) scanner.onResume();
     }
 
-    //============================
-    //　機　能　:　画面一時停止時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     @Override
     protected void onPause() {
         if (scanner != null) scanner.onPause();
         super.onPause();
     }
 
-    //============================
-    //　機　能　:　画面終了時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     @Override
     protected void onDestroy() {
         if (scanner != null) scanner.onDestroy();
         if (io != null) io.shutdownNow();
         super.onDestroy();
     }
-    //===============================
-    //　機　能　:　safe Strの処理
-    //　引　数　:　value ..... String
-    //　戻り値　:　[String] ..... なし
-    //===============================
 
     private String safeStr(String value) {
         return value == null ? "" : value;
     }
-    //===============================
-    //　機　能　:　trim Sagyou Ymdの処理
-    //　引　数　:　value ..... String
-    //　戻り値　:　[String] ..... なし
-    //===============================
 
     private String trimSagyouYmd(String value) {
         if (value == null) return "";
@@ -596,11 +468,6 @@ public class VanningCollationActivity extends BaseActivity {
 
     private static class VanningCollationAdapter extends RecyclerView.Adapter<VanningCollationAdapter.ViewHolder> {
         private final List<VanningCollationRow> rows = new ArrayList<>();
-        //====================================================
-        //　機　能　:　submit Listの処理
-        //　引　数　:　newRows ..... List<VanningCollationRow>
-        //　戻り値　:　[void] ..... なし
-        //====================================================
 
         void submitList(List<VanningCollationRow> newRows) {
             rows.clear();
@@ -608,12 +475,6 @@ public class VanningCollationActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
-        //================================================
-        //　機　能　:　on Create View Holderの処理
-        //　引　数　:　parent ..... android.view.ViewGroup
-        //　　　　　:　viewType ..... int
-        //　戻り値　:　[ViewHolder] ..... なし
-        //================================================
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
@@ -621,12 +482,6 @@ public class VanningCollationActivity extends BaseActivity {
             return new ViewHolder(view);
         }
 
-        //====================================
-        //　機　能　:　on Bind View Holderの処理
-        //　引　数　:　holder ..... ViewHolder
-        //　　　　　:　position ..... int
-        //　戻り値　:　[void] ..... なし
-        //====================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             VanningCollationRow row = rows.get(position);
@@ -637,11 +492,6 @@ public class VanningCollationActivity extends BaseActivity {
             holder.tvConfirmed.setText(row.confirmed);
         }
 
-        //============================
-        //　機　能　:　item Countを取得する
-        //　引　数　:　なし
-        //　戻り値　:　[int] ..... なし
-        //============================
         @Override
         public int getItemCount() {
             return rows.size();

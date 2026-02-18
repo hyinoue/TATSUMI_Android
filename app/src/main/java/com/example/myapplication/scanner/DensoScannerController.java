@@ -3,63 +3,35 @@ package com.example.myapplication.scanner;
 import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.densowave.bhtsdk.barcode.BarcodeDataReceivedEvent;
-import com.densowave.bhtsdk.barcode.BarcodeException;
 import com.densowave.bhtsdk.barcode.BarcodeManager;
 import com.densowave.bhtsdk.barcode.BarcodeScanner;
 import com.densowave.bhtsdk.barcode.BarcodeScannerSettings;
-import com.example.myapplication.settings.AppSettings;
-import com.example.myapplication.settings.HandyUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 
-
 /**
- * DENSO BHT SDK のスキャナ制御を共通化したコントローラ
+ * DENSO BHT SDK スキャナ制御（最小・統一版）
  * <p>
- * 【責務】
- * - BarcodeManager生成、Scanner取得
- * - onResume: claim / onPause: close
- * - claim()/close() をライフサイクル連動で制御
- * - onBarcodeDataReceived を受信して OnScanListener へ通知
- * - C#互換寄せの設定反映（存在する項目のみを反射でON）
+ * 方針：
+ * - 光/マーカー制御はしない（端末既定）
+ * - SCANキー制御もしない（端末既定）
+ * - 「アプリに入ってくるかどうか」だけを decode 設定で制御する
+ * <p>
+ * 使い分け：
+ * - 何でも読める画面（テスト画面など）: ALLOW_ALL_POLICY
+ * - 特定EditTextフォーカス時だけCode39: createCode39OnFocusPolicy(etGenpinNo)
  */
-
-//=======================================
-//　処理概要　:　DensoScannerControllerクラス
-//=======================================
-
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
-    private static final String TAG = "DensoScanner";
-
-    // ===== Activity / callback =====
-    private final Activity activity;
-    private final OnScanListener scanListener;
-    private final ScanPolicy scanPolicy;
-
-    // ===== SDK =====
-    private BarcodeManager mBarcodeManager = null;
-    private BarcodeScanner mBarcodeScanner = null;
-    private BarcodeScannerSettings mSettings = null;
-
-    // ===== Trigger =====
-    private int triggerKeyCode = 501;
-
-    private boolean resumed = false;
-
-    private boolean scannerClaimed = false;
-
-    // ===== Duplicate guard (optional) =====
-    private String lastScanned = "";
+    private static final String TAG = "DensoScannerMin";
 
     public enum SymbologyProfile {
         NONE,
@@ -68,40 +40,30 @@ public class DensoScannerController
     }
 
     public interface ScanPolicy {
-        boolean canStartScan();
+        /**
+         * 受信したデータをアプリ処理して良いか（例：EditTextフォーカス時のみ）
+         */
+        boolean canAcceptResult();
 
-        boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
-
+        /**
+         * デコードとして有効化したいプロファイル
+         * （ここが NONE ならアプリに基本入ってこない）
+         */
         @NonNull
         SymbologyProfile getSymbologyProfile();
+
+        /**
+         * 念のためのフィルタ（Code39以外を弾く等）
+         */
+        boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
     }
 
-    private static final ScanPolicy DENY_ALL_POLICY = new ScanPolicy() {
-        @Override
-        public boolean canStartScan() {
-            return false;
-        }
-
-        @Override
-        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-            return false;
-        }
-
-        @NonNull
-        @Override
-        public SymbologyProfile getSymbologyProfile() {
-            return SymbologyProfile.NONE;
-        }
-    };
-
+    /**
+     * 何でもOK（テスト画面等）
+     */
     public static final ScanPolicy ALLOW_ALL_POLICY = new ScanPolicy() {
         @Override
-        public boolean canStartScan() {
-            return true;
-        }
-
-        @Override
-        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+        public boolean canAcceptResult() {
             return true;
         }
 
@@ -110,240 +72,184 @@ public class DensoScannerController
         public SymbologyProfile getSymbologyProfile() {
             return SymbologyProfile.ALL;
         }
+
+        @Override
+        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+            return true;
+        }
     };
 
-    //==============================================
-    //　機　能　:　DensoScannerControllerの初期化処理
-    //　引　数　:　activity ..... Activity
-    //　　　　　:　scanListener ..... OnScanListener
-    //　戻り値　:　[DensoScannerController] ..... なし
-    //==============================================
+    /**
+     * 全拒否（decodeもOFF）
+     */
+    public static final ScanPolicy DENY_ALL_POLICY = new ScanPolicy() {
+        @Override
+        public boolean canAcceptResult() {
+            return false;
+        }
 
-    public DensoScannerController(@NonNull Activity activity,
-                                  @NonNull OnScanListener scanListener) {
-        this(activity, scanListener, DENY_ALL_POLICY);
-    }
+        @NonNull
+        @Override
+        public SymbologyProfile getSymbologyProfile() {
+            return SymbologyProfile.NONE;
+        }
 
-    public DensoScannerController(@NonNull Activity activity,
-                                  @NonNull OnScanListener scanListener,
-                                  @Nullable ScanPolicy scanPolicy) {
-        this.activity = activity;
-        this.scanListener = scanListener;
-        this.scanPolicy = scanPolicy != null ? scanPolicy : DENY_ALL_POLICY;
-    }
-
-    public void setWaitDecodeMs(long waitDecodeMs) {
-        // 旧実装互換のためAPIは残す（現在は使用しない）
-    }
-
-    // ----------------------------
-    // ライフサイクル呼び出し
-    // ----------------------------
+        @Override
+        public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+            return false;
+        }
+    };
 
     /**
-     * Activity.onCreate で呼ぶ（BarcodeManager生成開始）
+     * EditText がフォーカス中のときだけ Code39 をアプリ処理するポリシーを作る
+     * - フォーカス外：decode=NONE（アプリに入れない）
+     * - フォーカス中：decode=CODE39_ONLY（アプリに入れる）
      */
-    //============================
-    //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
+    @NonNull
+    public static ScanPolicy createCode39OnFocusPolicy(@NonNull final android.view.View focusView) {
+        return new ScanPolicy() {
+            @Override
+            public boolean canAcceptResult() {
+                return focusView.hasFocus() && focusView.isEnabled();
+            }
+
+            @NonNull
+            @Override
+            public SymbologyProfile getSymbologyProfile() {
+                return canAcceptResult() ? SymbologyProfile.CODE39_ONLY : SymbologyProfile.NONE;
+            }
+
+            @Override
+            public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
+                if ("Code39".equals(displayName)) return true;
+                String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
+                String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
+                return a.startsWith("]A") || a.contains("CODE39") || d.contains("CODE39");
+            }
+        };
+    }
+
+    private final Activity activity;
+    private final OnScanListener listener;
+    private final ScanPolicy policy;
+
+    private BarcodeManager manager;
+    private BarcodeScanner scanner;
+    private BarcodeScannerSettings settings;
+
+    private boolean resumed = false;
+
+    // 任意：重複ガード
+    private String last = "";
+
+    public DensoScannerController(@NonNull Activity activity,
+                                  @NonNull OnScanListener listener,
+                                  @NonNull ScanPolicy policy) {
+        this.activity = activity;
+        this.listener = listener;
+        this.policy = policy;
+    }
+
     public void onCreate() {
         try {
             BarcodeManager.create(activity, this);
-            Log.d(TAG, "BarcodeManager.create called");
-        } catch (BarcodeException e) {
-            Log.e(TAG, "BarcodeManager.create failed. ErrorCode=" + e.getErrorCode(), e);
         } catch (Exception e) {
-            Log.e(TAG, "BarcodeManager.create failed (unexpected)", e);
+            Log.e(TAG, "BarcodeManager.create failed", e);
         }
     }
 
-    /**
-     * Activity.onResume で呼ぶ（claim可能なら準備）
-     */
-    //============================
-    //　機　能　:　画面再表示時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     public void onResume() {
         resumed = true;
-        updateScannerClaimState("onResume");
+        applyProfileIfReady("onResume");
     }
 
-    /**
-     * Activity.onPause で呼ぶ（待機停止＋claim解放）
-     */
-    //============================
-    //　機　能　:　画面一時停止時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     public void onPause() {
         resumed = false;
-        scannerClaimed = false;
-
         try {
-            if (mBarcodeScanner != null) {
+            if (scanner != null) {
                 try {
-                    mBarcodeScanner.removeDataListener(this);
+                    scanner.removeDataListener(this);
                 } catch (Exception ignored) {
                 }
-                safeCloseScanner("onPause");
+                scanner.close();
             }
         } catch (Exception ignored) {
         }
     }
 
-    /**
-     * Activity.onDestroy で呼ぶ（破棄）
-     */
-    //============================
-    //　機　能　:　画面終了時の処理
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
     public void onDestroy() {
-        scannerClaimed = false;
-
         try {
-            if (mBarcodeScanner != null) {
-                safeCloseScanner("onDestroy");
-
+            if (scanner != null) {
                 try {
-                    mBarcodeScanner.destroy();
-                } catch (BarcodeException e) {
-                    Log.e(TAG, "Scanner destroy failed. ErrorCode=" + e.getErrorCode(), e);
-                } catch (Exception e) {
-                    Log.e(TAG, "Scanner destroy failed (unexpected)", e);
+                    scanner.close();
+                } catch (Exception ignored) {
                 }
-                mBarcodeScanner = null;
+                try {
+                    scanner.destroy();
+                } catch (Exception ignored) {
+                }
+                scanner = null;
             }
         } catch (Exception ignored) {
         }
 
         try {
-            if (mBarcodeManager != null) {
-                mBarcodeManager.destroy();
-                mBarcodeManager = null;
+            if (manager != null) {
+                manager.destroy();
+                manager = null;
             }
         } catch (Exception ignored) {
         }
     }
 
     /**
-     * Activity.dispatchKeyEvent から呼ぶ
-     *
-     * @return ここで処理したら true（イベント消費）
+     * フォーカス変化などでプロファイルを即時反映したいときに呼ぶ
+     * 例：etGenpinNo の onFocusChange で呼ぶ
      */
-    //====================================
-    //　機　能　:　dispatch Key Eventを処理する
-    //　引　数　:　event ..... KeyEvent
-    //　戻り値　:　[boolean] ..... なし
-    //====================================
-    public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getKeyCode() != triggerKeyCode) {
-            return false;
-        }
-        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
-            updateScannerClaimState("triggerDown");
-        }
-        // ハードウェアトリガーの押下自体はSDK側に任せる
-        return true;
+    public void refreshProfile(@NonNull String from) {
+        applyProfileIfReady(from);
     }
 
-    // ----------------------------
-    // BarcodeManager callbacks
-    // ----------------------------
-
-    //================================================
-    //　機　能　:　on Barcode Manager Createdの処理
-    //　引　数　:　barcodeManager ..... BarcodeManager
-    //　戻り値　:　[void] ..... なし
-    //================================================
     @Override
     public void onBarcodeManagerCreated(BarcodeManager barcodeManager) {
-        Log.d(TAG, "onBarcodeManagerCreated()");
-        mBarcodeManager = barcodeManager;
-
+        this.manager = barcodeManager;
         try {
-            List<BarcodeScanner> scanners = mBarcodeManager.getBarcodeScanners();
-            if (scanners == null || scanners.isEmpty()) {
-                Log.e(TAG, "No BarcodeScanner found.");
-                return;
-            }
+            List<BarcodeScanner> list = manager.getBarcodeScanners();
+            if (list == null || list.isEmpty()) return;
 
-            mBarcodeScanner = scanners.get(0);
+            scanner = list.get(0);
+            settings = scanner.getSettings();
 
-            if (mSettings == null) {
-                mSettings = mBarcodeScanner.getSettings();
-            }
-
-            Log.d(TAG, "scanner class=" + mBarcodeScanner.getClass().getName());
-            Log.d(TAG, "settings class=" + (mSettings != null ? mSettings.getClass().getName() : "null"));
-
-            if (resumed && scanPolicy.canStartScan()) {
-                setupScannerIfPossible("onBarcodeManagerCreated");
-            }
-
-        } catch (BarcodeException e) {
-            Log.e(TAG, "onBarcodeManagerCreated setup failed. ErrorCode=" + e.getErrorCode(), e);
+            applyProfileIfReady("onBarcodeManagerCreated");
         } catch (Exception e) {
-            Log.e(TAG, "onBarcodeManagerCreated setup failed (unexpected)", e);
+            Log.e(TAG, "onBarcodeManagerCreated failed", e);
         }
     }
 
-    // ----------------------------
-    // Scanner setup
-    // ----------------------------
-    //=====================================
-    //　機　能　:　scanner If Possibleを設定する
-    //　引　数　:　from ..... String
-    //　戻り値　:　[void] ..... なし
-    //=====================================
+    private void applyProfileIfReady(@NonNull String from) {
+        if (!resumed) return;
+        if (scanner == null || settings == null) return;
 
-    private void setupScannerIfPossible(String from) {
         try {
-            if (mBarcodeScanner == null) return;
-
-            // clean
             try {
-                mBarcodeScanner.removeDataListener(this);
+                scanner.removeDataListener(this);
             } catch (Exception ignored) {
             }
-            mBarcodeScanner.addDataListener(this);
+            scanner.addDataListener(this);
 
-            if (mSettings == null) {
-                mSettings = mBarcodeScanner.getSettings();
-            }
+            // ★ここが肝：フォーカス状態に応じて decode を NONE / CODE39_ONLY / ALL に切替
+            applySymbology(settings, policy.getSymbologyProfile());
 
-            applyCSharpLikeSettingsReflective(mSettings, scanPolicy.getSymbologyProfile());
-            mBarcodeScanner.setSettings(mSettings);
+            scanner.setSettings(settings);
+            scanner.claim();
 
-            if (!scannerClaimed) {
-                mBarcodeScanner.claim();
-                scannerClaimed = true;
-            }
+            Log.d(TAG, "applyProfile " + policy.getSymbologyProfile() + " from=" + from);
 
-            Log.d(TAG, "Scanner READY in " + from);
-
-        } catch (BarcodeException e) {
-            Log.e(TAG, "setupScannerIfPossible failed in " + from + ". ErrorCode=" + e.getErrorCode(), e);
         } catch (Exception e) {
-            Log.e(TAG, "setupScannerIfPossible failed in " + from + " (unexpected)", e);
+            Log.e(TAG, "applyProfileIfReady failed from=" + from, e);
         }
     }
 
-    // ----------------------------
-    // Data receive
-    // ----------------------------
-
-    //=================================================
-    //　機　能　:　on Barcode Data Receivedの処理
-    //　引　数　:　event ..... BarcodeDataReceivedEvent
-    //　戻り値　:　[void] ..... なし
-    //=================================================
     @Override
     public void onBarcodeDataReceived(BarcodeDataReceivedEvent event) {
         List<BarcodeDataReceivedEvent.BarcodeData> list = event.getBarcodeData();
@@ -357,280 +263,102 @@ public class DensoScannerController
         final String denso = safeToString(list.get(0).getSymbologyDenso());
         final String displayName = getBarcodeDisplayName(aim, denso);
 
-        if (!scanPolicy.canStartScan()) {
-            Log.d(TAG, "onBarcodeDataReceived ignored by focus policy. sym=" + displayName + " data=[" + normalized + "]");
-            return;
-        }
+        // フォーカスOFF等なら無視
+        if (!policy.canAcceptResult()) return;
+        if (!policy.isSymbologyAllowed(aim, denso, displayName)) return;
 
-        if (!scanPolicy.isSymbologyAllowed(aim, denso, displayName)) {
-            Log.d(TAG, "onBarcodeDataReceived ignored by symbology policy. sym=" + displayName + " data=[" + normalized + "]");
-            return;
-        }
+        // 任意：重複ガード
+        if (TextUtils.isEmpty(normalized)) return;
+        if (normalized.equals(last)) return;
+        last = normalized;
 
-        Log.d(TAG, "onBarcodeDataReceived data=[" + normalized + "] symDenso=" + denso + " symAim=" + aim);
-
-        // スキャン成功時は1回だけ振動
-        HandyUtil.playVibrater(activity, 1 - Math.max(1, AppSettings.VibratorCount));
-
-        // UI/業務通知はメインスレッドへ
-        activity.runOnUiThread(() -> {
-            // 空 or 重複はガード（必要なら外せます）
-            if (TextUtils.isEmpty(normalized)) {
-                return;
-            }
-            if (normalized.equals(lastScanned)) {
-                return;
-            }
-            lastScanned = normalized;
-
-            scanListener.onScan(normalized, aim, denso);
-        });
+        activity.runOnUiThread(() -> listener.onScan(normalized, aim, denso));
     }
-
-    private void updateScannerClaimState(@NonNull String from) {
-        if (mBarcodeScanner == null) return;
-        if (!resumed || !scanPolicy.canStartScan()) {
-            safeCloseScanner(from + "PolicyDenied");
-            return;
-        }
-        setupScannerIfPossible(from);
-    }
-
-    @NonNull
-    private String safeToString(@Nullable Object value) {
-        return value == null ? "" : String.valueOf(value);
-    }
-
-    //==================================
-    //　機　能　:　safe Close Scannerの処理
-    //　引　数　:　from ..... String
-    //　戻り値　:　[void] ..... なし
-    //==================================
-
-    private void safeCloseScanner(String from) {
-        if (mBarcodeScanner == null) return;
-        try {
-            mBarcodeScanner.close();
-            scannerClaimed = false;
-            Log.d(TAG, "Scanner CLOSE in " + from);
-        } catch (BarcodeException e) {
-            Log.e(TAG, "Scanner close failed in " + from + ". ErrorCode=" + e.getErrorCode(), e);
-        } catch (Exception e) {
-            Log.e(TAG, "Scanner close failed in " + from + " (unexpected)", e);
-        }
-    }
-
-    // ----------------------------
-    // Utils
-    // ----------------------------
-    //==============================
-    //　機　能　:　normalizeの処理
-    //　引　数　:　s ..... String
-    //　戻り値　:　[String] ..... なし
-    //==============================
 
     private String normalize(String s) {
-        if (s == null) return "";
         return s.replace("\r", "").replace("\n", "").trim();
     }
 
+    @NonNull
+    private String safeToString(@Nullable Object v) {
+        return v == null ? "" : String.valueOf(v);
+    }
+
     /**
-     * AIM/Denso の両方を見て “C#時代に近い” 表示名へ寄せる。
+     * ★public に変更：画面側で種別表示に使える
      */
-    //======================================
-    //　機　能　:　barcode Display Nameを取得する
-    //　引　数　:　aim ..... String
-    //　　　　　:　denso ..... String
-    //　戻り値　:　[String] ..... なし
-    //======================================
     @Nullable
     public String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
         String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
 
         // AIM優先
-        if (a.startsWith("]E4")) return "JAN-8 (EAN-8)";
-        if (a.startsWith("]E")) return "JAN-13 (EAN/UPC系)";
         if (a.startsWith("]A")) return "Code39";
         if (a.startsWith("]G")) return "Code93";
         if (a.startsWith("]C")) return "Code128";
-        if (a.startsWith("]I")) return "ITF(2of5)";
         if (a.startsWith("]F")) return "Codabar(NW7)";
+        if (a.startsWith("]I")) return "ITF(2of5)";
+        if (a.startsWith("]E")) return "EAN/UPC";
 
         // fallback
         if (a.contains("CODE39") || d.contains("CODE39")) return "Code39";
         if (a.contains("CODE93") || d.contains("CODE93")) return "Code93";
         if (a.contains("CODE128") || d.contains("CODE128")) return "Code128";
-        if (a.contains("CODABAR") || d.contains("CODABAR") || a.contains("NW7") || d.contains("NW7"))
-            return "Codabar(NW7)";
-
-        if (a.contains("STANDARD2OF5") || d.contains("STANDARD2OF5") || a.contains("STF") || d.contains("STF"))
-            return "Standard 2of5";
-        if (a.contains("INTERLEAVED2OF5") || d.contains("INTERLEAVED2OF5")
-                || a.contains("ITF") || d.contains("ITF")
-                || a.contains("I2OF5") || d.contains("I2OF5"))
-            return "ITF(2of5)";
-
-        if (a.contains("EAN8") || d.contains("EAN8")) return "JAN-8 (EAN-8)";
-        if (a.contains("EAN13") || d.contains("EAN13")
-                || a.contains("UPC_A") || d.contains("UPC_A")
-                || a.contains("UPC_E") || d.contains("UPC_E")
-                || a.contains("EAN13UPCA") || d.contains("EAN13UPCA"))
-            return "JAN-13 (EAN/UPC系)";
-
-        if (a.contains("GS1") || d.contains("GS1")
-                || a.contains("DATABAR") || d.contains("DATABAR")
-                || a.contains("COMPOSITE") || d.contains("COMPOSITE"))
-            return "GS1 DataBar";
-
-        if (a.contains("MSI") || d.contains("MSI")) return "MSI";
-
-        if (a.contains("MICROQR") || d.contains("MICROQR")) return "Micro QR";
-        if (a.contains("QR") || d.contains("QR")) return "QR";
-        if (a.contains("DATAMATRIX") || d.contains("DATAMATRIX")) return "DataMatrix";
-        if (a.contains("PDF417") || d.contains("PDF417")) return "PDF417";
-        if (a.contains("MICROPDF") || d.contains("MICROPDF")) return "MicroPDF";
-        if (a.contains("AZTEC") || d.contains("AZTEC")) return "Aztec";
-        if (a.contains("MAXICODE") || d.contains("MAXICODE")) return "MaxiCode";
-        if (a.contains("SQRC") || d.contains("SQRC")) return "SQRC";
-        if (a.contains("IQR") || d.contains("IQR")) return "iQR";
-        if (a.contains("RMQR") || d.contains("RMQR")) return "rMQR";
-
-        if (a.contains("OCR") || d.contains("OCR")) return "OCR";
-
         return null;
     }
 
-    // =====================================================================================
-    //  設定：C#に寄せて「許容シンボル」をON（存在する項目のみ）
-    // =====================================================================================
-    //=====================================================
-    //　機　能　:　apply CSharp Like Settings Reflectiveの処理
-    //　引　数　:　settingsRoot ..... Object
-    //　戻り値　:　[void] ..... なし
-    //=====================================================
+    // --- Symbology (reflectionで存在するものだけ) ---
+    private void applySymbology(Object settingsRoot, @NonNull SymbologyProfile profile) {
+        final String root = "decode.symbologies";
 
-    private void applyCSharpLikeSettingsReflective(Object settingsRoot, @NonNull SymbologyProfile profile) {
-        if (settingsRoot == null) return;
-
-        // 任意：音など（存在する場合のみ）
-        setBoolean(settingsRoot, "notification.sound.enabled", true);
-        setBoolean(settingsRoot, "output.intent.enabled", false);
-        setBoolean(settingsRoot, "output.keyboard.enabled", false);
-
-        final String[] allPaths = new String[]{
-                // 1D
-                "ean8",
-                "ean13UpcA",
-                "upcE",
-                "itf",
-                "stf",
+        final String[] all = new String[]{
                 "code39",
-                "code93",
-                "code128",
-                "codabar",
-                "gs1DataBar",
-                "gs1DataBarLimited",
-                "gs1DataBarExpanded",
-                "msi",
-                "gs1Composite",
-
-                // 2D（表記揺れ吸収）
-                "qrCode",
-                "qr",
-                "microQr",
-                "microQR",
-                "dataMatrix",
-                "datamatrix",
-                "pdf417",
-                "microPdf417",
-                "microPDF417",
-                "maxiCode",
-                "maxicode",
-                "aztec",
-                "sQrc",
-                "sqrc",
-                "iQr",
-                "iqr",
-                "rMqr",
-                "rmqr",
+                "ean8", "ean13UpcA", "upcE",
+                "itf", "stf",
+                "code93", "code128", "codabar",
+                "qr", "qrCode", "dataMatrix", "pdf417"
         };
 
-        final String[] decodeRoots = new String[]{
-                "decode.symbologies"
-        };
+        // 全OFF
+        for (String s : all) setBoolean(settingsRoot, root + "." + s + ".enabled", false);
 
-        for (String rootPath : decodeRoots) {
-            for (String sym : allPaths) {
-                setBoolean(settingsRoot, rootPath + "." + sym + ".enabled", false);
-            }
-        }
+        if (profile == SymbologyProfile.NONE) return;
 
-        if (profile == SymbologyProfile.NONE) {
+        if (profile == SymbologyProfile.CODE39_ONLY) {
+            setBoolean(settingsRoot, root + ".code39.enabled", true);
             return;
         }
 
-        final String[] enablePaths = profile == SymbologyProfile.CODE39_ONLY
-                ? new String[]{"code39"}
-                : allPaths;
-
-        for (String rootPath : decodeRoots) {
-            for (String sym : enablePaths) {
-                setBoolean(settingsRoot, rootPath + "." + sym + ".enabled", true);
-            }
-        }
+        // ALL
+        for (String s : all) setBoolean(settingsRoot, root + "." + s + ".enabled", true);
     }
-
-    // ===== Reflection helpers =====
-    //================================
-    //　機　能　:　booleanを設定する
-    //　引　数　:　root ..... Object
-    //　　　　　:　path ..... String
-    //　　　　　:　value ..... boolean
-    //　戻り値　:　[void] ..... なし
-    //================================
 
     private void setBoolean(Object root, String path, boolean value) {
         try {
             FieldAndOwner fo = resolveOwnerAndField(root, path);
-            if (fo == null) {
-                Log.d(TAG, "SKIP (path not found): " + path);
-                return;
-            }
+            if (fo == null) return;
 
             Field f = fo.field;
             Object owner = fo.owner;
+            f.setAccessible(true);
 
-            if (f.getType() == boolean.class || f.getType() == Boolean.class) {
-                f.setAccessible(true);
+            Class<?> t = f.getType();
+            if (t == boolean.class || t == Boolean.class) {
                 f.set(owner, value);
-                Log.d(TAG, "SET boolean " + path + " = " + value);
-            } else {
-                Log.d(TAG, "SKIP (not boolean): " + path);
             }
-        } catch (Exception e) {
-            Log.d(TAG, "SKIP (exception): " + path + " : " + e.getClass().getSimpleName());
+        } catch (Exception ignored) {
         }
     }
 
-    //=======================================
-    //　機　能　:　resolve Owner And Fieldの処理
-    //　引　数　:　root ..... Object
-    //　　　　　:　path ..... String
-    //　戻り値　:　[FieldAndOwner] ..... なし
-    //=======================================
     @Nullable
     private FieldAndOwner resolveOwnerAndField(Object root, String path) {
         String[] parts = path.split("\\.");
         if (parts.length < 2) return null;
 
         Object cur = root;
-
         for (int i = 0; i < parts.length - 1; i++) {
-            String name = parts[i];
-            Field f = findField(cur.getClass(), name);
+            Field f = findField(cur.getClass(), parts[i]);
             if (f == null) return null;
-
             try {
                 f.setAccessible(true);
                 Object next = f.get(cur);
@@ -641,19 +369,12 @@ public class DensoScannerController
             }
         }
 
-        String last = parts[parts.length - 1];
-        Field lastField = findField(cur.getClass(), last);
-        if (lastField == null) return null;
+        Field last = findField(cur.getClass(), parts[parts.length - 1]);
+        if (last == null) return null;
 
-        return new FieldAndOwner(cur, lastField);
+        return new FieldAndOwner(cur, last);
     }
 
-    //===============================
-    //　機　能　:　find Fieldの処理
-    //　引　数　:　cls ..... Class<?>
-    //　　　　　:　name ..... String
-    //　戻り値　:　[Field] ..... なし
-    //===============================
     @Nullable
     private Field findField(Class<?> cls, String name) {
         Class<?> cur = cls;

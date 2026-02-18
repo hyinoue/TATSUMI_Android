@@ -125,20 +125,8 @@ public class CommTestActivity extends BaseActivity {
             updateInternetStatus();
             return;
         }
-
         gprsConnected = true;
         updateInternetStatus();
-
-        if (STATUS_CELLULAR.equals(snapshot.activeNetworkName)) {
-            showInfoMsg("モバイル回線で接続できています", MsgDispMode.MsgBox);
-            return;
-        }
-
-        if (STATUS_WIFI.equals(snapshot.activeNetworkName)) {
-            showInfoMsg("Wi-Fiで接続できています", MsgDispMode.MsgBox);
-            return;
-        }
-
         showInfoMsg("接続しました", MsgDispMode.MsgBox);
     }
 
