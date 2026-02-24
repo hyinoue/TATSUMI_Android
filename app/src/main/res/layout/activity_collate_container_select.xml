@@ -1,10 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　照合コンテナ選定画面レイアウト
+　関　　連　:　照合対象No.入力
+　　　　　　:　照合対象コンテナ一覧表示（RecyclerView）
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -14,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,6 +36,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -40,7 +50,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 上部：入力エリア -->
+    <!--================================================================
+    　機　能　:　上部入力エリア
+    　内　容　:　照合対象No.の入力
+    　備　考　:　タイトルバー直下に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -51,19 +65,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：コンテナ重量 / ダンネージ -->
+        <!--================================================================
+        　機　能　:　照合対象No.入力行
+        　内　容　:　照合対象No.を数値で入力
+        　備　考　:　最大3桁（inputType=number, maxLength=3）
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:text="照合対象No." />
 
+            <!-- 照合対象No.入力 -->
             <EditText
                 android:id="@+id/etContainerKg"
                 android:layout_width="50dp"
@@ -76,18 +96,23 @@
                 android:paddingEnd="8dp" />
         </LinearLayout>
 
-        <!-- 2行目：現品番号 -->
+        <!--================================================================
+        　機　能　:　予備行（現状は空）
+        　備　考　:　将来の項目追加（例：検索条件等）に備えた領域
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-        </LinearLayout>
+            android:gravity="center_vertical"></LinearLayout>
     </LinearLayout>
 
-    <!-- 表ヘッダ（PNo / BNo / Index / 重量 / 削除） -->
+    <!--================================================================
+    　機　能　:　一覧ヘッダ（表見出し）
+    　内　容　:　No.／コンテナNo.／束／作業日時
+    　備　考　:　RecyclerViewの直上に固定表示
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/rowTableHeader"
         android:layout_width="0dp"
@@ -99,6 +124,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- No.列 -->
         <TextView
             android:layout_width="40dp"
             android:layout_height="match_parent"
@@ -110,6 +136,7 @@
             android:text="No."
             android:textStyle="bold" />
 
+        <!-- コンテナNo.列（可変幅：weight=2） -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -122,6 +149,7 @@
             android:text="コンテナNo."
             android:textStyle="bold" />
 
+        <!-- 束列 -->
         <TextView
             android:layout_width="40dp"
             android:layout_height="match_parent"
@@ -134,6 +162,7 @@
             android:text="束"
             android:textStyle="bold" />
 
+        <!-- 作業日時列（可変幅：weight=2） -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -145,11 +174,13 @@
             android:layout_marginStart="-2dp"
             android:text="作業日時"
             android:textStyle="bold" />
-
-
     </LinearLayout>
 
-    <!-- 一覧（表の中身） -->
+    <!--================================================================
+    　機　能　:　一覧表示（RecyclerView）
+    　内　容　:　照合対象コンテナ一覧（表の中身）を表示
+    　備　考　:　一覧ヘッダ直下～下部エリア直上までを占有
+    ==================================================================-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBundles"
         android:layout_width="0dp"
@@ -159,7 +190,11 @@
         app:layout_constraintBottom_toTopOf="@id/areaFooter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-    <!-- 下部：集計エリア -->
+
+    <!--================================================================
+    　機　能　:　下部集計エリア（現状は空）
+    　備　考　:　集計情報やメッセージ等の表示領域として確保
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaFooter"
         android:layout_width="0dp"
@@ -170,6 +205,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"></LinearLayout>
 
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

@@ -41,23 +41,32 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+//============================================================
+//　処理概要　:　コンテナ/シール撮影用カメラ画面Activity
+//　　　　　　:　CameraXでプレビュー・撮影を行い、撮影後に確認/保存/破棄を行う。
+//　　　　　　:　権限未許可の場合はカメラ権限を要求し、許可後にカメラを開始する。
+//　関　　数　:　onCreate ............... 画面生成/初期化(権限確認/イベント設定/カメラ開始)
+//　　　　　　:　onDestroy .............. リソース解放(シャッター音)
+//　　　　　　:　onResume ............... 設定変更検知/カメラ再起動
+//　　　　　　:　startCamera ............ CameraX初期化/プレビュー開始/撮影設定反映（Interop使用）
+//　　　　　　:　restartCamera .......... カメラ再起動
+//　　　　　　:　hasSettingChanges ...... カメラ設定変更有無判定
+//　　　　　　:　mapTargetResolution .... 設定値→解像度(Size)変換
+//　　　　　　:　mapFlashMode ........... 設定値→フラッシュモード変換
+//　　　　　　:　mapAeMode .............. 設定値→AEモード変換
+//　　　　　　:　mapAwbMode ............. 設定値→AWBモード変換
+//　　　　　　:　takePhoto .............. 撮影処理(一時ファイル作成/保存/プレビュー表示)
+//　　　　　　:　onPreviewTouched ....... タッチAF(フォーカス/測光)
+//　　　　　　:　showFocusIndicator ..... フォーカス位置インジケータ表示
+//　　　　　　:　playShutterSound ....... シャッター音再生
+//　　　　　　:　saveCapture ............ 撮影結果を返却して終了
+//　　　　　　:　discardCapture .......... 撮影破棄(一時ファイル削除/表示戻し)
+//　　　　　　:　showCaptureReview ...... プレビュー確認UI表示切替
+//　　　　　　:　triggerAfAeAtCenter .... 中央でAF/AEをトリガー
+//　　　　　　:　getOutputFile .......... 出力ファイル生成
+//　　　　　　:　setStatus .............. ステータス表示設定
+//============================================================
 
-//======================================
-//　処理概要　:　PhotographingActivityクラス
-//======================================
-
-/**
- * コンテナ/シール撮影用のカメラ画面Activity。
- *
- * <p>CameraXでプレビュー・撮影を行い、撮影後に確認/保存/破棄を選択する。</p>
- *
- * <p>主な処理フロー:</p>
- * <ul>
- *     <li>カメラ権限確認 → プレビュー開始。</li>
- *     <li>シャッターで撮影 → プレビュー確認画面へ切替。</li>
- *     <li>保存時はURIを返却し、破棄時は一時ファイルを削除。</li>
- * </ul>
- */
 @ExperimentalCamera2Interop
 public class PhotographingActivity extends BaseActivity {
 
@@ -112,8 +121,10 @@ public class PhotographingActivity extends BaseActivity {
     private final ActivityResultLauncher<String> requestCameraPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
                 if (granted) {
+                    // 許可されたらカメラ開始
                     startCamera();
                 } else {
+                    // 許可されない場合はステータス表示のみ
                     setStatus("CAM_PERMISSION_DENIED");
                 }
             });
@@ -126,24 +137,27 @@ public class PhotographingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_photographing);
 
+        // 設定初期化/読み込み
         AppSettings.init(this);
         AppSettings.load();
         lastImageSize = AppSettings.CameraImageSize;
         lastFlashMode = AppSettings.CameraFlash;
         lastLightMode = AppSettings.CameraLightMode;
 
+        // 設定ボタン
         btnSettings = findViewById(R.id.btnSettings);
         btnSettings.setOnClickListener(v -> {
             Intent intent = new Intent(this, CameraSettingActivity.class);
             startActivity(intent);
         });
 
+        // 呼び出し元から撮影対象を受け取る（未指定はCONTAINER）
         target = getIntent().getStringExtra(EXTRA_TARGET);
         if (target == null) target = "CONTAINER";
 
+        // 画面部品取得
         previewView = findViewById(R.id.previewView);
         statusBar = findViewById(R.id.statusBar);
         capturedPreview = findViewById(R.id.capturedPreview);
@@ -155,17 +169,21 @@ public class PhotographingActivity extends BaseActivity {
         btnSave = findViewById(R.id.btnSave);
         btnDiscard = findViewById(R.id.btnDiscard);
 
+        // イベント設定
         btnExit.setOnClickListener(v -> finish());
         btnShutter.setOnClickListener(v -> takePhoto());
         btnSave.setOnClickListener(v -> saveCapture());
         btnDiscard.setOnClickListener(v -> discardCapture());
         previewView.setOnTouchListener(this::onPreviewTouched);
 
+        // シャッター音
         shutterSound = new MediaActionSound();
         shutterSound.load(MediaActionSound.SHUTTER_CLICK);
 
+        // 初期はレビュー非表示
         showCaptureReview(false);
 
+        // 権限確認→許可済なら開始、未許可なら要求
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             startCamera();
@@ -174,6 +192,11 @@ public class PhotographingActivity extends BaseActivity {
         }
     }
 
+    //================================================================
+    //　機　能　:　リソース解放(シャッター音)
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //================================================================
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -191,7 +214,11 @@ public class PhotographingActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // 設定再読み込み
         AppSettings.load();
+
+        // 設定変更があればカメラ再起動
         if (hasSettingChanges()) {
             lastImageSize = AppSettings.CameraImageSize;
             lastFlashMode = AppSettings.CameraFlash;
@@ -205,22 +232,30 @@ public class PhotographingActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-    @ExperimentalCamera2Interop
+    // ※クラスに @ExperimentalCamera2Interop を付けているため、メソッド側のOpt-inは不要。
+    //   （もしクラスに付けない方針なら、このメソッドに @ExperimentalCamera2Interop を付与する。）
     private void startCamera() {
         setStatus("CAM_STARTING");
 
         ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(this);
         future.addListener(() -> {
             try {
+                // プロバイダ取得/既存バインド解除
                 cameraProvider = future.get();
                 cameraProvider.unbindAll();
 
+                // --- Preview設定 ---
                 androidx.camera.core.Preview.Builder previewBuilder =
                         new androidx.camera.core.Preview.Builder();
+
+                // 解像度設定
                 Size targetResolution = mapTargetResolution(AppSettings.CameraImageSize);
                 if (targetResolution != null) {
                     previewBuilder.setTargetResolution(targetResolution);
                 }
+
+                // Camera2パラメータ設定（AF/AWB）
+                // ※Camera2InteropはExperimental APIのためOpt-inが必要（本クラスで実施済み）
                 Camera2Interop.Extender<androidx.camera.core.Preview> previewExtender =
                         new Camera2Interop.Extender<>(previewBuilder);
                 previewExtender.setCaptureRequestOption(
@@ -231,9 +266,11 @@ public class PhotographingActivity extends BaseActivity {
                         CaptureRequest.CONTROL_AWB_MODE,
                         mapAwbMode(AppSettings.CameraLightMode)
                 );
+
                 Preview preview = previewBuilder.build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+                // --- Capture設定 ---
                 androidx.camera.core.ImageCapture.Builder captureBuilder =
                         new androidx.camera.core.ImageCapture.Builder()
                                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
@@ -241,6 +278,8 @@ public class PhotographingActivity extends BaseActivity {
                 if (targetResolution != null) {
                     captureBuilder.setTargetResolution(targetResolution);
                 }
+
+                // Camera2パラメータ設定（AF/AWB/AE）
                 Camera2Interop.Extender<androidx.camera.core.ImageCapture> captureExtender =
                         new Camera2Interop.Extender<>(captureBuilder);
                 captureExtender.setCaptureRequestOption(
@@ -257,10 +296,13 @@ public class PhotographingActivity extends BaseActivity {
                 );
                 imageCapture = captureBuilder.build();
 
+                // 背面カメラを選択してライフサイクルにバインド
                 CameraSelector selector = CameraSelector.DEFAULT_BACK_CAMERA;
-
                 camera = cameraProvider.bindToLifecycle(this, selector, preview, imageCapture);
+
                 setStatus("CAM_RUNNING");
+
+                // 開始直後に中央でAF/AEを一度トリガー
                 triggerAfAeAtCenter();
 
             } catch (Exception e) {
@@ -269,35 +311,36 @@ public class PhotographingActivity extends BaseActivity {
             }
         }, ContextCompat.getMainExecutor(this));
     }
+
     //==============================
     //　機　能　:　restart Cameraの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
-
     private void restartCamera() {
+        // 既存バインド解除して再開始
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
         startCamera();
     }
+
     //=================================
     //　機　能　:　setting Changesを判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... なし
     //=================================
-
     private boolean hasSettingChanges() {
         return lastImageSize != AppSettings.CameraImageSize
                 || lastFlashMode != AppSettings.CameraFlash
                 || lastLightMode != AppSettings.CameraLightMode;
     }
+
     //=====================================
     //　機　能　:　map Target Resolutionの処理
     //　引　数　:　setting ..... int
-    //　戻り値　:　[Size] ..... なし
+    //　戻り値　:　[Size] ..... 対応解像度（未対応はnull）
     //=====================================
-
     private Size mapTargetResolution(int setting) {
         switch (setting) {
             case CAM_UXGA:
@@ -316,12 +359,12 @@ public class PhotographingActivity extends BaseActivity {
                 return null;
         }
     }
+
     //==============================
     //　機　能　:　map Flash Modeの処理
     //　引　数　:　setting ..... int
-    //　戻り値　:　[int] ..... なし
+    //　戻り値　:　[int] ..... ImageCapture.FLASH_MODE_*
     //==============================
-
     private int mapFlashMode(int setting) {
         switch (setting) {
             case CAM_FLASH_AUTO:
@@ -334,12 +377,12 @@ public class PhotographingActivity extends BaseActivity {
                 return ImageCapture.FLASH_MODE_AUTO;
         }
     }
+
     //===================================
     //　機　能　:　map Ae Modeの処理
     //　引　数　:　flashSetting ..... int
-    //　戻り値　:　[int] ..... なし
+    //　戻り値　:　[int] ..... CaptureRequest.CONTROL_AE_MODE_*
     //===================================
-
     private int mapAeMode(int flashSetting) {
         switch (flashSetting) {
             case CAM_FLASH_ENABLE:
@@ -351,12 +394,12 @@ public class PhotographingActivity extends BaseActivity {
                 return AE_MODE_AUTO_FLASH;
         }
     }
+
     //===================================
     //　機　能　:　map Awb Modeの処理
     //　引　数　:　lightSetting ..... int
-    //　戻り値　:　[int] ..... なし
+    //　戻り値　:　[int] ..... CaptureRequest.CONTROL_AWB_MODE_*
     //===================================
-
     private int mapAwbMode(int lightSetting) {
         switch (lightSetting) {
             case CAM_OUTDOOR:
@@ -372,17 +415,21 @@ public class PhotographingActivity extends BaseActivity {
                 return CaptureRequest.CONTROL_AWB_MODE_AUTO;
         }
     }
+
     //============================
     //　機　能　:　take Photoの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void takePhoto() {
         if (imageCapture == null) {
             return;
         }
+
+        // シャッター音
         playShutterSound();
+
+        // 出力ファイル生成
         File file = getOutputFile();
         if (file == null) {
             setStatus("FILE_ERROR");
@@ -393,30 +440,37 @@ public class PhotographingActivity extends BaseActivity {
         ImageCapture.OutputFileOptions output =
                 new ImageCapture.OutputFileOptions.Builder(file).build();
 
+        // 撮影実行
         imageCapture.takePicture(
                 output,
                 ContextCompat.getMainExecutor(this),
                 new ImageCapture.OnImageSavedCallback() {
+
                     //===================================================================
-                    //　機　能　:　on Image Savedの処理
+                    //　機　能　:　撮影成功時の処理
                     //　引　数　:　outputFileResults ..... ImageCapture.OutputFileResults
                     //　戻り値　:　[void] ..... なし
                     //===================================================================
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        // File→URIへ変換（FileProvider経由）
                         pendingPhotoUri = FileProvider.getUriForFile(
                                 PhotographingActivity.this,
                                 getPackageName() + ".fileprovider",
                                 file
                         );
+
+                        // プレビュー表示へ反映
                         if (capturedPreview != null) {
                             capturedPreview.setImageURI(pendingPhotoUri);
                         }
+
+                        // レビュー表示に切替
                         showCaptureReview(true);
                     }
 
                     //==================================================
-                    //　機　能　:　on Errorの処理
+                    //　機　能　:　撮影失敗時の処理
                     //　引　数　:　exception ..... ImageCaptureException
                     //　戻り値　:　[void] ..... なし
                     //==================================================
@@ -429,15 +483,24 @@ public class PhotographingActivity extends BaseActivity {
         );
     }
 
+    //================================================================
+    //　機　能　:　タッチAF(フォーカス/測光)
+    //　引　数　:　v ..... View
+    //　　　　　:　event ..... MotionEvent
+    //　戻り値　:　[boolean] ..... True:消費
+    //================================================================
     private boolean onPreviewTouched(View v, MotionEvent event) {
+        // タッチ離し時のみ処理
         if (event.getAction() != MotionEvent.ACTION_UP || camera == null) {
             return true;
         }
 
+        // タッチ位置を取得しインジケータ表示
         float touchX = event.getX();
         float touchY = event.getY();
         showFocusIndicator(touchX, touchY);
 
+        // タッチ位置にAF/AEを設定
         MeteringPoint point = previewView.getMeteringPointFactory().createPoint(touchX, touchY);
         FocusMeteringAction action = new FocusMeteringAction.Builder(point)
                 .setAutoCancelDuration(2, TimeUnit.SECONDS)
@@ -446,14 +509,24 @@ public class PhotographingActivity extends BaseActivity {
         return true;
     }
 
+    //================================================================
+    //　機　能　:　フォーカス位置インジケータ表示
+    //　引　数　:　centerX ..... 表示中心X
+    //　　　　　:　centerY ..... 表示中心Y
+    //　戻り値　:　[void] ..... なし
+    //================================================================
     private void showFocusIndicator(float centerX, float centerY) {
         if (focusIndicator == null) {
             return;
         }
+
+        // インジケータをタッチ位置へ移動（中心合わせ）
         float halfWidth = focusIndicator.getWidth() / 2f;
         float halfHeight = focusIndicator.getHeight() / 2f;
         focusIndicator.setX(centerX - halfWidth);
         focusIndicator.setY(centerY - halfHeight);
+
+        // アニメーション表示
         focusIndicator.setScaleX(1.3f);
         focusIndicator.setScaleY(1.3f);
         focusIndicator.setAlpha(1f);
@@ -469,60 +542,78 @@ public class PhotographingActivity extends BaseActivity {
                 .start();
     }
 
+    //================================================================
+    //　機　能　:　シャッター音再生
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //================================================================
     private void playShutterSound() {
         if (shutterSound == null) {
             return;
         }
         shutterSound.play(MediaActionSound.SHUTTER_CLICK);
     }
+
     //============================
     //　機　能　:　captureを保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
-
     private void saveCapture() {
+        // 撮影結果が無ければエラー
         if (pendingPhotoUri == null) {
             setStatus("SAVE_ERROR");
             return;
         }
+
+        // 呼び出し元へURIを返却
         Intent result = new Intent();
         result.putExtra(EXTRA_RESULT_URI, pendingPhotoUri.toString());
         result.putExtra(EXTRA_TARGET, target);
         setResult(RESULT_OK, result);
         finish();
     }
+
     //===============================
     //　機　能　:　discard Captureの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
-
     private void discardCapture() {
+        // 一時ファイルがあれば削除
         if (pendingPhotoFile != null && pendingPhotoFile.exists()) {
             boolean deleted = pendingPhotoFile.delete();
             Log.d(TAG, "discard photo deleted=" + deleted);
         }
+
+        // 状態をクリア
         pendingPhotoFile = null;
         pendingPhotoUri = null;
+
+        // 画像表示をクリア
         if (capturedPreview != null) {
             capturedPreview.setImageDrawable(null);
         }
+
+        // 撮影画面へ戻す
         showCaptureReview(false);
     }
+
     //===================================
     //　機　能　:　show Capture Reviewの処理
     //　引　数　:　show ..... boolean
     //　戻り値　:　[void] ..... なし
     //===================================
-
     private void showCaptureReview(boolean show) {
+        // 撮影後レビューの表示/非表示切替
         if (capturedPreview != null) {
             capturedPreview.setVisibility(show ? View.VISIBLE : View.GONE);
         }
         if (confirmButtons != null) {
             confirmButtons.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+
+        // 撮影中UIの表示/非表示切替
         if (btnShutter != null) {
             btnShutter.setVisibility(show ? View.GONE : View.VISIBLE);
         }
@@ -535,56 +626,56 @@ public class PhotographingActivity extends BaseActivity {
         if (btnDiscard != null) {
             btnDiscard.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+
+        // レビュー中はフォーカスインジケータを消す
         if (focusIndicator != null && show) {
             focusIndicator.setVisibility(View.GONE);
         }
     }
+
     //=======================================
     //　機　能　:　trigger Af Ae At Centerの処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=======================================
-
     private void triggerAfAeAtCenter() {
         if (camera == null) return;
 
+        // プレビュー中央を測光/フォーカス点として作成
         MeteringPoint point =
-                //=======================================================
-                //　機　能　:　Surface Oriented Metering Point Factoryの処理
-                //　引　数　:　1.0f .....
-                //　　　　　:　.createPoint(0.5f ..... 1.0f)
-                //　　　　　:　0.5f .....
-                //　戻り値　:　[new] ..... なし
-                //=======================================================
                 new SurfaceOrientedMeteringPointFactory(1.0f, 1.0f)
                         .createPoint(0.5f, 0.5f);
 
+        // 中央でAF/AE開始（一定時間で自動キャンセル）
         FocusMeteringAction action = new FocusMeteringAction.Builder(point)
                 .setAutoCancelDuration(2, TimeUnit.SECONDS)
                 .build();
 
         camera.getCameraControl().startFocusAndMetering(action);
     }
+
     //=============================
     //　機　能　:　output Fileを取得する
     //　引　数　:　なし
-    //　戻り値　:　[File] ..... なし
+    //　戻り値　:　[File] ..... 出力先ファイル
     //=============================
-
     private File getOutputFile() {
+        // まずはPictures配下、無ければ内部領域へ
         File dir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
         if (dir == null) {
             dir = getFilesDir();
         }
+
+        // 一意なファイル名で作成
         String name = "capture_" + System.currentTimeMillis() + ".jpg";
         return new File(dir, name);
     }
+
     //=================================
     //　機　能　:　statusを設定する
     //　引　数　:　message ..... String
     //　戻り値　:　[void] ..... なし
     //=================================
-
     private void setStatus(String message) {
         if (statusBar != null) {
             statusBar.setText(message);

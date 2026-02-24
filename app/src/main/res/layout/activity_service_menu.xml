@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　サービスメニュー画面レイアウト
+　関　　連　:　タイトルバー（画面タイトル／バージョン表示）
+　　　　　　:　メニュー一覧（1～7）
+　　　　　　:　戻り領域（下寄せ用）
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -6,7 +12,10 @@
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -16,6 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -29,6 +39,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -42,7 +53,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- メニュー領域 -->
+    <!--================================================================
+    　機　能　:　メニュー領域（スクロール）
+    　内　容　:　メニュー一覧（1～7）を表示
+    　備　考　:　画面サイズにより縦スクロール可能
+    ==================================================================-->
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="0dp"
@@ -61,7 +76,10 @@
             android:paddingTop="18dp"
             android:paddingBottom="18dp">
 
-            <!-- 上側メニュー（1～7） -->
+            <!--================================================================
+            　機　能　:　上側メニュー一覧（1～7）
+            　内　容　:　各メニュー項目をタップ可能なTextViewで表示
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/menuArea"
                 android:layout_width="0dp"
@@ -71,7 +89,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- 1 -->
+                <!-- 1. データ確認 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -89,13 +107,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 2 -->
+                <!-- 2. データクリア -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -113,13 +132,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 3 -->
+                <!-- 3. メンテナンスデータ送信 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -137,13 +157,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 4 -->
+                <!-- 4. 通信テスト -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -161,13 +182,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 5 -->
+                <!-- 5. バーコードテスト -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,13 +207,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 6 -->
+                <!-- 6. 振動設定 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -209,13 +232,14 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#0000FF" />
                 </LinearLayout>
 
-                <!-- 7 -->
+                <!-- 7. サーバー切替 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -233,6 +257,7 @@
                         android:focusable="true"
                         android:padding="2dp" />
 
+                    <!-- 区切り線 -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -241,7 +266,11 @@
 
             </LinearLayout>
 
-            <!-- 下部：9 戻る（画面下寄せ） -->
+            <!--================================================================
+            　機　能　:　戻り領域（下寄せ用）
+            　内　容　:　「戻る」等の下部項目を配置するための領域
+            　備　考　:　画面下に寄せて表示
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/backArea"
                 android:layout_width="0dp"
@@ -251,11 +280,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
+                <!-- ※必要に応じて「9. 戻る」等の項目をここに追加する -->
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

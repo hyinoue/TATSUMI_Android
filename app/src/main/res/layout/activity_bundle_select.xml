@@ -1,10 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　積載束選定画面レイアウト
+　関　　連　:　上部入力（コンテナ重量／ダンネージ／現品番号）
+　　　　　　:　一覧表示（RecyclerView）
+　　　　　　:　下部集計（束数／総重量／残重量）
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -14,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,6 +36,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -40,7 +50,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 上部：入力エリア -->
+    <!--================================================================
+    　機　能　:　上部入力エリア
+    　内　容　:　コンテナ重量／ダンネージ重量／現品番号
+    　備　考　:　タイトルバー直下に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -51,19 +65,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：コンテナ重量 / ダンネージ -->
+        <!-- 1行目：コンテナ重量 / ダンネージ重量 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- コンテナ重量ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:text="コンテナ" />
 
+            <!-- コンテナ重量入力 -->
             <EditText
                 android:id="@+id/etContainerKg"
                 android:layout_width="65dp"
@@ -76,6 +92,7 @@
                 android:maxLength="4"
                 android:paddingEnd="8dp" />
 
+            <!-- 単位（kg） -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,6 +100,7 @@
                 android:textColor="#000000"
                 android:text="kg" />
 
+            <!-- ダンネージ重量ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,6 +108,7 @@
                 android:textColor="#000000"
                 android:text="ダンネージ" />
 
+            <!-- ダンネージ重量入力 -->
             <EditText
                 android:id="@+id/etDunnageKg"
                 android:layout_width="50dp"
@@ -101,6 +120,7 @@
                 android:maxLength="3"
                 android:paddingEnd="8dp" />
 
+            <!-- 単位（kg） -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,12 +137,14 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- 現品番号ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:text="現品番号" />
 
+            <!-- 現品番号入力 -->
             <EditText
                 android:id="@+id/etGenpinNo"
                 android:layout_width="222.5dp"
@@ -137,7 +159,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 表ヘッダ（P No / B No / Index / 重量） -->
+    <!--================================================================
+    　機　能　:　一覧ヘッダ（表見出し）
+    　内　容　:　P No／B No／Index／重量／（操作列などの空欄）
+    　備　考　:　RecyclerViewの直上に固定表示
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/rowTableHeader"
         android:layout_width="0dp"
@@ -149,6 +175,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- P No -->
         <TextView
             android:layout_width="80dp"
             android:layout_height="match_parent"
@@ -160,6 +187,7 @@
             android:text="P No"
             android:textStyle="bold" />
 
+        <!-- B No（境界線表現のためマージンを調整） -->
         <TextView
             android:layout_width="50dp"
             android:layout_height="match_parent"
@@ -172,6 +200,7 @@
             android:text="B No"
             android:textStyle="bold" />
 
+        <!-- Index -->
         <TextView
             android:layout_width="80dp"
             android:layout_height="match_parent"
@@ -184,6 +213,7 @@
             android:text="Index"
             android:textStyle="bold" />
 
+        <!-- 重量 -->
         <TextView
             android:layout_width="62dp"
             android:layout_height="match_parent"
@@ -196,6 +226,7 @@
             android:text="重量"
             android:textStyle="bold" />
 
+        <!-- 予備列（ボタン等の配置想定） -->
         <TextView
             android:layout_width="56dp"
             android:layout_height="match_parent"
@@ -208,7 +239,11 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- ✅ 一覧（RecyclerView） -->
+    <!--================================================================
+    　機　能　:　束一覧表示（RecyclerView）
+    　内　容　:　積載束の候補一覧を表示
+    　備　考　:　ヘッダ直下～下部集計エリア直上までを占有
+    ==================================================================-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBundles"
         android:layout_width="0dp"
@@ -219,7 +254,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 下部：集計エリア -->
+    <!--================================================================
+    　機　能　:　下部集計エリア
+    　内　容　:　積載束数／総重量／積載可能残重量
+    　備　考　:　最下段ボタン群（include）直上に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaFooter"
         android:layout_width="0dp"
@@ -230,12 +269,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
 
+        <!-- 1行目：積載束数 / 総重量 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- 積載束数ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -243,6 +284,7 @@
                 android:layout_marginStart="6dp"
                 android:text="積載束数" />
 
+            <!-- 積載束数表示 -->
             <TextView
                 android:id="@+id/tvBundleCount"
                 android:layout_width="50dp"
@@ -253,6 +295,7 @@
                 android:gravity="center"
                 android:background="@drawable/bg_blue_back" />
 
+            <!-- 総重量ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -260,6 +303,7 @@
                 android:textColor="#000000"
                 android:text="総重量" />
 
+            <!-- 総重量表示 -->
             <TextView
                 android:id="@+id/tvTotalWeight"
                 android:layout_width="90dp"
@@ -271,6 +315,7 @@
                 android:gravity="end|center_vertical"
                 android:paddingEnd="8dp" />
 
+            <!-- 単位（kg） -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -279,6 +324,7 @@
                 android:text="kg" />
         </LinearLayout>
 
+        <!-- 2行目：積載可能残重量 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -286,6 +332,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- 積載可能残重量ラベル（位置合わせのため左マージン大きめ） -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -293,6 +340,7 @@
                 android:layout_marginStart="81dp"
                 android:text="積載可能残重量" />
 
+            <!-- 残重量表示 -->
             <TextView
                 android:id="@+id/tvRemainWeight"
                 android:layout_width="90dp"
@@ -305,6 +353,7 @@
                 android:gravity="end|center_vertical"
                 android:paddingEnd="8dp" />
 
+            <!-- 単位（kg） -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -315,6 +364,11 @@
 
     </LinearLayout>
 
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

@@ -1,13 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　バックアップ設定ファイル（Auto Backup）
+　関　　連　:　アプリデータの自動バックアップ制御
+　備　　考　:　API 31 以上で有効
+============================================================-->
+<!--
+　説　明　:　必要に応じて include / exclude を設定する
+　　　　　　詳細は以下を参照
+　　　　　　https://developer.android.com/guide/topics/data/autobackup
+　　　　　　https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+
+    <!--================================================================
+    　機　能　:　SharedPreferences をバックアップ対象に含める例
+    ==================================================================-->
+    <!-- <include domain="sharedpref" path="."/> -->
+
+    <!--================================================================
+    　機　能　:　特定の SharedPreferences を除外する例
+    ==================================================================-->
+    <!-- <exclude domain="sharedpref" path="device.xml"/> -->
+
 </full-backup-content>

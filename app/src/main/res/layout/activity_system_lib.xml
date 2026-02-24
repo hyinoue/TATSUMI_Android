@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　振動設定画面レイアウト
+　関　　連　:　ブザー音設定（ON/OFF／音量／長さ／テスト）
+　　　　　　:　バイブレーション設定（ON/OFF／長さ／回数／間隔／テスト）
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -15,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -28,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -41,7 +51,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- メイン領域（下ボタンの上まで） -->
+    <!--================================================================
+    　機　能　:　メイン領域（スクロール）
+    　内　容　:　ブザー音設定／バイブレーション設定の入力項目を表示
+    　備　考　:　下部ボタンに重ならないよう、ボタン上までをスクロール対象とする
+    ==================================================================-->
     <ScrollView
         android:id="@+id/scrollMain"
         android:layout_width="0dp"
@@ -60,7 +74,12 @@
             android:paddingTop="14dp"
             android:paddingBottom="14dp">
 
-            <!-- ===== ブザー音設定 ===== -->
+            <!--================================================================
+            　機　能　:　ブザー音設定エリア
+            　内　容　:　ON/OFF／音量／長さ(ミリ秒)／テストボタン
+            ==================================================================-->
+
+            <!-- 見出し -->
             <TextView
                 android:id="@+id/tvBuzzerTitle"
                 android:layout_width="0dp"
@@ -74,6 +93,7 @@
                 app:layout_constraintEnd_toStartOf="@id/btnBuzzerTest"
                 app:layout_constraintHorizontal_bias="0" />
 
+            <!-- ブザーテスト -->
             <Button
                 android:id="@+id/btnBuzzerTest"
                 android:layout_width="92dp"
@@ -87,6 +107,7 @@
                 app:layout_constraintTop_toTopOf="@id/tvBuzzerTitle"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- ON/OFF -->
             <CheckBox
                 android:id="@+id/chkBuzzerOnOff"
                 android:layout_width="wrap_content"
@@ -110,6 +131,7 @@
                 app:layout_constraintTop_toBottomOf="@id/chkBuzzerOnOff"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- 音量選択（Spinner） -->
             <FrameLayout
                 android:id="@+id/areaContainerSize"
                 android:layout_width="115dp"
@@ -128,7 +150,6 @@
                     android:textColor="#000000" />
             </FrameLayout>
 
-
             <!-- 長さ（ミリ秒） -->
             <TextView
                 android:id="@+id/tvBuzzerLengthLabel"
@@ -141,6 +162,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tvBuzzerVolumeLabel"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- ブザー長さ入力 -->
             <EditText
                 android:id="@+id/etBuzzerLengthMs"
                 android:layout_width="120dp"
@@ -166,7 +188,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- ===== バイブレーション設定 ===== -->
+            <!--================================================================
+            　機　能　:　バイブレーション設定エリア
+            　内　容　:　ON/OFF／長さ(ミリ秒)／回数／間隔(ミリ秒)／テストボタン
+            ==================================================================-->
+
+            <!-- 見出し -->
             <TextView
                 android:id="@+id/tvVibrationTitle"
                 android:layout_width="0dp"
@@ -181,6 +208,7 @@
                 app:layout_constraintEnd_toStartOf="@id/btnVibrationTest"
                 app:layout_constraintHorizontal_bias="0" />
 
+            <!-- バイブレーションテスト -->
             <Button
                 android:id="@+id/btnVibrationTest"
                 android:layout_width="92dp"
@@ -194,6 +222,7 @@
                 app:layout_constraintTop_toTopOf="@id/tvVibrationTitle"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- ON/OFF -->
             <CheckBox
                 android:id="@+id/chkVibrationOnOff"
                 android:layout_width="wrap_content"
@@ -217,6 +246,7 @@
                 app:layout_constraintTop_toBottomOf="@id/chkVibrationOnOff"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- バイブ長さ入力 -->
             <EditText
                 android:id="@+id/etVibLengthMs"
                 android:layout_width="120dp"
@@ -245,6 +275,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tvVibLengthLabel"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- バイブ回数入力 -->
             <EditText
                 android:id="@+id/etVibCount"
                 android:layout_width="120dp"
@@ -273,6 +304,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tvVibCountLabel"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- バイブ間隔入力 -->
             <EditText
                 android:id="@+id/etVibIntervalMs"
                 android:layout_width="120dp"
@@ -303,7 +335,11 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- 画面下部ボタン -->
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

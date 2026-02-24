@@ -20,85 +20,115 @@ import java.util.Date;
 import java.util.List;
 
 
-//============================
+//============================================================
 //　処理概要　:　SoapParsersクラス
-//============================
-
+//　関　　数　:　throwIfSoapFault ......................... SOAP Fault検出時に例外送出
+//　　　　　　:　parseBooleanResult ...................... bool結果の取得
+//　　　　　　:　parseTextResult ......................... 文字列結果の取得
+//　　　　　　:　parseDateTimeResult ..................... DateTime結果の取得
+//　　　　　　:　parseStringArrayResult .................. string配列結果の取得
+//　　　　　　:　parseBase64Result ....................... base64Binary結果の取得
+//　　　　　　:　parseSyukkaDataResult ................... 出荷データ結果の完全パース
+//　　　　　　:　parseSyougoDataResult ................... 照合データ結果の完全パース
+//　　　　　　:　newParser ............................... XmlPullParser生成
+//　　　　　　:　readSyukkaHeaderArray ................... 出荷ヘッダ配列パース
+//　　　　　　:　readSyukkaHeader ........................ 出荷ヘッダ1件パース
+//　　　　　　:　readSyukkaMeisaiArray ................... 出荷明細配列パース
+//　　　　　　:　readSyukkaMeisai ........................ 出荷明細1件パース
+//　　　　　　:　readSyougoHeaderArray ................... 照合ヘッダ配列パース
+//　　　　　　:　readSyougoHeader ........................ 照合ヘッダ1件パース
+//　　　　　　:　readSyougoDtlArray ...................... 照合明細配列パース
+//　　　　　　:　readSyougoDtl ........................... 照合明細1件パース
+//　　　　　　:　safeParseInt ............................ int安全変換
+//　　　　　　:　safeParseBool ........................... boolean安全変換
+//　　　　　　:　safeParseDate ........................... Date安全変換
+//============================================================
 public class SoapParsers {
-    //===================================
-    //　機　能　:　SoapParsersの初期化処理
+
+    //================================================================
+    //　機　能　:　SoapParsersの生成を禁止する（ユーティリティクラス化）
     //　引　数　:　なし
     //　戻り値　:　[SoapParsers] ..... なし
-    //===================================
-
+    //================================================================
     private SoapParsers() {
+        // static専用クラスのためインスタンス化させない
     }
-    //=====================================
-    //　機　能　:　new Parserの処理
-    //　引　数　:　xml ..... String
-    //　戻り値　:　[XmlPullParser] ..... なし
-    //=====================================
 
+    //================================================================
+    //　機　能　:　XmlPullParserを生成する（namespace aware）
+    //　引　数　:　xml ..... String
+    //　戻り値　:　[XmlPullParser] ..... パーサ
+    //================================================================
     private static XmlPullParser newParser(String xml) throws Exception {
         XmlPullParserFactory f = XmlPullParserFactory.newInstance();
         f.setNamespaceAware(true);
+
         XmlPullParser p = f.newPullParser();
         p.setInput(new StringReader(xml));
         return p;
     }
-    //=====================================
-    //　機　能　:　throw If Soap Faultの処理
+
+    //================================================================
+    //　機　能　:　SOAP Faultを検出した場合に例外を送出する
     //　引　数　:　responseXml ..... String
     //　戻り値　:　[void] ..... なし
-    //=====================================
-
+    //================================================================
     public static void throwIfSoapFault(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
 
         int e = p.getEventType();
         while (e != XmlPullParser.END_DOCUMENT) {
+
+            // <Fault> を検出したら faultstring を取りに行く
             if (e == XmlPullParser.START_TAG && "Fault".equals(p.getName())) {
                 String faultString = null;
                 int depth = p.getDepth();
-                while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "Fault".equals(p.getName()))) {
+
+                // Fault要素の範囲内を走査して faultstring を取得する
+                while (!(e == XmlPullParser.END_TAG
+                        && p.getDepth() == depth
+                        && "Fault".equals(p.getName()))) {
+
                     e = p.next();
+
                     if (e == XmlPullParser.START_TAG && "faultstring".equals(p.getName())) {
                         faultString = p.nextText();
                     }
                 }
-                throw new SoapFaultException(faultString != null ? faultString : "SOAP Fault", responseXml);
+
+                // Faultを例外として扱う（レスポンスXMLも保持）
+                throw new SoapFaultException(
+                        faultString != null ? faultString : "SOAP Fault",
+                        responseXml
+                );
             }
+
             e = p.next();
         }
     }
-    //=======================================
-    //　機　能　:　boolean Resultを解析する
+
+    //================================================================
+    //　機　能　:　boolean結果（Resultタグ内）を解析する
     //　引　数　:　responseXml ..... String
     //　　　　　:　resultTagName ..... String
-    //　戻り値　:　[boolean] ..... なし
-    //=======================================
-
+    //　戻り値　:　[boolean] ..... 解析結果
+    //================================================================
     public static boolean parseBooleanResult(String responseXml, String resultTagName) throws Exception {
-        XmlPullParser p = newParser(responseXml);
-        int e = p.getEventType();
-        while (e != XmlPullParser.END_DOCUMENT) {
-            if (e == XmlPullParser.START_TAG && resultTagName.equals(p.getName())) {
-                String t = p.nextText();
-                return "true".equalsIgnoreCase(t.trim());
-            }
-            e = p.next();
-        }
-        throw new IllegalArgumentException("Result tag not found: " + resultTagName);
+        String t = parseTextResult(responseXml, resultTagName);
+
+        // "true"/"false" を想定（余分な空白は除去）
+        return t != null && "true".equalsIgnoreCase(t.trim());
     }
-    //=======================================
-    //　機　能　:　text Resultを解析する
+
+    //================================================================
+    //　機　能　:　テキスト結果（Resultタグ内）を解析する
     //　引　数　:　responseXml ..... String
     //　　　　　:　resultTagName ..... String
-    //　戻り値　:　[String] ..... なし
-    //=======================================
-
+    //　戻り値　:　[String] ..... 解析結果テキスト
+    //================================================================
     public static String parseTextResult(String responseXml, String resultTagName) throws Exception {
         XmlPullParser p = newParser(responseXml);
+
         int e = p.getEventType();
         while (e != XmlPullParser.END_DOCUMENT) {
             if (e == XmlPullParser.START_TAG && resultTagName.equals(p.getName())) {
@@ -106,15 +136,17 @@ public class SoapParsers {
             }
             e = p.next();
         }
+
+        // 結果タグが無い場合は異常
         throw new IllegalArgumentException("Result tag not found: " + resultTagName);
     }
-    //=======================================
-    //　機　能　:　date Time Resultを解析する
+
+    //================================================================
+    //　機　能　:　xsd:dateTime結果（Resultタグ内）を解析する
     //　引　数　:　responseXml ..... String
     //　　　　　:　resultTagName ..... String
-    //　戻り値　:　[Date] ..... なし
-    //=======================================
-
+    //　戻り値　:　[Date] ..... 解析結果
+    //================================================================
     public static Date parseDateTimeResult(String responseXml, String resultTagName) throws Exception {
         String t = parseTextResult(responseXml, resultTagName);
         try {
@@ -124,46 +156,60 @@ public class SoapParsers {
         }
     }
 
-    //=======================================
-    //　機　能　:　string Array Resultを解析する
+    //================================================================
+    //　機　能　:　string配列結果（Resultタグ内の<string>要素）を解析する
     //　引　数　:　responseXml ..... String
     //　　　　　:　resultTagName ..... String
-    //　戻り値　:　[String[]] ..... なし
-    //=======================================
+    //　戻り値　:　[String[]] ..... 解析結果
+    //================================================================
     public static String[] parseStringArrayResult(String responseXml, String resultTagName) throws Exception {
         XmlPullParser p = newParser(responseXml);
+
         List<String> values = new ArrayList<>();
         int e = p.getEventType();
+
         boolean inResult = false;
         int resultDepth = 0;
 
         while (e != XmlPullParser.END_DOCUMENT) {
+
             if (e == XmlPullParser.START_TAG) {
                 String name = p.getName();
+
+                // Result要素に入ったら範囲を記録
                 if (resultTagName.equals(name)) {
                     inResult = true;
                     resultDepth = p.getDepth();
+
+                    // Result配下の <string> を拾う
                 } else if (inResult && "string".equals(name)) {
                     values.add(p.nextText());
                 }
-            } else if (e == XmlPullParser.END_TAG && inResult && p.getDepth() == resultDepth
+
+            } else if (e == XmlPullParser.END_TAG
+                    && inResult
+                    && p.getDepth() == resultDepth
                     && resultTagName.equals(p.getName())) {
+                // Result要素を抜けたら終了
                 break;
             }
+
             e = p.next();
         }
 
         return values.toArray(new String[0]);
     }
 
-    //========================================
-    //　機　能　:　base64 Binary Resultを解析する
+    //================================================================
+    //　機　能　:　base64Binary結果（Resultタグ内）を解析してbyte配列に変換する
     //　引　数　:　responseXml ..... String
     //　　　　　:　resultTagName ..... String
-    //　戻り値　:　[byte[]] ..... なし
-    //========================================
+    //　戻り値　:　[byte[]] ..... 解析結果（空の場合は0バイト配列）
+    //================================================================
     public static byte[] parseBase64Result(String responseXml, String resultTagName) throws Exception {
         String t = parseTextResult(responseXml, resultTagName);
+
+        // null/空白は空配列
         if (t == null) {
             return new byte[0];
         }
@@ -171,83 +217,91 @@ public class SoapParsers {
         if (trimmed.isEmpty()) {
             return new byte[0];
         }
+
+        // Base64文字列をデコード
         return Base64.decode(trimmed, Base64.DEFAULT);
     }
 
-    // -------------------------
-    // GetSyukkaDataResult → SyukkaData 完全パース
-    // reference.cs:
-    //   SyukkaData { SyukkaHeader[] Header; SyukkaMeisai[] Meisai; }
-    //   SyukkaHeader: BookingNo, SyukkaYmd, ContainerCount, TotalBundole, TotalJyuryo,
-    //                KanryoContainerCnt, KanryoBundleSum, KnaryoJyuryoSum, LastUpdYmdHms
-    //   SyukkaMeisai: HeatNo, Sokuban, SyukkaSashizuNo, bundleNo(小文字), Jyuryo, BookingNo
-    // -------------------------
-    //=====================================
-    //　機　能　:　syukka Data Resultを解析する
+    //================================================================
+    //　機　能　:　GetSyukkaDataResult を SyukkaData として完全パースする
     //　引　数　:　responseXml ..... String
-    //　戻り値　:　[SyukkaData] ..... なし
-    //=====================================
+    //　戻り値　:　[SyukkaData] ..... 出荷データ
+    //================================================================
     public static SyukkaData parseSyukkaDataResult(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
 
-        // <GetSyukkaDataResult> の中に <SyukkaData>（実際は型名が出ないこともある）
-        // → ここでは <Header> と <Meisai> を見つけて読む方式にする（ASMXの実体に強い）
+        // <GetSyukkaDataResult> の中に <Header> と <Meisai> が来る想定で読む
         SyukkaData data = new SyukkaData();
 
         int e = p.getEventType();
         boolean inResult = false;
 
         while (e != XmlPullParser.END_DOCUMENT) {
+
             if (e == XmlPullParser.START_TAG) {
                 String name = p.getName();
+
                 if ("GetSyukkaDataResult".equals(name)) {
                     inResult = true;
+
                 } else if (inResult && "Header".equals(name)) {
-                    data.header = readSyukkaHeaderArray(p); // pはHeader開始位置
+                    // <Header>配下の配列を読み取る（読み取り後は</Header>位置まで進む）
+                    data.header = readSyukkaHeaderArray(p);
+
                 } else if (inResult && "Meisai".equals(name)) {
-                    data.meisai = readSyukkaMeisaiArray(p); // pはMeisai開始位置
+                    // <Meisai>配下の配列を読み取る
+                    data.meisai = readSyukkaMeisaiArray(p);
                 }
+
             } else if (e == XmlPullParser.END_TAG && "GetSyukkaDataResult".equals(p.getName())) {
+                // Result終了で抜ける
                 break;
             }
+
             e = p.next();
         }
 
         return data;
     }
-    //==========================================
-    //　機　能　:　read Syukka Header Arrayの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[List<SyukkaHeader>] ..... なし
-    //==========================================
 
+    //================================================================
+    //　機　能　:　出荷ヘッダ配列（<Header>配下）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<Header>のSTART_TAG上）
+    //　戻り値　:　[List<SyukkaHeader>] ..... ヘッダ一覧
+    //================================================================
     private static List<SyukkaHeader> readSyukkaHeaderArray(XmlPullParser p) throws Exception {
-        // ここに来た時点で <Header> の START_TAG 上
         List<SyukkaHeader> list = new ArrayList<>();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "Header".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "Header".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG && "SyukkaHeader".equals(p.getName())) {
                 list.add(readSyukkaHeader(p));
             }
+
             e = p.next();
         }
+
         return list;
     }
-    //====================================
-    //　機　能　:　read Syukka Headerの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[SyukkaHeader] ..... なし
-    //====================================
 
+    //================================================================
+    //　機　能　:　出荷ヘッダ1件（<SyukkaHeader>）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<SyukkaHeader>のSTART_TAG上）
+    //　戻り値　:　[SyukkaHeader] ..... ヘッダ1件
+    //================================================================
     private static SyukkaHeader readSyukkaHeader(XmlPullParser p) throws Exception {
-        // <SyukkaHeader> START_TAG 上
         SyukkaHeader h = new SyukkaHeader();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "SyukkaHeader".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "SyukkaHeader".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG) {
                 String n = p.getName();
                 String t = p.nextText();
@@ -262,43 +316,51 @@ public class SoapParsers {
                 else if ("KnaryoJyuryoSum".equals(n)) h.knaryoJyuryoSum = safeParseInt(t);
                 else if ("LastUpdYmdHms".equals(n)) h.lastUpdYmdHms = safeParseDate(t);
             }
+
             e = p.next();
         }
+
         return h;
     }
-    //==========================================
-    //　機　能　:　read Syukka Meisai Arrayの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[List<SyukkaMeisai>] ..... なし
-    //==========================================
 
+    //================================================================
+    //　機　能　:　出荷明細配列（<Meisai>配下）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<Meisai>のSTART_TAG上）
+    //　戻り値　:　[List<SyukkaMeisai>] ..... 明細一覧
+    //================================================================
     private static List<SyukkaMeisai> readSyukkaMeisaiArray(XmlPullParser p) throws Exception {
-        // <Meisai> START_TAG 上
         List<SyukkaMeisai> list = new ArrayList<>();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "Meisai".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "Meisai".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG && "SyukkaMeisai".equals(p.getName())) {
                 list.add(readSyukkaMeisai(p));
             }
+
             e = p.next();
         }
+
         return list;
     }
-    //====================================
-    //　機　能　:　read Syukka Meisaiの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[SyukkaMeisai] ..... なし
-    //====================================
 
+    //================================================================
+    //　機　能　:　出荷明細1件（<SyukkaMeisai>）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<SyukkaMeisai>のSTART_TAG上）
+    //　戻り値　:　[SyukkaMeisai] ..... 明細1件
+    //================================================================
     private static SyukkaMeisai readSyukkaMeisai(XmlPullParser p) throws Exception {
-        // <SyukkaMeisai> START_TAG 上
         SyukkaMeisai m = new SyukkaMeisai();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "SyukkaMeisai".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "SyukkaMeisai".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG) {
                 String n = p.getName();
                 String t = p.nextText();
@@ -310,24 +372,18 @@ public class SoapParsers {
                 else if ("Jyuryo".equals(n)) m.jyuryo = safeParseInt(t);
                 else if ("BookingNo".equals(n)) m.bookingNo = t;
             }
+
             e = p.next();
         }
+
         return m;
     }
 
-    // -------------------------
-    // GetSyougoDataResult → SyougoData 完全パース
-    // reference.cs:
-    //   SyougoData { SyougoHeader[] syougoHeader; SyougoDtl[] syogoDtl; }
-    //   SyougoHeader: containerID, containerNo, bundleCnt, sagyouYMD, syogoKanryo
-    //   SyougoDtl: syogoDtlheatNo, syogoDtlsokuban, syougoDtlsyukkaSashizuNo, syougoDtlbundleNo,
-    //             syougoDtljyuryo, syougoDtlcontainerID, syougoDtlsyougoKakunin
-    // -------------------------
-    //=====================================
-    //　機　能　:　syougo Data Resultを解析する
+    //================================================================
+    //　機　能　:　GetSyougoDataResult を SyougoData として完全パースする
     //　引　数　:　responseXml ..... String
-    //　戻り値　:　[SyougoData] ..... なし
-    //=====================================
+    //　戻り値　:　[SyougoData] ..... 照合データ
+    //================================================================
     public static SyougoData parseSyougoDataResult(String responseXml) throws Exception {
         XmlPullParser p = newParser(responseXml);
         SyougoData data = new SyougoData();
@@ -336,56 +392,68 @@ public class SoapParsers {
         boolean inResult = false;
 
         while (e != XmlPullParser.END_DOCUMENT) {
+
             if (e == XmlPullParser.START_TAG) {
                 String name = p.getName();
+
                 if ("GetSyougoDataResult".equals(name)) {
                     inResult = true;
+
                 } else if (inResult && "syougoHeader".equals(name)) {
                     data.syougoHeader = readSyougoHeaderArray(p);
+
                 } else if (inResult && "syogoDtl".equals(name)) {
                     data.syogoDtl = readSyougoDtlArray(p);
                 }
+
             } else if (e == XmlPullParser.END_TAG && "GetSyougoDataResult".equals(p.getName())) {
                 break;
             }
+
             e = p.next();
         }
 
         return data;
     }
-    //==========================================
-    //　機　能　:　read Syougo Header Arrayの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[List<SyougoHeader>] ..... なし
-    //==========================================
 
+    //================================================================
+    //　機　能　:　照合ヘッダ配列（<syougoHeader>配下）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<syougoHeader>のSTART_TAG上）
+    //　戻り値　:　[List<SyougoHeader>] ..... ヘッダ一覧
+    //================================================================
     private static List<SyougoHeader> readSyougoHeaderArray(XmlPullParser p) throws Exception {
-        // <syougoHeader> START_TAG
         List<SyougoHeader> list = new ArrayList<>();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "syougoHeader".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "syougoHeader".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG && "SyougoHeader".equals(p.getName())) {
                 list.add(readSyougoHeader(p));
             }
+
             e = p.next();
         }
+
         return list;
     }
-    //====================================
-    //　機　能　:　read Syougo Headerの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[SyougoHeader] ..... なし
-    //====================================
 
+    //================================================================
+    //　機　能　:　照合ヘッダ1件（<SyougoHeader>）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<SyougoHeader>のSTART_TAG上）
+    //　戻り値　:　[SyougoHeader] ..... ヘッダ1件
+    //================================================================
     private static SyougoHeader readSyougoHeader(XmlPullParser p) throws Exception {
-        // <SyougoHeader>
         SyougoHeader h = new SyougoHeader();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "SyougoHeader".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "SyougoHeader".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG) {
                 String n = p.getName();
                 String t = p.nextText();
@@ -396,43 +464,51 @@ public class SoapParsers {
                 else if ("sagyouYMD".equals(n)) h.sagyouYMD = safeParseDate(t);
                 else if ("syogoKanryo".equals(n)) h.syogoKanryo = safeParseBool(t);
             }
+
             e = p.next();
         }
+
         return h;
     }
-    //=======================================
-    //　機　能　:　read Syougo Dtl Arrayの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[List<SyougoDtl>] ..... なし
-    //=======================================
 
+    //================================================================
+    //　機　能　:　照合明細配列（<syogoDtl>配下）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<syogoDtl>のSTART_TAG上）
+    //　戻り値　:　[List<SyougoDtl>] ..... 明細一覧
+    //================================================================
     private static List<SyougoDtl> readSyougoDtlArray(XmlPullParser p) throws Exception {
-        // <syogoDtl> START_TAG
         List<SyougoDtl> list = new ArrayList<>();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "syogoDtl".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "syogoDtl".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG && "SyougoDtl".equals(p.getName())) {
                 list.add(readSyougoDtl(p));
             }
+
             e = p.next();
         }
+
         return list;
     }
-    //==================================
-    //　機　能　:　read Syougo Dtlの処理
-    //　引　数　:　p ..... XmlPullParser
-    //　戻り値　:　[SyougoDtl] ..... なし
-    //==================================
 
+    //================================================================
+    //　機　能　:　照合明細1件（<SyougoDtl>）を読み取る
+    //　引　数　:　p ..... XmlPullParser（<SyougoDtl>のSTART_TAG上）
+    //　戻り値　:　[SyougoDtl] ..... 明細1件
+    //================================================================
     private static SyougoDtl readSyougoDtl(XmlPullParser p) throws Exception {
-        // <SyougoDtl>
         SyougoDtl d = new SyougoDtl();
         int depth = p.getDepth();
 
         int e = p.next();
-        while (!(e == XmlPullParser.END_TAG && p.getDepth() == depth && "SyougoDtl".equals(p.getName()))) {
+        while (!(e == XmlPullParser.END_TAG
+                && p.getDepth() == depth
+                && "SyougoDtl".equals(p.getName()))) {
+
             if (e == XmlPullParser.START_TAG) {
                 String n = p.getName();
                 String t = p.nextText();
@@ -446,17 +522,18 @@ public class SoapParsers {
                 else if ("syougoDtlsyougoKakunin".equals(n))
                     d.syougoDtlsyougoKakunin = safeParseBool(t);
             }
+
             e = p.next();
         }
+
         return d;
     }
 
-    // ------- helpers -------
-    //==============================
-    //　機　能　:　safe Parse Intの処理
+    //================================================================
+    //　機　能　:　数値文字列をintへ安全に変換する（失敗時は0）
     //　引　数　:　t ..... String
-    //　戻り値　:　[int] ..... なし
-    //==============================
+    //　戻り値　:　[int] ..... 変換結果
+    //================================================================
     private static int safeParseInt(String t) {
         try {
             return Integer.parseInt(t.trim());
@@ -464,23 +541,25 @@ public class SoapParsers {
             return 0;
         }
     }
-    //===============================
-    //　機　能　:　safe Parse Boolの処理
-    //　引　数　:　t ..... String
-    //　戻り値　:　[boolean] ..... なし
-    //===============================
 
+    //================================================================
+    //　機　能　:　真偽値文字列をbooleanへ安全に変換する（null/不正はfalse）
+    //　引　数　:　t ..... String
+    //　戻り値　:　[boolean] ..... 変換結果
+    //================================================================
     private static boolean safeParseBool(String t) {
-        if (t == null) return false;
+        if (t == null) {
+            return false;
+        }
         String s = t.trim();
         return "true".equalsIgnoreCase(s) || "1".equals(s);
     }
-    //===============================
-    //　機　能　:　safe Parse Dateの処理
-    //　引　数　:　t ..... String
-    //　戻り値　:　[Date] ..... なし
-    //===============================
 
+    //================================================================
+    //　機　能　:　xsd:dateTime文字列をDateへ安全に変換する（失敗時はnull）
+    //　引　数　:　t ..... String
+    //　戻り値　:　[Date] ..... 変換結果
+    //================================================================
     private static Date safeParseDate(String t) {
         try {
             return XsdDateTime.parse(t);
@@ -489,4 +568,3 @@ public class SoapParsers {
         }
     }
 }
-

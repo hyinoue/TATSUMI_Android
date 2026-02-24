@@ -1,19 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　データ抽出ルール設定ファイル
+　関　　連　:　Android 12 以降のバックアップ／復元制御
+　備　　考　:　cloud-backup／device-transfer の対象制御
+============================================================-->
+<!--
+　説　明　:　必要に応じて <include> / <exclude> を設定する
+　　　　　　詳細は以下を参照
+　　　　　　https://developer.android.com/about/versions/12/backup-restore#xml-changes
 -->
 <data-extraction-rules>
+
+    <!--================================================================
+    　機　能　:　クラウドバックアップ対象の制御
+    　備　考　:　Googleクラウドバックアップ用
+    ==================================================================-->
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
+        <!--
         <include .../>
         <exclude .../>
         -->
     </cloud-backup>
+
+    <!--================================================================
+    　機　能　:　端末間データ移行対象の制御
+    　備　考　:　device-to-device転送用
+    ==================================================================-->
     <!--
     <device-transfer>
         <include .../>
         <exclude .../>
     </device-transfer>
     -->
+
 </data-extraction-rules>

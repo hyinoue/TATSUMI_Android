@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　メインメニュー画面レイアウト
+　関　　連　:　各機能画面への遷移ボタン（データ送受信／積載束選定／コンテナ情報入力／重量計算／照合コンテナ選定）
+　　　　　　:　コンテナサイズ選択（Spinner）
+　　　　　　:　作業状況表示（予定／完了／残り：コンテナ／出荷束数／出荷重量）
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -15,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -28,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -41,7 +51,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- メイン領域（スクロール無し：タイトルと下ボタンの間に固定） -->
+    <!--================================================================
+    　機　能　:　メイン領域（スクロール無し）
+    　内　容　:　メニュー各ボタン／コンテナサイズ選択／作業状況表示
+    　備　考　:　タイトルバー直下～下部ボタン群直上までを占有
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainArea"
         android:layout_width="0dp"
@@ -53,7 +67,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
 
-        <!-- 1. データ送受信 -->
+        <!--================================================================
+        　機　能　:　１.データ送受信ボタン
+        　内　容　:　データ送受信画面への遷移
+        ==================================================================-->
         <Button
             android:id="@+id/btnDataReceive"
             android:layout_width="290dp"
@@ -67,7 +84,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 最終受信（データ送受信ボタンと同じ幅で真下） -->
+        <!-- 最終受信日時表示（データ送受信ボタン直下） -->
         <TextView
             android:id="@+id/lblDataReceiveTime"
             android:layout_width="0dp"
@@ -79,7 +96,7 @@
             app:layout_constraintTop_toBottomOf="@id/btnDataReceive"
             app:layout_constraintStart_toStartOf="@id/btnDataReceive" />
 
-        <!-- 未送有（最終受信の右下＝データ送受信ボタンの右下側に配置） -->
+        <!-- 未送有表示（最終受信の右下付近） -->
         <TextView
             android:id="@+id/lblDataReceive"
             android:layout_width="wrap_content"
@@ -95,7 +112,10 @@
             app:layout_constraintTop_toBottomOf="@id/lblDataReceiveTime"
             app:layout_constraintEnd_toEndOf="@id/btnDataReceive" />
 
-        <!-- 2. 積載束選定 -->
+        <!--================================================================
+        　機　能　:　２.積載束選定ボタン
+        　内　容　:　積載束選定画面への遷移
+        ==================================================================-->
         <Button
             android:id="@+id/btnBundleSelect"
             android:layout_width="290dp"
@@ -109,7 +129,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- コンテナサイズ（積載束選定ボタンの右下：左にタイトル、右にコンボ） -->
+        <!--================================================================
+        　機　能　:　コンテナサイズ選択行
+        　内　容　:　積載束選定に使用するコンテナサイズを選択
+        　備　考　:　積載束選定ボタン直下の右寄せ位置に配置
+        ==================================================================-->
         <LinearLayout
             android:id="@+id/rowContainerSize"
             android:layout_width="wrap_content"
@@ -128,13 +152,14 @@
                 android:gravity="center_vertical"
                 android:layout_marginEnd="6dp" />
 
-            <!-- ★ Spinnerを黒枠で包む -->
+            <!-- Spinner枠（黒枠） -->
             <FrameLayout
                 android:layout_width="95dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_spinner_black_border"
                 android:padding="1dp">
 
+                <!-- コンテナサイズ選択Spinner -->
                 <Spinner
                     android:id="@+id/spContainerSize"
                     android:layout_width="match_parent"
@@ -147,8 +172,10 @@
 
         </LinearLayout>
 
-
-        <!-- 3. コンテナ情報入力 -->
+        <!--================================================================
+        　機　能　:　３.コンテナ情報入力ボタン
+        　内　容　:　コンテナ情報入力画面への遷移
+        ==================================================================-->
         <Button
             android:id="@+id/btnContainerInput"
             android:layout_width="290dp"
@@ -163,7 +190,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 選定済（コンテナ情報入力の右下） -->
+        <!-- 選定済表示（コンテナ情報入力ボタン右下） -->
         <TextView
             android:id="@+id/lblContainerInput"
             android:layout_width="wrap_content"
@@ -179,7 +206,10 @@
             app:layout_constraintTop_toBottomOf="@id/btnContainerInput"
             app:layout_constraintEnd_toEndOf="@id/btnContainerInput" />
 
-        <!-- 4. 重量計算 -->
+        <!--================================================================
+        　機　能　:　４.重量計算ボタン
+        　内　容　:　重量計算画面への遷移
+        ==================================================================-->
         <Button
             android:id="@+id/btnWeightCalc"
             android:layout_width="290dp"
@@ -194,7 +224,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 5. 照合コンテナ選定 -->
+        <!--================================================================
+        　機　能　:　５.照合コンテナ選定ボタン
+        　内　容　:　照合コンテナ選定画面への遷移
+        ==================================================================-->
         <Button
             android:id="@+id/btnCollateContainerSelect"
             android:layout_width="290dp"
@@ -209,7 +242,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 作業状況タイトル（左に寄せる） -->
+        <!--================================================================
+        　機　能　:　作業状況タイトル行
+        　内　容　:　作業状況エリアの見出し表示
+        ==================================================================-->
         <LinearLayout
             android:id="@+id/workTitleRow"
             android:layout_width="0dp"
@@ -231,7 +267,11 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- 作業状況グリッド（左に寄せる：左右padding 0） -->
+        <!--================================================================
+        　機　能　:　作業状況グリッド表示
+        　内　容　:　予定／完了／残り をコンテナ／出荷束数／出荷重量で表示
+        　備　考　:　6列×4行（区切り用の空列を含む）
+        ==================================================================-->
         <GridLayout
             android:id="@+id/gridWorkStatus"
             android:layout_width="0dp"
@@ -282,7 +322,7 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <!-- コンテナ -->
+            <!-- コンテナ行 -->
             <TextView
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
@@ -332,7 +372,7 @@
                 android:textColor="#000000"
                 android:paddingRight="8dp" />
 
-            <!-- 出荷束数 -->
+            <!-- 出荷束数行 -->
             <TextView
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
@@ -382,7 +422,7 @@
                 android:textColor="#000000"
                 android:paddingRight="8dp" />
 
-            <!-- 出荷重量 -->
+            <!-- 出荷重量行 -->
             <TextView
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
@@ -435,7 +475,11 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 下固定ボタン（共通部品） -->
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

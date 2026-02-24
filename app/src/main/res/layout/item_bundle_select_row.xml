@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　積載束照合一覧　1行レイアウト
+　関　　連　:　P No／B No／Index／重量／削除（確）表示
+　用　　途　:　RecyclerView（rvBundles）の行アイテム
+============================================================-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="28dp"
@@ -6,43 +10,51 @@
     android:gravity="center_vertical"
     android:background="#FFFFFF">
 
+    <!--================================================================
+    　機　能　:　P No 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowPNo"
         android:layout_width="80dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　B No 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowBNo"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:layout_marginStart="-2dp"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　Index 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowIndex"
         android:layout_width="80dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:layout_marginStart="-2dp"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　重量 表示（右寄せ）
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowJyuryo"
         android:layout_width="62dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:layout_marginStart="-2dp"
         android:gravity="end|center_vertical"
@@ -50,14 +62,18 @@
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　削除／確定 表示領域
+    　備　考　:　強調表示（黒背景＋白文字）
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowDelete"
         android:layout_width="56dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_edittext_black_back"
-        android:gravity="center"
         android:layout_marginStart="-2dp"
+        android:gravity="center"
         android:textColor="#FFFFFF"
         android:textSize="15sp" />
+
 </LinearLayout>

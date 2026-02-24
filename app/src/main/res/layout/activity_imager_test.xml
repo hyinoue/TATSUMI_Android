@@ -1,11 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　バーコードテスト画面レイアウト
+　関　　連　:　バーコード入力（EditText）
+　　　　　　:　種類表示（ラベル＋表示用EditText）
+　　　　　　:　種類詳細表示（ScrollView内TextView）
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -15,6 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -28,6 +38,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -41,8 +52,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <!-- 上側テキストボックス（中央より少し上） -->
+    <!--================================================================
+    　機　能　:　バーコード入力欄
+    　内　容　:　バーコード文字列を入力（最大18文字）
+    　備　考　:　画面上側（中央より少し上）に配置
+    ==================================================================-->
     <EditText
         android:id="@+id/etBarcode"
         android:layout_width="210dp"
@@ -59,7 +73,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 「種類」ラベル -->
+    <!--================================================================
+    　機　能　:　種類表示行
+    　内　容　:　「種類」ラベル＋表示用EditText（ユーザー入力不可）
+    　備　考　:　バーコード入力欄の下に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/rowKind"
         android:layout_width="0dp"
@@ -71,6 +89,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 「種類」ラベル -->
         <TextView
             android:id="@+id/tvKindLabel"
             android:layout_width="wrap_content"
@@ -81,6 +100,7 @@
             android:textSize="18sp"
             android:layout_gravity="center_vertical" />
 
+        <!-- 種類（表示用）※フォーカス不可／クリック不可 -->
         <EditText
             android:id="@+id/etKind"
             android:layout_width="200dp"
@@ -100,7 +120,11 @@
             android:paddingEnd="8dp" />
     </LinearLayout>
 
-    <!-- 大きなスクロールボックス -->
+    <!--================================================================
+    　機　能　:　種類詳細表示エリア（スクロール）
+    　内　容　:　種類の説明／解析結果などを表示
+    　備　考　:　縦スクロール可能、背景は青（bg_blue_back）
+    ==================================================================-->
     <ScrollView
         android:id="@+id/scrollKind"
         android:layout_width="0dp"
@@ -118,6 +142,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 種類詳細表示 -->
         <TextView
             android:id="@+id/tvKindContent"
             android:layout_width="match_parent"
@@ -127,7 +152,11 @@
             android:textSize="18sp" />
     </ScrollView>
 
-    <!-- 下部ボタン（指定どおり） -->
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"
@@ -137,6 +166,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

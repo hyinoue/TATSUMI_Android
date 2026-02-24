@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　コンテナ一覧　1行レイアウト
+　関　　連　:　Index／コンテナNo／束数／作業日表示
+　用　　途　:　RecyclerView 等の行アイテム
+============================================================-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="28dp"
@@ -6,16 +10,21 @@
     android:gravity="center_vertical"
     android:background="#FFFFFF">
 
+    <!--================================================================
+    　機　能　:　Index 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowIndex"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　コンテナNo 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowContainerNo"
         android:layout_width="0dp"
@@ -27,17 +36,22 @@
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　束数 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowBundleCnt"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:layout_weight="0"
         android:background="@drawable/bg_table_row"
         android:layout_marginStart="-2dp"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　作業日 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowSagyouYmd"
         android:layout_width="0dp"
@@ -48,4 +62,5 @@
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
+
 </LinearLayout>

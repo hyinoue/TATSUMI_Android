@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　共通下部ボタンレイアウト
+　関　　連　:　青／赤／緑／黄 ボタン
+　用　　途　:　各画面下部に共通表示（include用）
+============================================================-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -9,7 +13,9 @@
     android:paddingTop="0dp"
     android:paddingBottom="0dp">
 
-    <!-- 青（左端：右だけ隙間） -->
+    <!--================================================================
+    　機　能　:　青ボタン（左端）
+    ==================================================================-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBottomBlue"
         android:layout_width="0dp"
@@ -30,7 +36,9 @@
         app:backgroundTint="#0000FF"
         app:cornerRadius="0dp" />
 
-    <!-- 赤 -->
+    <!--================================================================
+    　機　能　:　赤ボタン
+    ==================================================================-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBottomRed"
         android:layout_width="0dp"
@@ -51,7 +59,9 @@
         app:backgroundTint="#FF0000"
         app:cornerRadius="0dp" />
 
-    <!-- 緑 -->
+    <!--================================================================
+    　機　能　:　緑ボタン
+    ==================================================================-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBottomGreen"
         android:layout_width="0dp"
@@ -72,7 +82,9 @@
         app:backgroundTint="#008000"
         app:cornerRadius="0dp" />
 
-    <!-- 黄（右端） -->
+    <!--================================================================
+    　機　能　:　黄ボタン
+    ==================================================================-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBottomYellow"
         android:layout_width="0dp"

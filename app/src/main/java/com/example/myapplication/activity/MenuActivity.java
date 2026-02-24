@@ -36,64 +36,169 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * メインメニュー画面のActivity。
- *
- * <p>役割:</p>
- * <ul>
- *     <li>各画面への遷移と戻り時の表示更新</li>
- *     <li>束選定/コンテナ入力の値保持と同期</li>
- *     <li>受信状況・作業状況の表示</li>
- *     <li>下部ファンクションボタンの設定</li>
- * </ul>
- */
+//============================================================
+//　処理概要　:　メインメニュー画面Activity
+//　　　　　　:　各機能画面への遷移、作業状況/受信状況の表示更新、
+//　　　　　　:　束選定/コンテナ入力の値保持と同期、下部ボタン設定を行う。
+//　　　　　　:　黄ボタンはデバッグ時は終了、本番時は端末再起動を行う。
+//　関　　数　:　onCreate                      ..... 画面生成/初期化
+//　　　　　　:　setupActivityLaunchers         ..... ActivityResultLauncher設定
+//　　　　　　:　initViews                     ..... View取得
+//　　　　　　:　setupContainerSizeSpinner      ..... コンテナサイズスピナー設定/保存
+//　　　　　　:　setupBottomButtonTexts         ..... 下部ボタン表示設定
+//　　　　　　:　wireActions                   ..... ボタン押下イベント設定
+//　　　　　　:　onFunctionYellow              ..... (黄)終了/再起動
+//　　　　　　:　onRestartMenu                 ..... 再起動確認/処理分岐
+//　　　　　　:　requestDeviceReboot           ..... 端末再起動サービス呼び出し
+//　　　　　　:　onResume                      ..... 画面再表示時(重量同期/表示更新)
+//　　　　　　:　goServiceMenu                 ..... サービスメニューへ遷移
+//　　　　　　:　openBundleSelect              ..... 積載束選定画面へ遷移
+//　　　　　　:　syncContainerValuesFromBundle ..... 束→コンテナの値同期
+//　　　　　　:　syncBundleValuesFromContainer ..... コンテナ→束の値同期
+//　　　　　　:　syncContainerWeightsFromPrefs  ..... Prefs重量→保持Mapへ同期
+//　　　　　　:　openContainerInputIfWorkExists ..... 作業有無チェック後にコンテナ入力へ遷移
+//　　　　　　:　openCollateContainerSelect     ..... 照合コンテナ選択へ遷移
+//　　　　　　:　onKeyDown                     ..... 物理キーでメニュー操作
+//　　　　　　:　setCenterStatus               ..... 中央ステータス表示設定
+//　　　　　　:　startDataSync                 ..... データ送受信開始(二重実行防止)
+//　　　　　　:　runDataSync                   ..... データ送受信実処理
+//　　　　　　:　showSyncErrorAndWait          ..... 同期エラー表示/OK待ち
+//　　　　　　:　refreshInformation            ..... DB集計/画面表示更新
+//　　　　　　:　intOrZero                     ..... null→0変換
+//　　　　　　:　formatNumber                  ..... 数値表示整形
+//　　　　　　:　formatRemaining               ..... 残数表示整形
+//　　　　　　:　readStringMap                 ..... IntentからMap取得
+//============================================================
+
 public class MenuActivity extends BaseActivity {
 
-    // メインメニュー画面
-    // NOTE: 積載束選定（Normal確定時）は BundleSelectActivity 側で
-    //       ContainerInputActivity に直接遷移する（メニュー経由しない）
+    // ============================
+    // 定数
+    // ============================
 
+    /**
+     * ログタグ
+     */
     private static final String TAG = "MENU";
 
+    /**
+     * DENSO PowerManagerService 呼出し情報（本番の再起動用）
+     */
     private static final String DENSO_POWER_MANAGER_PACKAGE = "com.densowave.powermanagerservice";
     private static final String DENSO_POWER_MANAGER_SERVICE = "com.densowave.powermanagerservice.PowerManagerService";
     private static final String DENSO_REBOOT_ACTION = "com.densowave.powermanagerservice.action.REBOOT";
+
+    /**
+     * Bundle/Containerで共有している重量キー
+     */
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
 
+    /**
+     * Prefsに保存している重量キー
+     */
     private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
     private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
 
+    // ============================
+    // メンバ
+    // ============================
+
+    /**
+     * DB/通信など重い処理用（単一スレッド）
+     */
     private ExecutorService io;
 
+    /**
+     * 束選定画面の戻り値受け取り
+     */
     private ActivityResultLauncher<Intent> bundleSelectLauncher;
+
+    /**
+     * コンテナ入力画面の戻り値受け取り
+     */
     private ActivityResultLauncher<Intent> containerInputLauncher;
 
-    // 積載束選定の値保持
+    /**
+     * 積載束選定の値保持（画面間で引き回す）
+     */
     private final Map<String, String> bundleValues = new HashMap<>();
-    // コンテナ情報入力の値保持
+
+    /**
+     * コンテナ情報入力の値保持（画面間で引き回す）
+     */
     private final Map<String, String> containerValues = new HashMap<>();
 
-    // ===== Views =====
-    private TextView tvCenterStatus;
-    private Spinner spContainerSize;
-
-    private Button btnDataReceive;
-    private Button btnBundleSelect;
-    private Button btnContainerInput;
-    private Button btnWeightCalc;
-    private Button btnCollateContainerSelect;
+    /**
+     * データ送受信の二重実行防止フラグ
+     */
     private final AtomicBoolean isDataSyncRunning = new AtomicBoolean(false);
 
+    // ============================
+    // Views
+    // ============================
+
+    /**
+     * 画面中央ステータス（存在するレイアウトの場合のみ）
+     */
+    private TextView tvCenterStatus;
+
+    /**
+     * コンテナサイズ選択スピナー
+     */
+    private Spinner spContainerSize;
+
+    /**
+     * 送受信ボタン
+     */
+    private Button btnDataReceive;
+    /**
+     * 束選定ボタン
+     */
+    private Button btnBundleSelect;
+    /**
+     * コンテナ入力ボタン
+     */
+    private Button btnContainerInput;
+    /**
+     * 重量計算ボタン（束選定の別モード）
+     */
+    private Button btnWeightCalc;
+    /**
+     * 照合コンテナ選択ボタン
+     */
+    private Button btnCollateContainerSelect;
+
+    /**
+     * ラベル：最終受信時刻
+     */
     private TextView lblDataReceiveTime;
+    /**
+     * ラベル：未送信あり表示
+     */
     private TextView lblDataReceive;
+    /**
+     * ラベル：作業中あり表示
+     */
     private TextView lblContainerInput;
+
+    /**
+     * ラベル：計画（コンテナ/束/重量）
+     */
     private TextView lblContainerPlan;
-    private TextView lblContainerFin;
     private TextView lblBundlePlan;
-    private TextView lblBundleFin;
     private TextView lblWeightPlan;
+
+    /**
+     * ラベル：完了（コンテナ/束/重量）
+     */
+    private TextView lblContainerFin;
+    private TextView lblBundleFin;
     private TextView lblWeightFin;
+
+    /**
+     * ラベル：残（コンテナ/束/重量）
+     */
     private TextView lblZanContainer;
     private TextView lblZanBundle;
     private TextView lblZanWeight;
@@ -108,10 +213,13 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        // 単一スレッドのExecutor（DB/通信系を順序通りに処理するため）
         io = Executors.newSingleThreadExecutor();
 
+        // DBインスタンス（初回アクセスでRoom初期化が走る）
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
+        // DBが開けるかログで確認（端末環境差異や初期不具合調査用）
         io.execute(() -> {
             try {
                 Log.d("DBCHK", "start");
@@ -122,12 +230,22 @@ public class MenuActivity extends BaseActivity {
             }
         });
 
+        // 画面遷移の戻り値受け取りを先に準備
         setupActivityLaunchers();
+
+        // Viewを全取得
         initViews();
+
+        // コンテナサイズの選択UIを初期化（prefs保存/復元）
         setupContainerSizeSpinner();
+
+        // 下部のファンクションボタン文言を設定
         setupBottomButtonTexts();
+
+        // 画面上の各ボタンに処理を紐づけ
         wireActions();
 
+        // DB集計値などを読み込み、画面表示を更新
         refreshInformation();
     }
 
@@ -137,27 +255,32 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //====================================
     private void setupActivityLaunchers() {
+        // 束選定画面の戻り値受け取り
         bundleSelectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    // 遷移はしない。表示更新のみ。
+                    // OKの場合のみ、結果Mapを受け取る
                     if (result.getResultCode() == RESULT_OK) {
                         Map<String, String> resultMap = readStringMap(
                                 result.getData(),
                                 BundleSelectActivity.EXTRA_BUNDLE_VALUES
                         );
                         if (resultMap != null) {
-                            // 受け取った束情報を保持し、表示用に同期
+                            // 受け取った束情報を保持
                             bundleValues.clear();
                             bundleValues.putAll(resultMap);
+
+                            // 束側に含まれる重量情報を、コンテナ側へ同期
                             syncContainerValuesFromBundle();
                         }
                     }
-                    // 表示の再計算/更新
+
+                    // 戻ってきたら必ず画面表示を更新
                     refreshInformation();
                 }
         );
 
+        // コンテナ入力画面の戻り値受け取り
         containerInputLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -167,13 +290,16 @@ public class MenuActivity extends BaseActivity {
                                 ContainerInputActivity.EXTRA_CONTAINER_VALUES
                         );
                         if (resultMap != null) {
-                            // コンテナ入力で確定した値を保持し、束情報側へ同期
+                            // 受け取ったコンテナ情報を保持
                             containerValues.clear();
                             containerValues.putAll(resultMap);
+
+                            // コンテナ側の重量を束側へ同期
                             syncBundleValuesFromContainer();
                         }
                     }
-                    // 画面ラベル/件数等を更新
+
+                    // 戻ってきたら必ず画面表示を更新
                     refreshInformation();
                 }
         );
@@ -185,23 +311,28 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================
     private void initViews() {
+        // ---- 入力UI ----
         spContainerSize = findViewById(R.id.spContainerSize);
 
+        // ---- 画面ボタン ----
         btnDataReceive = findViewById(R.id.btnDataReceive);
         btnBundleSelect = findViewById(R.id.btnBundleSelect);
         btnContainerInput = findViewById(R.id.btnContainerInput);
         btnWeightCalc = findViewById(R.id.btnWeightCalc);
         btnCollateContainerSelect = findViewById(R.id.btnCollateContainerSelect);
 
+        // ---- 表示ラベル ----
         lblDataReceiveTime = findViewById(R.id.lblDataReceiveTime);
         lblDataReceive = findViewById(R.id.lblDataReceive);
         lblContainerInput = findViewById(R.id.lblContainerInput);
+
         lblContainerPlan = findViewById(R.id.lblContainerPlan);
         lblContainerFin = findViewById(R.id.lblContainerFin);
         lblBundlePlan = findViewById(R.id.lblBundlePlan);
         lblBundleFin = findViewById(R.id.lblBundleFin);
         lblWeightPlan = findViewById(R.id.lblWeightPlan);
         lblWeightFin = findViewById(R.id.lblWeightFin);
+
         lblZanContainer = findViewById(R.id.lblZanContainer);
         lblZanBundle = findViewById(R.id.lblZanBundle);
         lblZanWeight = findViewById(R.id.lblZanWeight);
@@ -213,6 +344,7 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //========================================
     private void setupContainerSizeSpinner() {
+        // string-array（R.array.container_sizes）からスピナーの選択肢を生成
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
                 R.array.container_sizes,
@@ -221,14 +353,15 @@ public class MenuActivity extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spContainerSize.setAdapter(adapter);
 
+        // 永続化（container_size）用Prefs
         final SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
 
-        // 保存済みを復元（デフォルト 20ft）
+        // 保存済みの選択肢を復元（無ければ20ft）
         String savedSize = prefs.getString("container_size", "20ft");
         int pos = adapter.getPosition(savedSize);
         if (pos >= 0) spContainerSize.setSelection(pos);
 
-        // 変更されたら保存
+        // 選択変更時にPrefsへ保存
         spContainerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -238,6 +371,7 @@ public class MenuActivity extends BaseActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                // 何もしない
             }
         });
     }
@@ -253,14 +387,17 @@ public class MenuActivity extends BaseActivity {
         MaterialButton green = findViewById(R.id.btnBottomGreen);
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
 
+        // この画面は黄ボタンのみ使用（他は空表示にして無効化）
         if (blue != null) blue.setText("");
         if (red != null) red.setText("");
         if (green != null) green.setText("");
+
+        // Debugは「終了」、本番は「再起動」
         if (yellow != null) {
             yellow.setText(BuildConfig.DEBUG ? "終了" : "再起動");
         }
 
-        // 空文字は無効＋薄く（BaseActivity機能）
+        // BaseActivity：空文字ボタンはdisable＋薄くする
         refreshBottomButtonsEnabled();
     }
 
@@ -270,15 +407,30 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================
     private void wireActions() {
+        // データ送受信（サーバ同期）
+        if (btnDataReceive != null) {
+            btnDataReceive.setOnClickListener(v -> startDataSync());
+        }
 
-        // データ送受信
-        btnDataReceive.setOnClickListener(v -> startDataSync());
+        // 積載束選定（通常）
+        if (btnBundleSelect != null) {
+            btnBundleSelect.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_NORMAL));
+        }
 
-        // 画面遷移（タップ）
-        btnBundleSelect.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_NORMAL));
-        btnContainerInput.setOnClickListener(v -> openContainerInputIfWorkExists());
-        btnWeightCalc.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_JYURYO));
-        btnCollateContainerSelect.setOnClickListener(v -> openCollateContainerSelect());
+        // コンテナ情報入力（作業データがある場合のみ）
+        if (btnContainerInput != null) {
+            btnContainerInput.setOnClickListener(v -> openContainerInputIfWorkExists());
+        }
+
+        // 重量計算（束選定の重量モード）
+        if (btnWeightCalc != null) {
+            btnWeightCalc.setOnClickListener(v -> openBundleSelect(BundleSelectActivity.MODE_JYURYO));
+        }
+
+        // 照合（コンテナ選択へ）
+        if (btnCollateContainerSelect != null) {
+            btnCollateContainerSelect.setOnClickListener(v -> openCollateContainerSelect());
+        }
     }
 
     //==================================
@@ -297,12 +449,17 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //===============================
     private void onRestartMenu() {
+        // Debugビルドは単に画面終了
         if (BuildConfig.DEBUG) {
             finish();
             return;
         }
+
+        // 本番ビルドは端末再起動の確認を出す
         showQuestion("端末の再起動を実施します。\nよろしいですか？", yes -> {
             if (!yes) return;
+
+            // DENSO専用サービスで再起動を要求
             if (!requestDeviceReboot()) {
                 showErrorMsg("再起動に失敗しました。", MsgDispMode.Label);
             }
@@ -318,7 +475,9 @@ public class MenuActivity extends BaseActivity {
         Intent intent = new Intent();
         intent.setClassName(DENSO_POWER_MANAGER_PACKAGE, DENSO_POWER_MANAGER_SERVICE);
         intent.setAction(DENSO_REBOOT_ACTION);
+
         try {
+            // サービス起動により再起動を要求（端末環境によっては例外が出る）
             startService(intent);
             return true;
         } catch (Exception e) {
@@ -335,7 +494,11 @@ public class MenuActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Prefsに保存している重量を保持Mapに反映（戻り時に最新化）
         syncContainerWeightsFromPrefs();
+
+        // DB集計して表示更新
         refreshInformation();
     }
 
@@ -354,11 +517,13 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==============================
     private void openBundleSelect(String mode) {
+        // 遷移先へ渡すデータをIntentに詰める（MapはSerializableとして渡す）
         Intent intent = new Intent(this, BundleSelectActivity.class);
         intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
         intent.putExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
         intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
 
+        // launcherがあれば結果を受け取り、無ければ通常遷移
         if (bundleSelectLauncher != null) {
             bundleSelectLauncher.launch(intent);
         } else {
@@ -372,11 +537,14 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==============================================
     private void syncContainerValuesFromBundle() {
+        // 束選定で入力した重量（コンテナ重量/緩衝材重量）をコンテナ入力側へ反映する
         if (bundleValues.containsKey(KEY_CONTAINER_JYURYO)) {
             containerValues.put(KEY_CONTAINER_JYURYO, bundleValues.get(KEY_CONTAINER_JYURYO));
         } else {
+            // 束側に無い場合はコンテナ側も削除（古い値を残さない）
             containerValues.remove(KEY_CONTAINER_JYURYO);
         }
+
         if (bundleValues.containsKey(KEY_DUNNAGE_JYURYO)) {
             containerValues.put(KEY_DUNNAGE_JYURYO, bundleValues.get(KEY_DUNNAGE_JYURYO));
         } else {
@@ -390,8 +558,10 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==============================================
     private void syncBundleValuesFromContainer() {
+        // コンテナ入力で確定した重量を束側にも反映し、画面間の不整合を防ぐ
         String container = containerValues.get(KEY_CONTAINER_JYURYO);
         String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
+
         if (container != null) {
             bundleValues.put(KEY_CONTAINER_JYURYO, container);
         }
@@ -406,9 +576,12 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==============================================
     private void syncContainerWeightsFromPrefs() {
+        // Prefsから重量を読み、両Mapへ反映（画面復帰時に最新化するため）
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+
         String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, null);
         String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, null);
+
         if (!TextUtils.isEmpty(prefContainer)) {
             containerValues.put(KEY_CONTAINER_JYURYO, prefContainer);
             bundleValues.put(KEY_CONTAINER_JYURYO, prefContainer);
@@ -425,19 +598,29 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==============================================
     private void openContainerInputIfWorkExists() {
+        // DB確認があるため別スレッドでチェック
         io.execute(() -> {
             try {
                 AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+
+                // 作業データ（Work）が無い場合、コンテナ入力はできない
                 boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
+
                 runOnUiThread(() -> {
                     if (!hasWork) {
+                        // Work無しならユーザへ案内して中断
                         showErrorMsg("積載束選定が行われていません。先に積載束選定を実施してください。", MsgDispMode.Label);
                         return;
                     }
+
+                    // 遷移前にPrefsの重量を最新化
                     syncContainerWeightsFromPrefs();
+
+                    // コンテナ入力へ遷移（Mapを渡す）
                     Intent intent = new Intent(this, ContainerInputActivity.class);
                     intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
                     intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
+
                     if (containerInputLauncher != null) {
                         containerInputLauncher.launch(intent);
                     } else {
@@ -446,6 +629,8 @@ public class MenuActivity extends BaseActivity {
                 });
             } catch (Exception ex) {
                 Log.e(TAG, "openContainerInputIfWorkExists failed", ex);
+
+                // 例外内容を簡易表示（運用で原因が追いやすいように）
                 runOnUiThread(() -> showErrorMsg(
                         "コンテナ情報入力の起動に失敗しました。\n"
                                 + ex.getClass().getSimpleName() + ": " + ex.getMessage(),
@@ -472,37 +657,43 @@ public class MenuActivity extends BaseActivity {
     //=================================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        // ★長押し連打防止
+        // 長押し連打で同じ処理が走らないように抑止
         if (event.getRepeatCount() > 0) return true;
 
         switch (keyCode) {
             case KeyEvent.KEYCODE_0:
+                // 0キー：サービスメニューへ
                 goServiceMenu();
                 return true;
 
             case KeyEvent.KEYCODE_1:
+                // 1キー：送受信
                 startDataSync();
                 return true;
 
             case KeyEvent.KEYCODE_2:
+                // 2キー：束選定（通常）
                 openBundleSelect(BundleSelectActivity.MODE_NORMAL);
                 return true;
 
             case KeyEvent.KEYCODE_3:
+                // 3キー：コンテナ入力（作業がある場合のみ）
                 openContainerInputIfWorkExists();
                 return true;
 
             case KeyEvent.KEYCODE_4:
+                // 4キー：束選定（重量）
                 openBundleSelect(BundleSelectActivity.MODE_JYURYO);
                 return true;
 
             case KeyEvent.KEYCODE_5:
+                // 5キー：照合コンテナ選択
                 openCollateContainerSelect();
                 return true;
-        }
 
-        return super.onKeyDown(keyCode, event);
+            default:
+                return super.onKeyDown(keyCode, event);
+        }
     }
 
     //===============================
@@ -520,10 +711,15 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================
     private void startDataSync() {
+        // 送受信が走っている間は開始しない（連打/多重実行防止）
         if (!isDataSyncRunning.compareAndSet(false, true)) {
             return;
         }
+
+        // 画面中央に状況表示
         setCenterStatus("データ送受信中...");
+
+        // 実処理は別スレッドで実行
         io.execute(this::runDataSync);
     }
 
@@ -533,10 +729,17 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //=============================
     private void runDataSync() {
+        // 長い処理のためローディング表示
         showLoadingLong();
+
         try {
+            // DataSync内部で必要に応じてエラーを表示するため、コールバックを渡す
             DataSync sync = new DataSync(getApplicationContext(), this::showSyncErrorAndWait);
+
+            // 同期実行
             boolean success = sync.runSync();
+
+            // 結果をUIへ反映
             runOnUiThread(() -> {
                 if (success) {
                     setCenterStatus("データ送受信完了");
@@ -545,17 +748,24 @@ public class MenuActivity extends BaseActivity {
                     setCenterStatus("NG データ送受信に失敗しました");
                 }
             });
+
+            // 成功時はDB内容が変わるので再集計
             if (success) {
                 refreshInformation();
             }
+
         } catch (Exception ex) {
+            // 想定外例外：ログ＋ユーザへ表示
             Log.e(TAG, "DataSync failed", ex);
             String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
+
             runOnUiThread(() -> {
                 setCenterStatus("NG " + msg);
                 showErrorMsg(msg, MsgDispMode.MsgBox);
             });
+
         } finally {
+            // 二重実行防止解除＋ローディング解除
             isDataSyncRunning.set(false);
             hideLoadingLong();
         }
@@ -571,24 +781,33 @@ public class MenuActivity extends BaseActivity {
             return;
         }
 
+        // DataSync側のスレッドで呼ばれる前提のため、OK押下まで待機できるようLatchを使う
         CountDownLatch waitForOk = new CountDownLatch(1);
+
         runOnUiThread(() -> {
+            // エラー通知（音/バイブ）
             HandyUtil.playErrorBuzzer(this);
             HandyUtil.playVibrater(this);
+
+            // エラーダイアログ表示
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("エラー")
                     .setMessage(message)
                     .setCancelable(false)
                     .setPositiveButton("OK", (d, which) -> waitForOk.countDown())
                     .create();
+
+            // 背景の暗転を解除（現場で画面が見えにくくなるのを避ける）
             dialog.setOnShowListener(d -> {
                 if (dialog.getWindow() != null) {
                     dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 }
             });
+
             dialog.show();
         });
 
+        // OKが押されるまで待つ（同期処理が勝手に進まないようにする）
         try {
             waitForOk.await();
         } catch (InterruptedException ex) {
@@ -603,43 +822,59 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //=============================
     private void refreshInformation() {
+        // DBアクセスがあるので別スレッドで処理
         io.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+
+            // --- 最終受信日時を取得 ---
             SystemEntity system = db.systemDao().findById(1);
             String dataRecv = (system != null) ? system.dataRecvYmdhms : null;
 
+            // --- 未送信データの有無を確認 ---
+            // 出荷側の未送信があれば優先して表示
             boolean hasUnsentSyukka = !db.syukkaContainerDao().findUnsent().isEmpty();
+
+            // 出荷側に未送信が無い場合のみ、確認（照合）側の未送信を確認
             boolean hasUnsentKakunin = false;
             if (!hasUnsentSyukka) {
                 hasUnsentKakunin = !db.kakuninContainerDao().findUnsentCompleted().isEmpty();
             }
 
+            // --- 作業中データの有無（Workテーブル） ---
             boolean hasWork = !db.syukkaMeisaiWorkDao().findAll().isEmpty();
+
+            // --- 予定テーブルを集計（計画/完了/合計） ---
             List<YoteiEntity> yoteiRows = db.yoteiDao().findAll();
 
             long kanryoContainer = 0;
             long kanryoBundole = 0;
             long kanryoJyuryo = 0;
+
             long containerCount = 0;
             long goukeiBundole = 0;
             long goukeiJyuryo = 0;
 
+            // 行単位で足し上げ
             for (YoteiEntity row : yoteiRows) {
                 kanryoContainer += intOrZero(row.kanryoContainer);
                 kanryoBundole += intOrZero(row.kanryoBundole);
                 kanryoJyuryo += intOrZero(row.kanryoJyuryo);
+
                 containerCount += intOrZero(row.containerCount);
                 goukeiBundole += intOrZero(row.goukeiBundole);
                 goukeiJyuryo += intOrZero(row.goukeiJyuryo);
             }
 
+            // --- 重量はkgで保持されている想定のためt表示に変換 ---
             long kanryoJyuryoTon = kanryoJyuryo / 1000;
             long goukeiJyuryoTon = goukeiJyuryo / 1000;
 
+            // --- 残数算出 ---
             long zanContainer = containerCount - kanryoContainer;
             long zanBundle = goukeiBundole - kanryoBundole;
             long zanWeight = goukeiJyuryoTon - kanryoJyuryoTon;
 
+            // --- 表示用整形 ---
             final String recvText = (dataRecv == null || dataRecv.trim().isEmpty())
                     ? "----/--/-- --:--"
                     : dataRecv;
@@ -659,28 +894,37 @@ public class MenuActivity extends BaseActivity {
             final long zanBundleFinal = zanBundle;
             final long zanWeightFinal = zanWeight;
 
+            // --- UI反映はメインスレッドで実施 ---
             runOnUiThread(() -> {
+                // 最終受信時刻
                 if (lblDataReceiveTime != null) {
                     lblDataReceiveTime.setText("最終受信　" + recvText);
                 }
+
+                // 未送信があれば表示（無ければ非表示）
                 if (lblDataReceive != null) {
                     lblDataReceive.setVisibility(showUnsent ? View.VISIBLE : View.INVISIBLE);
                 }
+
+                // 作業中があれば表示（無ければ非表示）
                 if (lblContainerInput != null) {
                     lblContainerInput.setVisibility(hasWorkFinal ? View.VISIBLE : View.INVISIBLE);
                 }
 
+                // 完了
                 if (lblContainerFin != null)
                     lblContainerFin.setText(formatNumber(kanryoContainerFinal));
                 if (lblBundleFin != null) lblBundleFin.setText(formatNumber(kanryoBundoleFinal));
                 if (lblWeightFin != null) lblWeightFin.setText(formatNumber(kanryoJyuryoTonFinal));
 
+                // 計画
                 if (lblContainerPlan != null)
                     lblContainerPlan.setText(formatNumber(containerCountFinal));
                 if (lblBundlePlan != null) lblBundlePlan.setText(formatNumber(goukeiBundoleFinal));
                 if (lblWeightPlan != null)
                     lblWeightPlan.setText(formatNumber(goukeiJyuryoTonFinal));
 
+                // 残（0なら空表示）
                 if (lblZanContainer != null)
                     lblZanContainer.setText(formatRemaining(zanContainerFinal));
                 if (lblZanBundle != null) lblZanBundle.setText(formatRemaining(zanBundleFinal));
@@ -695,6 +939,7 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[long] ..... なし
     //================================
     private long intOrZero(Integer value) {
+        // DB列がNULLの場合を0として扱う
         return value == null ? 0 : value;
     }
 
@@ -704,6 +949,7 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[String] ..... なし
     //==============================
     private String formatNumber(long value) {
+        // 3桁カンマ区切り
         return String.format(Locale.JAPAN, "%,d", value);
     }
 
@@ -713,6 +959,7 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[String] ..... なし
     //==============================
     private String formatRemaining(long value) {
+        // 0は空（表示をスッキリさせる）
         return value == 0 ? "" : formatNumber(value);
     }
 
@@ -723,22 +970,33 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[Map<String, String>] ..... Map
     //============================================
     private Map<String, String> readStringMap(Intent data, String key) {
+        // Intentが無い場合は取得不可
         if (data == null) {
             return null;
         }
+
+        // EXTRAからSerializableとして取得
         java.io.Serializable extra = data.getSerializableExtra(key);
+
+        // 型がMapでなければ不正
         if (!(extra instanceof Map)) {
             return null;
         }
+
+        // raw型をString-Stringへ詰め直す（安全化）
         Map<?, ?> raw = (Map<?, ?>) extra;
         Map<String, String> result = new HashMap<>();
+
         for (Map.Entry<?, ?> entry : raw.entrySet()) {
             Object rawKey = entry.getKey();
             Object rawValue = entry.getValue();
+
+            // nullは除外（想定外データ対策）
             if (rawKey != null && rawValue != null) {
                 result.put(rawKey.toString(), rawValue.toString());
             }
         }
+
         return result;
     }
 }

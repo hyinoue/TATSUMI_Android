@@ -1,10 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　画像プレビュー画面レイアウト
+　関　　連　:　画像表示（ImageView）
+　　　　　　:　閉じるボタン
+============================================================-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#000000">
 
+    <!--================================================================
+    　機　能　:　画像表示エリア
+    　内　容　:　プレビュー画像を画面全体に表示（縦方向は可変）
+    　備　考　:　layout_weight=1 でボタン以外の領域を占有
+    ==================================================================-->
     <ImageView
         android:id="@+id/ivPreviewImage"
         android:layout_width="match_parent"
@@ -13,6 +22,11 @@
         android:scaleType="fitCenter"
         android:contentDescription="preview image" />
 
+    <!--================================================================
+    　機　能　:　閉じるボタン
+    　内　容　:　プレビュー画面を終了する
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <Button
         android:id="@+id/btnPreviewClose"
         android:layout_width="match_parent"
@@ -20,4 +34,5 @@
         android:layout_marginStart="6dp"
         android:layout_marginEnd="6dp"
         android:text="閉じる" />
+
 </LinearLayout>

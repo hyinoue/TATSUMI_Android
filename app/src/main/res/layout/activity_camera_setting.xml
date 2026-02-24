@@ -1,10 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　カメラ設定画面レイアウト
+　関　　連　:　画像サイズ／フラッシュ／ライトモードの設定
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -14,6 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,6 +35,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -40,7 +49,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 上部：入力エリア -->
+    <!--================================================================
+    　機　能　:　上部入力（設定）エリア
+    　内　容　:　画像サイズ／フラッシュ／ライトモード
+    　備　考　:　タイトルバー直下に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -51,20 +64,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：画像サイズ -->
+        <!--================================================================
+        　機　能　:　画像サイズ設定行
+        　内　容　:　Spinnerで画像サイズを選択
+        　備　考　:　Spinnerは枠（FrameLayout）で包んで罫線を表示
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="画像サイズ"
                 android:textColor="#000000" />
 
-            <!-- ★ Spinner を枠で包む -->
+            <!-- Spinner枠（黒枠） -->
             <FrameLayout
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
@@ -72,6 +90,7 @@
                 android:background="@drawable/bg_spinner_black_border"
                 android:padding="1dp">
 
+                <!-- 画像サイズ選択 -->
                 <Spinner
                     android:id="@+id/spImageSize"
                     android:layout_width="match_parent"
@@ -81,7 +100,11 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 2行目：フラッシュ -->
+        <!--================================================================
+        　機　能　:　フラッシュ設定行
+        　内　容　:　Spinnerでフラッシュ設定を選択
+        　備　考　:　Spinner背景は使わず、枠（FrameLayout）で統一
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,13 +112,14 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="フラッシュ"
                 android:textColor="#000000" />
 
-            <!-- ★ ここが今回の原因：Spinner背景を外して、枠で包む -->
+            <!-- Spinner枠（黒枠） -->
             <FrameLayout
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
@@ -103,6 +127,7 @@
                 android:background="@drawable/bg_spinner_black_border"
                 android:padding="1dp">
 
+                <!-- フラッシュ選択 -->
                 <Spinner
                     android:id="@+id/spFlash"
                     android:layout_width="match_parent"
@@ -112,7 +137,11 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 3行目：ライトモード -->
+        <!--================================================================
+        　機　能　:　ライトモード設定行
+        　内　容　:　Spinnerでライトモードを選択
+        　備　考　:　Spinnerは枠（FrameLayout）で包み、表示崩れを防止
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,12 +149,14 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ライトモード"
                 android:textColor="#000000" />
 
+            <!-- Spinner枠（黒枠） -->
             <FrameLayout
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
@@ -133,6 +164,7 @@
                 android:background="@drawable/bg_spinner_black_border"
                 android:padding="1dp">
 
+                <!-- ライトモード選択 -->
                 <Spinner
                     android:id="@+id/spLightMode"
                     android:layout_width="match_parent"
@@ -144,6 +176,11 @@
 
     </LinearLayout>
 
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

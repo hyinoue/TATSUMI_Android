@@ -1,23 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　AndroidManifest.xml（アプリ構成定義）
+　対　　象　:　権限／機能要件／Activity・Receiver・Providerの宣言
+　内　　容　:　・queries（暗黙Intentの可視化設定）
+　　　　　　:　・uses-permission（利用権限）
+　　　　　　:　・uses-feature（端末機能要件）
+　　　　　　:　・application配下の各コンポーネント定義
+============================================================-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ★追加：ACTION_IMAGE_CAPTURE を扱うアプリ（カメラ）を検索できるようにする -->
+    <!--============================================================
+　　　処理概要　:　queries定義（パッケージ可視性）
+　　　内　　容　:　Android 11以降で、暗黙Intentで起動可能なアプリ検索を行うために定義
+　　　対　　象　:　ACTION_IMAGE_CAPTURE（カメラ起動）
+    ============================================================-->
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
 
+    <!--============================================================
+　　　処理概要　:　使用権限（Permission）
+　　　内　　容　:　アプリが利用する機能に応じた権限を宣言
+    ============================================================-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- ・サーバ通信（WebAPI呼出等）に使用 -->
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- ・通信状態の取得（オンライン判定等）に使用 -->
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- ・カメラ利用に必要 -->
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- ・バイブレーション通知に使用 -->
+
+
+    <!--============================================================
+　　　処理概要　:　使用機能（Feature）
+　　　内　　容　:　端末機能要件を宣言
+　　　備　　考　:　required=false のため、カメラ非搭載端末でもインストール可能
+    ============================================================-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
 
+    <!--============================================================
+　　　処理概要　:　アプリケーション定義
+　　　内　　容　:　アプリ全体設定およびコンポーネント（Activity/Receiver/Provider）定義
+    ============================================================-->
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -26,6 +58,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
+
+        <!--============================================================
+　　　　　処理概要　:　画面（Activity）定義
+　　　　　内　　容　:　各機能画面をActivityとして登録
+　　　　　備　　考　:　exported=false のActivityはアプリ外部から起動不可
+        ============================================================-->
 
         <activity
             android:name=".activity.ServiceMenuActivity"
@@ -42,7 +80,6 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
-
         <activity
             android:name=".activity.CollateContainerSelectActivity"
             android:exported="false"
@@ -56,12 +93,13 @@
         <activity
             android:name=".activity.CameraSettingActivity"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
+        <!-- ・exported指定が無い場合、Android 12以降は intent-filter有無で要件が変わる
+             ・本Activityはintent-filterが無いので、基本的に外部公開目的ではない想定 -->
 
         <activity
             android:name=".activity.PhotographingActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
-
 
         <activity
             android:name=".activity.DbTestActivity"
@@ -83,12 +121,17 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
-
         <activity
             android:name=".activity.ServerSettingActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
+
+        <!--============================================================
+　　　　　処理概要　:　Receiver定義（バーコードスキャナ等のブロードキャスト受信）
+　　　　　内　　容　:　DENSOスキャン結果を受信するためのReceiver
+　　　　　備　　考　:　exported=true のため、アプリ外部からのBroadcastも受信可能
+        ============================================================-->
         <receiver
             android:name=".scanner.DensoScanReceiver"
             android:exported="true">
@@ -98,6 +141,11 @@
         </receiver>
 
 
+        <!--============================================================
+　　　　　処理概要　:　FileProvider定義（外部アプリへのファイル共有）
+　　　　　内　　容　:　カメラ撮影ファイル等をcontent://で共有するためのProvider
+　　　　　備　　考　:　file_paths の定義に従い共有可能パスを制限する
+        ============================================================-->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -109,6 +157,11 @@
         </provider>
 
 
+        <!--============================================================
+　　　　　処理概要　:　起動Activity（Launcher）
+　　　　　内　　容　:　アプリ起動時に表示される画面を定義
+　　　　　備　　考　:　intent-filterを持つため exported=true が必須（Android 12+）
+        ============================================================-->
         <activity
             android:name=".activity.MenuActivity"
             android:exported="true"
@@ -122,6 +175,3 @@
     </application>
 
 </manifest>
-
-
-

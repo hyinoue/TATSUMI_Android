@@ -1,10 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　積載束照合画面レイアウト
+　関　　連　:　ヘッダ入力（コンテナNo／積載束数／作業日時／現品番号）
+　　　　　　:　束一覧表示（RecyclerView）
+　　　　　　:　集計表示（読込束数）
+　　　　　　:　下部ボタン群（共通部品）
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -14,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -40,7 +51,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 上部：入力エリア（表以外：文字小さめ＆高さ低め） -->
+    <!--================================================================
+    　機　能　:　ヘッダ入力エリア
+    　内　容　:　コンテナNo／積載束数／作業日時／現品番号の入力
+    　備　考　:　表表示より上部に配置（文字小さめ・高さ低め）
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -51,7 +66,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 1行目：コンテナNo / 積載束数 -->
+        <!-- 1行目：コンテナNo／積載束数 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,18 +80,17 @@
                 android:textSize="14sp"
                 android:text="コンテナNo. " />
 
+            <!-- コンテナNo入力 -->
             <EditText
                 android:id="@+id/etContainerNo"
                 android:layout_width="0dp"
                 android:layout_height="26dp"
-                android:layout_marginStart="0dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_blue_back"
                 android:gravity="center_vertical"
                 android:inputType="text"
                 android:textColor="#000000"
                 android:paddingStart="3dp"
-                android:paddingEnd="0dp"
                 android:textSize="13sp" />
 
             <TextView
@@ -87,6 +101,7 @@
                 android:textSize="14sp"
                 android:text="積載束数" />
 
+            <!-- 積載束数入力 -->
             <EditText
                 android:id="@+id/etSekisaiBundleCount"
                 android:layout_width="44dp"
@@ -124,12 +139,12 @@
                 android:layout_marginStart="19dp"
                 android:text="作業日時" />
 
+            <!-- 作業日時入力 -->
             <EditText
                 android:id="@+id/etSagyouDateTime"
                 android:layout_width="160dp"
                 android:layout_height="28dp"
                 android:layout_marginStart="6dp"
-                android:layout_weight="0"
                 android:gravity="center_vertical"
                 android:background="@drawable/bg_blue_back"
                 android:inputType="text"
@@ -155,13 +170,12 @@
                 android:layout_marginStart="19dp"
                 android:text="現品番号" />
 
-            <!-- ★同じIDが2回あったので修正（重要） -->
+            <!-- 現品番号入力（最大18文字） -->
             <EditText
                 android:id="@+id/etGenpinNo"
                 android:layout_width="160dp"
                 android:layout_height="28dp"
                 android:layout_marginStart="6dp"
-                android:layout_weight="0"
                 android:gravity="center_vertical"
                 android:background="@drawable/bg_edittext_black_border"
                 android:inputType="text"
@@ -173,7 +187,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 表ヘッダ（ここは表なので変更なし） -->
+    <!--================================================================
+    　機　能　:　表ヘッダ表示
+    　内　容　:　P No／B No／Index／重量／確 の列見出し
+    　備　考　:　一覧の固定ヘッダ
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/rowTableHeader"
         android:layout_width="0dp"
@@ -185,6 +203,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 以下、各列ヘッダ -->
+        <!-- P No -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -196,6 +216,7 @@
             android:text="P No"
             android:textStyle="bold" />
 
+        <!-- B No -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -208,6 +229,7 @@
             android:text="B No"
             android:textStyle="bold" />
 
+        <!-- Index -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -220,6 +242,7 @@
             android:text="Index"
             android:textStyle="bold" />
 
+        <!-- 重量 -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -232,6 +255,7 @@
             android:text="重量"
             android:textStyle="bold" />
 
+        <!-- 確認 -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -245,7 +269,11 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 一覧（表の中身） -->
+    <!--================================================================
+    　機　能　:　束一覧表示エリア
+    　内　容　:　読み込んだ束データを一覧表示（RecyclerView）
+    　備　考　:　表ヘッダと集計エリアの間に配置
+    ==================================================================-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBundles"
         android:layout_width="0dp"
@@ -256,7 +284,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 下部：集計エリア（表以外：文字小さめ＆高さ低め） -->
+    <!--================================================================
+    　機　能　:　集計表示エリア
+    　内　容　:　読込束数の表示
+    　備　考　:　画面下部（ボタン上部）に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaFooter"
         android:layout_width="0dp"
@@ -281,6 +313,7 @@
                 android:textSize="14sp"
                 android:text="読込束数" />
 
+            <!-- 読込束数表示 -->
             <TextView
                 android:id="@+id/tvReadCount"
                 android:layout_width="44dp"
@@ -294,6 +327,11 @@
 
     </LinearLayout>
 
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

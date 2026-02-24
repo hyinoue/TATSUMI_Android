@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　積載束一覧（確認用）1行レイアウト
+　関　　連　:　P No／B No／Index／重量／確定フラグ表示
+　用　　途　:　RecyclerView（一覧表示）の行アイテム
+============================================================-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="28dp"
@@ -5,6 +10,9 @@
     android:gravity="center_vertical"
     android:background="#FFFFFF">
 
+    <!--================================================================
+    　機　能　:　P No 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowPNo"
         android:layout_width="0dp"
@@ -15,6 +23,9 @@
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　B No 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowBNo"
         android:layout_width="0dp"
@@ -26,6 +37,9 @@
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　Index 表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowIndex"
         android:layout_width="0dp"
@@ -37,18 +51,25 @@
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　重量 表示（右寄せ）
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowJyuryo"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1.8"
         android:background="@drawable/bg_table_row"
-        android:gravity="end|center_vertical"
         android:layout_marginStart="-2dp"
+        android:gravity="end|center_vertical"
         android:paddingEnd="8dp"
         android:textColor="#000000"
         android:textSize="15sp" />
 
+    <!--================================================================
+    　機　能　:　確定フラグ 表示
+    　備　考　:　照合結果や確定状態を表示
+    ==================================================================-->
     <TextView
         android:id="@+id/tvRowConfirmed"
         android:layout_width="0dp"
@@ -59,4 +80,5 @@
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="15sp" />
+
 </LinearLayout>

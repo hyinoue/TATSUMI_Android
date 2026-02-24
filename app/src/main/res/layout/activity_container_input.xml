@@ -1,11 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　コンテナ情報入力画面レイアウト
+　関　　連　:　コンテナNo／重量／ダンネージ等の入力・表示
+　　　　　　:　撮影（コンテナNo／シールNo）および撮影画像表示
+　　　　　　:　積載可残重量表示
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -15,6 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -28,6 +38,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -41,7 +52,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- メイン（下ボタンの上まで） -->
+    <!--================================================================
+    　機　能　:　メイン入力領域（スクロール）
+    　内　容　:　入力・表示項目一式を格納
+    　備　考　:　下部ボタン群の上までをスクロール対象とする
+    ==================================================================-->
     <ScrollView
         android:id="@+id/scrollMain"
         android:layout_width="0dp"
@@ -57,8 +72,11 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
 
-            <!-- 共通：左ラベル幅を揃えるため -->
-            <!-- 1行目：コンテナNo + 撮影 -->
+            <!--================================================================
+            　機　能　:　コンテナNo入力＋撮影
+            　内　容　:　英字部／数字部の入力、チェックデジット表示、撮影ボタン
+            　備　考　:　左ラベル幅(90dp)で他行と揃える
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowContainerNo"
                 android:layout_width="0dp"
@@ -77,7 +95,7 @@
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
-                <!-- 小枠（例：TSTU） -->
+                <!-- 英字部（例：TSTU）※先頭3文字入力 -->
                 <EditText
                     android:id="@+id/etContainerNo1"
                     android:layout_width="50dp"
@@ -90,6 +108,7 @@
                     android:padding="4dp"
                     android:text="" />
 
+                <!-- 固定文字（U） -->
                 <TextView
                     android:layout_width="18dp"
                     android:layout_height="wrap_content"
@@ -100,7 +119,7 @@
                     android:layout_marginStart="0dp"
                     android:layout_marginEnd="0dp" />
 
-                <!-- 本体枠（例：0000020） -->
+                <!-- 数字部（例：0000020）※最大6桁入力 -->
                 <EditText
                     android:id="@+id/etContainerNo2"
                     android:layout_width="62dp"
@@ -115,7 +134,7 @@
                     android:paddingEnd="4dp"
                     android:text="" />
 
-                <!-- チェックデジット -->
+                <!-- チェックデジット表示 -->
                 <TextView
                     android:id="@+id/tvCheckDigit"
                     android:layout_width="22dp"
@@ -126,6 +145,7 @@
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
+                <!-- コンテナNo撮影ボタン -->
                 <Button
                     android:id="@+id/btnPhotoContainerNo"
                     android:layout_width="45dp"
@@ -139,7 +159,11 @@
                     android:padding="0dp" />
             </LinearLayout>
 
-            <!-- 2行目：コンテナ自重 -->
+            <!--================================================================
+            　機　能　:　コンテナ自重入力
+            　内　容　:　コンテナ自重（kg）を数値入力
+            　備　考　:　最大4桁
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowContainerWeight"
                 android:layout_width="0dp"
@@ -178,7 +202,11 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 3行目：ダンネージ -->
+            <!--================================================================
+            　機　能　:　ダンネージ入力
+            　内　容　:　ダンネージ重量（kg）を数値入力
+            　備　考　:　最大3桁
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowDunnage"
                 android:layout_width="0dp"
@@ -217,7 +245,10 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 4行目：番線 -->
+            <!--================================================================
+            　機　能　:　番線重量表示
+            　内　容　:　番線重量（kg）を表示（入力不可）
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowBansen"
                 android:layout_width="0dp"
@@ -255,7 +286,10 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 5行目：積載束数 -->
+            <!--================================================================
+            　機　能　:　積載束数表示
+            　内　容　:　積載束数（束）を表示（入力不可）
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowBundleCount"
                 android:layout_width="0dp"
@@ -293,7 +327,10 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 6行目：総重量 -->
+            <!--================================================================
+            　機　能　:　総重量表示
+            　内　容　:　総重量（kg）を表示（入力不可）
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowTotalWeight"
                 android:layout_width="0dp"
@@ -331,7 +368,11 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 7行目：シールNo + 撮影 -->
+            <!--================================================================
+            　機　能　:　シールNo入力＋撮影
+            　内　容　:　シールNo入力、撮影ボタン
+            　備　考　:　最大12文字
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowSealNo"
                 android:layout_width="0dp"
@@ -377,7 +418,10 @@
                     android:padding="0dp" />
             </LinearLayout>
 
-            <!-- 8行目：予約No（長めの入力） -->
+            <!--================================================================
+            　機　能　:　予約No入力（表示用）
+            　内　容　:　予約Noを表示（背景が青：入力不可/参照用想定）
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowYoyakuNo"
                 android:layout_width="0dp"
@@ -410,7 +454,11 @@
                     android:text="" />
             </LinearLayout>
 
-            <!-- 予約Noの下：撮影画像表示エリア（左：コンテナNo撮影 / 右：シールNo撮影） -->
+            <!--================================================================
+            　機　能　:　撮影画像表示エリア
+            　内　容　:　左：コンテナNo撮影画像／右：シールNo撮影画像
+            　備　考　:　左側にラベル幅分の余白(View)を設けて位置合わせ
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowPhotos"
                 android:layout_width="0dp"
@@ -422,11 +470,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- 左側：ラベル幅分の空き（画像の「予約No左下スペース」っぽく） -->
+                <!-- ラベル幅分の空き -->
                 <View
                     android:layout_width="90dp"
                     android:layout_height="1dp" />
 
+                <!-- コンテナNo撮影画像 -->
                 <ImageView
                     android:id="@+id/ivPhotoContainer"
                     android:layout_width="0dp"
@@ -435,10 +484,12 @@
                     android:scaleType="centerCrop"
                     android:contentDescription="container photo" />
 
+                <!-- 画像間スペース -->
                 <View
                     android:layout_width="10dp"
                     android:layout_height="1dp" />
 
+                <!-- シールNo撮影画像 -->
                 <ImageView
                     android:id="@+id/ivPhotoSeal"
                     android:layout_width="0dp"
@@ -448,8 +499,11 @@
                     android:contentDescription="seal photo" />
             </LinearLayout>
 
-
-            <!-- 下寄せ：積載可残重量 -->
+            <!--================================================================
+            　機　能　:　積載可残重量表示（下寄せ）
+            　内　容　:　積載可残重量（kg）を表示
+            　備　考　:　親ConstraintLayoutのBottomに制約して下側に配置
+            ==================================================================-->
             <LinearLayout
                 android:id="@+id/rowRemain"
                 android:layout_width="0dp"
@@ -492,7 +546,11 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- 画面下部ボタン（あなた指定の include） -->
+    <!--================================================================
+    　機　能　:　画面下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

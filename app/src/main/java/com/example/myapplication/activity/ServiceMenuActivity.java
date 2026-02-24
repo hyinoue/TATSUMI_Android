@@ -34,19 +34,33 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+//============================================================
+//　処理概要　:　サービスメニュー画面Activity
+//　　　　　　:　保守/診断向け機能への入口をまとめた画面。
+//　　　　　　:　DB確認、データクリア、保守データ送信、通信/バーコードテスト、設定画面遷移を行う。
+//　　　　　　:　アクセス制限が必要な機能はパスワード確認を行う。
+//　関　　数　:　onCreate                 ..... 画面生成/初期化
+//　　　　　　:　onResume                 ..... 画面復帰時(メニューフォーカス解除)
+//　　　　　　:　clearMenuFocus           ..... メニューのフォーカス解除
+//　　　　　　:　onKeyDown                ..... 物理キー入力によるメニュー遷移
+//　　　　　　:　openDbTest               ..... DB確認画面へ遷移
+//　　　　　　:　openCommTest             ..... 通信テスト画面へ遷移(要PW)
+//　　　　　　:　openImagerTest           ..... バーコード(イメージャ)テスト画面へ遷移
+//　　　　　　:　openSystemLib            ..... システムライブラリ設定画面へ遷移
+//　　　　　　:　openServerSetting        ..... サーバ設定画面へ遷移(要PW)
+//　　　　　　:　clearData                ..... 端末内データの削除
+//　　　　　　:　sendMaintenanceData       ..... DB/ログの保守送信(アップロード)
+//　　　　　　:　resolveNetworkMessage     ..... 例外から通信エラーメッセージ生成
+//　　　　　　:　readFileBytes             ..... ファイル読み込み(byte配列)
+//　　　　　　:　confirmExit              ..... 終了確認
+//　　　　　　:　requestPasswordIfNeeded   ..... PW確認後に処理実行
+//　　　　　　:　showPasswordDialog        ..... PW入力ダイアログ表示
+//　　　　　　:　setupBottomButtonTexts    ..... 下部ボタン表示設定
+//　　　　　　:　onFunctionYellow          ..... (黄)終了処理
+//　　　　　　:　onDestroy                ..... リソース解放
+//　　　　　　:　PasswordCallback          ..... PWダイアログ結果通知IF
+//============================================================
 
-//====================================
-//　処理概要　:　ServiceMenuActivityクラス
-//====================================
-
-/**
- * サービスメニュー画面Activity。
- *
- * <p>保守/診断向けの機能への入口をまとめた画面で、
- * DB確認、データクリア、通信/バーコードテストなどを提供する。</p>
- *
- * <p>アクセス制限が必要な機能はパスワード確認を通して遷移する。</p>
- */
 public class ServiceMenuActivity extends BaseActivity {
 
     private static final int SYSTEM_RENBAN = 1;
@@ -61,6 +75,7 @@ public class ServiceMenuActivity extends BaseActivity {
     private TextView menu5;
     private TextView menu6;
     private TextView menu7;
+
     private ExecutorService io;
     private final AtomicBoolean isMaintenanceSendRunning = new AtomicBoolean(false);
 
@@ -74,25 +89,25 @@ public class ServiceMenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_menu);
 
+        // DB/IO用の単一スレッドを生成
         io = Executors.newSingleThreadExecutor();
 
-        // ▼ 下ボタン（include）を取得
+        // 下ボタン（include）を取得
         View bottom = findViewById(R.id.includeBottomButtons);
 
-        // ▼ 各ボタンを取得
+        // 各ボタンを取得
         MaterialButton btnBlue = bottom.findViewById(R.id.btnBottomBlue);
         MaterialButton btnRed = bottom.findViewById(R.id.btnBottomRed);
         MaterialButton btnGreen = bottom.findViewById(R.id.btnBottomGreen);
         MaterialButton btnYellow = bottom.findViewById(R.id.btnBottomYellow);
 
-        // ▼ 文字設定（画面ごとにここだけ変える）
+        // 文字設定（画面ごとにここだけ変える）
         btnBlue.setText("");
         btnRed.setText("");
         btnGreen.setText("");
         btnYellow.setText("終了");
 
-
-        // ▼ メニューTextView取得
+        // メニューTextView取得
         menu1 = findViewById(R.id.menu1);
         menu2 = findViewById(R.id.menu2);
         menu3 = findViewById(R.id.menu3);
@@ -101,7 +116,7 @@ public class ServiceMenuActivity extends BaseActivity {
         menu6 = findViewById(R.id.menu6);
         menu7 = findViewById(R.id.menu7);
 
-        // ▼ 画面タップで遷移
+        // メニュータップで遷移
         menu1.setOnClickListener(v -> openDbTest());
         menu2.setOnClickListener(v -> clearData());
         menu3.setOnClickListener(v -> sendMaintenanceData());
@@ -110,17 +125,28 @@ public class ServiceMenuActivity extends BaseActivity {
         menu6.setOnClickListener(v -> openSystemLib());
         menu7.setOnClickListener(v -> openServerSetting());
 
+        // 下部ボタン表示設定（黄：終了）
         setupBottomButtonTexts();
     }
 
+    //================================================================
+    //　機　能　:　画面復帰時の処理(メニューフォーカス解除)
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //================================================================
     @Override
     protected void onResume() {
         super.onResume();
         clearMenuFocus();
     }
 
-    //フォーカス解除
+    //================================================================
+    //　機　能　:　メニューのフォーカス解除
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //================================================================
     private void clearMenuFocus() {
+        // 全メニューのフォーカス/選択状態を解除
         TextView[] menus = {menu1, menu2, menu3, menu4, menu5, menu6, menu7};
         for (TextView menu : menus) {
             if (menu != null) {
@@ -129,6 +155,7 @@ public class ServiceMenuActivity extends BaseActivity {
             }
         }
 
+        // ルートにフォーカスを当て直す（物理キー入力の取りこぼし防止）
         View root = findViewById(R.id.root);
         if (root != null) {
             root.setFocusable(true);
@@ -149,10 +176,12 @@ public class ServiceMenuActivity extends BaseActivity {
     //=================================
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 長押しリピートは無視（連続実行防止）
         if (event.getRepeatCount() > 0) {
             return true;
         }
 
+        // 数字キーでメニュー遷移
         switch (keyCode) {
             case KeyEvent.KEYCODE_1:
                 openDbTest();
@@ -191,39 +220,37 @@ public class ServiceMenuActivity extends BaseActivity {
         }
     }
 
-    // -------------------------
-    // 画面遷移（ここだけ置換）
-    // -------------------------
-    //============================
-    //　機　能　:　db Testを開く
+    //=============================
+    //　機　能　:　「1.データ確認」を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //=============================
     private void openDbTest() {
         startActivity(new Intent(this, DbTestActivity.class));
     }
 
-    //============================
-    //　機　能　:　comm Testを開く
+    //==============================
+    //　機　能　:　「４.通信テスト」を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==============================
     private void openCommTest() {
+        // 通信テストは要パスワード
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, CommTestActivity.class)));
     }
 
-    //============================
-    //　機　能　:　imager Testを開く
+    //===================================
+    //　機　能　:　「５.バーコードテスト」を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //===================================
     private void openImagerTest() {
         startActivity(new Intent(this, ImagerTestActivity.class));
     }
 
     //============================
-    //　機　能　:　system Libを開く
+    //　機　能　:　「６.振動設定」を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -231,30 +258,34 @@ public class ServiceMenuActivity extends BaseActivity {
         startActivity(new Intent(this, SystemLibActivity.class));
     }
 
-    //==============================
-    //　機　能　:　server Settingを開く
+    //================================
+    //　機　能　:　「７.サーバー切替」を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //================================
     private void openServerSetting() {
+        // サーバ設定は要パスワード
         requestPasswordIfNeeded(() ->
                 startActivity(new Intent(this, ServerSettingActivity.class)));
     }
 
-    //============================
-    //　機　能　:　clear Dataの処理
+    //================================
+    //　機　能　:　「２.データクリア」の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //================================
     private void clearData() {
         showQuestion("端末内のデータをクリアします。（クリアすると作業中の情報が削除されます）\nよろしいですか？",
                 yes -> {
                     if (!yes) {
                         return;
                     }
+
+                    // DB削除は別スレッドで実行
                     io.execute(() -> {
                         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
                         db.runInTransaction(() -> {
+                            // DAO取得
                             SyukkaContainerDao syukkaContainerDao = db.syukkaContainerDao();
                             SyukkaMeisaiDao syukkaMeisaiDao = db.syukkaMeisaiDao();
                             SyukkaMeisaiWorkDao syukkaMeisaiWorkDao = db.syukkaMeisaiWorkDao();
@@ -264,6 +295,7 @@ public class ServiceMenuActivity extends BaseActivity {
                             KakuninMeisaiWorkDao kakuninMeisaiWorkDao = db.kakuninMeisaiWorkDao();
                             SystemDao systemDao = db.systemDao();
 
+                            // 作業系データを削除
                             syukkaMeisaiWorkDao.deleteAll();
                             syukkaMeisaiDao.deleteAll();
                             syukkaContainerDao.deleteAll();
@@ -271,24 +303,40 @@ public class ServiceMenuActivity extends BaseActivity {
                             kakuninMeisaiWorkDao.deleteAll();
                             kakuninMeisaiDao.deleteAll();
                             kakuninContainerDao.deleteAll();
-                            systemDao.updateDataSync(SYSTEM_RENBAN, null, null, "ServiceMenu#clearData", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN).format(new java.util.Date()));
+
+                            // 同期情報を更新（履歴/監査用）
+                            systemDao.updateDataSync(
+                                    SYSTEM_RENBAN,
+                                    null,
+                                    null,
+                                    "ServiceMenu#clearData",
+                                    new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN)
+                                            .format(new java.util.Date())
+                            );
                         });
+
+                        // 完了表示はUIスレッドで
                         runOnUiThread(() -> showInfoMsg("削除しました", MsgDispMode.MsgBox));
                     });
                 });
     }
 
-    //==================================
-    //　機　能　:　maintenance Dataを送信する
+    //========================================
+    //　機　能　:　「３.メンテナンスデータ送信」の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //========================================
     private void sendMaintenanceData() {
+        // 二重実行防止
         if (!isMaintenanceSendRunning.compareAndSet(false, true)) {
             return;
         }
+
+        // 送信処理は別スレッドで実行
         io.execute(() -> {
             try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
+
+                // DBファイルを取得
                 File dbFile = getDatabasePath(AppDatabase.DB_NAME);
                 if (!dbFile.exists()) {
                     FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルが見つかりません。", null);
@@ -296,6 +344,7 @@ public class ServiceMenuActivity extends BaseActivity {
                     return;
                 }
 
+                // DBファイルを読み込み＆アップロード
                 byte[] dbBytes = readFileBytes(dbFile);
                 if (!svc.uploadBinaryFile(dbFile.getName(), dbBytes)) {
                     FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルのアップロードに失敗しました。", null);
@@ -303,6 +352,7 @@ public class ServiceMenuActivity extends BaseActivity {
                     return;
                 }
 
+                // ログファイルが存在する場合のみアップロード
                 File logFile = new File(getFilesDir(), "ErrorLog.txt");
                 if (logFile.exists()) {
                     byte[] logBytes = readFileBytes(logFile);
@@ -313,19 +363,29 @@ public class ServiceMenuActivity extends BaseActivity {
                     }
                 }
 
+                // 送信完了
                 FileLogger.info(this, "frmServiceMenu-LinkLabel_Click", "ファイルをアップロードしました");
                 runOnUiThread(() -> showInfoMsg("ファイルをアップロードしました", MsgDispMode.MsgBox));
+
             } catch (Exception ex) {
+                // 例外内容からユーザ向けメッセージを整形
                 String msg = resolveNetworkMessage(ex);
                 FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", msg, ex);
                 runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox));
             } finally {
+                // フラグを必ず戻す
                 isMaintenanceSendRunning.set(false);
             }
         });
     }
 
+    //===========================================
+    //　機　能　:　例外から通信エラーメッセージ生成
+    //　引　数　:　ex ..... 例外
+    //　戻り値　:　[String] ..... メッセージ
+    //===========================================
     private String resolveNetworkMessage(Exception ex) {
+        // 原因例外を辿って代表的な通信例外を判定
         Throwable t = ex;
         while (t != null) {
             if (t instanceof javax.net.ssl.SSLHandshakeException
@@ -340,15 +400,23 @@ public class ServiceMenuActivity extends BaseActivity {
             }
             t = t.getCause();
         }
+        // 既知に当たらない場合は例外メッセージを返す
         return ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
     }
 
+    //===============================================
+    //　機　能　:　ファイル読み込み(byte配列)
+    //　引　数　:　file ..... 対象ファイル
+    //　戻り値　:　[byte[]] ..... 読み込んだバイト配列
+    //===============================================
     private byte[] readFileBytes(File file) throws IOException {
+        // サイズ分を一括で読み込む（途中で読めない場合は例外）
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] buffer = new byte[(int) file.length()];
             int offset = 0;
             int read;
-            while (offset < buffer.length && (read = fis.read(buffer, offset, buffer.length - offset)) != -1) {
+            while (offset < buffer.length
+                    && (read = fis.read(buffer, offset, buffer.length - offset)) != -1) {
                 offset += read;
             }
             if (offset != buffer.length) {
@@ -377,6 +445,7 @@ public class ServiceMenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //==========================================
     private void requestPasswordIfNeeded(Runnable onSuccess) {
+        // パスワード入力ダイアログを表示し、成功時のみ処理を実行
         showPasswordDialog(success -> {
             if (!success) {
                 showErrorMsg("パスワードが違います", MsgDispMode.MsgBox);
@@ -394,6 +463,7 @@ public class ServiceMenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================
     private void showPasswordDialog(PasswordCallback callback) {
+        // パスワード入力欄を作成
         EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
@@ -402,6 +472,7 @@ public class ServiceMenuActivity extends BaseActivity {
                 .setMessage("パスワードを入力(ヒント：内線番号)")
                 .setView(input)
                 .setPositiveButton("OK", (dialog, which) -> {
+                    // 入力値を取得して判定
                     String pwd = input.getText() != null ? input.getText().toString().trim() : "";
                     boolean ok = SERVICE_PASSWORDS.contains(pwd);
                     if (callback != null) {
@@ -409,7 +480,7 @@ public class ServiceMenuActivity extends BaseActivity {
                     }
                 })
                 .setNegativeButton("キャンセル", (dialog, which) -> {
-                    // キャンセル時はエラー表示を出さない
+                    // キャンセル時は何もしない（エラー表示なし）
                 })
                 .show();
     }
@@ -422,6 +493,7 @@ public class ServiceMenuActivity extends BaseActivity {
     private void setupBottomButtonTexts() {
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
 
+        // 黄のみ使用（終了）
         if (yellow != null) yellow.setText("終了");
         refreshBottomButtonsEnabled();
     }
@@ -444,11 +516,18 @@ public class ServiceMenuActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Executor解放
         if (io != null) {
             io.shutdown();
         }
     }
 
+    //============================================
+    //　機　能　:　PWダイアログ結果通知IF
+    //　引　数　:　なし
+    //　戻り値　:　[なし]
+    //============================================
     private interface PasswordCallback {
         //==================================
         //　機　能　:　on Resultの処理

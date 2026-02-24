@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　通信テスト画面レイアウト
+　関　　連　:　回線状態表示（モバイル／Wi-Fi／使用中回線／インターネット疎通）
+　　　　　　:　接続テスト実行ボタン
+　　　　　　:　下部ボタン群（共通部品）表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -6,7 +11,10 @@
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -16,6 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -29,6 +38,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -42,7 +52,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <!--================================================================
+    　機　能　:　状態表示エリア
+    　内　容　:　モバイル回線状態／Wi-Fi状態／使用中回線／インターネット疎通
+    　備　考　:　各項目は「ラベル＋値表示(TextView)」で構成
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/areaStatus"
         android:layout_width="0dp"
@@ -53,6 +67,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- モバイル回線状態（ラベル） -->
         <TextView
             android:id="@+id/lblMobilePower"
             android:layout_width="0dp"
@@ -65,6 +80,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvMobilePowerValue" />
 
+        <!-- モバイル回線状態（値） -->
         <TextView
             android:id="@+id/tvMobilePowerValue"
             android:layout_width="80dp"
@@ -77,6 +93,7 @@
             app:layout_constraintBottom_toBottomOf="@id/lblMobilePower"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Wi-Fi状態（ラベル） -->
         <TextView
             android:id="@+id/lblWifi"
             android:layout_width="0dp"
@@ -89,6 +106,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvWifiValue" />
 
+        <!-- Wi-Fi状態（値） -->
         <TextView
             android:id="@+id/tvWifiValue"
             android:layout_width="80dp"
@@ -101,6 +119,7 @@
             app:layout_constraintBottom_toBottomOf="@id/lblWifi"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- 使用中回線（ラベル） -->
         <TextView
             android:id="@+id/lblActiveNetwork"
             android:layout_width="0dp"
@@ -113,6 +132,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvActiveNetworkValue" />
 
+        <!-- 使用中回線（値） -->
         <TextView
             android:id="@+id/tvActiveNetworkValue"
             android:layout_width="80dp"
@@ -125,6 +145,7 @@
             app:layout_constraintBottom_toBottomOf="@id/lblActiveNetwork"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- インターネット疎通（ラベル） -->
         <TextView
             android:id="@+id/lblInternet"
             android:layout_width="0dp"
@@ -137,6 +158,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvInternetValue" />
 
+        <!-- インターネット疎通（値） -->
         <TextView
             android:id="@+id/tvInternetValue"
             android:layout_width="80dp"
@@ -151,6 +173,11 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!--================================================================
+    　機　能　:　操作エリア
+    　内　容　:　接続テストボタン
+    　備　考　:　状態表示エリアの下、下部ボタン群の上に配置
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/areaActions"
         android:layout_width="0dp"
@@ -161,6 +188,7 @@
         app:layout_constraintTop_toBottomOf="@id/areaStatus"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
 
+        <!-- 接続テスト実行 -->
         <Button
             android:id="@+id/btnTestConn"
             android:layout_width="0dp"
@@ -172,7 +200,11 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 下固定ボタン（共通部品） -->
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"
@@ -182,6 +214,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

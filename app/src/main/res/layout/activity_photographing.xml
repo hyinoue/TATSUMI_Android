@@ -1,4 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　カメラ画面レイアウト（CameraX）
+　関　　連　:　プレビュー表示（PreviewView）
+　　　　　　:　撮影画像プレビュー表示（ImageView）
+　　　　　　:　フォーカス表示（フォーカスリング）
+　　　　　　:　設定ボタン／終了ボタン
+　　　　　　:　シャッター／保存／破棄ボタン
+　　　　　　:　ステータスバー表示
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootCamera"
@@ -6,7 +14,11 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- ===== プレビュー（右端まで伸ばす） ===== -->
+    <!--================================================================
+    　機　能　:　プレビュー表示領域（CameraX PreviewView）
+    　内　容　:　カメラ映像を表示
+    　備　考　:　画面上部～下部バーの直上までを占有
+    ==================================================================-->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="0dp"
@@ -18,6 +30,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!--================================================================
+    　機　能　:　撮影後プレビュー表示
+    　内　容　:　撮影した画像を表示（プレビュー領域に重ねる）
+    　備　考　:　通常は非表示（visibility=gone）
+    ==================================================================-->
     <ImageView
         android:id="@+id/capturedPreview"
         android:layout_width="0dp"
@@ -30,6 +47,11 @@
         app:layout_constraintStart_toStartOf="@id/previewView"
         app:layout_constraintEnd_toEndOf="@id/previewView" />
 
+    <!--================================================================
+    　機　能　:　フォーカスインジケータ表示
+    　内　容　:　タップフォーカス等の位置をリングで表示
+    　備　考　:　通常は非表示（visibility=gone）
+    ==================================================================-->
     <View
         android:id="@+id/focusIndicator"
         android:layout_width="72dp"
@@ -41,7 +63,11 @@
         app:layout_constraintStart_toStartOf="@id/previewView"
         app:layout_constraintEnd_toEndOf="@id/previewView" />
 
-    <!-- ===== 左上：設定アイコン（PreviewViewの上に重ねる） ===== -->
+    <!--================================================================
+    　機　能　:　設定ボタン（左上）
+    　内　容　:　カメラ設定画面等への遷移
+    　備　考　:　プレビュー上に重ねて表示
+    ==================================================================-->
     <ImageButton
         android:id="@+id/btnSettings"
         android:layout_width="48dp"
@@ -56,7 +82,11 @@
         app:layout_constraintStart_toStartOf="@id/previewView"
         app:layout_constraintTop_toTopOf="@id/previewView" />
 
-    <!-- ===== Exit（PreviewViewの上に重ねて右上に詰める） ===== -->
+    <!--================================================================
+    　機　能　:　右上操作パネル（Exit）
+    　内　容　:　終了ボタン配置
+    　備　考　:　プレビュー上に重ねて右上に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/panelTopRight"
         android:layout_width="wrap_content"
@@ -67,6 +97,7 @@
         app:layout_constraintTop_toTopOf="@id/previewView"
         app:layout_constraintEnd_toEndOf="@id/previewView">
 
+        <!-- 終了ボタン -->
         <Button
             android:id="@+id/btnExit"
             android:layout_width="56dp"
@@ -82,7 +113,11 @@
             app:backgroundTint="@color/menu_button_bg" />
     </LinearLayout>
 
-    <!-- ===== 下部バー（シャッター） ===== -->
+    <!--================================================================
+    　機　能　:　下部バー（シャッター／保存／破棄）
+    　内　容　:　通常時はシャッターボタンを表示、撮影後は保存／破棄を表示
+    　備　考　:　ステータスバーの直上に固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomBar"
         android:layout_width="0dp"
@@ -92,7 +127,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/statusBar">
 
-        <!-- シャッターボタン -->
+        <!-- シャッターボタン（通常時表示） -->
         <ImageButton
             android:id="@+id/btnShutter"
             android:layout_width="56dp"
@@ -106,6 +141,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- 保存／破棄ボタン（撮影後表示：通常は非表示） -->
         <LinearLayout
             android:id="@+id/confirmButtons"
             android:layout_width="wrap_content"
@@ -117,6 +153,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- 保存 -->
             <ImageButton
                 android:id="@+id/btnSave"
                 android:layout_width="56dp"
@@ -126,6 +163,7 @@
                 android:scaleType="center"
                 android:src="@android:drawable/ic_menu_save" />
 
+            <!-- 破棄 -->
             <ImageButton
                 android:id="@+id/btnDiscard"
                 android:layout_width="56dp"
@@ -139,7 +177,11 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ===== ステータスバー（最下部） ===== -->
+    <!--================================================================
+    　機　能　:　ステータスバー（最下部）
+    　内　容　:　カメラ状態／エラーメッセージ等を表示
+    　備　考　:　画面最下部に固定
+    ==================================================================-->
     <TextView
         android:id="@+id/statusBar"
         android:layout_width="0dp"

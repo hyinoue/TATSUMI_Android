@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--============================================================
+　処理概要　:　バンニングレポート作成画面レイアウト
+　関　　連　:　テーブル選択（Spinner）
+　　　　　　:　DBテーブル一覧表示（横スクロール＋RecyclerView）
+　　　　　　:　下部エリア（予備／集計等）および下部ボタン群（共通部品）
+============================================================-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E6F7FF">
 
-    <!-- タイトルバー -->
+    <!--================================================================
+    　機　能　:　タイトルバー表示（画面タイトル／バージョン表示）
+    　備　考　:　最上段固定
+    ==================================================================-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -15,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- 画面タイトル -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -28,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- バージョン表示 -->
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"
@@ -41,7 +51,11 @@
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 上部：入力エリア -->
+    <!--================================================================
+    　機　能　:　上部入力エリア
+    　内　容　:　テーブル選択（Spinner）
+    　備　考　:　タイトルバー直下に配置
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaHeader"
         android:layout_width="0dp"
@@ -52,19 +66,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!--================================================================
+        　機　能　:　テーブル選択行
+        　内　容　:　Spinnerで対象テーブルを選択
+        　備　考　:　Spinnerは黒枠（FrameLayout）で包み外観を統一
+        ==================================================================-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- ラベル -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
                 android:text="テーブル" />
 
-            <!-- ★ Spinnerを黒枠で包む（▼は残る） -->
+            <!-- Spinner枠（黒枠）※▼（ドロップダウン矢印）は残す -->
             <FrameLayout
                 android:layout_width="240dp"
                 android:layout_height="wrap_content"
@@ -72,6 +92,7 @@
                 android:background="@drawable/bg_spinner_black_border"
                 android:padding="1dp">
 
+                <!-- テーブル選択Spinner -->
                 <Spinner
                     android:id="@+id/spContainerSize"
                     android:layout_width="match_parent"
@@ -84,8 +105,11 @@
         </LinearLayout>
     </LinearLayout>
 
-
-    <!-- 一覧（表の中身） -->
+    <!--================================================================
+    　機　能　:　DBテーブル一覧表示領域（横スクロール）
+    　内　容　:　表ヘッダ（動的生成想定）＋一覧（RecyclerView）
+    　備　考　:　列数が多い場合を想定し、HorizontalScrollViewで包む
+    ==================================================================-->
     <HorizontalScrollView
         android:id="@+id/hsvDbTable"
         android:layout_width="0dp"
@@ -102,7 +126,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- 表ヘッダ -->
+            <!-- 表ヘッダ（列見出し：コード側で追加する想定） -->
             <LinearLayout
                 android:id="@+id/rowTableHeader"
                 android:layout_width="wrap_content"
@@ -110,6 +134,7 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical" />
 
+            <!-- 一覧（表の中身） -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvDbTable"
                 android:layout_width="wrap_content"
@@ -119,7 +144,10 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- 下部：集計エリア -->
+    <!--================================================================
+    　機　能　:　下部エリア（現状は空）
+    　備　考　:　集計情報／メッセージ／操作部品の追加領域として確保
+    ==================================================================-->
     <LinearLayout
         android:id="@+id/areaFooter"
         android:layout_width="0dp"
@@ -128,10 +156,13 @@
         android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons">
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"></LinearLayout>
 
-    </LinearLayout>
-
+    <!--================================================================
+    　機　能　:　下部ボタン群の配置（共通部品）
+    　参　照　:　@layout/view_buttons
+    　備　考　:　画面最下部に固定表示
+    ==================================================================-->
     <include
         android:id="@+id/includeBottomButtons"
         layout="@layout/view_buttons"

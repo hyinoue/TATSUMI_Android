@@ -10,92 +10,126 @@ import com.example.myapplication.db.entity.YoteiEntity;
 import java.util.List;
 
 
+//============================================================
+//　処理概要　:　予定テーブル（T_YOTEI）に対するDAO
+//　関　　数　:　findAll               ..... 全件取得
+//　　　　　　:　findFirst             ..... 先頭1件取得
+//　　　　　　:　findWithNullLastUpd   ..... 最終更新日時がNULLのデータ取得
+//　　　　　　:　findByBookingNo       ..... 予約番号検索
+//　　　　　　:　incrementKanryo       ..... 完了数（コンテナ／束／重量）加算
+//　　　　　　:　upsert                ..... 追加／更新
+//　　　　　　:　deleteAll             ..... 全件削除
+//============================================================
 @Dao
-
-//=========================
-//　処理概要　:　YoteiDaoクラス
-//=========================
-
 public interface YoteiDao {
 
-    @Query("SELECT * FROM " +
-            "T_YOTEI"
+    //================================================================
+    //　機　能　:　予定データを全件取得する
+    //　引　数　:　なし
+    //　戻り値　:　[List<YoteiEntity>] ..... 全件データ
+    //================================================================
+    @Query(
+            "SELECT * FROM " +
+                    "T_YOTEI"
     )
-        //=========================================
-        //　機　能　:　find Allの処理
-        //　引　数　:　なし
-        //　戻り値　:　[List<YoteiEntity>] ..... なし
-        //=========================================
     List<YoteiEntity> findAll();
+    // ・T_YOTEIテーブルの全レコードを取得
+    // ・並び順の指定なし
 
-    @Query("SELECT * FROM " +
-            "T_YOTEI " +
-            "LIMIT 1"
+
+    //================================================================
+    //　機　能　:　予定データの先頭1件を取得する
+    //　引　数　:　なし
+    //　戻り値　:　[YoteiEntity] ..... 先頭データ（存在しない場合はnull）
+    //================================================================
+    @Query(
+            "SELECT * FROM " +
+                    "T_YOTEI " +
+                    "LIMIT 1"
     )
-        //===================================
-        //　機　能　:　find Firstの処理
-        //　引　数　:　なし
-        //　戻り値　:　[YoteiEntity] ..... なし
-        //===================================
     YoteiEntity findFirst();
+    // ・先頭1件のみ取得
+    // ・特定用途（初期表示など）で利用想定
+    // ・ORDER BYが無いため取得順はDB実装に依存
 
-    @Query("SELECT * FROM " +
-            "T_YOTEI " +
-            "WHERE " +
-            "LAST_UPD_YMDHMS IS NULL"
+
+    //================================================================
+    //　機　能　:　最終更新日時（LAST_UPD_YMDHMS）がNULLのデータを取得する
+    //　引　数　:　なし
+    //　戻り値　:　[List<YoteiEntity>] ..... 対象データ一覧
+    //================================================================
+    @Query(
+            "SELECT * FROM " +
+                    "T_YOTEI " +
+                    "WHERE " +
+                    "LAST_UPD_YMDHMS IS NULL"
     )
-        //=========================================
-        //　機　能　:　find With Null Last Updの処理
-        //　引　数　:　なし
-        //　戻り値　:　[List<YoteiEntity>] ..... なし
-        //=========================================
     List<YoteiEntity> findWithNullLastUpd();
+    // ・未更新／未同期などの判定に使用想定
 
-    @Query("SELECT * FROM " +
-            "T_YOTEI " +
-            "WHERE " +
-            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
+
+    //================================================================
+    //　機　能　:　予約番号を指定して予定データを取得する
+    //　引　数　:　bookingNo ..... 予約番号
+    //　戻り値　:　[YoteiEntity] ..... 該当データ（存在しない場合はnull）
+    //================================================================
+    @Query(
+            "SELECT * FROM " +
+                    "T_YOTEI " +
+                    "WHERE " +
+                    "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
-        //===================================
-        //　機　能　:　find By Booking Noの処理
-        //　引　数　:　bookingNo ..... String
-        //　戻り値　:　[YoteiEntity] ..... なし
-        //===================================
     YoteiEntity findByBookingNo(String bookingNo);
+    // ・BOOKING_NO一致で検索
+    // ・前後空白を除去して比較
 
-    @Query("UPDATE " +
-            "T_YOTEI " +
-            "SET " +
-            "KANRYO_CONTAINER = KANRYO_CONTAINER + 1, " +
-            "KANRYO_BUNDLE = KANRYO_BUNDLE + :bundleCount, " +
-            "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
-            "WHERE " +
-            "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
+
+    //================================================================
+    //　機　能　:　完了数（コンテナ／束／重量）を加算更新する
+    //　引　数　:　bookingNo    ..... 予約番号
+    //　　　　　:　bundleCount ..... 加算する束数
+    //　　　　　:　jyuryo       ..... 加算する重量
+    //　戻り値　:　[int] ..... 更新件数
+    //================================================================
+    @Query(
+            "UPDATE " +
+                    "T_YOTEI " +
+                    "SET " +
+                    "KANRYO_CONTAINER = KANRYO_CONTAINER + 1, " +
+                    "KANRYO_BUNDLE = KANRYO_BUNDLE + :bundleCount, " +
+                    "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
+                    "WHERE " +
+                    "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
-        //===================================
-        //　機　能　:　increment Kanryoの処理
-        //　引　数　:　bookingNo ..... String
-        //　　　　　:　bundleCount ..... int
-        //　　　　　:　jyuryo ..... int
-        //　戻り値　:　[int] ..... なし
-        //===================================
     int incrementKanryo(String bookingNo, int bundleCount, int jyuryo);
+    // ・完了コンテナ数は常に +1
+    // ・完了束数／重量は引数分を加算
+    // ・予約番号一致のレコードを更新
+    // ・更新件数を返却（0の場合は該当なし）
 
-    //=====================================
-    //　機　能　:　upsertの処理
+
+    //================================================================
+    //　機　能　:　予定データを追加または更新する（Upsert処理）
     //　引　数　:　entity ..... YoteiEntity
-    //　戻り値　:　[void] ..... なし
-    //=====================================
+    //　戻り値　:　[void]
+    //================================================================
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(YoteiEntity entity);
+    // ・主キー重複時は既存データを置換
+    // ・存在しない場合は新規追加
 
-    @Query("DELETE FROM " +
-            "T_YOTEI"
+
+    //================================================================
+    //　機　能　:　予定データを全件削除する
+    //　引　数　:　なし
+    //　戻り値　:　[void]
+    //================================================================
+    @Query(
+            "DELETE FROM " +
+                    "T_YOTEI"
     )
-        //============================
-        //　機　能　:　allを削除する
-        //　引　数　:　なし
-        //　戻り値　:　[void] ..... なし
-        //============================
     void deleteAll();
+    // ・テーブル内全レコード削除
+    // ・初期化処理などで使用
+
 }
