@@ -85,7 +85,7 @@ public class VanningCollationActivity extends BaseActivity {
     private VanningCollationController controller; // 画面制御ロジック
     private VanningCollationAdapter adapter;      // 一覧アダプター
 
-    // ★この画面専用スキャナ
+    // この画面専用スキャナ
     private DensoScannerController scanner; // DENSOスキャナ制御
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 

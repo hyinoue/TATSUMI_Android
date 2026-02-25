@@ -61,22 +61,16 @@ public class BaseActivity extends AppCompatActivity {
         void onResult(boolean yes);
     }
 
-    /**
-     * ラベル(バナー)表示時間(ms)
-     */
     protected int labelDisplayTimeMs = 2500; // ラベル(バナー)表示時間(ms)
 
     private final Handler uiHandler = new Handler(Looper.getMainLooper()); // UIスレッドハンドラ
 
-    // Label風バナー（frmBase.lblErrMsg相当）
     private TextView bannerView;         // バナー表示View
     private Runnable bannerHideRunnable; // バナー自動非表示Runnable
 
-    // Wait overlay（frmBase.pnlWaitLong/Short相当）
     private FrameLayout overlayLong;  // 長時間処理用オーバーレイ
     private FrameLayout overlayShort; // 短時間処理用オーバーレイ
 
-    // 画面下4色ボタン
     private MaterialButton btnBottomRed;    // 下部赤ボタン
     private MaterialButton btnBottomBlue;   // 下部青ボタン
     private MaterialButton btnBottomGreen;  // 下部緑ボタン

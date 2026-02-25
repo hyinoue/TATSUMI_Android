@@ -68,13 +68,13 @@ public class ServiceMenuActivity extends BaseActivity {
             new HashSet<>(Arrays.asList("2441", "4546", "4549", "4522", "4523")); // サービスメニューPW候補
 
     // 画面メニュー（TextView）
-    private TextView menu1; // メニュー1
-    private TextView menu2; // メニュー2
-    private TextView menu3; // メニュー3
-    private TextView menu4; // メニュー4
-    private TextView menu5; // メニュー5
-    private TextView menu6; // メニュー6
-    private TextView menu7; // メニュー7
+    private TextView menu1; // データ確認
+    private TextView menu2; // データクリア
+    private TextView menu3; // メンテナンスデータ送信
+    private TextView menu4; // 通信テスト
+    private TextView menu5; // バーコードテスト
+    private TextView menu6; // 振動設定
+    private TextView menu7; // サーバー切替
 
     private ExecutorService io; // I/O処理スレッド
     private final AtomicBoolean isMaintenanceSendRunning = new AtomicBoolean(false); // メンテ送信中フラグ

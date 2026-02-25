@@ -18,12 +18,8 @@ import java.util.Locale;
 //　処理概要　:　DateTimeFormatUtilクラス
 //===================================
 public final class DateTimeFormatUtil {
-
-    // 出力形式（表示用）
-    private static final String OUTPUT_PATTERN = "MM-dd HH:mm";
-
-    // 入力として想定する形式（DB/既存資産互換）
-    private static final String[] INPUT_PATTERNS = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm"};
+    private static final String OUTPUT_PATTERN = "MM-dd HH:mm";     // 出力形式（表示用）
+    private static final String[] INPUT_PATTERNS = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm"};   // 入力として想定する形式（DB/既存資産互換）
 
     //==========================================
     //　機　能　:　DateTimeFormatUtilの初期化処理

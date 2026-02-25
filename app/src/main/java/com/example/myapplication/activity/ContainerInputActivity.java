@@ -100,11 +100,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ContainerInputActivity extends BaseActivity {
 
-    private static final String TAG = "ContainerInput";                              // ログタグ
-    private static final int SYSTEM_RENBAN = 1;                                       // システム連番
+    private static final String TAG = "ContainerInput";       // ログタグ
+    private static final int SYSTEM_RENBAN = 1;              // システム連番
 
     public static final String EXTRA_BUNDLE_VALUES = "container_input_bundle_values"; // 束入力値受け渡しキー
-    public static final String EXTRA_CONTAINER_VALUES = "container_input_values";      // コンテナ入力値受け渡しキー
+    public static final String EXTRA_CONTAINER_VALUES = "container_input_values";    // コンテナ入力値受け渡しキー
 
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";          // コンテナ重量キー
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
@@ -137,9 +137,8 @@ public class ContainerInputActivity extends BaseActivity {
     private TextView tvTotalKg;         // 総重量
     private TextView tvRemainKg;        // 残重量
 
-    /**
-     * 写真撮影ターゲット（どちらの写真を撮るか）。
-     */
+
+    //写真撮影ターゲット（どちらの写真を撮るか）
     private enum PhotoTarget {CONTAINER, SEAL}
 
     private PhotoTarget currentTarget = PhotoTarget.CONTAINER; // 現在の撮影対象

@@ -42,13 +42,13 @@ import java.util.Locale;
 
 public class BundleSelectController {
 
-    public enum Mode {Normal, JyuryoCalc}
+    public enum Mode {Normal, JyuryoCalc}                  //積載束選定/重量計算
 
     private final SyukkaMeisaiDao syukkaMeisaiDao;         // 出荷明細DAO
     private final SyukkaMeisaiWorkDao syukkaMeisaiWorkDao; // 出荷明細WorkDAO
     private final Mode mode;                               // 画面モード
 
-    // C#：Dictionary<string, BundleInfo>（順序が必要なため LinkedHashMap を使用）
+    //順序が必要なため LinkedHashMap を使用
     private final LinkedHashMap<String, BundleInfo> dataList = new LinkedHashMap<>();
 
     // 一覧表示用（RecyclerViewに渡す）

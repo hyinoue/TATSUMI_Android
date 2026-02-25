@@ -6,20 +6,13 @@ package com.example.myapplication.grid;
 //============================================================
 public class BundleSelectRow {
 
-    // 梱包（Packing）No
     public String pNo; // PNo
-
-    // 束（Bundle）No
     public String bNo; // BNo
 
-    // 行インデックス（束番）
     public String index; // 行番号
 
-    // 表示用重量（フォーマット済み文字列）
     public String jyuryo; // 重量
-
-    // 取消表示文言（"削除"）
-    public String cancelText; // 取消表示
+    public String cancelText; // 「削除」表示
 
     //=====================================
     //　機　能　:　BundleSelectRowの初期化処理

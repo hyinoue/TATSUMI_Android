@@ -23,10 +23,6 @@ import androidx.annotation.NonNull;
 //　　　　　　:　playBuzzer ..... ブザー再生（内部共通）
 //　　　　　　:　charToCode ..... ISO 6346 文字→コード変換（重み付け計算用）
 //============================================================
-
-//==========================
-//　処理概要　:　HandyUtilクラス
-//==========================
 public class HandyUtil {
 
     private static final String TAG = "HandyUtil"; // ログタグ

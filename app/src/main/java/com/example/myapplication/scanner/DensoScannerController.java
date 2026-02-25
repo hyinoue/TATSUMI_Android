@@ -50,10 +50,6 @@ public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
     private static final String TAG = "DensoScannerM70"; // ログタグ
-
-    /**
-     * 連続同一データの弾き（短時間だけ）
-     */
     private static final long DUP_GUARD_MS = 300L; // 重複読取ガード時間(ms)
 
     // 端末によってSCANトリガーのキーコードが違うので列挙（必要に応じて追加）

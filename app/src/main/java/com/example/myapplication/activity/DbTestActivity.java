@@ -49,44 +49,20 @@ import java.util.concurrent.Executors;
 
 public class DbTestActivity extends BaseActivity {
 
-    /**
-     * テーブル選択用Spinner（レイアウトはspContainerSizeを流用）
-     */
     private Spinner spTables; // テーブル選択スピナー
 
-    /**
-     * 固定ヘッダ行（列名を横並びに表示）
-     */
     private LinearLayout headerRow; // 固定ヘッダ行
 
-    /**
-     * データ表示本体（行を縦に並べるRecyclerView）
-     */
     private RecyclerView rvDbTable; // DBテーブル表示一覧
 
-    /**
-     * 横スクロール領域（ヘッダと同じ横幅のテーブルを包む）
-     */
     private HorizontalScrollView hsvDbTable; // 横スクロール領域
 
-    /**
-     * Room DBインスタンス
-     */
     private AppDatabase roomDb; // Room DBインスタンス
 
-    /**
-     * DB読み込み用の単一スレッドExecutor（UIスレッドを塞がない）
-     */
     private ExecutorService executor; // DB読み込み用スレッド
 
-    /**
-     * RecyclerViewアダプタ（列幅自動調整を行う）
-     */
     private DbTableAdapter tableAdapter; // DBテーブル一覧アダプター
 
-    /**
-     * 非同期処理の戻りで画面が死んでいる場合に更新しないためのフラグ
-     */
     private volatile boolean isAlive = false; // 画面生存フラグ
 
     //============================================

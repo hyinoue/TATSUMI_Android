@@ -23,12 +23,9 @@ import java.util.Locale;
 //　処理概要　:　FileLoggerクラス
 //====================================
 public final class FileLogger {
+    private static final String LOG_FILE_NAME = "ErrorLog.txt";  // ログ出力ファイル名
 
-    // ログ出力ファイル名
-    private static final String LOG_FILE_NAME = "ErrorLog.txt";
-
-    // 排他制御用ロック（マルチスレッド対策）
-    private static final Object LOCK = new Object();
+    private static final Object LOCK = new Object();    // 排他制御用ロック（マルチスレッド対策）
 
     // インスタンス化禁止（ユーティリティクラス）
     private FileLogger() {

@@ -32,19 +32,11 @@ import androidx.appcompat.widget.AppCompatEditText;
 //====================================
 public class ImageScanTextBox extends AppCompatEditText {
 
-    // デフォルトの待機（将来の拡張用。現状は未使用）
     private static final int DEFAULT_WAIT_DECODE_MS = 5000; // 読取待機時間デフォルト(ms)
-
-    // 入力最小長（0以下なら1扱い）
     private int minLength = 0; // 最小文字数
-
-    // デコード待機時間（将来の拡張用）
     private long waitDecodeMs = DEFAULT_WAIT_DECODE_MS; // 読取待機時間(ms)
-
     @Nullable
     private DensoScannerController scannerController; // DENSOスキャナ制御
-
-    // BarcodeManager.create の多重呼び出し防止用
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
     //=================================================

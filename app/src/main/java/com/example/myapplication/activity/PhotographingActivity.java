@@ -92,7 +92,7 @@ public class PhotographingActivity extends BaseActivity {
     private static final int CAM_INCANDESCE = 3;   // 露出補正: 白熱灯
     private static final int CAM_DIMLIGHT = 4;     // 露出補正: 暗所
 
-    private static final int AE_MODE_AUTO = CaptureRequest.CONTROL_AE_MODE_ON;                         // AE: 自動露出
+    private static final int AE_MODE_AUTO = CaptureRequest.CONTROL_AE_MODE_ON;                        // AE: 自動露出
     private static final int AE_MODE_ALWAYS_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH;   // AE: 常時発光
     private static final int AE_MODE_AUTO_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH;       // AE: 自動発光
 
@@ -118,16 +118,25 @@ public class PhotographingActivity extends BaseActivity {
     private int lastLightMode;           // 最終露出補正設定
     private MediaActionSound shutterSound; // シャッター音
 
+    // カメラの実行時パーミッション（android.permission.CAMERA）をリクエストするためのLauncher。
+    // Activity Result API を使用して、非同期で許可結果を受け取る。
     private final ActivityResultLauncher<String> requestCameraPermission =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
-                if (granted) {
-                    // 許可されたらカメラ開始
-                    startCamera();
-                } else {
-                    // 許可されない場合はステータス表示のみ
-                    setStatus("CAM_PERMISSION_DENIED");
-                }
-            });
+            registerForActivityResult(
+                    // 1つのパーミッションをリクエストするContract
+                    new ActivityResultContracts.RequestPermission(),
+                    // パーミッション許可結果のコールバック（true: 許可 / false: 拒否）
+                    granted -> {
+                        if (granted) {
+                            // ユーザーがカメラ権限を許可した場合
+                            // → カメラ処理を開始する
+                            startCamera();
+                        } else {
+                            // ユーザーがカメラ権限を拒否した場合
+                            // → カメラは起動せず、ステータスのみ更新する
+                            setStatus("CAM_PERMISSION_DENIED");
+                        }
+                    }
+            );
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

@@ -37,31 +37,17 @@ import java.util.Map;
 //　　　　　　:　nullToEmpty ..... null→空文字
 //　　　　　　:　ensureInitialized ..... init呼出しチェック
 //============================================================
-
-//====================================
-//　処理概要　:　AppSettingsクラス
-//====================================
-
-/**
- * アプリケーション設定クラス（Android版）
- * C# WinCE AppSettings の移植 + INIファイル対応
- */
 public final class AppSettings {
 
     // ================================
     // SharedPreferences
     // ================================
-
-    // SharedPreferences名
     private static final String PREF_NAME = "AppSettings"; // SharedPreferences名
-
-    // INIファイル名
     private static final String INI_FILE_NAME = "TatsumiHandy.ini"; // INIファイル名
 
     // ================================
-    // Key 定義（C#版と完全一致）
+    // Key 定義
     // ================================
-
     private static final String KEY_BUZZER_MUTE = "BuzzerMute";      // ブザーON/OFFキー
     private static final String KEY_BUZZER_LENGTH = "BuzzerLength";  // ブザー長さキー
     private static final String KEY_BUZZER_VOLUME = "BuzzerVolume";  // ブザー音量キー
@@ -84,13 +70,9 @@ public final class AppSettings {
     private static final String KEY_WEBSVC_SCS = "WebSvcSCS";       // SCS WebSvcキー
     private static final String KEY_WEBSVC_TEST = "WebSvcTest";     // テストWebSvcキー
 
-    // SharedPreferences実体
+
     private static SharedPreferences pref; // SharedPreferencesインスタンス
-
-    // アプリケーションContext（assetsアクセスやディレクトリ解決用）
     private static Context appContext; // アプリケーションコンテキスト
-
-    // INIファイルパス
     private static File iniFile; // INIファイル実体
 
     // ================================

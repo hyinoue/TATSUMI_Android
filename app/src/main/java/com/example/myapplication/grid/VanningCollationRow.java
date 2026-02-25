@@ -5,13 +5,8 @@ package com.example.myapplication.grid;
 //　関　　数　:　VanningCollationRow ..... バンニング照合一覧の表示行データ
 //============================================================
 public class VanningCollationRow {
-
-    // 出荷指図No（Packing No）
     public final String pNo; // PNo
-
-    // バンドルNo.（Bundle No）
     public final String bNo; // BNo
-
     // 束番（Index）
     public final String index; // 行番号
 

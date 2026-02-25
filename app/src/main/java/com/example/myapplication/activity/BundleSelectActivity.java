@@ -95,7 +95,7 @@ public class BundleSelectActivity extends BaseActivity {
     private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
     private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
 
-    private static final int SYSTEM_RENBAN = 1;                                       // システム連番
+    private static final int SYSTEM_RENBAN = 1;    // システム連番
 
     private EditText etContainerKg;    // コンテナ重量
     private EditText etDunnageKg;      // ダンネージ重量
@@ -110,7 +110,6 @@ public class BundleSelectActivity extends BaseActivity {
     private BundleSelectController controller; // 画面制御ロジック
     private BundleRowAdapter adapter;       // 束一覧アダプター
 
-    // ★この画面専用：フォーカス中だけCode39
     private DensoScannerController scanner; // DENSOスキャナ制御
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
