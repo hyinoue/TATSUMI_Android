@@ -49,7 +49,7 @@ public class XmlUtil {
 
     /**
      * 送信用 xsd:dateTime
-     * ★ASMX(C# DateTime) 側がタイムゾーン無し前提で「完全一致」をしているため、
+     * ★ASMX 側がタイムゾーン無し前提で「完全一致」をしているため、
      * ここでは "+09:00" を付けない（yyyy-MM-dd'T'HH:mm:ss）形式で送る。
      * <p>
      * 例: 2020-03-21T00:00:00

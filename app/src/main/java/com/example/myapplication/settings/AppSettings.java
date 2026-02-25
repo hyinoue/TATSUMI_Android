@@ -30,7 +30,7 @@ import java.util.Map;
 //　　　　　　:　saveToIni ..... 設定値をINI用Mapへ変換して保存
 //　　　　　　:　readIni ..... INI読み込み（key=value）
 //　　　　　　:　writeIni ..... INI書き込み（key=value）
-//　　　　　　:　applyDefaultValues ..... デフォルト値補正（C#互換）
+//　　　　　　:　applyDefaultValues ..... デフォルト値補正
 //　　　　　　:　parseInt ..... int変換（失敗時デフォルト）
 //　　　　　　:　parseBoolean ..... boolean変換（"1"/"0"/true/false）
 //　　　　　　:　parseString ..... String変換（null時デフォルト）
@@ -179,7 +179,7 @@ public final class AppSettings {
             loadFromIni();
         }
 
-        // C#版同様のデフォルト補正
+        // デフォルト補正
         applyDefaultValues();
     }
 
@@ -422,13 +422,13 @@ public final class AppSettings {
     }
 
     //=================================================
-    //　機　能　:　デフォルト値を補正する（C#互換）
+    //　機　能　:　デフォルト値を補正する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================================
     private static void applyDefaultValues() {
 
-        // 数値が0の場合のみデフォルトを適用（C#版互換）
+        // 数値が0の場合のみデフォルトを適用
         if (BuzzerLength == 0) BuzzerLength = 1000;
         if (BuzzerVolume == 0) BuzzerVolume = 1;
 
@@ -514,9 +514,8 @@ public final class AppSettings {
     }
 
     // ================================
-    // 設定値（C# static property 相当）
+    // 設定値
     // ================================
-
     public static boolean BuzzerMute; // ブザーON/OFF
     public static int BuzzerLength;   // ブザー長さ
     public static int BuzzerVolume;   // ブザー音量

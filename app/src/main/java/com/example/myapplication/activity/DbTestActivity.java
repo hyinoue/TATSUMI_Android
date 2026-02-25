@@ -49,7 +49,7 @@ import java.util.concurrent.Executors;
 
 public class DbTestActivity extends BaseActivity {
 
-    private Spinner spTables; // テーブル選択スピナー
+    private Spinner spTables; // テーブル選択スピナー（コンボボックス）
 
     private LinearLayout headerRow; // 固定ヘッダ行
 

@@ -35,7 +35,7 @@ import java.util.Locale;
 //　　　　　　:　removeWorkTable ..... Workテーブルから削除
 //　　　　　　:　keyOf ..... heatNo+sokuban のキー生成
 //　　　　　　:　safeStr ..... null安全な文字列化
-//　　　　　　:　padLeft4AsSpaces ..... 4桁右寄せスペース埋め（C#互換）
+//　　　　　　:　padLeft4AsSpaces ..... 4桁右寄せスペース埋め
 //　　　　　　:　repeat ..... 文字列繰り返し生成
 //　　　　　　:　nowAsText ..... 現在時刻文字列生成（yyyyMMddHHmmss）
 //============================================================
@@ -120,10 +120,6 @@ public class BundleSelectController {
         return Collections.unmodifiableList(displayRows);
     }
 
-    // ============================================================
-    // C#：CheckBundle
-    // ============================================================
-
     //=========================================
     //　機　能　:　check Bundleの処理
     //　引　数　:　heatNo ..... String
@@ -163,7 +159,7 @@ public class BundleSelectController {
             return "積載重量を超過します";
         }
 
-        // 既に出荷済チェック（C#はCONTAINER_IDが空でない、ここは null/非null）
+        // 出荷済チェック
         if (e.containerId != null) {
             return "既に出荷済です";
         }
@@ -187,10 +183,6 @@ public class BundleSelectController {
         return "";
     }
 
-    // ============================================================
-    // C#：AddBundleNo（bundleNo空のものだけ更新）
-    // ============================================================
-
     //=====================================
     //　機　能　:　bundle Noを追加する
     //　引　数　:　heatNo ..... String
@@ -202,16 +194,12 @@ public class BundleSelectController {
                             @NonNull String sokuban,
                             @NonNull String bundleNoOrg) {
 
-        // C#：ToInt32(bundleNoOrg).ToString().PadLeft(4,' ') を再現（4桁右寄せスペース埋め）
+        // 4桁右寄せスペース埋め
         String padded = padLeft4AsSpaces(bundleNoOrg);
 
         // bundleNoが空のものだけ更新（DB側の条件更新に委譲）
         syukkaMeisaiDao.updateBundleNoIfEmpty(heatNo, sokuban, padded);
     }
-
-    // ============================================================
-    // C#：AddBundle（DB→保持→Work→表示更新）
-    // ============================================================
 
     //=================================
     //　機　能　:　bundleを追加する
@@ -237,7 +225,7 @@ public class BundleSelectController {
         item.jyuryo = (e.jyuryo == null) ? 0 : e.jyuryo;
         item.bookingNo = safeStr(e.bookingNo);
 
-        // 取消列（C# DataTableの "削除" 相当）
+        // 削除列
         item.torikeshi = "削除";
 
         // 保持データへ追加（順序維持）
@@ -251,10 +239,6 @@ public class BundleSelectController {
         // 表示用行を再生成
         refreshDisplayRows();
     }
-
-    // ============================================================
-    // C#：RemoveBundle(row)
-    // ============================================================
 
     //===============================
     //　機　能　:　bundleを削除する
@@ -289,10 +273,6 @@ public class BundleSelectController {
         refreshDisplayRows();
     }
 
-    // ============================================================
-    // C#：DeleteBundles()
-    // ============================================================
-
     //============================
     //　機　能　:　bundlesを削除する
     //　引　数　:　なし
@@ -304,10 +284,6 @@ public class BundleSelectController {
             removeBundle(0);
         }
     }
-
-    // ============================================================
-    // C#：refreshDataGrid()（表示行生成）
-    // ============================================================
 
     //==============================
     //　機　能　:　display Rowsを更新する
@@ -326,7 +302,7 @@ public class BundleSelectController {
             String bNo = safeStr(item.bundleNo);
             String idx = safeStr(item.sokuban);
 
-            // 重量：3桁区切り + 左6桁幅スペース埋め（C#互換）
+            // 重量：3桁区切り + 左6桁幅スペース埋め
             String j = String.format(Locale.JAPAN, "%,d", item.jyuryo);
             if (j.length() < 6) {
                 j = repeat(" ", 6 - j.length()) + j;
@@ -336,10 +312,6 @@ public class BundleSelectController {
             displayRows.add(new BundleSelectRow(pNo, bNo, idx, j, "削除"));
         }
     }
-
-    // ============================================================
-    // C#：readWorkTblToList()
-    // ============================================================
 
     //=====================================
     //　機　能　:　read Work Tbl To Listの処理
@@ -381,7 +353,7 @@ public class BundleSelectController {
     }
 
     // ============================================================
-    // Workテーブル操作（C# addWorkTable/removeWorkTable）
+    // Workテーブル操作
     // ※ WorkEntityが少カラムなので、heat/sokuban + updateYmd だけで運用
     // ============================================================
 
@@ -397,10 +369,10 @@ public class BundleSelectController {
         w.heatNo = item.heatNo;
         w.sokuban = item.sokuban;
 
-        // 必要なら保持（現状はC#互換で未使用のため null 運用）
+        // 必要なら保持
         w.containerId = null;
 
-        // 並び順/更新時刻用（C#のINSERT_YMD相当を updateYmd で代用）
+        // 並び順/更新時刻用
         w.updateYmd = nowAsText();
 
         // upsert（存在すれば更新、なければ追加）
