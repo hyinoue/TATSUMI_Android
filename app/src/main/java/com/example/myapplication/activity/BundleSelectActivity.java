@@ -85,40 +85,40 @@ import java.util.concurrent.Executors;
 
 public class BundleSelectActivity extends BaseActivity {
 
-    public static final String EXTRA_MODE = "bundle_select_mode";
-    public static final String EXTRA_BUNDLE_VALUES = "bundle_select_values";
-    public static final String MODE_NORMAL = "normal";
-    public static final String MODE_JYURYO = "jyuryo_calc";
+    public static final String EXTRA_MODE = "bundle_select_mode";                  // 画面モード受け渡しキー
+    public static final String EXTRA_BUNDLE_VALUES = "bundle_select_values";        // 束入力値受け渡しキー
+    public static final String MODE_NORMAL = "normal";                              // 通常モード
+    public static final String MODE_JYURYO = "jyuryo_calc";                         // 重量計算モード
 
-    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
-    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
-    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
-    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
+    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";          // コンテナ重量キー
+    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
 
-    private static final int SYSTEM_RENBAN = 1;
+    private static final int SYSTEM_RENBAN = 1;                                       // システム連番
 
-    private EditText etContainerKg;
-    private EditText etDunnageKg;
-    private EditText etGenpinNo;
-    private TextView tvBundleCount;
-    private TextView tvTotalWeight;
-    private TextView tvRemainWeight;
-    private TextView tvTitle;
-    private RecyclerView rvBundles;
+    private EditText etContainerKg;    // コンテナ重量
+    private EditText etDunnageKg;      // ダンネージ重量
+    private EditText etGenpinNo;       // 現品No
+    private TextView tvBundleCount;    // 束本数
+    private TextView tvTotalWeight;    // 総重量
+    private TextView tvRemainWeight;   // 残重量
+    private TextView tvTitle;          // タイトル
+    private RecyclerView rvBundles;    // 束一覧
 
-    private ExecutorService io;
-    private BundleSelectController controller;
-    private BundleRowAdapter adapter;
+    private ExecutorService io;             // I/O処理スレッド
+    private BundleSelectController controller; // 画面制御ロジック
+    private BundleRowAdapter adapter;       // 束一覧アダプター
 
     // ★この画面専用：フォーカス中だけCode39
-    private DensoScannerController scanner;
-    private boolean scannerCreated = false;
+    private DensoScannerController scanner; // DENSOスキャナ制御
+    private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
-    private final Map<String, String> bundleValues = new HashMap<>();
-    private final Map<String, String> containerValues = new HashMap<>();
+    private final Map<String, String> bundleValues = new HashMap<>();    // 束入力値保持
+    private final Map<String, String> containerValues = new HashMap<>(); // コンテナ入力値保持
 
-    private int maxContainerJyuryo = 0;
-    private BundleSelectController.Mode mode = BundleSelectController.Mode.Normal;
+    private int maxContainerJyuryo = 0; // 最大積載可能重量
+    private BundleSelectController.Mode mode = BundleSelectController.Mode.Normal; // 画面モード
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

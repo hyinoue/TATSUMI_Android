@@ -39,29 +39,29 @@ public class ImagerTestActivity extends BaseActivity {
     /**
      * 読取対象（このEditTextにフォーカス中のみスキャンを受け付ける）
      */
-    private EditText etBarcode;
+    private EditText etBarcode; // 読取対象入力欄
 
     /**
      * 読取種別表示（Code39/QRなどの判定結果を表示）
      */
-    private EditText etKind;
+    private EditText etKind; // 読取種別表示欄
 
     /**
      * 履歴表示領域（スクロール用）
      */
-    private ScrollView svKindContent;
+    private ScrollView svKindContent; // 履歴スクロール領域
 
     /**
      * 履歴の本文（読取データを改行区切りで追記）
      */
-    private TextView tvKindContent;
+    private TextView tvKindContent; // 読取履歴表示
 
     // ===== Scanner =====
 
     /**
      * DENSOスキャナ制御（本画面専用）
      */
-    private DensoScannerController scanner;
+    private DensoScannerController scanner; // DENSOスキャナ制御
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

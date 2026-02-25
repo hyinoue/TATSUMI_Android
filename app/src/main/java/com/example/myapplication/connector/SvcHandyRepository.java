@@ -27,7 +27,7 @@ public class SvcHandyRepository {
     public static final String DEFAULT_ENDPOINT =
             "https://scstestvanningreport.azurewebsites.net/WebSvc/SvcHandy.asmx";
 
-    private final SoapAsmxClient client;
+    private final SoapAsmxClient client; // SOAP通信クライアント
 
     //================================================================
     //　機　能　:　SvcHandyRepositoryを初期化する（デフォルト）

@@ -48,14 +48,14 @@ import java.util.concurrent.Executors;
 
 public class ServerSettingActivity extends BaseActivity {
 
-    private static final int SYSTEM_RENBAN = 1;
-    private static final int CONNECTION_TIMEOUT_MS = 10000;
+    private static final int SYSTEM_RENBAN = 1;          // システム連番
+    private static final int CONNECTION_TIMEOUT_MS = 10000; // 接続タイムアウト(ms)
 
-    private boolean testSuccess = false;
-    private Spinner spServerUrl;
-    private Button btnTestConn;
-    private ExecutorService io;
-    private List<ServerOption> serverOptions;
+    private boolean testSuccess = false; // 接続テスト成功フラグ
+    private Spinner spServerUrl;         // 接続先サーバー選択
+    private Button btnTestConn;          // 接続テストボタン
+    private ExecutorService io;          // I/O処理スレッド
+    private List<ServerOption> serverOptions; // 接続先候補一覧
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

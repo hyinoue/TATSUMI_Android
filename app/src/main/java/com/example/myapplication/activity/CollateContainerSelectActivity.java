@@ -46,16 +46,16 @@ import java.util.concurrent.Executors;
 
 public class CollateContainerSelectActivity extends BaseActivity {
 
-    private EditText etSelectedNo;
-    private RecyclerView rvContainers;
-    private MaterialButton btnBlue;
-    private MaterialButton btnRed;
-    private MaterialButton btnGreen;
-    private MaterialButton btnYellow;
+    private EditText etSelectedNo;       // 照合対象No入力
+    private RecyclerView rvContainers;   // コンテナ一覧
+    private MaterialButton btnBlue;      // 下部青ボタン
+    private MaterialButton btnRed;       // 下部赤ボタン
+    private MaterialButton btnGreen;     // 下部緑ボタン
+    private MaterialButton btnYellow;    // 下部黄ボタン
 
-    private CollateContainerSelectController controller;
-    private CollateContainerAdapter adapter;
-    private ExecutorService io;
+    private CollateContainerSelectController controller; // 画面制御ロジック
+    private CollateContainerAdapter adapter;             // 一覧アダプター
+    private ExecutorService io;                          // I/O処理スレッド
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

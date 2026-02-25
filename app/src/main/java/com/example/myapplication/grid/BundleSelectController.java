@@ -44,9 +44,9 @@ public class BundleSelectController {
 
     public enum Mode {Normal, JyuryoCalc}
 
-    private final SyukkaMeisaiDao syukkaMeisaiDao;
-    private final SyukkaMeisaiWorkDao syukkaMeisaiWorkDao;
-    private final Mode mode;
+    private final SyukkaMeisaiDao syukkaMeisaiDao;         // 出荷明細DAO
+    private final SyukkaMeisaiWorkDao syukkaMeisaiWorkDao; // 出荷明細WorkDAO
+    private final Mode mode;                               // 画面モード
 
     // C#：Dictionary<string, BundleInfo>（順序が必要なため LinkedHashMap を使用）
     private final LinkedHashMap<String, BundleInfo> dataList = new LinkedHashMap<>();
@@ -54,7 +54,7 @@ public class BundleSelectController {
     // 一覧表示用（RecyclerViewに渡す）
     private final List<BundleSelectRow> displayRows = new ArrayList<>();
 
-    private static final int MAX_ROWS = 20;
+    private static final int MAX_ROWS = 20; // 一覧最大行数
 
     //==========================================================
     //　機　能　:　BundleSelectControllerの初期化処理

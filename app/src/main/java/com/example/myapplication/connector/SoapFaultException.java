@@ -8,7 +8,7 @@ package com.example.myapplication.connector;
 public class SoapFaultException extends Exception {
 
     // SOAP Fault時の生レスポンスXML（調査用）
-    private final String rawXml;
+    private final String rawXml; // Fault生XML
 
     //================================================================
     //　機　能　:　SoapFaultExceptionを生成する

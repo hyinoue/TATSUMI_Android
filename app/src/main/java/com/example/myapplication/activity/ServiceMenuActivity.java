@@ -63,21 +63,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServiceMenuActivity extends BaseActivity {
 
-    private static final int SYSTEM_RENBAN = 1;
+    private static final int SYSTEM_RENBAN = 1; // システム連番
     private static final Set<String> SERVICE_PASSWORDS =
-            new HashSet<>(Arrays.asList("2441", "4546", "4549", "4522", "4523"));
+            new HashSet<>(Arrays.asList("2441", "4546", "4549", "4522", "4523")); // サービスメニューPW候補
 
     // 画面メニュー（TextView）
-    private TextView menu1;
-    private TextView menu2;
-    private TextView menu3;
-    private TextView menu4;
-    private TextView menu5;
-    private TextView menu6;
-    private TextView menu7;
+    private TextView menu1; // メニュー1
+    private TextView menu2; // メニュー2
+    private TextView menu3; // メニュー3
+    private TextView menu4; // メニュー4
+    private TextView menu5; // メニュー5
+    private TextView menu6; // メニュー6
+    private TextView menu7; // メニュー7
 
-    private ExecutorService io;
-    private final AtomicBoolean isMaintenanceSendRunning = new AtomicBoolean(false);
+    private ExecutorService io; // I/O処理スレッド
+    private final AtomicBoolean isMaintenanceSendRunning = new AtomicBoolean(false); // メンテ送信中フラグ
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

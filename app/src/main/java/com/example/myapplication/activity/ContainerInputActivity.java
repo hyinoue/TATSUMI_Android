@@ -100,52 +100,52 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ContainerInputActivity extends BaseActivity {
 
-    private static final String TAG = "ContainerInput";
-    private static final int SYSTEM_RENBAN = 1;
+    private static final String TAG = "ContainerInput";                              // ログタグ
+    private static final int SYSTEM_RENBAN = 1;                                       // システム連番
 
-    public static final String EXTRA_BUNDLE_VALUES = "container_input_bundle_values";
-    public static final String EXTRA_CONTAINER_VALUES = "container_input_values";
+    public static final String EXTRA_BUNDLE_VALUES = "container_input_bundle_values"; // 束入力値受け渡しキー
+    public static final String EXTRA_CONTAINER_VALUES = "container_input_values";      // コンテナ入力値受け渡しキー
 
-    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
-    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
-    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
-    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
-    private static final String KEY_CONTAINER_NO1 = "container_no1";
-    private static final String KEY_CONTAINER_NO2 = "container_no2";
-    private static final String KEY_SEAL_NO = "seal_no";
-    private static final String KEY_CONTAINER_PHOTO_URI = "container_photo_uri";
-    private static final String KEY_SEAL_PHOTO_URI = "seal_photo_uri";
+    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";          // コンテナ重量キー
+    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
+    private static final String KEY_CONTAINER_NO1 = "container_no1";                // コンテナ番号1キー
+    private static final String KEY_CONTAINER_NO2 = "container_no2";                // コンテナ番号2キー
+    private static final String KEY_SEAL_NO = "seal_no";                            // シール番号キー
+    private static final String KEY_CONTAINER_PHOTO_URI = "container_photo_uri";    // コンテナ写真URIキー
+    private static final String KEY_SEAL_PHOTO_URI = "seal_photo_uri";              // シール写真URIキー
 
-    private static final String MSG_CONTAINER_CONFIRMED = "コンテナ情報を確定しました";
+    private static final String MSG_CONTAINER_CONFIRMED = "コンテナ情報を確定しました"; // 確定メッセージ
 
-    private Button btnPhotoContainerNo;
-    private Button btnPhotoSealNo;
+    private Button btnPhotoContainerNo; // コンテナ番号写真ボタン
+    private Button btnPhotoSealNo;      // シール番号写真ボタン
 
-    private ImageView ivPhotoContainer;
-    private ImageView ivPhotoSeal;
+    private ImageView ivPhotoContainer; // コンテナ写真プレビュー
+    private ImageView ivPhotoSeal;      // シール写真プレビュー
 
-    private EditText etContainerNo1;
-    private EditText etContainerNo2;
-    private EditText etContainerKg;
-    private EditText etDunnageKg;
-    private EditText etSealNo;
-    private EditText etBookingNo;
+    private EditText etContainerNo1;    // コンテナNo（前半）
+    private EditText etContainerNo2;    // コンテナNo（後半）
+    private EditText etContainerKg;     // コンテナ重量
+    private EditText etDunnageKg;       // ダンネージ重量
+    private EditText etSealNo;          // シールNo
+    private EditText etBookingNo;       // Booking No
 
-    private TextView tvCheckDigit;
-    private TextView tvBansenKg;
-    private TextView tvBundleCount;
-    private TextView tvTotalKg;
-    private TextView tvRemainKg;
+    private TextView tvCheckDigit;      // チェックデジット
+    private TextView tvBansenKg;        // 番線重量
+    private TextView tvBundleCount;     // 束本数
+    private TextView tvTotalKg;         // 総重量
+    private TextView tvRemainKg;        // 残重量
 
     /**
      * 写真撮影ターゲット（どちらの写真を撮るか）。
      */
     private enum PhotoTarget {CONTAINER, SEAL}
 
-    private PhotoTarget currentTarget = PhotoTarget.CONTAINER;
+    private PhotoTarget currentTarget = PhotoTarget.CONTAINER; // 現在の撮影対象
 
-    private ExecutorService io;
-    private AppDatabase db;
+    private ExecutorService io; // I/O処理スレッド
+    private AppDatabase db;     // DBインスタンス
 
     // 前画面から受け取った束情報（重量など）を保持
     private final java.util.Map<String, String> bundleValues = new java.util.HashMap<>();
@@ -156,8 +156,8 @@ public class ContainerInputActivity extends BaseActivity {
     private int sekisaiSokuJyuryo = 0;  // 積載束重量（kg）
     private int maxContainerJyuryo = 0; // 最大積載可能重量（kg）
 
-    private Uri containerPhotoUri;
-    private Uri sealPhotoUri;
+    private Uri containerPhotoUri; // コンテナ写真URI
+    private Uri sealPhotoUri;      // シール写真URI
 
     /**
      * 撮影画面からの戻りを受け取るランチャー。

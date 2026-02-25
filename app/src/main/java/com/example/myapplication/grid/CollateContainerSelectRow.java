@@ -7,16 +7,16 @@ package com.example.myapplication.grid;
 public class CollateContainerSelectRow {
 
     // 一覧表示用の連番（1始まり）
-    public final String index;
+    public final String index; // 行番号
 
     // コンテナNo
-    public final String containerNo;
+    public final String containerNo; // コンテナNo
 
     // 束数（表示用文字列）
-    public final String bundleCnt;
+    public final String bundleCnt; // 束数
 
     // 作業日（表示用フォーマット済み文字列）
-    public final String sagyouYmd;
+    public final String sagyouYmd; // 作業日時
 
     //===========================================
     //　機　能　:　CollateContainerSelectRowの初期化処理

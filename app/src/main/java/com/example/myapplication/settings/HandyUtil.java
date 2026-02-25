@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
 //==========================
 public class HandyUtil {
 
-    private static final String TAG = "HandyUtil";
+    private static final String TAG = "HandyUtil"; // ログタグ
 
     //=================================
     //　機　能　:　HandyUtilの初期化処理
