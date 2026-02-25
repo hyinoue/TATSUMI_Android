@@ -11,11 +11,11 @@ import java.util.List;
 
 
 //============================================================
-//　処理概要　:　予定テーブル（T_YOTEI）に対するDAO
+//　処理概要　:　作業予定テーブル（T_YOTEI）に対するDAO
 //　関　　数　:　findAll               ..... 全件取得
 //　　　　　　:　findFirst             ..... 先頭1件取得
 //　　　　　　:　findWithNullLastUpd   ..... 最終更新日時がNULLのデータ取得
-//　　　　　　:　findByBookingNo       ..... 予約番号検索
+//　　　　　　:　findByBookingNo       ..... 予約No.検索
 //　　　　　　:　incrementKanryo       ..... 完了数（コンテナ／束／重量）加算
 //　　　　　　:　upsert                ..... 追加／更新
 //　　　　　　:　deleteAll             ..... 全件削除
@@ -69,8 +69,8 @@ public interface YoteiDao {
 
 
     //================================================================
-    //　機　能　:　予約番号を指定して予定データを取得する
-    //　引　数　:　bookingNo ..... 予約番号
+    //　機　能　:　予約No.を指定して予定データを取得する
+    //　引　数　:　bookingNo ..... 予約No.
     //　戻り値　:　[YoteiEntity] ..... 該当データ（存在しない場合はnull）
     //================================================================
     @Query(
@@ -86,7 +86,7 @@ public interface YoteiDao {
 
     //================================================================
     //　機　能　:　完了数（コンテナ／束／重量）を加算更新する
-    //　引　数　:　bookingNo    ..... 予約番号
+    //　引　数　:　bookingNo    ..... 予約No.
     //　　　　　:　bundleCount ..... 加算する束数
     //　　　　　:　jyuryo       ..... 加算する重量
     //　戻り値　:　[int] ..... 更新件数
@@ -104,7 +104,7 @@ public interface YoteiDao {
     int incrementKanryo(String bookingNo, int bundleCount, int jyuryo);
     // ・完了コンテナ数は常に +1
     // ・完了束数／重量は引数分を加算
-    // ・予約番号一致のレコードを更新
+    // ・予約No.一致のレコードを更新
     // ・更新件数を返却（0の場合は該当なし）
 
 

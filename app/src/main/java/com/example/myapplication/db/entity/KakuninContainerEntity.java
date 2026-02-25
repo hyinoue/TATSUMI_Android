@@ -27,8 +27,8 @@ public class KakuninContainerEntity {
 
 
     //============================================================
-    //　項目概要　:　コンテナ番号
-    //　内　　容　:　表示用コンテナ番号
+    //　項目概要　:　コンテナNo.
+    //　内　　容　:　表示用コンテナNo.
     //============================================================
     @ColumnInfo(name = "CONTAINER_NO")
     public String containerNo;
@@ -50,12 +50,12 @@ public class KakuninContainerEntity {
     //============================================================
     @ColumnInfo(name = "SAGYOU_YMD")
     public String sagyouYmd;
-    // ・yyyyMMdd形式などで保存想定
+    // ・yyyy-MM-dd'T'HH:mm:ss
 
 
     //============================================================
-    //　項目概要　:　照合完了フラグ
-    //　内　　容　:　照合完了 여부（BIT → INTEGER）
+    //　項目概要　:　コンテナ照合完了
+    //　内　　容　:　照合完了フラグ （BIT → INTEGER）
     //============================================================
     @ColumnInfo(name = "CONTAINER_SYOUGO_KANRYO")
     public Boolean containerSyougoKanryo;
@@ -82,12 +82,12 @@ public class KakuninContainerEntity {
 
 
     //============================================================
-    //　項目概要　:　登録日
-    //　内　　容　:　登録日（DATE → TEXT）
+    //　項目概要　:　登録年月日
+    //　内　　容　:　登録年月日（DATE → TEXT）
     //============================================================
     @ColumnInfo(name = "INSERT_YMD")
     public String insertYmd;
-    // ・yyyyMMdd形式などで保存想定
+    // ・yyyy-MM-dd'T'HH:mm:ss
 
 
     //============================================================
@@ -100,11 +100,11 @@ public class KakuninContainerEntity {
 
 
     //============================================================
-    //　項目概要　:　更新日
+    //　項目概要　:　更新年月日
     //　内　　容　:　最終更新日（DATE → TEXT）
     //============================================================
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
-    // ・yyyyMMdd形式などで保存想定
+    // ・yyyy-MM-dd'T'HH:mm:ss
 
 }

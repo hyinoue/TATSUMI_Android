@@ -40,9 +40,6 @@ import java.util.Locale;
 //　　　　　　:　nowAsText ..... 現在時刻文字列生成（yyyyMMddHHmmss）
 //============================================================
 
-//=======================================
-//　処理概要　:　BundleSelectControllerクラス
-//=======================================
 public class BundleSelectController {
 
     public enum Mode {Normal, JyuryoCalc}

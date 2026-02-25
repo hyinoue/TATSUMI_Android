@@ -457,7 +457,7 @@ public class ContainerInputActivity extends BaseActivity {
                 // 1) システム設定（既定重量/最大重量など）を取得
                 SystemEntity system = db.systemDao().findById(SYSTEM_RENBAN);
 
-                // 2) 作業中明細の集計（束数・重量・予約番号など）を取得
+                // 2) 作業中明細の集計（束数・重量・予約No.など）を取得
                 SyukkaMeisaiWorkDao.WorkSummary summary = db.syukkaMeisaiWorkDao().getWorkSummary();
 
                 // 3) 初期値を解決（DB設定値が無い場合のフォールバック含む）
@@ -537,7 +537,7 @@ public class ContainerInputActivity extends BaseActivity {
                         tvBansenKg.setText(formatNumber(bundleCount));
                     }
 
-                    // 予約番号表示
+                    // 予約No.表示
                     if (etBookingNo != null) {
                         etBookingNo.setText(bookingNo);
                     }
@@ -1168,7 +1168,7 @@ public class ContainerInputActivity extends BaseActivity {
             // 4) 作業中明細へcontainerIdを設定（紐付け）
             db.syukkaMeisaiDao().updateContainerIdForWork(containerId);
 
-            // 5) 予約番号がある場合は完了数/重量を加算
+            // 5) 予約No.がある場合は完了数/重量を加算
             if (!TextUtils.isEmpty(bookingNo)) {
                 db.yoteiDao().incrementKanryo(bookingNo, bundleCount, sekisaiSokuJyuryo);
             }

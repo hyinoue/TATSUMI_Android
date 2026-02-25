@@ -89,23 +89,12 @@
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
-                android:background="@drawable/bg_edittext_black_border"
+                android:background="@drawable/bg_text_input"
                 android:gravity="end|center_vertical"
                 android:inputType="number"
                 android:maxLength="3"
                 android:paddingEnd="8dp" />
         </LinearLayout>
-
-        <!--================================================================
-        　機　能　:　予備行（現状は空）
-        　備　考　:　将来の項目追加（例：検索条件等）に備えた領域
-        ==================================================================-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"></LinearLayout>
     </LinearLayout>
 
     <!--================================================================
@@ -131,7 +120,7 @@
             android:layout_weight="0"
             android:gravity="center"
             android:textColor="#000000"
-            android:background="@drawable/bg_blue_back"
+            android:background="@drawable/bg_text_readonly"
             android:textSize="15sp"
             android:text="No."
             android:textStyle="bold" />
@@ -143,7 +132,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:textColor="#000000"
-            android:background="@drawable/bg_blue_back"
+            android:background="@drawable/bg_text_readonly"
             android:textSize="15sp"
             android:layout_marginStart="-2dp"
             android:text="コンテナNo."
@@ -156,7 +145,7 @@
             android:layout_weight="0"
             android:gravity="center"
             android:textColor="#000000"
-            android:background="@drawable/bg_blue_back"
+            android:background="@drawable/bg_text_readonly"
             android:textSize="15sp"
             android:layout_marginStart="-2dp"
             android:text="束"
@@ -169,7 +158,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:textColor="#000000"
-            android:background="@drawable/bg_blue_back"
+            android:background="@drawable/bg_text_readonly"
             android:textSize="15sp"
             android:layout_marginStart="-2dp"
             android:text="作業日時"
@@ -179,7 +168,7 @@
     <!--================================================================
     　機　能　:　一覧表示（RecyclerView）
     　内　容　:　照合対象コンテナ一覧（表の中身）を表示
-    　備　考　:　一覧ヘッダ直下～下部エリア直上までを占有
+    　備　考　:　一覧ヘッダ直下～ボタン群直上までを占有
     ==================================================================-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBundles"
@@ -187,23 +176,10 @@
         android:layout_height="0dp"
         android:background="#888888"
         app:layout_constraintTop_toBottomOf="@id/rowTableHeader"
-        app:layout_constraintBottom_toTopOf="@id/areaFooter"
+        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
+        android:layout_marginBottom="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!--================================================================
-    　機　能　:　下部集計エリア（現状は空）
-    　備　考　:　集計情報やメッセージ等の表示領域として確保
-    ==================================================================-->
-    <LinearLayout
-        android:id="@+id/areaFooter"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"></LinearLayout>
 
     <!--================================================================
     　機　能　:　下部ボタン群の配置（共通部品）

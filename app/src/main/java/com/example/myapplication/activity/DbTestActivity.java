@@ -376,7 +376,7 @@ public class DbTestActivity extends BaseActivity {
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
         tv.setGravity(Gravity.CENTER);
-        tv.setBackgroundResource(R.drawable.bg_blue_back);
+        tv.setBackgroundResource(R.drawable.bg_text_readonly);
         tv.setPadding(dp(6), dp(4), dp(6), dp(4));
 
         // サイズ/マージンを適用
@@ -688,7 +688,7 @@ public class DbTestActivity extends BaseActivity {
         private TextView buildRowHeader() {
             TextView tv = new TextView(DbTestActivity.this);
             tv.setTextColor(0xFF000000);
-            tv.setBackgroundResource(R.drawable.bg_table_row);
+            tv.setBackgroundResource(R.drawable.bg_table_cell);
             tv.setGravity(Gravity.CENTER);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
             tv.setPadding(dp(6), dp(4), dp(6), dp(4));
@@ -703,7 +703,7 @@ public class DbTestActivity extends BaseActivity {
         private TextView buildCell() {
             TextView tv = new TextView(DbTestActivity.this);
             tv.setTextColor(0xFF000000);
-            tv.setBackgroundResource(R.drawable.bg_table_row);
+            tv.setBackgroundResource(R.drawable.bg_table_cell);
 
             // 1行表示（長い場合は横に伸びる前提）
             tv.setSingleLine(true);

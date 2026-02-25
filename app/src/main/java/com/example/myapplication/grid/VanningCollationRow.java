@@ -4,19 +4,15 @@ package com.example.myapplication.grid;
 //　処理概要　:　共通関数
 //　関　　数　:　VanningCollationRow ..... バンニング照合一覧の表示行データ
 //============================================================
-
-//====================================
-//　処理概要　:　VanningCollationRowクラス
-//====================================
 public class VanningCollationRow {
 
     // 出荷指図No（Packing No）
     public final String pNo;
 
-    // 束No（Bundle No）
+    // バンドルNo.（Bundle No）
     public final String bNo;
 
-    // 側番（Index）
+    // 束番（Index）
     public final String index;
 
     // 重量（3桁区切り＋左スペース埋め済み表示用文字列）

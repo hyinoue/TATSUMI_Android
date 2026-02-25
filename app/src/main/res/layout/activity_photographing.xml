@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--============================================================
-　処理概要　:　カメラ画面レイアウト（CameraX）
+　処理概要　:　カメラ撮影画面レイアウト（CameraX）
 　関　　連　:　プレビュー表示（PreviewView）
 　　　　　　:　撮影画像プレビュー表示（ImageView）
 　　　　　　:　フォーカス表示（フォーカスリング）
@@ -56,7 +56,7 @@
         android:id="@+id/focusIndicator"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:background="@drawable/bg_camera_focus_ring"
+        android:background="@drawable/ic_camera_focus"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="@id/previewView"
         app:layout_constraintBottom_toBottomOf="@id/previewView"
@@ -75,7 +75,7 @@
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_settings"
+        android:src="@drawable/ic_camera_settings"
         android:contentDescription="settings"
         android:scaleType="centerInside"
         android:tint="#FFFFFF"
@@ -132,7 +132,7 @@
             android:id="@+id/btnShutter"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="@drawable/bg_blue_back"
+            android:background="@drawable/bg_text_readonly"
             android:contentDescription="shutter"
             android:scaleType="center"
             android:src="@android:drawable/ic_menu_camera"
@@ -158,7 +158,7 @@
                 android:id="@+id/btnSave"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:background="@drawable/bg_blue_back"
+                android:background="@drawable/bg_text_readonly"
                 android:contentDescription="save"
                 android:scaleType="center"
                 android:src="@android:drawable/ic_menu_save" />
@@ -169,7 +169,7 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="24dp"
-                android:background="@drawable/bg_blue_back"
+                android:background="@drawable/bg_text_readonly"
                 android:contentDescription="discard"
                 android:scaleType="center"
                 android:src="@android:drawable/ic_menu_delete" />

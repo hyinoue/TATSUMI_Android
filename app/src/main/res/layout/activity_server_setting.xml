@@ -80,14 +80,14 @@
         <!--================================================================
         　機　能　:　接続先選択コンボ（Spinner）
         　内　容　:　接続先URL候補を選択
-        　備　考　:　黒枠（FrameLayout）で包み外観を統一（▼は隠れない）
+        　備　考　:　黒枠（FrameLayout）で包み外観を統一
         ==================================================================-->
         <FrameLayout
             android:id="@+id/flServerUrl"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:background="@drawable/bg_spinner_black_border"
+            android:background="@drawable/bg_combobox_border_black"
             android:padding="1dp"
             app:layout_constraintStart_toEndOf="@id/tvServerUrlLabel"
             app:layout_constraintTop_toTopOf="@id/tvServerUrlLabel"

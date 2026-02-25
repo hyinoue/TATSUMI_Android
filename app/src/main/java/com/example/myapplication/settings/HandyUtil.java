@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 //============================================================
 //　処理概要　:　共通関数
 //　関　　数　:　HandyUtil ..... 端末ユーティリティ（チェックデジット/ブザー/バイブ）
-//　　　　　　:　calcCheckDigit ..... ISO 6346 コンテナ番号チェックデジット計算
+//　　　　　　:　calcCheckDigit ..... ISO 6346 コンテナNo.チェックデジット計算
 //　　　　　　:　playErrorBuzzer ..... エラーブザー再生
 //　　　　　　:　playSuccessBuzzer ..... 成功ブザー再生
 //　　　　　　:　playVibrater ..... バイブ再生（設定値で回数/長さ/間隔制御）
@@ -41,7 +41,7 @@ public class HandyUtil {
     }
 
     /**
-     * ISO 6346 コンテナ番号のチェックデジット計算
+     * ISO 6346 コンテナNo.のチェックデジット計算
      */
     //=====================================
     //　機　能　:　calc Check Digitの処理

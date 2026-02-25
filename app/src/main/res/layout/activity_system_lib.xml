@@ -52,288 +52,273 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--================================================================
-    　機　能　:　メイン領域（スクロール）
-    　内　容　:　ブザー音設定／バイブレーション設定の入力項目を表示
-    　備　考　:　下部ボタンに重ならないよう、ボタン上までをスクロール対象とする
-    ==================================================================-->
-    <ScrollView
-        android:id="@+id/scrollMain"
+     　機　能　:　メイン領域
+     　内　容　:　ブザー音設定／バイブレーション設定の入力項目を表示
+     　備　考　:　下部ボタンに重ならないよう、ボタン上までを表示領域とする
+     ==================================================================-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMain"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="true"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/includeBottomButtons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <!--================================================================
+        　機　能　:　ブザー音設定エリア
+        　内　容　:　ON/OFF／音量／長さ(ミリ秒)／テストボタン
+        ==================================================================-->
+
+        <!-- 見出し -->
+        <TextView
+            android:id="@+id/tvBuzzerTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp">
+            android:text="ブザー音設定"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnBuzzerTest"
+            app:layout_constraintHorizontal_bias="0" />
 
-            <!--================================================================
-            　機　能　:　ブザー音設定エリア
-            　内　容　:　ON/OFF／音量／長さ(ミリ秒)／テストボタン
-            ==================================================================-->
+        <!-- ブザーテスト -->
+        <Button
+            android:id="@+id/btnBuzzerTest"
+            android:layout_width="92dp"
+            android:layout_height="36dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="テスト"
+            android:textSize="16sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:layout_constraintTop_toTopOf="@id/tvBuzzerTitle"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- 見出し -->
-            <TextView
-                android:id="@+id/tvBuzzerTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="ブザー音設定"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btnBuzzerTest"
-                app:layout_constraintHorizontal_bias="0" />
+        <!-- ON/OFF -->
+        <CheckBox
+            android:id="@+id/chkBuzzerOnOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="On/Off"
+            android:textSize="18sp"
+            android:buttonTint="#000000"
+            app:layout_constraintTop_toBottomOf="@id/tvBuzzerTitle"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- ブザーテスト -->
-            <Button
-                android:id="@+id/btnBuzzerTest"
-                android:layout_width="92dp"
-                android:layout_height="36dp"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:text="テスト"
-                android:textSize="16sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                app:layout_constraintTop_toTopOf="@id/tvBuzzerTitle"
-                app:layout_constraintEnd_toEndOf="parent" />
+        <!-- 音量 -->
+        <TextView
+            android:id="@+id/tvBuzzerVolumeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="音量"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            app:layout_constraintTop_toBottomOf="@id/chkBuzzerOnOff"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- ON/OFF -->
-            <CheckBox
-                android:id="@+id/chkBuzzerOnOff"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="On/Off"
-                android:textSize="18sp"
-                android:buttonTint="#000000"
-                app:layout_constraintTop_toBottomOf="@id/tvBuzzerTitle"
-                app:layout_constraintStart_toStartOf="parent" />
+        <!-- 音量選択（Spinner） -->
+        <FrameLayout
+            android:id="@+id/areaContainerSize"
+            android:layout_width="115dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="75dp"
+            android:background="@drawable/bg_combobox_border_black"
+            android:padding="1dp"
+            app:layout_constraintTop_toTopOf="@id/tvBuzzerVolumeLabel"
+            app:layout_constraintStart_toEndOf="@id/tvBuzzerVolumeLabel">
 
-            <!-- 音量 -->
-            <TextView
-                android:id="@+id/tvBuzzerVolumeLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="音量"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                app:layout_constraintTop_toBottomOf="@id/chkBuzzerOnOff"
-                app:layout_constraintStart_toStartOf="parent" />
+            <Spinner
+                android:id="@+id/spBuzzerVolume"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:spinnerMode="dropdown"
+                android:textColor="#000000" />
+        </FrameLayout>
 
-            <!-- 音量選択（Spinner） -->
-            <FrameLayout
-                android:id="@+id/areaContainerSize"
-                android:layout_width="115dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="75dp"
-                android:background="@drawable/bg_spinner_black_border"
-                android:padding="1dp"
-                app:layout_constraintTop_toTopOf="@id/tvBuzzerVolumeLabel"
-                app:layout_constraintStart_toEndOf="@id/tvBuzzerVolumeLabel">
+        <!-- 長さ（ミリ秒） -->
+        <TextView
+            android:id="@+id/tvBuzzerLengthLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="長さ(ミリ秒)"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            app:layout_constraintTop_toBottomOf="@id/tvBuzzerVolumeLabel"
+            app:layout_constraintStart_toStartOf="parent" />
 
-                <Spinner
-                    android:id="@+id/spBuzzerVolume"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:spinnerMode="dropdown"
-                    android:textColor="#000000" />
-            </FrameLayout>
+        <!-- ブザー長さ入力 -->
+        <EditText
+            android:id="@+id/etBuzzerLengthMs"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="14dp"
+            android:inputType="number"
+            android:text="200"
+            android:textSize="16sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@android:drawable/edit_text"
+            app:layout_constraintTop_toTopOf="@id/tvBuzzerLengthLabel"
+            app:layout_constraintStart_toEndOf="@id/tvBuzzerLengthLabel" />
 
-            <!-- 長さ（ミリ秒） -->
-            <TextView
-                android:id="@+id/tvBuzzerLengthLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="長さ(ミリ秒)"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                app:layout_constraintTop_toBottomOf="@id/tvBuzzerVolumeLabel"
-                app:layout_constraintStart_toStartOf="parent" />
+        <!-- セクション区切り（余白） -->
+        <View
+            android:id="@+id/space1"
+            android:layout_width="0dp"
+            android:layout_height="22dp"
+            app:layout_constraintTop_toBottomOf="@id/etBuzzerLengthMs"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- ブザー長さ入力 -->
-            <EditText
-                android:id="@+id/etBuzzerLengthMs"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="14dp"
-                android:inputType="number"
-                android:text="200"
-                android:textSize="16sp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@android:drawable/edit_text"
-                app:layout_constraintTop_toTopOf="@id/tvBuzzerLengthLabel"
-                app:layout_constraintStart_toEndOf="@id/tvBuzzerLengthLabel" />
+        <!--================================================================
+        　機　能　:　バイブレーション設定エリア
+        　内　容　:　ON/OFF／長さ(ミリ秒)／回数／間隔(ミリ秒)／テストボタン
+        ==================================================================-->
 
-            <!-- セクション区切り（余白） -->
-            <View
-                android:id="@+id/space1"
-                android:layout_width="0dp"
-                android:layout_height="22dp"
-                app:layout_constraintTop_toBottomOf="@id/etBuzzerLengthMs"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+        <!-- 見出し -->
+        <TextView
+            android:id="@+id/tvVibrationTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="バイブレーション設定"
+            android:layout_marginTop="30dp"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/space1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnVibrationTest"
+            app:layout_constraintHorizontal_bias="0" />
 
-            <!--================================================================
-            　機　能　:　バイブレーション設定エリア
-            　内　容　:　ON/OFF／長さ(ミリ秒)／回数／間隔(ミリ秒)／テストボタン
-            ==================================================================-->
+        <!-- バイブレーションテスト -->
+        <Button
+            android:id="@+id/btnVibrationTest"
+            android:layout_width="92dp"
+            android:layout_height="36dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="テスト"
+            android:textSize="16sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:layout_constraintTop_toTopOf="@id/tvVibrationTitle"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- 見出し -->
-            <TextView
-                android:id="@+id/tvVibrationTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="バイブレーション設定"
-                android:layout_marginTop="30dp"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/space1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btnVibrationTest"
-                app:layout_constraintHorizontal_bias="0" />
+        <!-- ON/OFF -->
+        <CheckBox
+            android:id="@+id/chkVibrationOnOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="On/Off"
+            android:textSize="18sp"
+            android:buttonTint="#000000"
+            app:layout_constraintTop_toBottomOf="@id/tvVibrationTitle"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- バイブレーションテスト -->
-            <Button
-                android:id="@+id/btnVibrationTest"
-                android:layout_width="92dp"
-                android:layout_height="36dp"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:text="テスト"
-                android:textSize="16sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                app:layout_constraintTop_toTopOf="@id/tvVibrationTitle"
-                app:layout_constraintEnd_toEndOf="parent" />
+        <!-- 長さ（ミリ秒） -->
+        <TextView
+            android:id="@+id/tvVibLengthLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="長さ(ミリ秒)"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            app:layout_constraintTop_toBottomOf="@id/chkVibrationOnOff"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- ON/OFF -->
-            <CheckBox
-                android:id="@+id/chkVibrationOnOff"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="On/Off"
-                android:textSize="18sp"
-                android:buttonTint="#000000"
-                app:layout_constraintTop_toBottomOf="@id/tvVibrationTitle"
-                app:layout_constraintStart_toStartOf="parent" />
+        <!-- バイブ長さ入力 -->
+        <EditText
+            android:id="@+id/etVibLengthMs"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="14dp"
+            android:inputType="number"
+            android:text="250"
+            android:textSize="16sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@android:drawable/edit_text"
+            app:layout_constraintTop_toTopOf="@id/tvVibLengthLabel"
+            app:layout_constraintStart_toEndOf="@id/tvVibLengthLabel" />
 
-            <!-- 長さ（ミリ秒） -->
-            <TextView
-                android:id="@+id/tvVibLengthLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="長さ(ミリ秒)"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                app:layout_constraintTop_toBottomOf="@id/chkVibrationOnOff"
-                app:layout_constraintStart_toStartOf="parent" />
+        <!-- 回数 -->
+        <TextView
+            android:id="@+id/tvVibCountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="回数"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            app:layout_constraintTop_toBottomOf="@id/tvVibLengthLabel"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- バイブ長さ入力 -->
-            <EditText
-                android:id="@+id/etVibLengthMs"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="14dp"
-                android:inputType="number"
-                android:text="250"
-                android:textSize="16sp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@android:drawable/edit_text"
-                app:layout_constraintTop_toTopOf="@id/tvVibLengthLabel"
-                app:layout_constraintStart_toEndOf="@id/tvVibLengthLabel" />
+        <!-- バイブ回数入力 -->
+        <EditText
+            android:id="@+id/etVibCount"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="73dp"
+            android:inputType="number"
+            android:text="3"
+            android:textSize="16sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@android:drawable/edit_text"
+            app:layout_constraintTop_toTopOf="@id/tvVibCountLabel"
+            app:layout_constraintStart_toEndOf="@id/tvVibCountLabel" />
 
-            <!-- 回数 -->
-            <TextView
-                android:id="@+id/tvVibCountLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="回数"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                app:layout_constraintTop_toBottomOf="@id/tvVibLengthLabel"
-                app:layout_constraintStart_toStartOf="parent" />
+        <!-- 間隔（ミリ秒） -->
+        <TextView
+            android:id="@+id/tvVibIntervalLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="間隔(ミリ秒)"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            app:layout_constraintTop_toBottomOf="@id/tvVibCountLabel"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- バイブ回数入力 -->
-            <EditText
-                android:id="@+id/etVibCount"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="73dp"
-                android:inputType="number"
-                android:text="3"
-                android:textSize="16sp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@android:drawable/edit_text"
-                app:layout_constraintTop_toTopOf="@id/tvVibCountLabel"
-                app:layout_constraintStart_toEndOf="@id/tvVibCountLabel" />
+        <!-- バイブ間隔入力 -->
+        <EditText
+            android:id="@+id/etVibIntervalMs"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="14dp"
+            android:nextFocusDown="@id/chkBuzzerOnOff"
+            android:nextFocusForward="@id/chkBuzzerOnOff"
+            android:inputType="number"
+            android:text="100"
+            android:textSize="16sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@android:drawable/edit_text"
+            app:layout_constraintTop_toTopOf="@id/tvVibIntervalLabel"
+            app:layout_constraintStart_toEndOf="@id/tvVibIntervalLabel" />
 
-            <!-- 間隔（ミリ秒） -->
-            <TextView
-                android:id="@+id/tvVibIntervalLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="間隔(ミリ秒)"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                app:layout_constraintTop_toBottomOf="@id/tvVibCountLabel"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <!-- バイブ間隔入力 -->
-            <EditText
-                android:id="@+id/etVibIntervalMs"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="14dp"
-                android:nextFocusDown="@id/chkBuzzerOnOff"
-                android:nextFocusForward="@id/chkBuzzerOnOff"
-                android:inputType="number"
-                android:text="100"
-                android:textSize="16sp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@android:drawable/edit_text"
-                app:layout_constraintTop_toTopOf="@id/tvVibIntervalLabel"
-                app:layout_constraintStart_toEndOf="@id/tvVibIntervalLabel" />
-
-            <!-- 下の余白（スクロール時に下ボタンに隠れないように） -->
-            <View
-                android:layout_width="0dp"
-                android:layout_height="12dp"
-                app:layout_constraintTop_toBottomOf="@id/etVibIntervalMs"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--================================================================
     　機　能　:　下部ボタン群の配置（共通部品）

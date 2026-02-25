@@ -54,237 +54,213 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--================================================================
-    　機　能　:　メニュー領域（スクロール）
+    　機　能　:　メニュー領域
     　内　容　:　メニュー一覧（1～7）を表示
-    　備　考　:　画面サイズにより縦スクロール可能
     ==================================================================-->
-    <ScrollView
-        android:id="@+id/scroll"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMenu"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="true"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingStart="22dp"
-            android:paddingEnd="22dp"
-            android:paddingTop="18dp"
-            android:paddingBottom="18dp">
+        <!--================================================================
+        　機　能　:　上側メニュー一覧（1～7）
+        　内　容　:　各メニュー項目をタップ可能なTextViewで表示
+        ==================================================================-->
+        <LinearLayout
+            android:id="@+id/menuArea"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <!--================================================================
-            　機　能　:　上側メニュー一覧（1～7）
-            　内　容　:　各メニュー項目をタップ可能なTextViewで表示
-            ==================================================================-->
+            <!-- 1. データ確認 -->
             <LinearLayout
-                android:id="@+id/menuArea"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:paddingVertical="6dp">
 
-                <!-- 1. データ確認 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/menu1"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
+                    android:text="1.  データ確認"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
 
-                    <TextView
-                        android:id="@+id/menu1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1.  データ確認"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 2. データクリア -->
-                <LinearLayout
+                <!-- 区切り線 -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="2.  データクリア"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 3. メンテナンスデータ送信 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="3.  メンテナンスデータ送信"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 4. 通信テスト -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4.  通信テスト"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 5. バーコードテスト -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5.  バーコードテスト"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 6. 振動設定 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="6.  振動設定"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
-                <!-- 7. サーバー切替 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="6dp">
-
-                    <TextView
-                        android:id="@+id/menu7"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="7.  サーバー切替"
-                        android:textColor="#0000FF"
-                        android:textSize="18sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="2dp" />
-
-                    <!-- 区切り線 -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#0000FF" />
-                </LinearLayout>
-
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
             </LinearLayout>
 
-            <!--================================================================
-            　機　能　:　戻り領域（下寄せ用）
-            　内　容　:　「戻る」等の下部項目を配置するための領域
-            　備　考　:　画面下に寄せて表示
-            ==================================================================-->
+            <!-- 2. データクリア -->
             <LinearLayout
-                android:id="@+id/backArea"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:paddingVertical="6dp">
 
-                <!-- ※必要に応じて「9. 戻る」等の項目をここに追加する -->
+                <TextView
+                    android:id="@+id/menu2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2.  データクリア"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+            <!-- 3. メンテナンスデータ送信 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/menu3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3.  メンテナンスデータ送信"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
+            </LinearLayout>
+
+            <!-- 4. 通信テスト -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/menu4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.  通信テスト"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
+            </LinearLayout>
+
+            <!-- 5. バーコードテスト -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/menu5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5.  バーコードテスト"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
+            </LinearLayout>
+
+            <!-- 6. 振動設定 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/menu6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="6.  振動設定"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
+            </LinearLayout>
+
+            <!-- 7. サーバー切替 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/menu7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7.  サーバー切替"
+                    android:textColor="#0000FF"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="2dp" />
+
+                <!-- 区切り線 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#0000FF" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--================================================================
     　機　能　:　下部ボタン群の配置（共通部品）

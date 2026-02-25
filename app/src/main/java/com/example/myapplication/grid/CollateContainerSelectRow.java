@@ -4,10 +4,6 @@ package com.example.myapplication.grid;
 //　処理概要　:　共通関数
 //　関　　数　:　CollateContainerSelectRow ..... 照合対象コンテナ一覧の表示行データ
 //============================================================
-
-//====================================
-//　処理概要　:　CollateContainerSelectRowクラス
-//====================================
 public class CollateContainerSelectRow {
 
     // 一覧表示用の連番（1始まり）

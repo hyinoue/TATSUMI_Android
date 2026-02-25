@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--============================================================
 　処理概要　:　共通定義
-　定　　義　:　メニューボタン背景Shape（矩形・黒枠付き）
+　定　　義　:　読み取り専用テキストボックス
 ============================================================-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">

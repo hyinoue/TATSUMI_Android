@@ -13,7 +13,7 @@ import java.util.List;
 //============================================================
 //　処理概要　:　出荷コンテナテーブル（T_SYUKKA_CONTAINER）に対するDAO
 //　関　　数　:　findById            ..... コンテナID検索
-//　　　　　　:　findByBookingNo     ..... 予約番号検索
+//　　　　　　:　findByBookingNo     ..... 予約No.検索
 //　　　　　　:　upsert              ..... 追加／更新
 //　　　　　　:　findUnsent          ..... 未送信データ取得
 //　　　　　　:　getMaxContainerId   ..... 最大コンテナID取得
@@ -41,8 +41,8 @@ public interface SyukkaContainerDao {
 
 
     //================================================================
-    //　機　能　:　予約番号に紐づくコンテナを取得する
-    //　引　数　:　bookingNo ..... 予約番号
+    //　機　能　:　予約No.に紐づくコンテナを取得する
+    //　引　数　:　bookingNo ..... 予約No.
     //　戻り値　:　[List<SyukkaContainerEntity>] ..... 該当コンテナ一覧
     //================================================================
     @Query(

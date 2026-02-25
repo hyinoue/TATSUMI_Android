@@ -9,7 +9,7 @@ import com.example.myapplication.db.entity.SystemEntity;
 
 
 //============================================================
-//　処理概要　:　システム管理テーブル（M_SYSTEM）に対するDAO
+//　処理概要　:　システムマスタ（M_SYSTEM）に対するDAO
 //　関　　数　:　insert           ..... 新規登録
 //　　　　　　:　get              ..... 固定レコード取得（RENBAN=1）
 //　　　　　　:　findById         ..... RENBAN指定取得

@@ -27,9 +27,6 @@ import java.util.List;
 //　　　　　　:　safeStr ..... null安全な文字列化
 //============================================================
 
-//=================================================
-//　処理概要　:　CollateContainerSelectControllerクラス
-//=================================================
 public class CollateContainerSelectController {
 
     private final KakuninContainerDao kakuninContainerDao;

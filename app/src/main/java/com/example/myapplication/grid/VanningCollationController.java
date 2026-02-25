@@ -24,7 +24,7 @@ import java.util.Locale;
 //　　　　　　:　load ..... コンテナID指定でWork再作成→一覧読込→表示更新
 //　　　　　　:　getDetails ..... Work明細の取得
 //　　　　　　:　getDisplayRows ..... 表示用行データの取得
-//　　　　　　:　checkSokuDtl ..... 側番明細の照合可否チェック（存在/確認済）
+//　　　　　　:　checkSokuDtl ..... 束番明細の照合可否チェック（存在/確認済）
 //　　　　　　:　updateSyougo ..... 照合済フラグ更新（Work更新→再読込→表示更新）
 //　　　　　　:　getSyougouSumiCount ..... 照合済件数の取得
 //　　　　　　:　getUncollatedCount ..... 未照合件数の取得
@@ -39,9 +39,6 @@ import java.util.Locale;
 //　　　　　　:　nowAsText ..... 現在時刻文字列生成（yyyy-MM-dd HH:mm:ss）
 //============================================================
 
-//===========================================
-//　処理概要　:　VanningCollationControllerクラス
-//===========================================
 public class VanningCollationController {
 
     private final KakuninMeisaiDao kakuninMeisaiDao;

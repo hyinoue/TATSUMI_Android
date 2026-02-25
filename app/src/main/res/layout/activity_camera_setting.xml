@@ -87,7 +87,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="26dp"
-                android:background="@drawable/bg_spinner_black_border"
+                android:background="@drawable/bg_combobox_border_black"
                 android:padding="1dp">
 
                 <!-- 画像サイズ選択 -->
@@ -124,7 +124,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="26dp"
-                android:background="@drawable/bg_spinner_black_border"
+                android:background="@drawable/bg_combobox_border_black"
                 android:padding="1dp">
 
                 <!-- フラッシュ選択 -->
@@ -161,7 +161,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:background="@drawable/bg_spinner_black_border"
+                android:background="@drawable/bg_combobox_border_black"
                 android:padding="1dp">
 
                 <!-- ライトモード選択 -->

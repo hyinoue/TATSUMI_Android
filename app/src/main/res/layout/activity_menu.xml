@@ -52,7 +52,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--================================================================
-    　機　能　:　メイン領域（スクロール無し）
+    　機　能　:　メイン領域
     　内　容　:　メニュー各ボタン／コンテナサイズ選択／作業状況表示
     　備　考　:　タイトルバー直下～下部ボタン群直上までを占有
     ==================================================================-->
@@ -156,7 +156,7 @@
             <FrameLayout
                 android:layout_width="95dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_spinner_black_border"
+                android:background="@drawable/bg_combobox_border_black"
                 android:padding="1dp">
 
                 <!-- コンテナサイズ選択Spinner -->

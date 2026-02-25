@@ -781,7 +781,6 @@ public class DataSync {
                 return;
             }
 
-            // 共通の登録日時
             String now = formatDbDate(new Date());
 
             // ヘッダ（コンテナ）を反映

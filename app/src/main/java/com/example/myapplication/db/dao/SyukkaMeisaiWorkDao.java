@@ -39,8 +39,8 @@ public interface SyukkaMeisaiWorkDao {
 
     //================================================================
     //　機　能　:　HEAT_NOとSOKUBANを指定してワーク明細を1件取得する
-    //　引　数　:　heatNo  ..... ヒート番号
-    //　　　　　:　sokuban ..... 側番
+    //　引　数　:　heatNo  ..... 鋼番
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[SyukkaMeisaiWorkEntity] ..... 該当データ（存在しない場合はnull）
     //================================================================
     @Query(
@@ -72,8 +72,8 @@ public interface SyukkaMeisaiWorkDao {
 
     //================================================================
     //　機　能　:　指定したHEAT_NOとSOKUBANのデータを削除する
-    //　引　数　:　heatNo  ..... ヒート番号
-    //　　　　　:　sokuban ..... 側番
+    //　引　数　:　heatNo  ..... 鋼番
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[int] ..... 削除件数
     //================================================================
     @Query(
@@ -101,7 +101,7 @@ public interface SyukkaMeisaiWorkDao {
 
 
     //================================================================
-    //　機　能　:　ワーク明細の集計情報（束数・重量・予約番号）を取得する
+    //　機　能　:　ワーク明細の集計情報（束数・重量・予約No.）を取得する
     //　引　数　:　なし
     //　戻り値　:　[WorkSummary] ..... 集計結果
     //================================================================
@@ -121,10 +121,10 @@ public interface SyukkaMeisaiWorkDao {
     )
     WorkSummary getWorkSummary();
     // ・ワーク（W）に登録されている明細を対象に集計
-    // ・本体（T）とJOINして重量／予約番号を取得
+    // ・本体（T）とJOINして重量／予約No.を取得
     // ・sokusu    : ワーク件数（束数の扱い想定）
     // ・jyuryo    : 重量合計（T.JYURYOの合計）
-    // ・bookingNo : 予約番号（複数ある場合はmaxで代表値取得）
+    // ・bookingNo : 予約No.（複数ある場合はmaxで代表値取得）
 
 
     //================================================================
@@ -161,21 +161,21 @@ public interface SyukkaMeisaiWorkDao {
     //　処理概要　:　ワークJOIN結果（一覧表示用）
     //============================================================
     class WorkJoinRow {
-        public String heatNo;     // ヒート番号
-        public String sokuban;    // 側番
-        public String packingNo;  // 出荷指図番号（SQL上はSYUKKA_SASHIZU_NO）
-        public String bundleNo;   // バンドル番号
+        public String heatNo;     // 鋼番
+        public String sokuban;    // 束番
+        public String packingNo;  // 出荷指図No.（SQL上はSYUKKA_SASHIZU_NO）
+        public String bundleNo;   // バンドルNo.
         public Integer jyuryo;    // 重量
-        public String bookingNo;  // 予約番号
+        public String bookingNo;  // 予約No.
     }
 
     //============================================================
-    //　処理概要　:　ワーク集計結果（束数・重量・予約番号）
+    //　処理概要　:　ワーク集計結果（束数・重量・予約No.）
     //============================================================
     class WorkSummary {
         public int sokusu;        // 束数（ワーク件数）
         public Integer jyuryo;    // 重量合計（NULLの可能性あり）
-        public String bookingNo;  // 予約番号（代表値）
+        public String bookingNo;  // 予約No.（代表値）
     }
 
 }
