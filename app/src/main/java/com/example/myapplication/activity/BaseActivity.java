@@ -64,24 +64,24 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * ラベル(バナー)表示時間(ms)
      */
-    protected int labelDisplayTimeMs = 2500;
+    protected int labelDisplayTimeMs = 2500; // ラベル(バナー)表示時間(ms)
 
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = new Handler(Looper.getMainLooper()); // UIスレッドハンドラ
 
     // Label風バナー（frmBase.lblErrMsg相当）
-    private TextView bannerView;
-    private Runnable bannerHideRunnable;
+    private TextView bannerView;         // バナー表示View
+    private Runnable bannerHideRunnable; // バナー自動非表示Runnable
 
     // Wait overlay（frmBase.pnlWaitLong/Short相当）
-    private FrameLayout overlayLong;
-    private FrameLayout overlayShort;
+    private FrameLayout overlayLong;  // 長時間処理用オーバーレイ
+    private FrameLayout overlayShort; // 短時間処理用オーバーレイ
 
     // 画面下4色ボタン
-    private MaterialButton btnBottomRed;
-    private MaterialButton btnBottomBlue;
-    private MaterialButton btnBottomGreen;
-    private MaterialButton btnBottomYellow;
-    private boolean bottomButtonsBound = false;
+    private MaterialButton btnBottomRed;    // 下部赤ボタン
+    private MaterialButton btnBottomBlue;   // 下部青ボタン
+    private MaterialButton btnBottomGreen;  // 下部緑ボタン
+    private MaterialButton btnBottomYellow; // 下部黄ボタン
+    private boolean bottomButtonsBound = false; // 下部ボタン紐付け済みフラグ
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

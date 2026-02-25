@@ -71,52 +71,52 @@ import java.util.concurrent.TimeUnit;
 public class PhotographingActivity extends BaseActivity {
 
     public static final String EXTRA_TARGET = "extra_target";      // "CONTAINER" / "SEAL"
-    public static final String EXTRA_RESULT_URI = "extra_result_uri";
+    public static final String EXTRA_RESULT_URI = "extra_result_uri"; // 撮影結果URI返却キー
 
-    private static final String TAG = "Photographing";
+    private static final String TAG = "Photographing"; // ログタグ
 
-    private static final int CAM_UXGA = 0;
-    private static final int CAM_QUADVGA = 1;
-    private static final int CAM_XGA = 2;
-    private static final int CAM_SVGA = 3;
-    private static final int CAM_VGA = 4;
-    private static final int CAM_QVGA = 5;
+    private static final int CAM_UXGA = 0;    // 画像サイズ: UXGA
+    private static final int CAM_QUADVGA = 1; // 画像サイズ: QUADVGA
+    private static final int CAM_XGA = 2;     // 画像サイズ: XGA
+    private static final int CAM_SVGA = 3;    // 画像サイズ: SVGA
+    private static final int CAM_VGA = 4;     // 画像サイズ: VGA
+    private static final int CAM_QVGA = 5;    // 画像サイズ: QVGA
 
-    private static final int CAM_FLASH_AUTO = 0;
-    private static final int CAM_FLASH_ENABLE = 1;
-    private static final int CAM_FLASH_DISABLE = 2;
+    private static final int CAM_FLASH_AUTO = 0;    // フラッシュ: AUTO
+    private static final int CAM_FLASH_ENABLE = 1;  // フラッシュ: ON
+    private static final int CAM_FLASH_DISABLE = 2; // フラッシュ: OFF
 
-    private static final int CAM_LIGHT_AUTO = 0;
-    private static final int CAM_OUTDOOR = 1;
-    private static final int CAM_FLUORESCENT = 2;
-    private static final int CAM_INCANDESCE = 3;
-    private static final int CAM_DIMLIGHT = 4;
+    private static final int CAM_LIGHT_AUTO = 0;   // 露出補正: AUTO
+    private static final int CAM_OUTDOOR = 1;      // 露出補正: 屋外
+    private static final int CAM_FLUORESCENT = 2;  // 露出補正: 蛍光灯
+    private static final int CAM_INCANDESCE = 3;   // 露出補正: 白熱灯
+    private static final int CAM_DIMLIGHT = 4;     // 露出補正: 暗所
 
-    private static final int AE_MODE_AUTO = CaptureRequest.CONTROL_AE_MODE_ON;
-    private static final int AE_MODE_ALWAYS_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH;
-    private static final int AE_MODE_AUTO_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH;
+    private static final int AE_MODE_AUTO = CaptureRequest.CONTROL_AE_MODE_ON;                         // AE: 自動露出
+    private static final int AE_MODE_ALWAYS_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH;   // AE: 常時発光
+    private static final int AE_MODE_AUTO_FLASH = CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH;       // AE: 自動発光
 
-    private PreviewView previewView;
-    private TextView statusBar;
-    private ImageView capturedPreview;
-    private View focusIndicator;
-    private View confirmButtons;
-    private ImageButton btnSettings;
-    private ImageButton btnShutter;
-    private ImageButton btnSave;
-    private ImageButton btnDiscard;
+    private PreviewView previewView;     // カメラプレビュー
+    private TextView statusBar;          // ステータスメッセージ
+    private ImageView capturedPreview;   // 撮影画像プレビュー
+    private View focusIndicator;         // フォーカス表示
+    private View confirmButtons;         // 保存/破棄ボタン領域
+    private ImageButton btnSettings;     // 設定ボタン
+    private ImageButton btnShutter;      // シャッターボタン
+    private ImageButton btnSave;         // 保存ボタン
+    private ImageButton btnDiscard;      // 破棄ボタン
 
-    private ProcessCameraProvider cameraProvider;
-    private Camera camera;
-    private ImageCapture imageCapture;
+    private ProcessCameraProvider cameraProvider; // CameraXプロバイダ
+    private Camera camera;                        // カメラインスタンス
+    private ImageCapture imageCapture;            // 撮影ユースケース
 
-    private String target;
-    private Uri pendingPhotoUri;
-    private File pendingPhotoFile;
-    private int lastImageSize;
-    private int lastFlashMode;
-    private int lastLightMode;
-    private MediaActionSound shutterSound;
+    private String target;               // 撮影対象種別
+    private Uri pendingPhotoUri;         // 仮保存画像URI
+    private File pendingPhotoFile;       // 仮保存画像ファイル
+    private int lastImageSize;           // 最終画像サイズ設定
+    private int lastFlashMode;           // 最終フラッシュ設定
+    private int lastLightMode;           // 最終露出補正設定
+    private MediaActionSound shutterSound; // シャッター音
 
     private final ActivityResultLauncher<String> requestCameraPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {

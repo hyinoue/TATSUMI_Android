@@ -43,20 +43,20 @@ import java.util.List;
 
 public class SystemLibActivity extends BaseActivity {
 
-    private static final int BUZZER_VOLUME_MAX = 10;
-    private static final int BUZZER_VOLUME_MID = 5;
-    private static final int BUZZER_VOLUME_MIN = 1;
+    private static final int BUZZER_VOLUME_MAX = 10; // ブザー音量: 最大
+    private static final int BUZZER_VOLUME_MID = 5;  // ブザー音量: 中
+    private static final int BUZZER_VOLUME_MIN = 1;  // ブザー音量: 最小
 
-    private CheckBox chkBuzzerOnOff;
-    private EditText etBuzzerLength;
-    private Spinner spBuzzerVolume;
-    private CheckBox chkVibrationOnOff;
-    private EditText etVibLength;
-    private EditText etVibCount;
-    private EditText etVibInterval;
-    private Button btnBuzzerTest;
-    private Button btnVibrationTest;
-    private List<VolumeOption> volumeOptions;
+    private CheckBox chkBuzzerOnOff;      // ブザーON/OFF
+    private EditText etBuzzerLength;      // ブザー時間
+    private Spinner spBuzzerVolume;       // ブザー音量
+    private CheckBox chkVibrationOnOff;   // バイブON/OFF
+    private EditText etVibLength;         // バイブ時間
+    private EditText etVibCount;          // バイブ回数
+    private EditText etVibInterval;       // バイブ間隔
+    private Button btnBuzzerTest;         // ブザーテストボタン
+    private Button btnVibrationTest;      // バイブテストボタン
+    private List<VolumeOption> volumeOptions; // 音量選択肢
 
     //============================================
     //　機　能　:　画面生成時の初期化処理
