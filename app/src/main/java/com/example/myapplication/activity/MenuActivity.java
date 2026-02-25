@@ -79,26 +79,26 @@ public class MenuActivity extends BaseActivity {
     /**
      * ログタグ
      */
-    private static final String TAG = "MENU";
+    private static final String TAG = "MENU"; // ログタグ
 
     /**
      * DENSO PowerManagerService 呼出し情報（本番の再起動用）
      */
-    private static final String DENSO_POWER_MANAGER_PACKAGE = "com.densowave.powermanagerservice";
-    private static final String DENSO_POWER_MANAGER_SERVICE = "com.densowave.powermanagerservice.PowerManagerService";
-    private static final String DENSO_REBOOT_ACTION = "com.densowave.powermanagerservice.action.REBOOT";
+    private static final String DENSO_POWER_MANAGER_PACKAGE = "com.densowave.powermanagerservice"; // 電源管理サービスパッケージ
+    private static final String DENSO_POWER_MANAGER_SERVICE = "com.densowave.powermanagerservice.PowerManagerService"; // 電源管理サービス名
+    private static final String DENSO_REBOOT_ACTION = "com.densowave.powermanagerservice.action.REBOOT"; // 再起動アクション
 
     /**
      * Bundle/Containerで共有している重量キー
      */
-    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";
-    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";
+    private static final String KEY_CONTAINER_JYURYO = "container_jyuryo"; // コンテナ重量キー
+    private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";     // ダンネージ重量キー
 
     /**
      * Prefsに保存している重量キー
      */
-    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";
-    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";
+    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo"; // コンテナ重量設定キー
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";     // ダンネージ重量設定キー
 
     // ============================
     // メンバ
@@ -107,32 +107,32 @@ public class MenuActivity extends BaseActivity {
     /**
      * DB/通信など重い処理用（単一スレッド）
      */
-    private ExecutorService io;
+    private ExecutorService io; // I/O処理スレッド
 
     /**
      * 束選定画面の戻り値受け取り
      */
-    private ActivityResultLauncher<Intent> bundleSelectLauncher;
+    private ActivityResultLauncher<Intent> bundleSelectLauncher; // 束選定画面ランチャー
 
     /**
      * コンテナ入力画面の戻り値受け取り
      */
-    private ActivityResultLauncher<Intent> containerInputLauncher;
+    private ActivityResultLauncher<Intent> containerInputLauncher; // コンテナ入力画面ランチャー
 
     /**
      * 積載束選定の値保持（画面間で引き回す）
      */
-    private final Map<String, String> bundleValues = new HashMap<>();
+    private final Map<String, String> bundleValues = new HashMap<>(); // 束入力値保持
 
     /**
      * コンテナ情報入力の値保持（画面間で引き回す）
      */
-    private final Map<String, String> containerValues = new HashMap<>();
+    private final Map<String, String> containerValues = new HashMap<>(); // コンテナ入力値保持
 
     /**
      * データ送受信の二重実行防止フラグ
      */
-    private final AtomicBoolean isDataSyncRunning = new AtomicBoolean(false);
+    private final AtomicBoolean isDataSyncRunning = new AtomicBoolean(false); // 送受信処理中フラグ
 
     // ============================
     // Views
@@ -141,67 +141,67 @@ public class MenuActivity extends BaseActivity {
     /**
      * 画面中央ステータス（存在するレイアウトの場合のみ）
      */
-    private TextView tvCenterStatus;
+    private TextView tvCenterStatus; // 中央ステータス表示
 
     /**
      * コンテナサイズ選択スピナー
      */
-    private Spinner spContainerSize;
+    private Spinner spContainerSize; // コンテナサイズ選択
 
     /**
      * 送受信ボタン
      */
-    private Button btnDataReceive;
+    private Button btnDataReceive; // 送受信ボタン
     /**
      * 束選定ボタン
      */
-    private Button btnBundleSelect;
+    private Button btnBundleSelect; // 束選定ボタン
     /**
      * コンテナ入力ボタン
      */
-    private Button btnContainerInput;
+    private Button btnContainerInput; // コンテナ入力ボタン
     /**
      * 重量計算ボタン（束選定の別モード）
      */
-    private Button btnWeightCalc;
+    private Button btnWeightCalc; // 重量計算ボタン
     /**
      * 照合コンテナ選択ボタン
      */
-    private Button btnCollateContainerSelect;
+    private Button btnCollateContainerSelect; // 照合コンテナ選択ボタン
 
     /**
      * ラベル：最終受信時刻
      */
-    private TextView lblDataReceiveTime;
+    private TextView lblDataReceiveTime; // 最終受信時刻ラベル
     /**
      * ラベル：未送信あり表示
      */
-    private TextView lblDataReceive;
+    private TextView lblDataReceive; // 未送信ありラベル
     /**
      * ラベル：作業中あり表示
      */
-    private TextView lblContainerInput;
+    private TextView lblContainerInput; // 作業中ありラベル
 
     /**
      * ラベル：計画（コンテナ/束/重量）
      */
-    private TextView lblContainerPlan;
-    private TextView lblBundlePlan;
-    private TextView lblWeightPlan;
+    private TextView lblContainerPlan; // 計画コンテナラベル
+    private TextView lblBundlePlan;    // 計画束ラベル
+    private TextView lblWeightPlan;    // 計画重量ラベル
 
     /**
      * ラベル：完了（コンテナ/束/重量）
      */
-    private TextView lblContainerFin;
-    private TextView lblBundleFin;
-    private TextView lblWeightFin;
+    private TextView lblContainerFin; // 完了コンテナラベル
+    private TextView lblBundleFin;    // 完了束ラベル
+    private TextView lblWeightFin;    // 完了重量ラベル
 
     /**
      * ラベル：残（コンテナ/束/重量）
      */
-    private TextView lblZanContainer;
-    private TextView lblZanBundle;
-    private TextView lblZanWeight;
+    private TextView lblZanContainer; // 残コンテナラベル
+    private TextView lblZanBundle;    // 残束ラベル
+    private TextView lblZanWeight;    // 残重量ラベル
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

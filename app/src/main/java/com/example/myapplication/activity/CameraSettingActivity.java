@@ -30,30 +30,30 @@ import java.util.List;
 
 public class CameraSettingActivity extends BaseActivity {
 
-    private static final int CAM_UXGA = 0;
-    private static final int CAM_QUADVGA = 1;
-    private static final int CAM_XGA = 2;
-    private static final int CAM_SVGA = 3;
-    private static final int CAM_VGA = 4;
-    private static final int CAM_QVGA = 5;
+    private static final int CAM_UXGA = 0;    // 画像サイズ: UXGA
+    private static final int CAM_QUADVGA = 1; // 画像サイズ: QUADVGA
+    private static final int CAM_XGA = 2;     // 画像サイズ: XGA
+    private static final int CAM_SVGA = 3;    // 画像サイズ: SVGA
+    private static final int CAM_VGA = 4;     // 画像サイズ: VGA
+    private static final int CAM_QVGA = 5;    // 画像サイズ: QVGA
 
-    private static final int CAM_FLASH_AUTO = 0;
-    private static final int CAM_FLASH_ENABLE = 1;
-    private static final int CAM_FLASH_DISABLE = 2;
+    private static final int CAM_FLASH_AUTO = 0;    // フラッシュ: AUTO
+    private static final int CAM_FLASH_ENABLE = 1;  // フラッシュ: ON
+    private static final int CAM_FLASH_DISABLE = 2; // フラッシュ: OFF
 
-    private static final int CAM_LIGHT_AUTO = 0;
-    private static final int CAM_OUTDOOR = 1;
-    private static final int CAM_FLUORESCENT = 2;
-    private static final int CAM_INCANDESCE = 3;
-    private static final int CAM_DIMLIGHT = 4;
+    private static final int CAM_LIGHT_AUTO = 0;   // 露出補正: AUTO
+    private static final int CAM_OUTDOOR = 1;      // 露出補正: 屋外
+    private static final int CAM_FLUORESCENT = 2;  // 露出補正: 蛍光灯
+    private static final int CAM_INCANDESCE = 3;   // 露出補正: 白熱灯
+    private static final int CAM_DIMLIGHT = 4;     // 露出補正: 暗所
 
-    private Spinner spImageSize;
-    private Spinner spFlash;
-    private Spinner spLightMode;
+    private Spinner spImageSize; // 画像サイズ選択
+    private Spinner spFlash;     // フラッシュ選択
+    private Spinner spLightMode; // 露出補正選択
 
-    private List<Option> sizeOptions;
-    private List<Option> flashOptions;
-    private List<Option> lightOptions;
+    private List<Option> sizeOptions;  // 画像サイズ選択肢
+    private List<Option> flashOptions; // フラッシュ選択肢
+    private List<Option> lightOptions; // 露出補正選択肢
 
     //============================================
     //　機　能　:　画面生成時の初期化処理

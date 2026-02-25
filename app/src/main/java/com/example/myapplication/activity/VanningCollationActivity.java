@@ -65,32 +65,32 @@ import java.util.concurrent.Executors;
 
 public class VanningCollationActivity extends BaseActivity {
 
-    public static final String EXTRA_CONTAINER_ID = "extra_container_id";
-    public static final String EXTRA_CONTAINER_NO = "extra_container_no";
-    public static final String EXTRA_BUNDLE_CNT = "extra_bundle_cnt";
-    public static final String EXTRA_SAGYOU_YMD = "extra_sagyou_ymd";
+    public static final String EXTRA_CONTAINER_ID = "extra_container_id"; // コンテナID受け渡しキー
+    public static final String EXTRA_CONTAINER_NO = "extra_container_no"; // コンテナNo受け渡しキー
+    public static final String EXTRA_BUNDLE_CNT = "extra_bundle_cnt";     // 束数受け渡しキー
+    public static final String EXTRA_SAGYOU_YMD = "extra_sagyou_ymd";     // 作業日時受け渡しキー
 
-    private EditText etContainerNo;
-    private EditText etBundleCount;
-    private EditText etSagyouYmd;
-    private EditText etGenpinNo;
-    private TextView tvReadCount;
-    private RecyclerView rvBundles;
-    private MaterialButton btnBlue;
-    private MaterialButton btnRed;
-    private MaterialButton btnGreen;
-    private MaterialButton btnYellow;
+    private EditText etContainerNo;     // コンテナNo
+    private EditText etBundleCount;     // 積載束数
+    private EditText etSagyouYmd;       // 作業日時
+    private EditText etGenpinNo;        // 現品No入力
+    private TextView tvReadCount;       // 読取件数表示
+    private RecyclerView rvBundles;     // 照合一覧
+    private MaterialButton btnBlue;     // 下部青ボタン
+    private MaterialButton btnRed;      // 下部赤ボタン
+    private MaterialButton btnGreen;    // 下部緑ボタン
+    private MaterialButton btnYellow;   // 下部黄ボタン
 
-    private ExecutorService io;
-    private VanningCollationController controller;
-    private VanningCollationAdapter adapter;
+    private ExecutorService io;                   // I/O処理スレッド
+    private VanningCollationController controller; // 画面制御ロジック
+    private VanningCollationAdapter adapter;      // 一覧アダプター
 
     // ★この画面専用スキャナ
-    private DensoScannerController scanner;
-    private boolean scannerCreated = false;
+    private DensoScannerController scanner; // DENSOスキャナ制御
+    private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
-    private String containerId;
-    private boolean confirmed;
+    private String containerId; // 照合対象コンテナID
+    private boolean confirmed;  // 確定済みフラグ
 
     //================================================================
     //　機　能　:　画面生成/初期化

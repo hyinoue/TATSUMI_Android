@@ -28,24 +28,24 @@ import com.google.android.material.button.MaterialButton;
 
 public class CommTestActivity extends BaseActivity {
 
-    private static final String STATUS_ON = "ＯＮ";
-    private static final String STATUS_OFF = "ＯＦＦ";
-    private static final String STATUS_ERROR = "エラー";
-    private static final String STATUS_CONNECTED = "接続";
-    private static final String STATUS_DISCONNECTED = "未接続";
+    private static final String STATUS_ON = "ＯＮ";                    // ON表示文字列
+    private static final String STATUS_OFF = "ＯＦＦ";                  // OFF表示文字列
+    private static final String STATUS_ERROR = "エラー";               // エラー表示文字列
+    private static final String STATUS_CONNECTED = "接続";             // 接続状態表示文字列
+    private static final String STATUS_DISCONNECTED = "未接続";         // 未接続状態表示文字列
 
-    private static final String STATUS_CELLULAR = "モバイル";
-    private static final String STATUS_WIFI = "Wi-Fi";
-    private static final String STATUS_NONE = "なし";
-    private static final String STATUS_OTHER = "その他";
+    private static final String STATUS_CELLULAR = "モバイル";           // モバイル回線表示文字列
+    private static final String STATUS_WIFI = "Wi-Fi";                // Wi-Fi表示文字列
+    private static final String STATUS_NONE = "なし";                  // 回線なし表示文字列
+    private static final String STATUS_OTHER = "その他";               // その他回線表示文字列
 
-    private TextView tvMobilePowerValue;
-    private TextView tvWifiValue;
-    private TextView tvActiveNetworkValue;
-    private TextView tvInternetValue;
+    private TextView tvMobilePowerValue;    // モバイル電波状態
+    private TextView tvWifiValue;           // Wi-Fi状態
+    private TextView tvActiveNetworkValue;  // 有効ネットワーク種別
+    private TextView tvInternetValue;       // インターネット接続状態
 
     // 疎通テスト結果（インターネット接続状態）を保持
-    private boolean gprsConnected;
+    private boolean gprsConnected; // モバイル接続フラグ
 
     //============================================
     //　機　能　:　画面生成時の初期化処理
