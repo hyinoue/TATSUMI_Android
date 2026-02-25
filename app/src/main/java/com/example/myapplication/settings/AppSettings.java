@@ -53,45 +53,45 @@ public final class AppSettings {
     // ================================
 
     // SharedPreferences名
-    private static final String PREF_NAME = "AppSettings";
+    private static final String PREF_NAME = "AppSettings"; // SharedPreferences名
 
     // INIファイル名
-    private static final String INI_FILE_NAME = "TatsumiHandy.ini";
+    private static final String INI_FILE_NAME = "TatsumiHandy.ini"; // INIファイル名
 
     // ================================
     // Key 定義（C#版と完全一致）
     // ================================
 
-    private static final String KEY_BUZZER_MUTE = "BuzzerMute";
-    private static final String KEY_BUZZER_LENGTH = "BuzzerLength";
-    private static final String KEY_BUZZER_VOLUME = "BuzzerVolume";
+    private static final String KEY_BUZZER_MUTE = "BuzzerMute";      // ブザーON/OFFキー
+    private static final String KEY_BUZZER_LENGTH = "BuzzerLength";  // ブザー長さキー
+    private static final String KEY_BUZZER_VOLUME = "BuzzerVolume";  // ブザー音量キー
 
-    private static final String KEY_VIBRATOR_MUTE = "VibratorMute";
-    private static final String KEY_VIBRATOR_LENGTH = "VibratorLength";
-    private static final String KEY_VIBRATOR_COUNT = "VibratorCount";
-    private static final String KEY_VIBRATOR_INTERVAL = "VibratorInterval";
+    private static final String KEY_VIBRATOR_MUTE = "VibratorMute";          // バイブON/OFFキー
+    private static final String KEY_VIBRATOR_LENGTH = "VibratorLength";      // バイブ長さキー
+    private static final String KEY_VIBRATOR_COUNT = "VibratorCount";        // バイブ回数キー
+    private static final String KEY_VIBRATOR_INTERVAL = "VibratorInterval";  // バイブ間隔キー
 
-    private static final String KEY_CAMERA_SIZE = "CameraImageSize";
-    private static final String KEY_CAMERA_FLASH = "CameraFlash";
-    private static final String KEY_CAMERA_LIGHT = "CameraLight";
+    private static final String KEY_CAMERA_SIZE = "CameraImageSize"; // カメラサイズキー
+    private static final String KEY_CAMERA_FLASH = "CameraFlash";    // カメラフラッシュキー
+    private static final String KEY_CAMERA_LIGHT = "CameraLight";    // カメラ露出キー
 
-    private static final String KEY_COMM_NAME = "CommName";
-    private static final String KEY_COMM_APN = "CommApn";
-    private static final String KEY_COMM_USER = "CommUser";
-    private static final String KEY_COMM_PWD = "CommPasswd";
+    private static final String KEY_COMM_NAME = "CommName"; // 通信名称キー
+    private static final String KEY_COMM_APN = "CommApn";   // APNキー
+    private static final String KEY_COMM_USER = "CommUser"; // 通信ユーザーキー
+    private static final String KEY_COMM_PWD = "CommPasswd"; // 通信パスワードキー
 
-    private static final String KEY_WEBSVC_HONBAN = "WebSvcHonban";
-    private static final String KEY_WEBSVC_SCS = "WebSvcSCS";
-    private static final String KEY_WEBSVC_TEST = "WebSvcTest";
+    private static final String KEY_WEBSVC_HONBAN = "WebSvcHonban"; // 本番WebSvcキー
+    private static final String KEY_WEBSVC_SCS = "WebSvcSCS";       // SCS WebSvcキー
+    private static final String KEY_WEBSVC_TEST = "WebSvcTest";     // テストWebSvcキー
 
     // SharedPreferences実体
-    private static SharedPreferences pref;
+    private static SharedPreferences pref; // SharedPreferencesインスタンス
 
     // アプリケーションContext（assetsアクセスやディレクトリ解決用）
-    private static Context appContext;
+    private static Context appContext; // アプリケーションコンテキスト
 
     // INIファイルパス
-    private static File iniFile;
+    private static File iniFile; // INIファイル実体
 
     // ================================
     // 初期化（Application / Activityで1回）
@@ -535,27 +535,27 @@ public final class AppSettings {
     // 設定値（C# static property 相当）
     // ================================
 
-    public static boolean BuzzerMute;
-    public static int BuzzerLength;
-    public static int BuzzerVolume;
+    public static boolean BuzzerMute; // ブザーON/OFF
+    public static int BuzzerLength;   // ブザー長さ
+    public static int BuzzerVolume;   // ブザー音量
 
-    public static boolean VibratorMute;
-    public static int VibratorLength;
-    public static int VibratorCount;
-    public static int VibratorInterval;
+    public static boolean VibratorMute; // バイブON/OFF
+    public static int VibratorLength;   // バイブ長さ
+    public static int VibratorCount;    // バイブ回数
+    public static int VibratorInterval; // バイブ間隔
 
-    public static int CameraImageSize;
-    public static int CameraFlash;
-    public static int CameraLightMode;
+    public static int CameraImageSize; // カメラ画像サイズ
+    public static int CameraFlash;     // カメラフラッシュ設定
+    public static int CameraLightMode; // カメラ露出設定
 
-    public static String CommName;
-    public static String CommApn;
-    public static String CommUser;
-    public static String CommPasswd;
+    public static String CommName;   // 通信名称
+    public static String CommApn;    // APN
+    public static String CommUser;   // 通信ユーザー
+    public static String CommPasswd; // 通信パスワード
 
-    public static String WebSvcURL_Honban;
-    public static String WebSvcURL_SCS;
-    public static String WebSvcURL_Test;
+    public static String WebSvcURL_Honban; // 本番WebSvc URL
+    public static String WebSvcURL_SCS;    // SCS WebSvc URL
+    public static String WebSvcURL_Test;   // テストWebSvc URL
 
     //=================================
     //　機　能　:　AppSettingsのインスタンス化禁止

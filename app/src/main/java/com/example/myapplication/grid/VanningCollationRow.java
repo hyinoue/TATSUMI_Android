@@ -7,19 +7,19 @@ package com.example.myapplication.grid;
 public class VanningCollationRow {
 
     // 出荷指図No（Packing No）
-    public final String pNo;
+    public final String pNo; // PNo
 
     // バンドルNo.（Bundle No）
-    public final String bNo;
+    public final String bNo; // BNo
 
     // 束番（Index）
-    public final String index;
+    public final String index; // 行番号
 
     // 重量（3桁区切り＋左スペース埋め済み表示用文字列）
-    public final String jyuryo;
+    public final String jyuryo; // 重量
 
     // 照合状態表示（"済" または 空白）
-    public final String confirmed;
+    public final String confirmed; // 確定状態
 
     //===========================================
     //　機　能　:　VanningCollationRowの初期化処理

@@ -35,11 +35,11 @@ import java.util.Locale;
 //============================================================
 public class SvcHandyWrapper implements Closeable {
 
-    private static final int RETRY_COUNT = 3;
-    private static final int MAX_TEXT_LENGTH = 1000;
+    private static final int RETRY_COUNT = 3;      // リトライ回数
+    private static final int MAX_TEXT_LENGTH = 1000; // ログ文字列最大長
 
-    private final SvcHandyRepository repository;
-    private final CommHistoryDao commHistoryDao;
+    private final SvcHandyRepository repository; // サービスリポジトリ
+    private final CommHistoryDao commHistoryDao; // 通信履歴DAO
 
     // ログID採番の排他用
     private static final Object LOG_ID_LOCK = new Object();

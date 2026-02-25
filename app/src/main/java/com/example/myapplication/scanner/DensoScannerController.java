@@ -49,15 +49,15 @@ import java.util.Locale;
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
-    private static final String TAG = "DensoScannerM70";
+    private static final String TAG = "DensoScannerM70"; // ログタグ
 
     /**
      * 連続同一データの弾き（短時間だけ）
      */
-    private static final long DUP_GUARD_MS = 300L;
+    private static final long DUP_GUARD_MS = 300L; // 重複読取ガード時間(ms)
 
     // 端末によってSCANトリガーのキーコードが違うので列挙（必要に応じて追加）
-    private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234};
+    private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234}; // スキャン起動キーコード
 
     //==============================
     //　処理概要　:　SymbologyProfile列挙
@@ -118,31 +118,31 @@ public class DensoScannerController
         };
     }
 
-    private final Activity activity;
-    private final OnScanListener listener;
-    private final ScanPolicy policy;
+    private final Activity activity;     // ホストActivity
+    private final OnScanListener listener; // 読取結果コールバック
+    private final ScanPolicy policy;     // 受入/シンボロジー制御ポリシー
 
-    private BarcodeManager manager;
-    private BarcodeScanner scanner;
-    private BarcodeScannerSettings settings;
+    private BarcodeManager manager;          // DENSOバーコードマネージャ
+    private BarcodeScanner scanner;          // DENSOスキャナ本体
+    private BarcodeScannerSettings settings; // スキャナ設定
 
     // Activityのライフサイクル（onResume/onPause）連動用
-    private boolean resumed = false;
+    private boolean resumed = false; // onResume反映フラグ
 
     /**
      * 現在 claim しているか
      */
-    private boolean claimed = false;
+    private boolean claimed = false; // スキャナClaim済みフラグ
 
     /**
      * 最後に適用したプロファイル（無駄なclose/claimを減らす）
      */
     @Nullable
-    private SymbologyProfile appliedProfile = null;
+    private SymbologyProfile appliedProfile = null; // 現在適用中プロファイル
 
     // 重複ガード（短時間のみ）
-    private String last = "";
-    private long lastAt = 0L;
+    private String last = ""; // 直近読取データ
+    private long lastAt = 0L; // 直近読取時刻(ms)
 
     //=========================================================
     //　機　能　:　DensoScannerControllerの初期化処理

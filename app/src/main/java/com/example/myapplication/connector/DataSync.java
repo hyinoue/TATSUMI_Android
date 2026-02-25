@@ -78,27 +78,27 @@ import java.util.Locale;
 //　　　　　　:　reportError .................... エラー通知（ログ/コールバック）
 //============================================================
 public class DataSync {
-    private static final String TAG = "DataSync";
-    private static final int SYSTEM_RENBAN = 1;
+    private static final String TAG = "DataSync"; // ログタグ
+    private static final int SYSTEM_RENBAN = 1;    // システム連番
 
     public interface ErrorHandler {
         void onError(String message);
     }
 
-    private final AppDatabase db;
-    private final SvcHandyWrapper svcWrapper;
-    private final CommHistoryDao commHistoryDao;
-    private final SyukkaContainerDao syukkaContainerDao;
-    private final SyukkaMeisaiDao syukkaMeisaiDao;
-    private final YoteiDao yoteiDao;
-    private final KakuninContainerDao kakuninContainerDao;
-    private final KakuninMeisaiDao kakuninMeisaiDao;
-    private final SystemDao systemDao;
-    private final File imageDir;
+    private final AppDatabase db;                        // DBインスタンス
+    private final SvcHandyWrapper svcWrapper;            // Webサービスラッパー
+    private final CommHistoryDao commHistoryDao;         // 通信履歴DAO
+    private final SyukkaContainerDao syukkaContainerDao; // 出荷コンテナDAO
+    private final SyukkaMeisaiDao syukkaMeisaiDao;       // 出荷明細DAO
+    private final YoteiDao yoteiDao;                     // 予定DAO
+    private final KakuninContainerDao kakuninContainerDao; // 確認コンテナDAO
+    private final KakuninMeisaiDao kakuninMeisaiDao;     // 確認明細DAO
+    private final SystemDao systemDao;                   // システムDAO
+    private final File imageDir;                         // 画像格納ディレクトリ
 
-    private final ErrorHandler errorHandler;
+    private final ErrorHandler errorHandler; // エラーハンドラ
 
-    private String lastErrorMessage;
+    private String lastErrorMessage; // 最終エラーメッセージ
 
     //================================================================
     //　機　能　:　DB用日時フォーマット（yyyy-MM-dd HH:mm:ss）を生成する

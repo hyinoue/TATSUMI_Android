@@ -41,8 +41,8 @@ import java.util.Locale;
 
 public class VanningCollationController {
 
-    private final KakuninMeisaiDao kakuninMeisaiDao;
-    private final KakuninMeisaiWorkDao kakuninMeisaiWorkDao;
+    private final KakuninMeisaiDao kakuninMeisaiDao;         // 確認明細DAO
+    private final KakuninMeisaiWorkDao kakuninMeisaiWorkDao; // 確認明細WorkDAO
 
     // Work明細（照合状態を保持する作業用リスト）
     private final List<KakuninMeisaiWorkEntity> details = new ArrayList<>();

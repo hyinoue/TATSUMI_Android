@@ -21,10 +21,10 @@ import com.densowave.bhtsdk.barcode.OutputSettings;
 //==================================
 public class DensoScanReceiver extends BroadcastReceiver {
 
-    public static final String TAG = "DensoScanReceiver";
+    public static final String TAG = "DensoScanReceiver"; // ログタグ
 
     // Manifestで指定したAction名（SDK側の設定とも一致させる）
-    public static final String ACTION_DENSO_SCAN = "com.example.myapplication.DENSO_SCAN";
+    public static final String ACTION_DENSO_SCAN = "com.example.myapplication.DENSO_SCAN"; // 外部スキャン受信アクション
 
     //==================================
     //　機　能　:　受信時の処理

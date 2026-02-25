@@ -20,8 +20,8 @@ public class SoapAsmxClient {
     // SOAP(ASMX)送信用 Content-Type
     private static final MediaType SOAP_XML = MediaType.parse("text/xml; charset=utf-8");
 
-    private final OkHttpClient http;
-    private final String endpointUrl;
+    private final OkHttpClient http; // HTTPクライアント
+    private final String endpointUrl; // 接続先エンドポイントURL
 
     //================================================================
     //　機　能　:　SoapAsmxClientを初期化する

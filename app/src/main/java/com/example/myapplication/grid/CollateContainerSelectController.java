@@ -29,7 +29,7 @@ import java.util.List;
 
 public class CollateContainerSelectController {
 
-    private final KakuninContainerDao kakuninContainerDao;
+    private final KakuninContainerDao kakuninContainerDao; // 確認コンテナDAO
 
     // DAOから取得した未照合コンテナ一覧（保持）
     private final List<KakuninContainerEntity> containers = new ArrayList<>();
@@ -38,10 +38,10 @@ public class CollateContainerSelectController {
     private final List<CollateContainerSelectRow> displayRows = new ArrayList<>();
 
     // 選択中のコンテナ情報（selectContainerで設定）
-    private String selectedContainerId;
-    private String selectedContainerNo;
-    private int selectedBundleCnt;
-    private String selectedSagyouYmd;
+    private String selectedContainerId; // 選択中コンテナID
+    private String selectedContainerNo; // 選択中コンテナNo
+    private int selectedBundleCnt;      // 選択中束数
+    private String selectedSagyouYmd;   // 選択中作業日時
 
     //==========================================================
     //　機　能　:　CollateContainerSelectControllerの初期化処理
