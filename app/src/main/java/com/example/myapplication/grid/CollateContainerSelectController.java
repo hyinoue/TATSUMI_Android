@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.example.myapplication.db.dao.KakuninContainerDao;
 import com.example.myapplication.db.entity.KakuninContainerEntity;
-import com.example.myapplication.time.DateTimeFormatUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -189,8 +187,8 @@ public class CollateContainerSelectController {
             String containerNo = safeStr(entity.containerNo);
             String bundleCnt = String.valueOf(entity.bundleCnt != null ? entity.bundleCnt : 0);
 
-            // 作業日は表示用フォーマットへ変換（ユーティリティに委譲）
-            String sagyouYmdDisp = DateTimeFormatUtil.formatSagyouYmdForDisplay(entity.sagyouYmd);
+            // 作業日は表示用フォーマットへ変換
+            String sagyouYmdDisp = toSagyouYmdDisplay(entity.sagyouYmd);
 
             // 表示行を追加
             displayRows.add(new CollateContainerSelectRow(
@@ -209,5 +207,24 @@ public class CollateContainerSelectController {
     //===============================
     private String safeStr(String value) {
         return value == null ? "" : value;
+    }
+
+    //===============================
+    //　機　能　:　作業日時を表示用へ整形する
+    //　引　数　:　value ..... String
+    //　戻り値　:　[String] ..... MM-dd HH:mm（変換不可時は元文字列）
+    //===============================
+    private String toSagyouYmdDisplay(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        String trimmed = value.trim();
+        if (trimmed.length() < 16) {
+            return trimmed;
+        }
+
+        // yyyy-MM-dd HH:mm:ss / yyyy-MM-dd HH:mm を想定し MM-dd HH:mm を切り出す
+        return trimmed.substring(5, 16);
     }
 }
