@@ -101,7 +101,7 @@ public class DbTestActivity extends BaseActivity {
         // 行間の境界線が重なって太く見えないように、上方向を少し詰める
         rvDbTable.addItemDecoration(new RecyclerView.ItemDecoration() {
             //===========================================
-            //　機　能　:　item Offsetsを取得する
+            //　機　能　:　一覧行の余白（オフセット）を設定する
             //　引　数　:　outRect ..... Rect
             //　　　　　:　view ..... View
             //　　　　　:　parent ..... RecyclerView
@@ -136,7 +136,7 @@ public class DbTestActivity extends BaseActivity {
         spTables.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             //========================================
-            //　機　能　:　on Item Selectedの処理
+            //　機　能　:　項目選択時の処理を行う
             //　引　数　:　parent ..... AdapterView<?>
             //　　　　　:　view ..... View
             //　　　　　:　position ..... int
@@ -166,7 +166,7 @@ public class DbTestActivity extends BaseActivity {
             }
 
             //========================================
-            //　機　能　:　on Nothing Selectedの処理
+            //　機　能　:　未選択時の処理を行う
             //　引　数　:　parent ..... AdapterView<?>
             //　戻り値　:　[void] ..... なし
             //========================================
@@ -197,7 +197,7 @@ public class DbTestActivity extends BaseActivity {
     // =============================================================================================
 
     //=============================
-    //　機　能　:　table Namesを読み込む
+    //　機　能　:　テーブル名一覧を読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -249,7 +249,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　table Dataを読み込む
+    //　機　能　:　テーブルデータを読み込む
     //　引　数　:　table ..... String
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -371,7 +371,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bottom Buttonsを設定する
+    //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -420,7 +420,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -578,7 +578,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=====================================
-        //　機　能　:　on Create View Holderの処理
+        //　機　能　:　一覧1行分のViewHolderを生成する
         //　引　数　:　parent ..... ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[RowViewHolder] ..... 行ViewHolder
@@ -612,7 +612,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=======================================
-        //　機　能　:　on Bind View Holderの処理
+        //　機　能　:　指定行のデータをViewHolderへ表示する
         //　引　数　:　holder ..... RowViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
@@ -647,7 +647,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //============================
-        //　機　能　:　item Countを取得する
+        //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
         //============================

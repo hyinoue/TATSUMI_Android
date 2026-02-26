@@ -58,7 +58,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     private ExecutorService io;                          // I/O処理スレッド
 
     //============================================
-    //　機　能　:　画面生成時の初期化処理
+    //　機　能　:　画面表示時の初期化を行う
     //　引　数　:　savedInstanceState ..... Bundle
     //　戻り値　:　[void] ..... なし
     //============================================
@@ -86,7 +86,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
 
             //===========================================
-            //　機　能　:　item Offsetsを取得する
+            //　機　能　:　一覧行の余白（オフセット）を設定する
             //　引　数　:　outRect ..... Rect
             //　　　　　:　view ..... View
             //　　　　　:　parent ..... RecyclerView
@@ -106,7 +106,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　bind Viewsの処理
+    //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -125,7 +125,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bottom Buttonsを設定する
+    //　機　能　:　下部ボタンの表示内容と活性状態を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -141,7 +141,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　recyclerを設定する
+    //　機　能　:　コンテナ一覧表示（RecyclerView）を初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -162,7 +162,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　input Handlersを設定する
+    //　機　能　:　照合対象№入力欄の入力イベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -183,7 +183,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　containersを読み込む
+    //　機　能　:　DBからコンテナ一覧を読み込み、画面に反映する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -223,7 +223,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　ui For Containersを更新する
+    //　機　能　:　コンテナ一覧の有無に応じて画面状態を更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -249,7 +249,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　selected No Inputを処理する
+    //　機　能　:　入力された照合対象№の妥当性を確認する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -287,7 +287,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　on Function Blueの処理
+    //　機　能　:　決定ボタン押下時に入力確認後、次画面へ遷移する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -311,7 +311,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　on Function Redの処理
+    //　機　能　:　赤ボタン押下時の処理（未使用）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -321,7 +321,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　on Function Greenの処理
+    //　機　能　:　緑ボタン押下時の処理（未使用）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -331,7 +331,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　終了ボタン押下時に画面を閉じる
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -342,7 +342,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　validate And Selectの処理
+    //　機　能　:　入力値を検証し、照合対象コンテナの選択を確定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... True:選択成功、False:失敗
     //===================================
@@ -383,7 +383,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　画面終了時の処理
+    //　機　能　:　画面終了時の後処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -396,14 +396,14 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　処理概要　:　コンテナ一覧表示用Adapter
+    //　処理概要　:　コンテナ一覧を表示するためのAdapter
     //============================================================
     private static class CollateContainerAdapter extends RecyclerView.Adapter<CollateContainerAdapter.ViewHolder> {
 
         private final List<CollateContainerSelectRow> rows = new ArrayList<>();
 
         //====================================================
-        //　機　能　:　submit Listの処理
+        //　機　能　:　一覧データを更新して再描画する
         //　引　数　:　newRows ..... List<CollateContainerSelectRow>
         //　戻り値　:　[void] ..... なし
         //====================================================
@@ -417,7 +417,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
 
         //================================================
-        //　機　能　:　on Create View Holderの処理
+        //　機　能　:　一覧1行分のViewHolderを生成する
         //　引　数　:　parent ..... android.view.ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[ViewHolder] ..... 生成したViewHolder
@@ -431,7 +431,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
 
         //====================================
-        //　機　能　:　on Bind View Holderの処理
+        //　機　能　:　指定行のデータをViewHolderへ表示する
         //　引　数　:　holder ..... ViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
@@ -449,7 +449,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
 
         //============================
-        //　機　能　:　item Countを取得する
+        //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
         //============================
@@ -459,7 +459,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
 
         //============================================================
-        //　処理概要　:　行表示用ViewHolder
+        //　処理概要　:　一覧1行分の表示部品を保持するViewHolder
         //============================================================
         static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -468,6 +468,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             final TextView tvBundleCnt;
             final TextView tvSagyouYmd;
 
+            //============================================
+            //　機　能　:　行表示用ViewHolderを初期化する
+            //　引　数　:　itemView ..... android.view.View
+            //　戻り値　:　[void] ..... なし
+            //============================================
             ViewHolder(android.view.View itemView) {
                 super(itemView);
 

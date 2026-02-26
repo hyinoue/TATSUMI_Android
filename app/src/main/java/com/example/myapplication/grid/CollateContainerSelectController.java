@@ -53,7 +53,7 @@ public class CollateContainerSelectController {
     }
 
     //============================
-    //　機　能　:　containersを読み込む
+    //　機　能　:　コンテナ一覧を読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -70,7 +70,7 @@ public class CollateContainerSelectController {
     }
 
     //====================================================
-    //　機　能　:　containersを取得する
+    //　機　能　:　コンテナ一覧を取得する
     //　引　数　:　なし
     //　戻り値　:　[List<KakuninContainerEntity>] ..... 読込済みコンテナ一覧（読み取り専用）
     //====================================================
@@ -81,7 +81,7 @@ public class CollateContainerSelectController {
     }
 
     //=================================================
-    //　機　能　:　display Rowsを取得する
+    //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<CollateContainerSelectRow>] ..... 表示用行データ（読み取り専用）
     //=================================================
@@ -92,7 +92,7 @@ public class CollateContainerSelectController {
     }
 
     //=================================
-    //　機　能　:　check Selected Noの処理
+    //　機　能　:　照合対象№の妥当性を確認する
     //　引　数　:　selectedNo ..... int
     //　戻り値　:　[String] ..... 結果（OK/エラーメッセージ）
     //=================================
@@ -108,7 +108,7 @@ public class CollateContainerSelectController {
     }
 
     //=================================
-    //　機　能　:　select Containerの処理
+    //　機　能　:　照合対象コンテナを選択する
     //　引　数　:　selectedNo ..... int
     //　戻り値　:　[String] ..... 結果（OK/エラーメッセージ）
     //=================================
@@ -134,7 +134,7 @@ public class CollateContainerSelectController {
     }
 
     //=======================================
-    //　機　能　:　selected Container Idを取得する
+    //　機　能　:　選択中コンテナIDを取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... 選択中コンテナID
     //=======================================
@@ -143,7 +143,7 @@ public class CollateContainerSelectController {
     }
 
     //=======================================
-    //　機　能　:　selected Container Noを取得する
+    //　機　能　:　選択中コンテナ番号を取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... 選択中コンテナNo
     //=======================================
@@ -152,7 +152,7 @@ public class CollateContainerSelectController {
     }
 
     //=====================================
-    //　機　能　:　selected Bundle Cntを取得する
+    //　機　能　:　選択中の束数を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 選択中束数
     //=====================================
@@ -161,7 +161,7 @@ public class CollateContainerSelectController {
     }
 
     //=====================================
-    //　機　能　:　selected Sagyou Ymdを取得する
+    //　機　能　:　選択中の作業日を取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... 選択中作業日（YYYYMMDD等の生値想定）
     //=====================================
@@ -170,7 +170,7 @@ public class CollateContainerSelectController {
     }
 
     //==============================
-    //　機　能　:　display Rowsを更新する
+    //　機　能　:　表示用行データを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -203,7 +203,7 @@ public class CollateContainerSelectController {
     }
 
     //===============================
-    //　機　能　:　safe Strの処理
+    //　機　能　:　null安全な文字列へ変換する
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... nullなら空文字、非nullはそのまま
     //===============================

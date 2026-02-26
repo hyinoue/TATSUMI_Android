@@ -167,7 +167,7 @@ public class ImagerTestActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bottom Buttonsを設定する
+    //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -188,7 +188,7 @@ public class ImagerTestActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -242,7 +242,7 @@ public class ImagerTestActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　dispatch Key Eventの処理
+    //　機　能　:　キーイベント処理を行う
     //　引　数　:　event ..... KeyEvent
     //　戻り値　:　[boolean] ..... true:処理済み / false:未処理
     //=================================

@@ -427,7 +427,7 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　confirm Exitの処理
+    //　機　能　:　終了確認を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -440,7 +440,7 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     //==========================================
-    //　機　能　:　request Password If Neededの処理
+    //　機　能　:　必要時のみパスワード入力を要求する
     //　引　数　:　onSuccess ..... Runnable
     //　戻り値　:　[void] ..... なし
     //==========================================
@@ -458,7 +458,7 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     //============================================
-    //　機　能　:　show Password Dialogの処理
+    //　機　能　:　パスワード入力ダイアログを表示する
     //　引　数　:　callback ..... PasswordCallback
     //　戻り値　:　[void] ..... なし
     //============================================
@@ -486,7 +486,7 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     //=====================================
-    //　機　能　:　bottom Button Textsを設定する
+    //　機　能　:　下部ボタンの表示文言を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -499,7 +499,7 @@ public class ServiceMenuActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -530,7 +530,7 @@ public class ServiceMenuActivity extends BaseActivity {
     //============================================
     private interface PasswordCallback {
         //==================================
-        //　機　能　:　on Resultの処理
+        //　機　能　:　結果受信時の処理を行う
         //　引　数　:　success ..... boolean
         //　戻り値　:　[void] ..... なし
         //==================================

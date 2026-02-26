@@ -62,7 +62,7 @@ public class DensoScanReceiver extends BroadcastReceiver {
     }
 
     //==============================
-    //　機　能　:　normalizeの処理
+    //　機　能　:　文字列を正規化する
     //　引　数　:　s ..... String
     //　戻り値　:　[String] ..... 正規化後文字列
     //==============================

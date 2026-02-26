@@ -77,7 +77,7 @@ public class CommTestActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bottom Buttonsを設定する
+    //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -133,7 +133,7 @@ public class CommTestActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -144,7 +144,7 @@ public class CommTestActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Blueの処理
+    //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================

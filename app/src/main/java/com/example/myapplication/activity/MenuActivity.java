@@ -291,7 +291,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //=====================================
-    //　機　能　:　bottom Button Textsを設定する
+    //　機　能　:　下部ボタンの表示文言を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -348,7 +348,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -858,7 +858,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　numberを整形する
+    //　機　能　:　数値文字列を整形する
     //　引　数　:　value ..... long
     //　戻り値　:　[String] ..... なし
     //==============================

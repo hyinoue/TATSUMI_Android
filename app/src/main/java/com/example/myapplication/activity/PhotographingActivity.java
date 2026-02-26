@@ -322,7 +322,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　restart Cameraの処理
+    //　機　能　:　カメラを再起動する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -335,7 +335,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　setting Changesを判定する
+    //　機　能　:　設定変更の有無を判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... なし
     //=================================
@@ -346,7 +346,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //=====================================
-    //　機　能　:　map Target Resolutionの処理
+    //　機　能　:　解像度設定をCameraX値へ変換する
     //　引　数　:　setting ..... int
     //　戻り値　:　[Size] ..... 対応解像度（未対応はnull）
     //=====================================
@@ -370,7 +370,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　map Flash Modeの処理
+    //　機　能　:　フラッシュ設定をCameraX値へ変換する
     //　引　数　:　setting ..... int
     //　戻り値　:　[int] ..... ImageCapture.FLASH_MODE_*
     //==============================
@@ -388,7 +388,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　map Ae Modeの処理
+    //　機　能　:　AE設定をCameraX値へ変換する
     //　引　数　:　flashSetting ..... int
     //　戻り値　:　[int] ..... CaptureRequest.CONTROL_AE_MODE_*
     //===================================
@@ -405,7 +405,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　map Awb Modeの処理
+    //　機　能　:　AWB設定をCameraX値へ変換する
     //　引　数　:　lightSetting ..... int
     //　戻り値　:　[int] ..... CaptureRequest.CONTROL_AWB_MODE_*
     //===================================
@@ -426,7 +426,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　take Photoの処理
+    //　機　能　:　写真を撮影する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -584,7 +584,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　discard Captureの処理
+    //　機　能　:　撮影結果を破棄する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -609,7 +609,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　show Capture Reviewの処理
+    //　機　能　:　撮影結果の確認表示を行う
     //　引　数　:　show ..... boolean
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -643,7 +643,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //=======================================
-    //　機　能　:　trigger Af Ae At Centerの処理
+    //　機　能　:　中央でAF/AEを実行する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=======================================
@@ -664,7 +664,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　output Fileを取得する
+    //　機　能　:　出力先ファイルを取得する
     //　引　数　:　なし
     //　戻り値　:　[File] ..... 出力先ファイル
     //=============================
