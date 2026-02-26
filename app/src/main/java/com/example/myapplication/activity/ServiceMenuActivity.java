@@ -434,7 +434,7 @@ public class ServiceMenuActivity extends BaseActivity {
     private void confirmExit() {
         showQuestion("アプリケーションを終了します。\nよろしいですか？", yes -> {
             if (yes) {
-                finish();
+                finishAffinity();
             }
         });
     }

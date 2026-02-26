@@ -45,10 +45,6 @@ public class SvcHandyWrapper implements Closeable {
     // ログID採番の排他用
     private static final Object LOG_ID_LOCK = new Object();
 
-    // DB格納用日時（yyyy-MM-dd HH:mm:ss）
-    private final SimpleDateFormat dbDateFormat =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN);
-
     // ログID用日付（yyyyMMdd）
     private final SimpleDateFormat logIdDateFormat =
             new SimpleDateFormat("yyyyMMdd", Locale.JAPAN);

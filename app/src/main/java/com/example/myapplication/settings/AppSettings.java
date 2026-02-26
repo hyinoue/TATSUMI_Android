@@ -61,11 +61,6 @@ public final class AppSettings {
     private static final String KEY_CAMERA_FLASH = "CameraFlash";    // カメラフラッシュキー
     private static final String KEY_CAMERA_LIGHT = "CameraLight";    // カメラ露出キー
 
-    private static final String KEY_COMM_NAME = "CommName"; // 通信名称キー
-    private static final String KEY_COMM_APN = "CommApn";   // APNキー
-    private static final String KEY_COMM_USER = "CommUser"; // 通信ユーザーキー
-    private static final String KEY_COMM_PWD = "CommPasswd"; // 通信パスワードキー
-
     private static final String KEY_WEBSVC_HONBAN = "WebSvcHonban"; // 本番WebSvcキー
     private static final String KEY_WEBSVC_SCS = "WebSvcSCS";       // SCS WebSvcキー
     private static final String KEY_WEBSVC_TEST = "WebSvcTest";     // テストWebSvcキー
@@ -212,12 +207,6 @@ public final class AppSettings {
         e.putInt(KEY_CAMERA_FLASH, CameraFlash);
         e.putInt(KEY_CAMERA_LIGHT, CameraLightMode);
 
-        // 通信設定
-        e.putString(KEY_COMM_NAME, CommName);
-        e.putString(KEY_COMM_APN, CommApn);
-        e.putString(KEY_COMM_USER, CommUser);
-        e.putString(KEY_COMM_PWD, CommPasswd);
-
         // WebサービスURL
         e.putString(KEY_WEBSVC_HONBAN, WebSvcURL_Honban);
         e.putString(KEY_WEBSVC_SCS, WebSvcURL_SCS);
@@ -253,12 +242,6 @@ public final class AppSettings {
         CameraFlash = pref.getInt(KEY_CAMERA_FLASH, 0);
         CameraLightMode = pref.getInt(KEY_CAMERA_LIGHT, 0);
 
-        // 通信設定
-        CommName = pref.getString(KEY_COMM_NAME, "");
-        CommApn = pref.getString(KEY_COMM_APN, "");
-        CommUser = pref.getString(KEY_COMM_USER, "");
-        CommPasswd = pref.getString(KEY_COMM_PWD, "");
-
         // WebサービスURL
         WebSvcURL_Honban = pref.getString(KEY_WEBSVC_HONBAN, "");
         WebSvcURL_SCS = pref.getString(KEY_WEBSVC_SCS, "");
@@ -291,12 +274,6 @@ public final class AppSettings {
         CameraFlash = parseInt(map.get(KEY_CAMERA_FLASH), CameraFlash);
         CameraLightMode = parseInt(map.get(KEY_CAMERA_LIGHT), CameraLightMode);
 
-        // 通信設定
-        CommName = parseString(map.get(KEY_COMM_NAME), CommName);
-        CommApn = parseString(map.get(KEY_COMM_APN), CommApn);
-        CommUser = parseString(map.get(KEY_COMM_USER), CommUser);
-        CommPasswd = parseString(map.get(KEY_COMM_PWD), CommPasswd);
-
         // WebサービスURL
         WebSvcURL_Honban = parseString(map.get(KEY_WEBSVC_HONBAN), WebSvcURL_Honban);
         WebSvcURL_SCS = parseString(map.get(KEY_WEBSVC_SCS), WebSvcURL_SCS);
@@ -328,12 +305,6 @@ public final class AppSettings {
         map.put(KEY_CAMERA_SIZE, String.valueOf(CameraImageSize));
         map.put(KEY_CAMERA_FLASH, String.valueOf(CameraFlash));
         map.put(KEY_CAMERA_LIGHT, String.valueOf(CameraLightMode));
-
-        // 通信設定（nullは空文字へ）
-        map.put(KEY_COMM_NAME, nullToEmpty(CommName));
-        map.put(KEY_COMM_APN, nullToEmpty(CommApn));
-        map.put(KEY_COMM_USER, nullToEmpty(CommUser));
-        map.put(KEY_COMM_PWD, nullToEmpty(CommPasswd));
 
         // WebサービスURL（nullは空文字へ）
         map.put(KEY_WEBSVC_HONBAN, nullToEmpty(WebSvcURL_Honban));
@@ -436,12 +407,6 @@ public final class AppSettings {
         if (VibratorCount == 0) VibratorCount = 2;
         if (VibratorInterval == 0) VibratorInterval = 100;
 
-        // 通信設定デフォルト
-        if (CommName == null || CommName.isEmpty()) CommName = "docomo";
-        if (CommApn == null || CommApn.isEmpty()) CommApn = "mopera.net";
-        if (CommUser == null) CommUser = "";
-        if (CommPasswd == null) CommPasswd = "";
-
         // URLはnull禁止（空文字へ）
         if (WebSvcURL_Honban == null) WebSvcURL_Honban = "";
         if (WebSvcURL_SCS == null) WebSvcURL_SCS = "";
@@ -528,11 +493,6 @@ public final class AppSettings {
     public static int CameraImageSize; // カメラ画像サイズ
     public static int CameraFlash;     // カメラフラッシュ設定
     public static int CameraLightMode; // カメラ露出設定
-
-    public static String CommName;   // 通信名称
-    public static String CommApn;    // APN
-    public static String CommUser;   // 通信ユーザー
-    public static String CommPasswd; // 通信パスワード
 
     public static String WebSvcURL_Honban; // 本番WebSvc URL
     public static String WebSvcURL_SCS;    // SCS WebSvc URL
