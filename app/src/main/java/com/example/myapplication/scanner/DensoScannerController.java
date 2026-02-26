@@ -576,27 +576,23 @@ public class DensoScannerController
     //　戻り値　:　[boolean] ..... true:Code39、false:それ以外
     //=================================================
     public static boolean isCode39(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-        // 既に表示名で確定している場合
-        if ("Code39".equals(displayName)) return true;
+        // 既に表示名がある場合はそれを優先
+        if (displayName != null) {
+            return "Code39".equals(displayName);
+        }
 
-        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
-        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
-
-        // AIM：]A は Code39
-        if (a.startsWith("]A")) return true;
-
-        // 文字列に含まれるかで判定
-        return a.contains("CODE39") || d.contains("CODE39");
+        // 判定ロジックは共通Resolverを利用
+        return "Code39".equals(resolveBarcodeDisplayName(aim, denso));
     }
 
     //=================================================
-    //　機　能　:　バーコード種別の表示名を推定する
+    //　機　能　:　バーコード種別の表示名を推定する（共通）
     //　引　数　:　aim ..... String
     //　　　　　:　denso ..... String
     //　戻り値　:　[String] ..... 表示名（不明ならnull）
     //=================================================
     @Nullable
-    private String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
+    public static String resolveBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
         String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
 
@@ -612,10 +608,22 @@ public class DensoScannerController
         if (a.contains("CODE39") || d.contains("CODE39")) return "Code39";
         if (a.contains("CODE93") || d.contains("CODE93")) return "Code93";
         if (a.contains("CODE128") || d.contains("CODE128")) return "Code128";
+        if (a.contains("QR") || d.contains("QR")) return "QR";
+        if (a.contains("DATAMATRIX") || d.contains("DATAMATRIX")) return "DataMatrix";
+        if (a.contains("PDF") || d.contains("PDF")) return "PDF417";
         return null;
     }
 
-    // --- Symbology (reflectionで存在するものだけ) ---
+    //=================================================
+    //　機　能　:　バーコード種別の表示名を推定する
+    //　引　数　:　aim ..... String
+    //　　　　　:　denso ..... String
+    //　戻り値　:　[String] ..... 表示名（不明ならnull）
+    //=================================================
+    @Nullable
+    private String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
+        return resolveBarcodeDisplayName(aim, denso);
+    }
 
     //=================================================
     //　機　能　:　シンボロジーの有効/無効を適用する

@@ -49,16 +49,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　openSystemLib            ..... システムライブラリ設定画面へ遷移
 //　　　　　　:　openServerSetting        ..... サーバ設定画面へ遷移(要PW)
 //　　　　　　:　clearData                ..... 端末内データの削除
-//　　　　　　:　sendMaintenanceData       ..... DB/ログの保守送信(アップロード)
-//　　　　　　:　resolveNetworkMessage     ..... 例外から通信エラーメッセージ生成
-//　　　　　　:　readFileBytes             ..... ファイル読み込み(byte配列)
+//　　　　　　:　sendMaintenanceData      ..... DB/ログの保守送信(アップロード)
+//　　　　　　:　resolveNetworkMessage    ..... 例外から通信エラーメッセージ生成
+//　　　　　　:　readFileBytes            ..... ファイル読み込み(byte配列)
 //　　　　　　:　confirmExit              ..... 終了確認
-//　　　　　　:　requestPasswordIfNeeded   ..... PW確認後に処理実行
-//　　　　　　:　showPasswordDialog        ..... PW入力ダイアログ表示
-//　　　　　　:　setupBottomButtonTexts    ..... 下部ボタン表示設定
-//　　　　　　:　onFunctionYellow          ..... (黄)終了処理
+//　　　　　　:　requestPasswordIfNeeded  ..... PW確認後に処理実行
+//　　　　　　:　showPasswordDialog       ..... PW入力ダイアログ表示
+//　　　　　　:　setupBottomButtonTexts   ..... 下部ボタン表示設定
+//　　　　　　:　onFunctionYellow         ..... (黄)終了処理
 //　　　　　　:　onDestroy                ..... リソース解放
-//　　　　　　:　PasswordCallback          ..... PWダイアログ結果通知IF
+//　　　　　　:　PasswordCallback         ..... PWダイアログ結果通知IF
 //============================================================
 
 public class ServiceMenuActivity extends BaseActivity {
@@ -339,7 +339,7 @@ public class ServiceMenuActivity extends BaseActivity {
                 // DBファイルを取得
                 File dbFile = getDatabasePath(AppDatabase.DB_NAME);
                 if (!dbFile.exists()) {
-                    FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルが見つかりません。", null);
+                    FileLogger.error(this, "ServiceMenuActivity-LinkLabel_Click", "DBファイルが見つかりません。", null);
                     runOnUiThread(() -> showErrorMsg("DBファイルが見つかりません。", MsgDispMode.MsgBox));
                     return;
                 }
@@ -347,7 +347,7 @@ public class ServiceMenuActivity extends BaseActivity {
                 // DBファイルを読み込み＆アップロード
                 byte[] dbBytes = readFileBytes(dbFile);
                 if (!svc.uploadBinaryFile(dbFile.getName(), dbBytes)) {
-                    FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "DBファイルのアップロードに失敗しました。", null);
+                    FileLogger.error(this, "ServiceMenuActivity-LinkLabel_Click", "DBファイルのアップロードに失敗しました。", null);
                     runOnUiThread(() -> showErrorMsg("DBファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
                     return;
                 }
@@ -357,20 +357,20 @@ public class ServiceMenuActivity extends BaseActivity {
                 if (logFile.exists()) {
                     byte[] logBytes = readFileBytes(logFile);
                     if (!svc.uploadBinaryFile(logFile.getName(), logBytes)) {
-                        FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", "ログファイルのアップロードに失敗しました。", null);
+                        FileLogger.error(this, "ServiceMenuActivity-LinkLabel_Click", "ログファイルのアップロードに失敗しました。", null);
                         runOnUiThread(() -> showErrorMsg("ログファイルのアップロードに失敗しました。", MsgDispMode.MsgBox));
                         return;
                     }
                 }
 
                 // 送信完了
-                FileLogger.info(this, "frmServiceMenu-LinkLabel_Click", "ファイルをアップロードしました");
+                FileLogger.info(this, "ServiceMenuActivity-LinkLabel_Click", "ファイルをアップロードしました");
                 runOnUiThread(() -> showInfoMsg("ファイルをアップロードしました", MsgDispMode.MsgBox));
 
             } catch (Exception ex) {
                 // 例外内容からユーザ向けメッセージを整形
                 String msg = resolveNetworkMessage(ex);
-                FileLogger.error(this, "frmServiceMenu-LinkLabel_Click", msg, ex);
+                FileLogger.error(this, "ServiceMenuActivity-LinkLabel_Click", msg, ex);
                 runOnUiThread(() -> showErrorMsg(msg, MsgDispMode.MsgBox));
             } finally {
                 // フラグを必ず戻す

@@ -395,9 +395,6 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         if (etGenpinNo != null) {
-            // キーボードは出さず、スキャナ入力を前提にする
-            etGenpinNo.setShowSoftInputOnFocus(false);
-
             // ★フォーカスが変わったらプロファイルを即反映（NONE⇔CODE39_ONLY）
             etGenpinNo.setOnFocusChangeListener((v, hasFocus) -> {
                 if (scanner != null) scanner.refreshProfile("GenpinFocus=" + hasFocus);
@@ -461,7 +458,7 @@ public class BundleSelectActivity extends BaseActivity {
                 // 既定重量・最大積載を解決
                 int defaultContainer = resolveDefaultContainerWeight(system);
                 int defaultDunnage = resolveDefaultDunnageWeight(system);
-                maxContainerJyuryo = resolveMaxContainerWeight(system);
+                maxContainerJyuryo = resolveMaxContainerWeight();
 
                 runOnUiThread(() -> {
                     // 前回入力値（SharedPreferences）を取得
@@ -536,7 +533,9 @@ public class BundleSelectActivity extends BaseActivity {
     //　戻り値　:　[int] ..... 既定コンテナ重量
     //====================================================
     private int resolveDefaultContainerWeight(@Nullable SystemEntity system) {
-        // ※必要に応じて system.defaultContainerJyuryo 等の実装に置き換え
+        if (system != null && system.defaultContainerJyuryo != null) {
+            return system.defaultContainerJyuryo;
+        }
         return 0;
     }
 
@@ -557,13 +556,7 @@ public class BundleSelectActivity extends BaseActivity {
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 最大積載重量
     //===================================================
-    private int resolveMaxContainerWeight(@Nullable SystemEntity system) {
-        // System設定があれば優先
-        if (system != null && system.maxContainerJyuryo != null && system.maxContainerJyuryo > 0) {
-            return system.maxContainerJyuryo;
-        }
-
-        // 無ければコンテナサイズ設定から推定
+    private int resolveMaxContainerWeight() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         String size = prefs.getString("container_size", "20ft");
         return "40ft".equals(size) ? 30000 : 24000;

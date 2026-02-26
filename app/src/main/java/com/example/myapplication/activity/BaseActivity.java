@@ -10,7 +10,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,7 +49,7 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　createBannerView .......... バナーView生成
 //　　　　　　:　createLoadingOverlay ...... ローディングView生成
 //　　　　　　:　dpToPx .................... dp→px変換
-//　　　　　　:　getAppVersionName ......... アプリVersionName取得
+//　　　　　　:　getAppVersionName ......... アプリバージョン名取得
 //============================================================
 
 public class BaseActivity extends AppCompatActivity {
@@ -89,9 +88,6 @@ public class BaseActivity extends AppCompatActivity {
         // 設定初期化/読み込み
         AppSettings.init(this);
         AppSettings.load();
-
-        // SoftInputのレイアウト調整を行わない（既存仕様）
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
     }
 
     //============================
@@ -164,7 +160,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //================================================================
-    //　機　能　:　共通エラー処理（frmBase: ErrorProcess 相当）
+    //　機　能　:　共通エラー処理
     //　引　数　:　procName ..... String（ログ用途）
     //　　　　　:　ex ..... Exception
     //　戻り値　:　[void] ..... なし
@@ -188,7 +184,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //========================================================
-    //　機　能　:　Error/Warning/Info 表示（frmBase: ShowXxxMsg 相当）
+    //　機　能　:　Error/Warning/Info 表示
     //　引　数　:　msg ..... String
     //　　　　　:　mode ..... MsgDispMode（MsgBox or Label）
     //　戻り値　:　[void] ..... なし
@@ -271,7 +267,6 @@ public class BaseActivity extends AppCompatActivity {
                 .show());
     }
 
-    // ===== Banner（Label表示相当） =====
     private enum BannerType {ERROR, WARNING, INFO}
 
     //=========================================
@@ -460,7 +455,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private boolean canRun(MaterialButton btn) {
-        // 「下部ボタンが無い画面」でも物理キーは通す（元仕様）
+        // 「下部ボタンが無い画面」でも物理キーは通す
         return !bottomButtonsBound || isActive(btn);
     }
 
@@ -611,7 +606,6 @@ public class BaseActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= 33) {
                 pi = pm.getPackageInfo(getPackageName(), PackageManager.PackageInfoFlags.of(0));
             } else {
-                //noinspection deprecation
                 pi = pm.getPackageInfo(getPackageName(), 0);
             }
             return pi.versionName;

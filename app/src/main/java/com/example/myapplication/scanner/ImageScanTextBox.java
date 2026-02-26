@@ -32,9 +32,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 //====================================
 public class ImageScanTextBox extends AppCompatEditText {
 
-    private static final int DEFAULT_WAIT_DECODE_MS = 5000; // 読取待機時間デフォルト(ms)
     private int minLength = 0; // 最小文字数
-    private long waitDecodeMs = DEFAULT_WAIT_DECODE_MS; // 読取待機時間(ms)
     @Nullable
     private DensoScannerController scannerController; // DENSOスキャナ制御
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
@@ -46,7 +44,6 @@ public class ImageScanTextBox extends AppCompatEditText {
     //=================================================
     public ImageScanTextBox(@NonNull Context context) {
         super(context);
-        init();
     }
 
     //=================================================
@@ -57,7 +54,6 @@ public class ImageScanTextBox extends AppCompatEditText {
     //=================================================
     public ImageScanTextBox(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     //=================================================
@@ -69,17 +65,6 @@ public class ImageScanTextBox extends AppCompatEditText {
     //=================================================
     public ImageScanTextBox(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    //============================
-    //　機　能　:　初期設定を行う
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================
-    private void init() {
-        // フォーカス時にソフトキーボードを表示しない（スキャナ入力前提）
-        setShowSoftInputOnFocus(false);
     }
 
     //=================================================
@@ -118,13 +103,7 @@ public class ImageScanTextBox extends AppCompatEditText {
         destroyScanner();
         super.onDetachedFromWindow();
     }
-
-    /**
-     * ★重要：SCANキーをここで消費しない
-     * （消費すると端末側のトリガー処理が動かず「反応しない」になりがち）
-     * <p>
-     * ※なので onKeyDown/onKeyUp はオーバーライドしない（=端末に渡す）
-     */
+    
 
     //=================================================
     //　機　能　:　スキャナを利用可能状態にする

@@ -169,9 +169,6 @@ public class CollateContainerSelectActivity extends BaseActivity {
     private void setupInputHandlers() {
         if (etSelectedNo == null) return;
 
-        // ソフトキーボードは表示しない（物理キー/バーコードスキャナ想定）
-        etSelectedNo.setShowSoftInputOnFocus(false);
-
         // Enter押下で入力処理
         etSelectedNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {

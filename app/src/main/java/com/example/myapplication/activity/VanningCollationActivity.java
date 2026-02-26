@@ -229,9 +229,6 @@ public class VanningCollationActivity extends BaseActivity {
     private void setupInputHandlers() {
         if (etGenpinNo == null) return;
 
-        // スキャナ入力を想定し、ソフトキーボードは出さない
-        etGenpinNo.setShowSoftInputOnFocus(false);
-
         // フォーカス変化時に、プロファイルを即時反映（NONE⇔CODE39_ONLY）
         etGenpinNo.setOnFocusChangeListener((v, hasFocus) -> {
             if (scanner != null) scanner.refreshProfile("GenpinFocus=" + hasFocus);

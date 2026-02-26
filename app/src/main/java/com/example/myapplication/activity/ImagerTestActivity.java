@@ -14,8 +14,6 @@ import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
-import java.util.Locale;
-
 //============================================================
 //　処理概要　:　バーコードテスト画面
 //　　　　　　:　対象入力欄（etBarcode）にフォーカス中のみスキャン結果を受け付ける。
@@ -29,7 +27,6 @@ import java.util.Locale;
 //　　　　　　:　onPause                     ..... 画面非表示時にスキャナ一時停止
 //　　　　　　:　onDestroy                   ..... 画面破棄時にスキャナ破棄
 //　　　　　　:　dispatchKeyEvent            ..... 物理キーイベントをスキャナへ委譲
-//　　　　　　:　getBarcodeDisplayNameCompat ..... AIM/DENSO文字列から種別表示名を推定
 //============================================================
 
 public class ImagerTestActivity extends BaseActivity {
@@ -64,23 +61,26 @@ public class ImagerTestActivity extends BaseActivity {
         svKindContent = findViewById(R.id.scrollKind);
         tvKindContent = findViewById(R.id.tvKindContent);
 
+        //フォーカスを入力欄に固定
+        if (etBarcode != null) {
+            etBarcode.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    v.post(v::requestFocus);
+                }
+            });
+        }
+
         // ---- 下部ボタン設定 ----
         setupBottomButtons();
 
         // ---- 入力欄初期化（フォーカス固定・キーボード抑止）----
         if (etBarcode != null) {
-            // スキャナ入力前提のためソフトキーボードは表示しない
-            etBarcode.setShowSoftInputOnFocus(false);
-
             // 初期状態で空にしてフォーカスを当てる（読取開始しやすくする）
             etBarcode.setText("");
             etBarcode.requestFocus();
         }
 
         if (etKind != null) {
-            // 種別表示用もキーボードは不要
-            etKind.setShowSoftInputOnFocus(false);
-
             // 初期表示は空
             etKind.setText("");
         }
@@ -104,8 +104,7 @@ public class ImagerTestActivity extends BaseActivity {
 
                         // ---- 種別表示（AIM/DENSOから推定して表示） ----
                         if (etKind != null) {
-                            String display = getBarcodeDisplayNameCompat(aim, denso);
-                            etKind.setText(!TextUtils.isEmpty(display) ? display : "");
+                            etKind.setText(DensoScannerController.resolveBarcodeDisplayName(aim, denso));
                         }
 
                         // ---- 履歴追記（読み取ったデータのみ） ----
@@ -248,47 +247,9 @@ public class ImagerTestActivity extends BaseActivity {
     //=================================
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // 端末によってはSCANキー等がKeyEventとして飛んでくるため、scannerに委譲する
-        // （必要な場合のみ true が返る）
         if (scanner != null && scanner.handleDispatchKeyEvent(event)) {
             return true;
         }
         return super.dispatchKeyEvent(event);
-    }
-
-    //=========================================================
-    //　機　能　:　バーコード種別の表示名を推定して返す
-    //　引　数　:　aim ..... String (AIM識別子)
-    //　　　　　:　denso ..... String (DENSO独自識別/ログ用)
-    //　戻り値　:　[String] ..... 種別表示名（不明時は空文字）
-    //=========================================================
-
-    /**
-     * controllerのprivateに依存しない “種別表示” 判定
-     */
-    private String getBarcodeDisplayNameCompat(@Nullable String aim, @Nullable String denso) {
-        // null対策＋大文字化（判定を単純化）
-        String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
-        String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
-
-        // ---- AIM識別子（]A0 等）での判定 ----
-        // ※AIMのプレフィックスは代表例。読み取り機種/設定で変わる場合あり。
-        if (a.startsWith("]A")) return "Code39";
-        if (a.startsWith("]G")) return "Code93";
-        if (a.startsWith("]C")) return "Code128";
-        if (a.startsWith("]F")) return "Codabar(NW7)";
-        if (a.startsWith("]I")) return "ITF(2of5)";
-        if (a.startsWith("]E")) return "EAN/UPC";
-
-        // ---- 文字列含有でのフォールバック判定 ----
-        if (a.contains("CODE39") || d.contains("CODE39")) return "Code39";
-        if (a.contains("CODE93") || d.contains("CODE93")) return "Code93";
-        if (a.contains("CODE128") || d.contains("CODE128")) return "Code128";
-        if (a.contains("QR") || d.contains("QR")) return "QR";
-        if (a.contains("DATAMATRIX") || d.contains("DATAMATRIX")) return "DataMatrix";
-        if (a.contains("PDF") || d.contains("PDF")) return "PDF417";
-
-        // 判定不能
-        return "";
     }
 }
