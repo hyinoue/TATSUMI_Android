@@ -84,7 +84,7 @@ public class BundleSelectController {
     // ============================================================
 
     //=================================
-    //　機　能　:　bundlesを取得する
+    //　機　能　:　束データ一覧を取得する
     //　引　数　:　なし
     //　戻り値　:　[LinkedHashMap<String, BundleInfo>] ..... 保持データ
     //=================================
@@ -94,7 +94,7 @@ public class BundleSelectController {
     }
 
     //============================
-    //　機　能　:　jyuryo Sumを取得する
+    //　機　能　:　重量合計を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 重量合計
     //============================
@@ -110,7 +110,7 @@ public class BundleSelectController {
     }
 
     //===========================================
-    //　機　能　:　display Rowsを取得する
+    //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<BundleSelectRow>] ..... 表示用行データ（読み取り専用）
     //===========================================
@@ -121,7 +121,7 @@ public class BundleSelectController {
     }
 
     //=========================================
-    //　機　能　:　check Bundleの処理
+    //　機　能　:　入力された束Noの妥当性を確認する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　　　　　:　containerJyuryo ..... int
@@ -184,7 +184,7 @@ public class BundleSelectController {
     }
 
     //=====================================
-    //　機　能　:　bundle Noを追加する
+    //　機　能　:　束Noを追加する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　　　　　:　bundleNoOrg ..... String
@@ -202,7 +202,7 @@ public class BundleSelectController {
     }
 
     //=================================
-    //　機　能　:　bundleを追加する
+    //　機　能　:　束データを追加する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[void] ..... なし
@@ -241,7 +241,7 @@ public class BundleSelectController {
     }
 
     //===============================
-    //　機　能　:　bundleを削除する
+    //　機　能　:　束データを削除する
     //　引　数　:　rowIndex ..... int
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -274,7 +274,7 @@ public class BundleSelectController {
     }
 
     //============================
-    //　機　能　:　bundlesを削除する
+    //　機　能　:　束データを全件削除する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -286,7 +286,7 @@ public class BundleSelectController {
     }
 
     //==============================
-    //　機　能　:　display Rowsを更新する
+    //　機　能　:　表示用行データを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -314,7 +314,7 @@ public class BundleSelectController {
     }
 
     //=====================================
-    //　機　能　:　read Work Tbl To Listの処理
+    //　機　能　:　ワークテーブルの内容を一覧へ読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -358,7 +358,7 @@ public class BundleSelectController {
     // ============================================================
 
     //==================================
-    //　機　能　:　work Tableを追加する
+    //　機　能　:　ワークテーブルへ追加する
     //　引　数　:　item ..... BundleInfo
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -380,7 +380,7 @@ public class BundleSelectController {
     }
 
     //==================================
-    //　機　能　:　work Tableを削除する
+    //　機　能　:　ワークテーブルから削除する
     //　引　数　:　item ..... BundleInfo
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -394,7 +394,7 @@ public class BundleSelectController {
     // ============================================================
 
     //=================================
-    //　機　能　:　key Ofの処理
+    //　機　能　:　束識別キーを生成する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[String] ..... 連結キー（heatNo+sokuban）
@@ -404,7 +404,7 @@ public class BundleSelectController {
     }
 
     //==============================
-    //　機　能　:　safe Strの処理
+    //　機　能　:　null安全な文字列へ変換する
     //　引　数　:　s ..... String
     //　戻り値　:　[String] ..... nullなら空文字、非nullはそのまま
     //==============================
@@ -413,7 +413,7 @@ public class BundleSelectController {
     }
 
     //===================================
-    //　機　能　:　pad Left4 As Spacesの処理
+    //　機　能　:　4桁右寄せになるよう空白埋めする
     //　引　数　:　org ..... String
     //　戻り値　:　[String] ..... 数値化→文字列化→4桁右寄せスペース埋め
     //===================================
@@ -444,7 +444,7 @@ public class BundleSelectController {
     }
 
     //==============================
-    //　機　能　:　repeatの処理
+    //　機　能　:　指定文字列を繰り返して作成する
     //　引　数　:　s ..... String
     //　　　　　:　n ..... int
     //　戻り値　:　[String] ..... s を n回繰り返した文字列
@@ -466,7 +466,7 @@ public class BundleSelectController {
     }
 
     //==============================
-    //　機　能　:　now As Textの処理
+    //　機　能　:　現在日時を文字列で取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... 現在時刻（yyyyMMddHHmmss）
     //==============================

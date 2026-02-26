@@ -160,7 +160,7 @@ public class BundleSelectActivity extends BaseActivity {
         RecyclerView rvBundles = findViewById(R.id.rvBundles);
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
             //===========================================
-            //　機　能　:　item Offsetsを取得する
+            //　機　能　:　一覧行の余白（オフセット）を設定する
             //　引　数　:　outRect ..... Rect
             //　　　　　:　view ..... View
             //　　　　　:　parent ..... RecyclerView
@@ -180,7 +180,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　bind Viewsの処理
+    //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -216,7 +216,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bundle Valuesを読み込む
+    //　機　能　:　束関連の引き継ぎ値を読み込む
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
     //================================
@@ -239,7 +239,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　container Valuesを読み込む
+    //　機　能　:　コンテナ関連の引き継ぎ値を読み込む
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
     //====================================
@@ -305,7 +305,7 @@ public class BundleSelectActivity extends BaseActivity {
                     }
 
                     //====================================================
-                    //　機　能　:　symbology Profileを取得する
+                    //　機　能　:　シンボロジープロファイルを取得する
                     //　引　数　:　なし
                     //　戻り値　:　[SymbologyProfile] ..... 許可するシンボロジ
                     //====================================================
@@ -339,7 +339,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　input Handlersを設定する
+    //　機　能　:　入力イベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -531,7 +531,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //====================================================
-    //　機　能　:　default Container Weightを取得する
+    //　機　能　:　既定のコンテナ重量を取得する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 既定コンテナ重量
     //====================================================
@@ -541,7 +541,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //===================================================
-    //　機　能　:　default Dunnage Weightを取得する
+    //　機　能　:　既定の緩衝材重量を取得する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 既定ダンネージ重量
     //===================================================
@@ -553,7 +553,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //===================================================
-    //　機　能　:　max Container Weightを取得する
+    //　機　能　:　コンテナ最大重量を取得する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 最大積載重量
     //===================================================
@@ -638,7 +638,7 @@ public class BundleSelectActivity extends BaseActivity {
     //====================================================
     private final TextWatcher weightWatcher = new TextWatcher() {
         //===================================
-        //　機　能　:　before Text Changedの処理
+        //　機　能　:　テキスト変更前の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　count ..... int
@@ -650,7 +650,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //=================================
-        //　機　能　:　on Text Changedの処理
+        //　機　能　:　テキスト変更中の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　before ..... int
@@ -662,7 +662,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //==================================
-        //　機　能　:　after Text Changedの処理
+        //　機　能　:　テキスト変更後の処理を行う
         //　引　数　:　s ..... Editable
         //　戻り値　:　[void] ..... なし
         //==================================
@@ -700,7 +700,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //=====================================
-    //　機　能　:　bottom Button Textsを設定する
+    //　機　能　:　下部ボタンの表示文言を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -725,7 +725,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　on Function Redの処理
+    //　機　能　:　赤ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -755,7 +755,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　on Function Blueの処理
+    //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -860,7 +860,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　on Function Greenの処理
+    //　機　能　:　緑ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -870,7 +870,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -981,7 +981,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　remaining Weightを取得する
+    //　機　能　:　残重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 残量（最大-合計）
     //==================================
@@ -991,7 +991,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　total Weightを取得する
+    //　機　能　:　総重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 合計重量
     //============================
@@ -1060,7 +1060,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　numberを整形する
+    //　機　能　:　数値文字列を整形する
     //　引　数　:　value ..... int
     //　戻り値　:　[String] ..... 3桁区切り
     //==============================
@@ -1099,7 +1099,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　finishの処理
+    //　機　能　:　画面を終了する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -1193,7 +1193,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //====================================================
-        //　機　能　:　submit Listの処理
+        //　機　能　:　一覧データを更新して再描画する
         //　引　数　:　newRows ..... List<BundleSelectRow>
         //　戻り値　:　[void] ..... なし
         //====================================================
@@ -1205,7 +1205,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //================================================
-        //　機　能　:　on Create View Holderの処理
+        //　機　能　:　一覧1行分のViewHolderを生成する
         //　引　数　:　parent ..... android.view.ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[ViewHolder] ..... なし
@@ -1219,7 +1219,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //====================================
-        //　機　能　:　on Bind View Holderの処理
+        //　機　能　:　指定行のデータをViewHolderへ表示する
         //　引　数　:　holder ..... ViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
@@ -1249,7 +1249,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //============================
-        //　機　能　:　item Countを取得する
+        //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
         //============================

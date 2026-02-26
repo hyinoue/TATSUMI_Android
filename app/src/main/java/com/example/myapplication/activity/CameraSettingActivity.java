@@ -96,7 +96,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //=======================================
-    //　機　能　:　bind Spinnerの処理
+    //　機　能　:　スピナー部品を関連付ける
     //　引　数　:　spinner ..... Spinner
     //　　　　　:　options ..... List<Option>
     //　戻り値　:　[void] ..... なし
@@ -115,7 +115,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //=======================================
-    //　機　能　:　spinner Selectionを設定する
+    //　機　能　:　スピナーの選択値を設定する
     //　引　数　:　spinner ..... Spinner
     //　　　　　:　options ..... List<Option>
     //　　　　　:　value ..... int
@@ -134,7 +134,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　size Optionsを生成する
+    //　機　能　:　サイズ選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 解像度選択肢一覧
     //====================================
@@ -151,7 +151,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　flash Optionsを生成する
+    //　機　能　:　フラッシュ選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... フラッシュ選択肢一覧
     //====================================
@@ -165,7 +165,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　light Optionsを生成する
+    //　機　能　:　照明選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 光源モード選択肢一覧
     //====================================
@@ -181,7 +181,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //=====================================
-    //　機　能　:　bottom Button Textsを設定する
+    //　機　能　:　下部ボタンの表示文言を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -199,7 +199,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　on Function Blueの処理
+    //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -219,7 +219,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -231,7 +231,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　selected Valueを取得する
+    //　機　能　:　選択値を取得する
     //　引　数　:　spinner ..... Spinner
     //　戻り値　:　[int] ..... Option.value（未取得時は0）
     //==================================
@@ -264,7 +264,7 @@ public class CameraSettingActivity extends BaseActivity {
         }
 
         //==============================
-        //　機　能　:　to Stringの処理
+        //　機　能　:　表示文字列へ変換する
         //　引　数　:　なし
         //　戻り値　:　[String] ..... Spinner表示用文字列（label）
         //==============================

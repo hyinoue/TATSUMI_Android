@@ -63,7 +63,7 @@ public class VanningCollationController {
     }
 
     //=====================================
-    //　機　能　:　loadの処理
+    //　機　能　:　データを読み込む
     //　引　数　:　containerId ..... String
     //　戻り値　:　[void] ..... なし
     //=====================================
@@ -98,7 +98,7 @@ public class VanningCollationController {
     }
 
     //=================================================
-    //　機　能　:　display Rowsを取得する
+    //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<VanningCollationRow>] ..... 表示用行データ（読み取り専用）
     //=================================================
@@ -109,7 +109,7 @@ public class VanningCollationController {
     }
 
     //=================================
-    //　機　能　:　check Soku Dtlの処理
+    //　機　能　:　束明細の照合可否を確認する
     //　引　数　:　heatNo ..... String
     //　　　　　:　sokuban ..... String
     //　戻り値　:　[String] ..... 結果（OK/エラーメッセージ）
@@ -177,7 +177,7 @@ public class VanningCollationController {
     }
 
     //====================================
-    //　機　能　:　syougou Sumi Countを取得する
+    //　機　能　:　照合済件数を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 照合済件数
     //====================================
@@ -196,7 +196,7 @@ public class VanningCollationController {
     }
 
     //==================================
-    //　機　能　:　uncollated Countを取得する
+    //　機　能　:　未照合件数を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 未照合件数
     //==================================
@@ -215,7 +215,7 @@ public class VanningCollationController {
     }
 
     //==========================================================
-    //　機　能　:　mark Container Collatedの処理
+    //　機　能　:　コンテナを照合済として更新する
     //　引　数　:　kakuninContainerDao ..... KakuninContainerDao
     //　戻り値　:　[void] ..... なし
     //==========================================================
@@ -253,7 +253,7 @@ public class VanningCollationController {
     }
 
     //==============================
-    //　機　能　:　display Rowsを更新する
+    //　機　能　:　表示用行データを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -304,7 +304,7 @@ public class VanningCollationController {
     }
 
     //============================================
-    //　機　能　:　read W_KAKUNIN_MEISAIto Listの処理
+    //　機　能　:　W_KAKUNIN_MEISAIを一覧へ読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================
@@ -316,7 +316,7 @@ public class VanningCollationController {
     }
 
     //===============================================
-    //　機　能　:　to Work Entityの処理
+    //　機　能　:　ワークエンティティへ変換する
     //　引　数　:　entity ..... KakuninMeisaiEntity
     //　戻り値　:　[KakuninMeisaiWorkEntity] ..... WorkEntity
     //===============================================
@@ -351,7 +351,7 @@ public class VanningCollationController {
     }
 
     //===============================
-    //　機　能　:　safe Strの処理
+    //　機　能　:　null安全な文字列へ変換する
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... nullなら空文字、非nullはそのまま
     //===============================
@@ -360,7 +360,7 @@ public class VanningCollationController {
     }
 
     //===============================
-    //　機　能　:　blankを判定する
+    //　機　能　:　空文字かどうか判定する
     //　引　数　:　value ..... String
     //　戻り値　:　[boolean] ..... true:空/空白、false:それ以外
     //===============================
@@ -369,7 +369,7 @@ public class VanningCollationController {
     }
 
     //==============================
-    //　機　能　:　repeatの処理
+    //　機　能　:　指定文字列を繰り返して作成する
     //　引　数　:　s ..... String
     //　　　　　:　n ..... int
     //　戻り値　:　[String] ..... s を n回繰り返した文字列
@@ -391,7 +391,7 @@ public class VanningCollationController {
     }
 
     //==============================
-    //　機　能　:　now As Textの処理
+    //　機　能　:　現在日時を文字列で取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... 現在時刻（yyyy-MM-dd HH:mm:ss）
     //==============================

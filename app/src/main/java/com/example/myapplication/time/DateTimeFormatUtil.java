@@ -22,7 +22,7 @@ public final class DateTimeFormatUtil {
     private static final String[] INPUT_PATTERNS = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm"};   // 入力として想定する形式（DB/既存資産互換）
 
     //==========================================
-    //　機　能　:　DateTimeFormatUtilの初期化処理
+    //　機　能　:　DateTimeFormatUtilのインスタンス生成を禁止する
     //　引　数　:　なし
     //　戻り値　:　[DateTimeFormatUtil] ..... なし
     //==========================================
@@ -31,7 +31,7 @@ public final class DateTimeFormatUtil {
     }
 
     //========================================
-    //　機　能　:　sagyou Ymd For Displayを整形する
+    //　機　能　:　作業日表示用に日付文字列を整形する
     //　引　数　:　value ..... String（入力日時文字列：例 "yyyy-MM-dd HH:mm:ss" 等）
     //　戻り値　:　[String] ..... 表示用文字列（整形不可時は可能な範囲で返却）
     //========================================

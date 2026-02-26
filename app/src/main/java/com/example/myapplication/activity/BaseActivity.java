@@ -305,7 +305,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=================================
-    //　機　能　:　loading Longを表示する
+    //　機　能　:　長時間ローディングを表示する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -318,7 +318,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=================================
-    //　機　能　:　loading Longを非表示にする
+    //　機　能　:　長時間ローディングを非表示にする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -328,7 +328,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=================================
-    //　機　能　:　loading Shortを表示する
+    //　機　能　:　短時間ローディングを表示する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -341,7 +341,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=================================
-    //　機　能　:　loading Shortを非表示にする
+    //　機　能　:　短時間ローディングを非表示にする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=================================
@@ -351,7 +351,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=========================================================
-    //　機　能　:　Function keys（物理キー → onFunctionXxx に集約）
+    //　機　能　:　ファンクションキー入力を共通処理へ集約する
     //　引　数　:　event ..... KeyEvent
     //　戻り値　:　[boolean] ..... True:消費
     //=========================================================
@@ -516,7 +516,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //============================
-    //　機　能　:　Banner Viewを生成する
+    //　機　能　:　バナー表示Viewを生成する
     //　引　数　:　なし
     //　戻り値　:　[TextView] ..... バナーView
     //============================
@@ -540,7 +540,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //============================
-    //　機　能　:　Loading Overlayを生成する
+    //　機　能　:　ローディングオーバーレイを生成する
     //　引　数　:　isLong ..... boolean（Long/Short）
     //　戻り値　:　[FrameLayout] ..... overlay
     //============================

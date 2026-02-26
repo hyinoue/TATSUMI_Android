@@ -272,7 +272,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　bind Viewsの処理
+    //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -302,7 +302,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　bottom Buttonsを設定する
+    //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -323,7 +323,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　input Handlersを設定する
+    //　機　能　:　入力イベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -402,7 +402,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　photo Handlersを設定する
+    //　機　能　:　写真関連のイベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -442,7 +442,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　initial Dataを読み込む
+    //　機　能　:　初期データを読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -558,7 +558,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　formを初期化する
+    //　機　能　:　入力フォームを初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -582,7 +582,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　passed Valuesを読み込む
+    //　機　能　:　引き継ぎ値を読み込む
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
     //================================
@@ -626,7 +626,7 @@ public class ContainerInputActivity extends BaseActivity {
      */
     private final TextWatcher containerNoWatcher = new TextWatcher() {
         //===================================
-        //　機　能　:　before Text Changedの処理
+        //　機　能　:　テキスト変更前の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　count ..... int
@@ -639,7 +639,7 @@ public class ContainerInputActivity extends BaseActivity {
         }
 
         //=================================
-        //　機　能　:　on Text Changedの処理
+        //　機　能　:　テキスト変更中の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　before ..... int
@@ -652,7 +652,7 @@ public class ContainerInputActivity extends BaseActivity {
         }
 
         //==================================
-        //　機　能　:　after Text Changedの処理
+        //　機　能　:　テキスト変更後の処理を行う
         //　引　数　:　s ..... Editable
         //　戻り値　:　[void] ..... なし
         //==================================
@@ -664,7 +664,7 @@ public class ContainerInputActivity extends BaseActivity {
     };
 
     //=============================
-    //　機　能　:　check Digitを更新する
+    //　機　能　:　チェックデジット表示を更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -692,7 +692,7 @@ public class ContainerInputActivity extends BaseActivity {
      */
     private final TextWatcher weightWatcher = new TextWatcher() {
         //===================================
-        //　機　能　:　before Text Changedの処理
+        //　機　能　:　テキスト変更前の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　count ..... int
@@ -705,7 +705,7 @@ public class ContainerInputActivity extends BaseActivity {
         }
 
         //=================================
-        //　機　能　:　on Text Changedの処理
+        //　機　能　:　テキスト変更中の処理を行う
         //　引　数　:　s ..... CharSequence
         //　　　　　:　start ..... int
         //　　　　　:　before ..... int
@@ -718,7 +718,7 @@ public class ContainerInputActivity extends BaseActivity {
         }
 
         //==================================
-        //　機　能　:　after Text Changedの処理
+        //　機　能　:　テキスト変更後の処理を行う
         //　引　数　:　s ..... Editable
         //　戻り値　:　[void] ..... なし
         //==================================
@@ -733,7 +733,7 @@ public class ContainerInputActivity extends BaseActivity {
     };
 
     //=========================================
-    //　機　能　:　persist Container Weightsの処理
+    //　機　能　:　容器重量を保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=========================================
@@ -751,7 +751,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　calc Jyuryoの処理
+    //　機　能　:　重量を計算する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -774,7 +774,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　launch Cameraの処理
+    //　機　能　:　カメラを起動する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -793,7 +793,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //======================================
-    //　機　能　:　launch Camera Internalの処理
+    //　機　能　:　内部処理でカメラを起動する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //======================================
@@ -807,7 +807,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　show Previewの処理
+    //　機　能　:　撮影画像のプレビューを表示する
     //　引　数　:　source ..... ImageView
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -836,7 +836,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //======================================
-    //　機　能　:　restore Photoの処理
+    //　機　能　:　写真表示を復元する
     //　引　数　:　target ..... ImageView
     //　　　　　:　uriString ..... String
     //　　　　　:　isContainer ..... boolean
@@ -871,7 +871,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　on Function Blueの処理
+    //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //================================
@@ -896,7 +896,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==========================================
-    //　機　能　:　confirm Seal Then Registerの処理
+    //　機　能　:　封印確認後に登録する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==========================================
@@ -917,7 +917,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　on Function Yellowの処理
+    //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================
@@ -928,7 +928,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //========================================
-    //　機　能　:　validate Required Fieldsの処理
+    //　機　能　:　必須項目をチェックする
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 入力OK:true、NG:false
     //========================================
@@ -973,7 +973,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　remaining Weightを取得する
+    //　機　能　:　残重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 残重量
     //==================================
@@ -986,7 +986,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //=============================================
-    //　機　能　:　needs Container Photo Confirmの処理
+    //　機　能　:　容器写真確認が必要か判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 確認が必要ならtrue
     //=============================================
@@ -997,7 +997,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //========================================
-    //　機　能　:　needs Seal Photo Confirmの処理
+    //　機　能　:　封印写真確認が必要か判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 確認が必要ならtrue
     //========================================
@@ -1008,7 +1008,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　imageを判定する
+    //　機　能　:　画像の有無を判定する
     //　引　数　:　view ..... ImageView
     //　　　　　:　uri ..... Uri
     //　戻り値　:　[boolean] ..... 画像があればtrue
@@ -1019,7 +1019,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　proc Registerの処理
+    //　機　能　:　登録処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -1129,7 +1129,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //===========================
-    //　機　能　:　register Dbの処理
+    //　機　能　:　DBへ登録する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 採番したcontainerId
     //===========================
@@ -1180,7 +1180,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　container Noを生成する
+    //　機　能　:　コンテナ番号を生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... コンテナNo（チェックデジット付、未入力なら空）
     //==============================
@@ -1201,7 +1201,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //======================================
-    //　機　能　:　resolve Container Sizeの処理
+    //　機　能　:　コンテナサイズを決定する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 20 or 40
     //======================================
@@ -1213,7 +1213,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==========================================
-    //　機　能　:　image Fileを保存する
+    //　機　能　:　画像ファイルを保存する
     //　引　数　:　containerId ..... int
     //　　　　　:　type ..... DataSync.ImageType
     //　　　　　:　uri ..... Uri
@@ -1247,7 +1247,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==========================================
-    //　機　能　:　image Fileを取得する
+    //　機　能　:　画像ファイルを取得する
     //　引　数　:　containerId ..... int
     //　　　　　:　type ..... DataSync.ImageType
     //　戻り値　:　[File] ..... 保存先ファイル
@@ -1265,7 +1265,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　now As Textの処理
+    //　機　能　:　現在日時を文字列で取得する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... yyyy-MM-dd HH:mm:ss
     //==============================
@@ -1274,7 +1274,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================================
-    //　機　能　:　resolve Default Container Weightの処理
+    //　機　能　:　既定のコンテナ重量を決定する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 既定コンテナ自重（未設定は0）
     //================================================
@@ -1286,7 +1286,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==============================================
-    //　機　能　:　resolve Default Dunnage Weightの処理
+    //　機　能　:　既定の緩衝材重量を決定する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 既定ダンネージ重量（未設定は0）
     //==============================================
@@ -1298,7 +1298,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================================
-    //　機　能　:　resolve Max Container Weightの処理
+    //　機　能　:　コンテナ最大重量を決定する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 最大積載重量
     //============================================
@@ -1315,7 +1315,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　safe Intの処理
+    //　機　能　:　null安全な整数へ変換する
     //　引　数　:　value ..... Integer
     //　戻り値　:　[int] ..... nullなら0
     //================================
@@ -1324,7 +1324,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　int From Editを取得する
+    //　機　能　:　入力欄から整数値を取得する
     //　引　数　:　editText ..... EditText
     //　戻り値　:　[int] ..... 数値（不正/未入力は0）
     //====================================
@@ -1348,7 +1348,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　safe Textの処理
+    //　機　能　:　null安全な文字列を取得する
     //　引　数　:　editText ..... EditText
     //　戻り値　:　[String] ..... null安全な文字列
     //====================================
@@ -1358,7 +1358,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　default Stringの処理
+    //　機　能　:　既定値付き文字列を取得する
     //　引　数　:　value ..... String
     //　戻り値　:　[String] ..... nullなら空文字
     //===============================
@@ -1367,7 +1367,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　numberを整形する
+    //　機　能　:　数値文字列を整形する
     //　引　数　:　value ..... int
     //　戻り値　:　[String] ..... カンマ区切り文字列
     //==============================
@@ -1376,7 +1376,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　toastの処理
+    //　機　能　:　トーストを表示する
     //　引　数　:　msg ..... String
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -1385,7 +1385,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　finishの処理
+    //　機　能　:　画面を終了する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -1403,7 +1403,7 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //==================================
-    //　機　能　:　container Valuesを保存する
+    //　機　能　:　コンテナ入力値を保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==================================

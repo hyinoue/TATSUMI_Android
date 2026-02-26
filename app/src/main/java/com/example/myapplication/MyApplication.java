@@ -17,7 +17,7 @@ import com.example.myapplication.log.FileLogger;
 public class MyApplication extends Application {
 
     //========================================
-    //　機　能　:　onCreateの処理
+    //　機　能　:　起動時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
