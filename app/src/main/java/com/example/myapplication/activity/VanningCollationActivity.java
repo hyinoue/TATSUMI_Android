@@ -672,6 +672,7 @@ public class VanningCollationActivity extends BaseActivity {
         return value.length() <= 16 ? value : value.substring(0, 16);
     }
 
+
     //================================================================
     //　機　能　:　一覧表示用Adapter(内部クラス)
     //　引　数　:　なし

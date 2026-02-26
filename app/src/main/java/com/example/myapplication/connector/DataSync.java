@@ -31,6 +31,7 @@ import com.example.myapplication.model.SyougoHeader;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.time.XsdDateTime;
 
 import java.io.ByteArrayOutputStream;
@@ -1060,7 +1061,7 @@ public class DataSync {
         if (date == null) {
             return null;
         }
-        return dbDateFormat.format(date);
+        return DateTimeFormatUtil.formatDbYmdHms(date);
     }
 
     //================================================================

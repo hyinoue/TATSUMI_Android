@@ -9,11 +9,10 @@ import com.example.myapplication.db.dao.KakuninMeisaiWorkDao;
 import com.example.myapplication.db.entity.KakuninContainerEntity;
 import com.example.myapplication.db.entity.KakuninMeisaiEntity;
 import com.example.myapplication.db.entity.KakuninMeisaiWorkEntity;
+import com.example.myapplication.time.DateTimeFormatUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +35,6 @@ import java.util.Locale;
 //　　　　　　:　safeStr ..... null安全な文字列化
 //　　　　　　:　isBlank ..... 空/空白判定
 //　　　　　　:　repeat ..... 文字列繰り返し生成
-//　　　　　　:　nowAsText ..... 現在時刻文字列生成（yyyy-MM-dd HH:mm:ss）
 //============================================================
 
 public class VanningCollationController {
@@ -166,7 +164,7 @@ public class VanningCollationController {
 
         // 更新情報を設定
         entity.updateProcName = "VanningCollationController";
-        entity.updateYmd = nowAsText();
+        entity.updateYmd = DateTimeFormatUtil.nowDbYmdHms();
 
         // Workテーブルへ反映（upsert）
         kakuninMeisaiWorkDao.upsert(entity);
@@ -246,7 +244,7 @@ public class VanningCollationController {
 
         // 更新情報を設定
         container.updateProcName = "VanningCollation";
-        container.updateYmd = nowAsText();
+        container.updateYmd = DateTimeFormatUtil.nowDbYmdHms();
 
         // コンテナを更新（upsert）
         kakuninContainerDao.upsert(container);
@@ -390,13 +388,4 @@ public class VanningCollationController {
         return sb.toString();
     }
 
-    //==============================
-    //　機　能　:　現在日時を文字列で取得する
-    //　引　数　:　なし
-    //　戻り値　:　[String] ..... 現在時刻（yyyy-MM-dd HH:mm:ss）
-    //==============================
-    private String nowAsText() {
-        // 更新日時用の文字列時刻を作成
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN).format(new Date());
-    }
 }
