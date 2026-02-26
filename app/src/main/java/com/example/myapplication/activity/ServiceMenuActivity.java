@@ -22,6 +22,7 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
 import com.example.myapplication.log.FileLogger;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
@@ -310,8 +311,7 @@ public class ServiceMenuActivity extends BaseActivity {
                                     null,
                                     null,
                                     "ServiceMenu#clearData",
-                                    new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN)
-                                            .format(new java.util.Date())
+                                    DateTimeFormatUtil.nowDbYmdHms()
                             );
                         });
 

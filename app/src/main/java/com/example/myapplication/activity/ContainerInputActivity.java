@@ -34,14 +34,13 @@ import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.SyukkaContainerEntity;
 import com.example.myapplication.settings.HandyUtil;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1146,7 +1145,7 @@ public class ContainerInputActivity extends BaseActivity {
             // 2) 登録用データを組み立て
             String containerNo = buildContainerNo();
             String bookingNo = safeText(etBookingNo).trim();
-            String now = nowAsText();
+            String now = DateTimeFormatUtil.nowDbYmdHms();
 
             SyukkaContainerEntity entity = new SyukkaContainerEntity();
             entity.containerId = containerId;
@@ -1264,14 +1263,6 @@ public class ContainerInputActivity extends BaseActivity {
         return new File(dir, name);
     }
 
-    //==============================
-    //　機　能　:　現在日時を文字列で取得する
-    //　引　数　:　なし
-    //　戻り値　:　[String] ..... yyyy-MM-dd HH:mm:ss
-    //==============================
-    private String nowAsText() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.JAPAN).format(new Date());
-    }
 
     //================================================
     //　機　能　:　既定のコンテナ重量を決定する

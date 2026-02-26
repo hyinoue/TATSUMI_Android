@@ -7,12 +7,11 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.model.BundleInfo;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -373,7 +372,7 @@ public class BundleSelectController {
         w.containerId = null;
 
         // 並び順/更新時刻用
-        w.updateYmd = nowAsText();
+        w.updateYmd = DateTimeFormatUtil.nowCompactYmdHms();
 
         // upsert（存在すれば更新、なければ追加）
         syukkaMeisaiWorkDao.upsert(w);
@@ -465,13 +464,4 @@ public class BundleSelectController {
         return sb.toString();
     }
 
-    //==============================
-    //　機　能　:　現在日時を文字列で取得する
-    //　引　数　:　なし
-    //　戻り値　:　[String] ..... 現在時刻（yyyyMMddHHmmss）
-    //==============================
-    private String nowAsText() {
-        // Workの並び順用の文字列時刻を作成
-        return new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT).format(new Date());
-    }
 }
