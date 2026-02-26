@@ -10,6 +10,7 @@ import android.widget.Spinner;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.settings.AppSettings;
 import com.google.android.material.button.MaterialButton;
 
@@ -151,8 +152,7 @@ public class ServerSettingActivity extends BaseActivity {
 
             // 変更がある場合のみ更新
             if (!equalsIgnoreCase(selectedUrl, currentUrl)) {
-                String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.JAPAN)
-                        .format(new java.util.Date());
+                String now = DateTimeFormatUtil.nowDbYmdHms();
                 system.webSvcUrl = selectedUrl;
                 system.updateProcName = "ServerSetting#onFunctionBlue";
                 system.updateYmd = now;

@@ -6,6 +6,7 @@ import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.SyougoData;
 import com.example.myapplication.model.SyukkaData;
+import com.example.myapplication.time.DateTimeFormatUtil;
 
 import java.io.Closeable;
 import java.text.SimpleDateFormat;
@@ -434,7 +435,7 @@ public class SvcHandyWrapper implements Closeable {
         if (value == null) {
             return null;
         }
-        return dbDateFormat.format(value);
+        return DateTimeFormatUtil.formatDbYmdHms(value);
     }
 
     //================================================================
