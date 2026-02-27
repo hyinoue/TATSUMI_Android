@@ -11,7 +11,7 @@ import okhttp3.Response;
 
 
 //============================================================
-//　処理概要　:　SoapAsmxClientクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　SoapAsmxClient .......................... 初期化（OkHttp設定）
 //　　　　　　:　call .................................... SOAP呼び出し（POST送信→レスポンス取得）
 //============================================================
@@ -23,11 +23,11 @@ public class SoapAsmxClient {
     private final OkHttpClient http; // HTTPクライアント
     private final String endpointUrl; // 接続先エンドポイントURL
 
-    //================================================================
+    //============================================================
     //　機　能　:　SoapAsmxClientを初期化する
-    //　引　数　:　endpointUrl ..... String（ASMXエンドポイントURL）
+    //　引　数　:　endpointUrl ..... 接続先URL
     //　戻り値　:　[SoapAsmxClient] ..... なし
-    //================================================================
+    //============================================================
     public SoapAsmxClient(String endpointUrl) {
         this.endpointUrl = endpointUrl;
 
@@ -39,12 +39,12 @@ public class SoapAsmxClient {
                 .build();
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　SOAP(ASMX)を呼び出してレスポンスXMLを取得する
-    //　引　数　:　soapAction ..... String（例：http://tempuri.org/GetSyukkaData）
-    //　　　　　:　soapEnvelopeXml ..... String（SOAP Envelope全文）
+    //　引　数　:　soapAction ..... SOAPアクション名
+    //　　　　　:　soapEnvelopeXml ..... XML文字列
     //　戻り値　:　[String] ..... SOAPレスポンスXML
-    //================================================================
+    //============================================================
     public String call(String soapAction, String soapEnvelopeXml) throws IOException {
 
         // 送信XMLをRequestBodyへ設定

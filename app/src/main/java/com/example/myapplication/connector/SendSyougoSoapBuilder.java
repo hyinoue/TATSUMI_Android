@@ -6,26 +6,26 @@ import com.example.myapplication.time.XmlUtil;
 
 
 //============================================================
-//　処理概要　:　SendSyougoSoapBuilderクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　buildSendSyougoData ..... SendSyougoData用SOAPボディ生成
 //============================================================
 public class SendSyougoSoapBuilder {
     private static final String NS = "http://tempuri.org/";
 
-    //================================================================
+    //============================================================
     //　機　能　:　SendSyougoSoapBuilderの生成を禁止する（ユーティリティクラス化）
     //　引　数　:　なし
     //　戻り値　:　[SendSyougoSoapBuilder] ..... なし
-    //================================================================
+    //============================================================
     private SendSyougoSoapBuilder() {
         // インスタンス化不要のため、コンストラクタはprivate
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　照合データ送信用（SendSyougoData）のSOAPメッセージを生成する
-    //　引　数　:　data ..... CollateData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildSendSyougoData(CollateData data) {
         // Body内に入れるXMLを組み立てる
         StringBuilder inner = new StringBuilder();

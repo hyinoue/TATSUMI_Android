@@ -16,7 +16,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　バーコードスキャン連携を行うクラス
 //　関　　数　:　ImageScanTextBox ..... フォーカス中のみCode39をアプリ処理するEditText
 //　　　　　　:　onFocusChanged ..... フォーカス変化に合わせてスキャナ開始/停止＋プロファイル反映
 //　　　　　　:　onDetachedFromWindow ..... View破棄時にスキャナを破棄
@@ -34,43 +34,43 @@ public class ImageScanTextBox extends AppCompatEditText {
     private DensoScannerController scannerController; // DENSOスキャナ制御
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
-    //=================================================
+    //============================================================
     //　機　能　:　ImageScanTextBoxの初期化処理
-    //　引　数　:　context ..... Context
+    //　引　数　:　context ..... コンテキスト情報
     //　戻り値　:　[ImageScanTextBox] ..... なし
-    //=================================================
+    //============================================================
     public ImageScanTextBox(@NonNull Context context) {
         super(context);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　ImageScanTextBoxの初期化処理
-    //　引　数　:　context ..... Context
-    //　　　　　:　attrs ..... AttributeSet
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　attrs ..... 属性情報
     //　戻り値　:　[ImageScanTextBox] ..... なし
-    //=================================================
+    //============================================================
     public ImageScanTextBox(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　ImageScanTextBoxの初期化処理
-    //　引　数　:　context ..... Context
-    //　　　　　:　attrs ..... AttributeSet
-    //　　　　　:　defStyleAttr ..... int
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　attrs ..... 属性情報
+    //　　　　　:　defStyleAttr ..... デフォルトスタイル属性
     //　戻り値　:　[ImageScanTextBox] ..... なし
-    //=================================================
+    //============================================================
     public ImageScanTextBox(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　フォーカス変化時の処理
-    //　引　数　:　focused ..... boolean
-    //　　　　　:　direction ..... int
-    //　　　　　:　previouslyFocusedRect ..... Rect
+    //　引　数　:　focused ..... フォーカス状態
+    //　　　　　:　direction ..... ファイル関連情報
+    //　　　　　:　previouslyFocusedRect ..... 直前フォーカス領域
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     @Override
     protected void onFocusChanged(boolean focused, int direction, @Nullable android.graphics.Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
@@ -89,11 +89,11 @@ public class ImageScanTextBox extends AppCompatEditText {
         }
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　ViewがWindowから外れた時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     @Override
     protected void onDetachedFromWindow() {
         // View破棄時にScanner/Managerを確実に解放
@@ -102,11 +102,11 @@ public class ImageScanTextBox extends AppCompatEditText {
     }
 
 
-    //=================================================
+    //============================================================
     //　機　能　:　スキャナを利用可能状態にする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void ensureScannerReady() {
 
         // ContextからActivityを取得（BarcodeManager.createに必要）
@@ -189,22 +189,22 @@ public class ImageScanTextBox extends AppCompatEditText {
         scannerController.refreshProfile("ImageScanTextBox.ensureScannerReady");
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　スキャナを一時停止する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void pauseScanner() {
         if (scannerController != null) {
             scannerController.onPause();
         }
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　スキャナを破棄する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void destroyScanner() {
         if (scannerController != null) {
             scannerController.onDestroy();
@@ -213,11 +213,11 @@ public class ImageScanTextBox extends AppCompatEditText {
         scannerCreated = false;
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　EditTextの最大長を推定する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 最大長（不明/未設定は0）
-    //=================================================
+    //============================================================
     private int resolveMaxLength() {
 
         // 設定されているInputFilterを取得
@@ -252,11 +252,11 @@ public class ImageScanTextBox extends AppCompatEditText {
         return 0;
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　ContextからActivityを探索する
-    //　引　数　:　context ..... Context
+    //　引　数　:　context ..... コンテキスト情報
     //　戻り値　:　[Activity] ..... Activity（見つからなければnull）
-    //=================================================
+    //============================================================
     @Nullable
     private Activity findActivity(@Nullable Context context) {
 

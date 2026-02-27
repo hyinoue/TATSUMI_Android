@@ -1,16 +1,16 @@
 package com.example.myapplication.connector;
 
 //============================================================
-//　処理概要　:　SoapEnvelopeクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　wrapBody ................................. SOAP Envelope生成
 //============================================================
 public class SoapEnvelope {
 
-    //================================================================
+    //============================================================
     //　機　能　:　SOAP Body文字列をEnvelopeでラップする
-    //　引　数　:　innerBodyXml ..... String（Body内に入れるXML文字列）
+    //　引　数　:　innerBodyXml ..... XML文字列
     //　戻り値　:　[String] ..... SOAP Envelope全体のXML文字列
-    //================================================================
+    //============================================================
     public static String wrapBody(String innerBodyXml) {
 
         // XML宣言 + SOAP Envelope + SOAP Body で包む

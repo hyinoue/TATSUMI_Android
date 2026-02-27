@@ -28,42 +28,42 @@ public final class FileLogger {
     private FileLogger() {
     }
 
-    //===========================================
+    //============================================================
     //　機　能　:　infoログを出力する
-    //　引　数　:　context ..... Context
-    //　　　　　:　source ..... String（出力元クラス・処理名）
-    //　　　　　:　message ..... String（ログメッセージ）
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　source ..... 呼び出し元
+    //　　　　　:　message ..... メッセージ
     //　戻り値　:　[void] ..... なし
-    //===========================================
+    //============================================================
     public static void info(Context context, String source, String message) {
 
         // 共通write処理へ委譲（例外なし）
         write(context, "INFO", source, message, null);
     }
 
-    //===========================================
+    //============================================================
     //　機　能　:　errorログを出力する
-    //　引　数　:　context ..... Context
-    //　　　　　:　source ..... String（出力元クラス・処理名）
-    //　　　　　:　message ..... String（ログメッセージ）
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　source ..... 呼び出し元
+    //　　　　　:　message ..... メッセージ
     //　　　　　:　t ..... Throwable（例外）
     //　戻り値　:　[void] ..... なし
-    //===========================================
+    //============================================================
     public static void error(Context context, String source, String message, Throwable t) {
 
         // 共通write処理へ委譲（例外情報付き）
         write(context, "ERROR", source, message, t);
     }
 
-    //===========================================
+    //============================================================
     //　機　能　:　ログファイルへ書き込む
-    //　引　数　:　context ..... Context
-    //　　　　　:　level ..... String（INFO/ERROR）
-    //　　　　　:　source ..... String（出力元）
-    //　　　　　:　message ..... String（メッセージ）
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　level ..... ログレベル
+    //　　　　　:　source ..... 呼び出し元
+    //　　　　　:　message ..... メッセージ
     //　　　　　:　t ..... Throwable（例外）
     //　戻り値　:　[void] ..... なし
-    //===========================================
+    //============================================================
     private static void write(Context context,
                               String level,
                               String source,

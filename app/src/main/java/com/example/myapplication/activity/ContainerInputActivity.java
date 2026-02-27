@@ -87,7 +87,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　resolveDefaultContainerWeight .. 既定コンテナ重量取得
 //　　　　　　:　resolveDefaultDunnageWeight .... 既定ダンネージ重量取得
 //　　　　　　:　resolveMaxContainerWeight ...... 最大積載重量取得
-//　　　　　　:　safeInt ........................ Integer→int安全変換
+//　　　　　　:　safeInt ..... 安全な数値変換処理
 //　　　　　　:　getIntFromEdit ................. EditText→int取得
 //　　　　　　:　safeText ....................... EditText→String安全取得
 //　　　　　　:　defaultString .................. null→""変換
@@ -219,11 +219,11 @@ public class ContainerInputActivity extends BaseActivity {
                 }
             });
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @ExperimentalCamera2Interop
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -255,11 +255,11 @@ public class ContainerInputActivity extends BaseActivity {
         loadInitialData();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -270,11 +270,11 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     private void bindViews() {
         // ボタン
         btnPhotoContainerNo = findViewById(R.id.btnPhotoContainerNo);
@@ -300,11 +300,11 @@ public class ContainerInputActivity extends BaseActivity {
         tvRemainKg = findViewById(R.id.tvRemainKg);
     }
 
-    //================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupBottomButtons() {
         MaterialButton btnBlue = findViewById(R.id.btnBottomBlue);
         MaterialButton btnRed = findViewById(R.id.btnBottomRed);
@@ -321,11 +321,11 @@ public class ContainerInputActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //================================
+    //============================================================
     //　機　能　:　入力イベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupInputHandlers() {
         // コンテナNo入力 → チェックデジット更新
         if (etContainerNo1 != null) etContainerNo1.addTextChangedListener(containerNoWatcher);
@@ -349,12 +349,12 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　Enter/IME入力でフォーカスを移動する
     //　引　数　:　from ..... EditText（移動元）
     //　　　　　:　to ..... EditText（移動先）
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     private void setupEnterFocus(@Nullable EditText from, @Nullable EditText to) {
         if (from == null) return;
 
@@ -387,12 +387,12 @@ public class ContainerInputActivity extends BaseActivity {
         });
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　Enter/IMEアクションかを判定する
-    //　引　数　:　actionId ..... int（IMEアクションID）
+    //　引　数　:　actionId ..... ID
     //　　　　　:　event ..... KeyEvent（キーイベント）
     //　戻り値　:　[boolean] ..... Enter相当ならtrue
-    //============================================
+    //============================================================
     private boolean isEnterAction(int actionId, KeyEvent event) {
         return actionId == EditorInfo.IME_ACTION_NEXT
                 || actionId == EditorInfo.IME_ACTION_DONE
@@ -400,11 +400,11 @@ public class ContainerInputActivity extends BaseActivity {
                 || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
     }
 
-    //================================
+    //============================================================
     //　機　能　:　写真関連のイベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     @ExperimentalCamera2Interop
     private void setupPhotoHandlers() {
         // コンテナ写真ボタン
@@ -440,11 +440,11 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　初期データを読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //============================================================
     private void loadInitialData() {
         // 画面項目の初期化
         initForm();
@@ -556,11 +556,11 @@ public class ContainerInputActivity extends BaseActivity {
         });
     }
 
-    //============================
+    //============================================================
     //　機　能　:　入力フォームを初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     private void initForm() {
         // 入力欄初期化
         if (etContainerNo1 != null) etContainerNo1.setText("");
@@ -580,11 +580,11 @@ public class ContainerInputActivity extends BaseActivity {
         if (ivPhotoSeal != null) ivPhotoSeal.setImageDrawable(null);
     }
 
-    //================================
+    //============================================================
     //　機　能　:　引き継ぎ値を読み込む
-    //　引　数　:　intent ..... Intent
+    //　引　数　:　intent ..... 画面遷移情報
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void loadPassedValues(@Nullable Intent intent) {
         if (intent == null) return;
 
@@ -624,37 +624,37 @@ public class ContainerInputActivity extends BaseActivity {
      * コンテナNo入力監視（チェックデジット更新）。
      */
     private final TextWatcher containerNoWatcher = new TextWatcher() {
-        //===================================
+        //============================================================
         //　機　能　:　テキスト変更前の処理を行う
-        //　引　数　:　s ..... CharSequence
-        //　　　　　:　start ..... int
-        //　　　　　:　count ..... int
-        //　　　　　:　after ..... int
+        //　引　数　:　s ..... 文字列
+        //　　　　　:　start ..... 開始位置
+        //　　　　　:　count ..... 件数
+        //　　　　　:　after ..... 変更後文字数
         //　戻り値　:　[void] ..... なし
-        //===================================
+        //============================================================
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             // 事前処理なし
         }
 
-        //=================================
+        //============================================================
         //　機　能　:　テキスト変更中の処理を行う
-        //　引　数　:　s ..... CharSequence
-        //　　　　　:　start ..... int
-        //　　　　　:　before ..... int
-        //　　　　　:　count ..... int
+        //　引　数　:　s ..... 文字列
+        //　　　　　:　start ..... 開始位置
+        //　　　　　:　before ..... 変更前文字数
+        //　　　　　:　count ..... 件数
         //　戻り値　:　[void] ..... なし
-        //=================================
+        //============================================================
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             // 途中処理なし
         }
 
-        //==================================
+        //============================================================
         //　機　能　:　テキスト変更後の処理を行う
-        //　引　数　:　s ..... Editable
+        //　引　数　:　s ..... 文字列
         //　戻り値　:　[void] ..... なし
-        //==================================
+        //============================================================
         @Override
         public void afterTextChanged(Editable s) {
             // 入力確定後にチェックデジット再計算
@@ -662,11 +662,11 @@ public class ContainerInputActivity extends BaseActivity {
         }
     };
 
-    //=============================
+    //============================================================
     //　機　能　:　チェックデジット表示を更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //============================================================
     private void updateCheckDigit() {
         if (etContainerNo1 == null || etContainerNo2 == null || tvCheckDigit == null) return;
 
@@ -690,37 +690,37 @@ public class ContainerInputActivity extends BaseActivity {
      * 重量入力監視（総重量/残重量の再計算＋Preferences保存）。
      */
     private final TextWatcher weightWatcher = new TextWatcher() {
-        //===================================
+        //============================================================
         //　機　能　:　テキスト変更前の処理を行う
-        //　引　数　:　s ..... CharSequence
-        //　　　　　:　start ..... int
-        //　　　　　:　count ..... int
-        //　　　　　:　after ..... int
+        //　引　数　:　s ..... 文字列
+        //　　　　　:　start ..... 開始位置
+        //　　　　　:　count ..... 件数
+        //　　　　　:　after ..... 変更後文字数
         //　戻り値　:　[void] ..... なし
-        //===================================
+        //============================================================
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             // 事前処理なし
         }
 
-        //=================================
+        //============================================================
         //　機　能　:　テキスト変更中の処理を行う
-        //　引　数　:　s ..... CharSequence
-        //　　　　　:　start ..... int
-        //　　　　　:　before ..... int
-        //　　　　　:　count ..... int
+        //　引　数　:　s ..... 文字列
+        //　　　　　:　start ..... 開始位置
+        //　　　　　:　before ..... 変更前文字数
+        //　　　　　:　count ..... 件数
         //　戻り値　:　[void] ..... なし
-        //=================================
+        //============================================================
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             // 途中処理なし
         }
 
-        //==================================
+        //============================================================
         //　機　能　:　テキスト変更後の処理を行う
-        //　引　数　:　s ..... Editable
+        //　引　数　:　s ..... 文字列
         //　戻り値　:　[void] ..... なし
-        //==================================
+        //============================================================
         @Override
         public void afterTextChanged(Editable s) {
             // 重量変更 → 合計/残量を即時計算
@@ -731,11 +731,11 @@ public class ContainerInputActivity extends BaseActivity {
         }
     };
 
-    //=========================================
+    //============================================================
     //　機　能　:　コンテナ重量を保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================================
+    //============================================================
     private void persistContainerWeights() {
         // Preferencesへ保存（次回起動時の初期値に利用）
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
@@ -749,11 +749,11 @@ public class ContainerInputActivity extends BaseActivity {
                 .apply();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　重量を計算する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     private void calcJyuryo() {
         // 入力重量を取得（未入力/不正は0）
         int container = getIntFromEdit(etContainerKg);
@@ -772,11 +772,11 @@ public class ContainerInputActivity extends BaseActivity {
         if (tvRemainKg != null) tvRemainKg.setText(formatNumber(remaining));
     }
 
-    //=============================
+    //============================================================
     //　機　能　:　カメラを起動する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //============================================================
     @ExperimentalCamera2Interop
     private void launchCamera() {
         // カメラ権限チェック
@@ -791,11 +791,11 @@ public class ContainerInputActivity extends BaseActivity {
         launchCameraInternal();
     }
 
-    //======================================
+    //============================================================
     //　機　能　:　内部処理でカメラを起動する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================================
     @ExperimentalCamera2Interop
     private void launchCameraInternal() {
         // 撮影画面へ遷移し、ターゲット（コンテナ/シール）を引き渡す
@@ -805,11 +805,11 @@ public class ContainerInputActivity extends BaseActivity {
         cameraLauncher.launch(intent);
     }
 
-    //===================================
+    //============================================================
     //　機　能　:　撮影画像のプレビューを表示する
-    //　引　数　:　source ..... ImageView
+    //　引　数　:　source ..... 呼び出し元
     //　戻り値　:　[void] ..... なし
-    //===================================
+    //============================================================
     private void showPreview(ImageView source) {
         // 画像が無い場合は何もしない
         if (source == null || source.getDrawable() == null) {
@@ -834,13 +834,13 @@ public class ContainerInputActivity extends BaseActivity {
         dialog.show();
     }
 
-    //======================================
+    //============================================================
     //　機　能　:　写真表示を復元する
-    //　引　数　:　target ..... ImageView
-    //　　　　　:　uriString ..... String
-    //　　　　　:　isContainer ..... boolean
+    //　引　数　:　target ..... 対象ビュー
+    //　　　　　:　uriString ..... URI文字列
+    //　　　　　:　isContainer ..... 真偽値フラグ
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================================
     private void restorePhoto(ImageView target, String uriString, boolean isContainer) {
         // 表示先が無い、またはURIが空なら何もしない
         if (target == null || TextUtils.isEmpty(uriString)) {
@@ -869,11 +869,11 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //================================
+    //============================================================
     //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     @Override
     protected void onFunctionBlue() {
         // 1) 入力チェック（必須/桁数/重量超過など）
@@ -894,11 +894,11 @@ public class ContainerInputActivity extends BaseActivity {
         confirmSealThenRegister();
     }
 
-    //==========================================
+    //============================================================
     //　機　能　:　シール写真確認後に登録する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================================
+    //============================================================
     private void confirmSealThenRegister() {
         // シール写真が必要条件に対して未撮影なら確認ダイアログ
         if (needsSealPhotoConfirm()) {
@@ -915,22 +915,22 @@ public class ContainerInputActivity extends BaseActivity {
         procRegister();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 終了（finish()がオーバーライドされており、引継値保存も行う）
         finish();
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　必須項目をチェックする
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 入力OK:true、NG:false
-    //========================================
+    //============================================================
     private boolean validateRequiredFields() {
         // コンテナNoは入力がある場合のみ桁数チェックを行う
         String containerNo = safeText(etContainerNo1).trim() + safeText(etContainerNo2).trim();
@@ -971,11 +971,11 @@ public class ContainerInputActivity extends BaseActivity {
         return true;
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　残重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 残重量
-    //==================================
+    //============================================================
     private int getRemainingWeight() {
         // 現在の入力値から総重量を算出し、最大積載との差分を返す
         int container = getIntFromEdit(etContainerKg);
@@ -984,44 +984,44 @@ public class ContainerInputActivity extends BaseActivity {
         return maxContainerJyuryo - total;
     }
 
-    //=============================================
+    //============================================================
     //　機　能　:　コンテナ写真確認が必要か判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 確認が必要ならtrue
-    //=============================================
+    //============================================================
     private boolean needsContainerPhotoConfirm() {
         // コンテナNo未入力かつ写真も無い場合は確認対象
         String containerNo = safeText(etContainerNo1).trim() + safeText(etContainerNo2).trim();
         return TextUtils.isEmpty(containerNo) && !hasImage(ivPhotoContainer, containerPhotoUri);
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　シール写真確認が必要か判定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 確認が必要ならtrue
-    //========================================
+    //============================================================
     private boolean needsSealPhotoConfirm() {
         // シールNo未入力かつ写真も無い場合は確認対象
         String sealNo = safeText(etSealNo).trim();
         return TextUtils.isEmpty(sealNo) && !hasImage(ivPhotoSeal, sealPhotoUri);
     }
 
-    //=================================
+    //============================================================
     //　機　能　:　画像の有無を判定する
-    //　引　数　:　view ..... ImageView
-    //　　　　　:　uri ..... Uri
+    //　引　数　:　view ..... ビュー
+    //　　　　　:　uri ..... URI情報
     //　戻り値　:　[boolean] ..... 画像があればtrue
-    //=================================
+    //============================================================
     private boolean hasImage(ImageView view, Uri uri) {
         // URIが保持されている、またはImageViewにDrawableがあれば画像ありとみなす
         return uri != null || (view != null && view.getDrawable() != null);
     }
 
-    //=============================
+    //============================================================
     //　機　能　:　登録処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //============================================================
     private void procRegister() {
         // ローディング表示
         showLoadingShort();
@@ -1127,11 +1127,11 @@ public class ContainerInputActivity extends BaseActivity {
         return base + "\n" + trimmed;
     }
 
-    //===========================
+    //============================================================
     //　機　能　:　DBへ登録する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 採番したcontainerId
-    //===========================
+    //============================================================
     private int registerDb() {
         AtomicInteger newId = new AtomicInteger(0);
 
@@ -1178,11 +1178,11 @@ public class ContainerInputActivity extends BaseActivity {
         return newId.get();
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　コンテナ番号を生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... コンテナNo（チェックデジット付、未入力なら空）
-    //==============================
+    //============================================================
     private String buildContainerNo() {
         // 先頭3桁/末尾6桁を取得
         String no1 = safeText(etContainerNo1).trim();
@@ -1199,11 +1199,11 @@ public class ContainerInputActivity extends BaseActivity {
         return base + checkDigit;
     }
 
-    //======================================
+    //============================================================
     //　機　能　:　コンテナサイズを決定する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 20 or 40
-    //======================================
+    //============================================================
     private int resolveContainerSize() {
         // Preferencesからサイズを取得（既定は20ft）
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
@@ -1211,13 +1211,13 @@ public class ContainerInputActivity extends BaseActivity {
         return "40ft".equals(size) ? 40 : 20;
     }
 
-    //==========================================
+    //============================================================
     //　機　能　:　画像ファイルを保存する
-    //　引　数　:　containerId ..... int
-    //　　　　　:　type ..... DataSync.ImageType
-    //　　　　　:　uri ..... Uri
+    //　引　数　:　containerId ..... ID
+    //　　　　　:　type ..... 種別
+    //　　　　　:　uri ..... URI情報
     //　戻り値　:　[void] ..... なし
-    //==========================================
+    //============================================================
     private void saveImageFile(int containerId, DataSync.ImageType type, Uri uri) throws IOException {
         // 未撮影なら保存不要
         if (uri == null) {
@@ -1245,12 +1245,12 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //==========================================
+    //============================================================
     //　機　能　:　画像ファイルを取得する
-    //　引　数　:　containerId ..... int
-    //　　　　　:　type ..... DataSync.ImageType
+    //　引　数　:　containerId ..... ID
+    //　　　　　:　type ..... 種別
     //　戻り値　:　[File] ..... 保存先ファイル
-    //==========================================
+    //============================================================
     private File getImageFile(int containerId, DataSync.ImageType type) {
         // 外部領域（Pictures）を優先し、取れなければ内部領域へ
         File dir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
@@ -1264,11 +1264,11 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
 
-    //================================================
+    //============================================================
     //　機　能　:　既定のコンテナ重量を決定する
-    //　引　数　:　system ..... SystemEntity
+    //　引　数　:　system ..... システム設定情報
     //　戻り値　:　[int] ..... 既定コンテナ自重（未設定は0）
-    //================================================
+    //============================================================
     private int resolveDefaultContainerWeight(@Nullable SystemEntity system) {
         if (system != null && system.defaultContainerJyuryo != null) {
             return system.defaultContainerJyuryo;
@@ -1276,11 +1276,11 @@ public class ContainerInputActivity extends BaseActivity {
         return 0;
     }
 
-    //==============================================
+    //============================================================
     //　機　能　:　既定のダンネージ重量を決定する
-    //　引　数　:　system ..... SystemEntity
+    //　引　数　:　system ..... システム設定情報
     //　戻り値　:　[int] ..... 既定ダンネージ重量（未設定は0）
-    //==============================================
+    //============================================================
     private int resolveDefaultDunnageWeight(@Nullable SystemEntity system) {
         if (system != null && system.defaultDunnageJyuryo != null) {
             return system.defaultDunnageJyuryo;
@@ -1288,11 +1288,11 @@ public class ContainerInputActivity extends BaseActivity {
         return 0;
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　コンテナ最大重量を決定する
-    //　引　数　:　system ..... SystemEntity
+    //　引　数　:　system ..... システム設定情報
     //　戻り値　:　[int] ..... 最大積載重量
-    //============================================
+    //============================================================
     private int resolveMaxContainerWeight(@Nullable SystemEntity system) {
         // DB設定があり、かつ正の値ならそれを採用
         if (system != null && system.maxContainerJyuryo != null && system.maxContainerJyuryo > 0) {
@@ -1305,20 +1305,20 @@ public class ContainerInputActivity extends BaseActivity {
         return "40ft".equals(size) ? 30000 : 24000;
     }
 
-    //================================
+    //============================================================
     //　機　能　:　null安全な整数へ変換する
-    //　引　数　:　value ..... Integer
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[int] ..... nullなら0
-    //================================
+    //============================================================
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
 
-    //====================================
+    //============================================================
     //　機　能　:　入力欄から整数値を取得する
-    //　引　数　:　editText ..... EditText
+    //　引　数　:　editText ..... テキスト
     //　戻り値　:　[int] ..... 数値（不正/未入力は0）
-    //====================================
+    //============================================================
     private int getIntFromEdit(EditText editText) {
         if (editText == null) return 0;
 
@@ -1338,48 +1338,48 @@ public class ContainerInputActivity extends BaseActivity {
         }
     }
 
-    //====================================
+    //============================================================
     //　機　能　:　null安全な文字列を取得する
-    //　引　数　:　editText ..... EditText
+    //　引　数　:　editText ..... テキスト
     //　戻り値　:　[String] ..... null安全な文字列
-    //====================================
+    //============================================================
     private String safeText(EditText editText) {
         if (editText == null || editText.getText() == null) return "";
         return editText.getText().toString();
     }
 
-    //===============================
+    //============================================================
     //　機　能　:　既定値付き文字列を取得する
-    //　引　数　:　value ..... String
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... nullなら空文字
-    //===============================
+    //============================================================
     private String defaultString(String value) {
         return value == null ? "" : value;
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　数値文字列を整形する
-    //　引　数　:　value ..... int
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... カンマ区切り文字列
-    //==============================
+    //============================================================
     private String formatNumber(int value) {
         return String.format(Locale.JAPAN, "%,d", value);
     }
 
-    //=============================
+    //============================================================
     //　機　能　:　短時間メッセージを表示
-    //　引　数　:　msg ..... String
+    //　引　数　:　msg ..... メッセージ
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //============================================================
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面を終了する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     public void finish() {
         // 終了時に入力値をMapへ保存（次画面/再表示の引継用）
@@ -1393,11 +1393,11 @@ public class ContainerInputActivity extends BaseActivity {
         super.finish();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　コンテナ入力値を保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     private void saveContainerValues() {
         // 入力値を引継用Mapへ保存
         containerValues.put(KEY_CONTAINER_JYURYO, safeText(etContainerKg).trim());

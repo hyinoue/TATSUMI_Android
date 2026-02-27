@@ -18,7 +18,7 @@ import java.util.Locale;
 
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　一覧表示データの制御を行うクラス
 //　関　　数　:　BundleSelectController ..... Bundle選択制御（保持/チェック/追加/削除/表示更新）
 //　　　　　　:　getBundles ..... 保持データの取得
 //　　　　　　:　getJyuryoSum ..... 重量合計の取得
@@ -55,13 +55,13 @@ public class BundleSelectController {
 
     private static final int MAX_ROWS = 20; // 一覧最大行数
 
-    //==========================================================
+    //============================================================
     //　機　能　:　BundleSelectControllerの初期化処理
-    //　引　数　:　syukkaMeisaiDao ..... SyukkaMeisaiDao
-    //　　　　　:　syukkaMeisaiWorkDao ..... SyukkaMeisaiWorkDao
-    //　　　　　:　mode ..... Mode
+    //　引　数　:　syukkaMeisaiDao ..... データアクセスオブジェクト
+    //　　　　　:　syukkaMeisaiWorkDao ..... データアクセスオブジェクト
+    //　　　　　:　mode ..... 動作モード
     //　戻り値　:　[BundleSelectController] ..... なし
-    //==========================================================
+    //============================================================
     public BundleSelectController(@NonNull SyukkaMeisaiDao syukkaMeisaiDao,
                                   @NonNull SyukkaMeisaiWorkDao syukkaMeisaiWorkDao,
                                   @NonNull Mode mode) {
@@ -82,21 +82,21 @@ public class BundleSelectController {
     // 公開：保持データ・表示データ
     // ============================================================
 
-    //=================================
+    //============================================================
     //　機　能　:　束データ一覧を取得する
     //　引　数　:　なし
     //　戻り値　:　[LinkedHashMap<String, BundleInfo>] ..... 保持データ
-    //=================================
+    //============================================================
     @NonNull
     public LinkedHashMap<String, BundleInfo> getBundles() {
         return dataList;
     }
 
-    //============================
+    //============================================================
     //　機　能　:　重量合計を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 重量合計
-    //============================
+    //============================================================
     public int getJyuryoSum() {
         int sum = 0;
 
@@ -108,26 +108,26 @@ public class BundleSelectController {
         return sum;
     }
 
-    //===========================================
+    //============================================================
     //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<BundleSelectRow>] ..... 表示用行データ（読み取り専用）
-    //===========================================
+    //============================================================
     @NonNull
     public List<BundleSelectRow> getDisplayRows() {
         // 外部から改変されないよう unmodifiableList を返す
         return Collections.unmodifiableList(displayRows);
     }
 
-    //=========================================
+    //============================================================
     //　機　能　:　入力された束Noの妥当性を確認する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
-    //　　　　　:　containerJyuryo ..... int
-    //　　　　　:　dunnageJyuryo ..... int
-    //　　　　　:　maxContainerJyuryo ..... int
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
+    //　　　　　:　containerJyuryo ..... コンテナ重量
+    //　　　　　:　dunnageJyuryo ..... 緩衝材重量
+    //　　　　　:　maxContainerJyuryo ..... コンテナ重量上限
     //　戻り値　:　[String] ..... エラーメッセージ（問題なしは ""）
-    //=========================================
+    //============================================================
     @NonNull
     public String checkBundle(@NonNull String heatNo,
                               @NonNull String sokuban,
@@ -182,13 +182,13 @@ public class BundleSelectController {
         return "";
     }
 
-    //=====================================
+    //============================================================
     //　機　能　:　束Noを追加する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
-    //　　　　　:　bundleNoOrg ..... String
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
+    //　　　　　:　bundleNoOrg ..... 件数
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //============================================================
     public void addBundleNo(@NonNull String heatNo,
                             @NonNull String sokuban,
                             @NonNull String bundleNoOrg) {
@@ -200,12 +200,12 @@ public class BundleSelectController {
         syukkaMeisaiDao.updateBundleNoIfEmpty(heatNo, sokuban, padded);
     }
 
-    //=================================
+    //============================================================
     //　機　能　:　束データを追加する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[void] ..... なし
-    //=================================
+    //============================================================
     public void addBundle(@NonNull String heatNo, @NonNull String sokuban) {
 
         // DBから追加対象の出荷束明細を取得
@@ -239,11 +239,11 @@ public class BundleSelectController {
         refreshDisplayRows();
     }
 
-    //===============================
+    //============================================================
     //　機　能　:　束データを削除する
-    //　引　数　:　rowIndex ..... int
+    //　引　数　:　rowIndex ..... 位置番号
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //============================================================
     public void removeBundle(int rowIndex) {
 
         // 範囲外は何もしない
@@ -272,11 +272,11 @@ public class BundleSelectController {
         refreshDisplayRows();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　束データを全件削除する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     public void deleteBundles() {
         // 先頭から削除していく（内部でWork/表示も更新される）
         while (!dataList.isEmpty()) {
@@ -284,11 +284,11 @@ public class BundleSelectController {
         }
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　表示用行データを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //============================================================
     private void refreshDisplayRows() {
         // 一旦クリアして作り直す
         displayRows.clear();
@@ -312,11 +312,11 @@ public class BundleSelectController {
         }
     }
 
-    //=====================================
+    //============================================================
     //　機　能　:　ワークテーブルの内容を一覧へ読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //============================================================
     private void readWorkTblToList() {
 
         // Work + 明細のJoin結果を取得（表示・チェックに必要な情報を含む想定）
@@ -356,11 +356,11 @@ public class BundleSelectController {
     // ※ WorkEntityが少カラムなので、heat/sokuban + updateYmd だけで運用
     // ============================================================
 
-    //==================================
+    //============================================================
     //　機　能　:　ワークテーブルへ追加する
-    //　引　数　:　item ..... BundleInfo
+    //　引　数　:　item ..... 対象データ
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     private void addWorkTable(@NonNull BundleInfo item) {
 
         // WorkEntity を作成
@@ -378,11 +378,11 @@ public class BundleSelectController {
         syukkaMeisaiWorkDao.upsert(w);
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　ワークテーブルから削除する
-    //　引　数　:　item ..... BundleInfo
+    //　引　数　:　item ..... 対象データ
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     private void removeWorkTable(@NonNull BundleInfo item) {
         // heatNo+sokuban をキーにWorkの該当1件を削除
         syukkaMeisaiWorkDao.deleteOne(item.heatNo, item.sokuban);
@@ -392,30 +392,30 @@ public class BundleSelectController {
     // utils
     // ============================================================
 
-    //=================================
+    //============================================================
     //　機　能　:　束識別キーを生成する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[String] ..... 連結キー（heatNo+sokuban）
-    //=================================
+    //============================================================
     private String keyOf(String heatNo, String sokuban) {
         return safeStr(heatNo) + safeStr(sokuban);
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　null安全な文字列へ変換する
-    //　引　数　:　s ..... String
+    //　引　数　:　s ..... 文字列
     //　戻り値　:　[String] ..... nullなら空文字、非nullはそのまま
-    //==============================
+    //============================================================
     private String safeStr(@Nullable String s) {
         return s == null ? "" : s;
     }
 
-    //===================================
+    //============================================================
     //　機　能　:　4桁右寄せになるよう空白埋めする
-    //　引　数　:　org ..... String
+    //　引　数　:　org ..... 元の文字列
     //　戻り値　:　[String] ..... 数値化→文字列化→4桁右寄せスペース埋め
-    //===================================
+    //============================================================
     private String padLeft4AsSpaces(String org) {
 
         int n = 0;
@@ -442,12 +442,12 @@ public class BundleSelectController {
         return repeat(" ", 4 - s.length()) + s;
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　指定文字列を繰り返して作成する
-    //　引　数　:　s ..... String
-    //　　　　　:　n ..... int
+    //　引　数　:　s ..... 文字列
+    //　　　　　:　n ..... 数値
     //　戻り値　:　[String] ..... s を n回繰り返した文字列
-    //==============================
+    //============================================================
     private String repeat(String s, int n) {
 
         // 繰り返し回数が0以下の場合は空文字

@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 //============================================================
-//　処理概要　:　SoapRequestBuildersクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　buildGetSysDate ................................. GetSysDate要求XML生成
 //　　　　　　:　buildGetSagyouYmd .............................. GetSagyouYmd要求XML生成
 //　　　　　　:　buildGetUpdateYmdHms ........................... GetUpdateYmdHms要求XML生成
@@ -22,41 +22,41 @@ public class SoapRequestBuilders {
 
     private static final String NS = "http://tempuri.org/";
 
-    //================================================================
+    //============================================================
     //　機　能　:　SoapRequestBuildersの生成を禁止する（ユーティリティクラス化）
     //　引　数　:　なし
     //　戻り値　:　[SoapRequestBuilders] ..... なし
-    //================================================================
+    //============================================================
     private SoapRequestBuilders() {
         // static専用クラスのためインスタンス化させない
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetSysDate要求のSOAPメッセージを生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetSysDate() {
         // 引数なしのため自己終了タグで生成
         String body = "<GetSysDate xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetSagyouYmd要求のSOAPメッセージを生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetSagyouYmd() {
         String body = "<GetSagyouYmd xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetUpdateYmdHms要求のSOAPメッセージを生成する
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetUpdateYmdHms(Date sagyouYmd) {
         // Body内XMLを組み立てる
         StringBuilder inner = new StringBuilder();
@@ -73,11 +73,11 @@ public class SoapRequestBuilders {
         return SoapEnvelope.wrapBody(inner.toString());
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetSyukkaData要求のSOAPメッセージを生成する
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetSyukkaData(Date sagyouYmd) {
         StringBuilder inner = new StringBuilder();
 
@@ -91,22 +91,22 @@ public class SoapRequestBuilders {
         return SoapEnvelope.wrapBody(inner.toString());
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetSyougoData要求のSOAPメッセージを生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetSyougoData() {
         String body = "<GetSyougoData xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　UploadBinaryFile要求のSOAPメッセージを生成する
-    //　引　数　:　fileName ..... String
-    //　　　　　:　buffer ..... byte[]
+    //　引　数　:　fileName ..... ファイル関連情報
+    //　　　　　:　buffer ..... 文字列バッファ
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildUploadBinaryFile(String fileName, byte[] buffer) {
         StringBuilder inner = new StringBuilder();
 
@@ -130,21 +130,21 @@ public class SoapRequestBuilders {
         return SoapEnvelope.wrapBody(inner.toString());
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetDownloadHandyExecuteFileNames要求のSOAPメッセージを生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetDownloadHandyExecuteFileNames() {
         String body = "<GetDownloadHandyExecuteFileNames xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　GetDownloadHandyExecuteFile要求のSOAPメッセージを生成する
-    //　引　数　:　fileName ..... String
+    //　引　数　:　fileName ..... ファイル関連情報
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildGetDownloadHandyExecuteFile(String fileName) {
         StringBuilder inner = new StringBuilder();
 

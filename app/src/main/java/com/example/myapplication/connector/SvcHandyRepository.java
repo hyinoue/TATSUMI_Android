@@ -9,7 +9,7 @@ import java.util.Date;
 
 
 //============================================================
-//　処理概要　:　SvcHandyRepositoryクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　getSysDate .......................... システム日時取得
 //　　　　　　:　getSagyouYmd ....................... 作業日取得
 //　　　　　　:　getUpdateYmdHms .................... 更新日時取得
@@ -29,29 +29,29 @@ public class SvcHandyRepository {
 
     private final SoapAsmxClient client; // SOAP通信クライアント
 
-    //================================================================
+    //============================================================
     //　機　能　:　SvcHandyRepositoryを初期化する（デフォルト）
     //　引　数　:　なし
     //　戻り値　:　[SvcHandyRepository] ..... なし
-    //================================================================
+    //============================================================
     public SvcHandyRepository() {
         this(DEFAULT_ENDPOINT);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　SvcHandyRepositoryを初期化する（エンドポイント指定）
-    //　引　数　:　endpointUrl ..... String
+    //　引　数　:　endpointUrl ..... 接続先URL
     //　戻り値　:　[SvcHandyRepository] ..... なし
-    //================================================================
+    //============================================================
     public SvcHandyRepository(String endpointUrl) {
         this.client = new SoapAsmxClient(endpointUrl);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　システム日時を取得する
     //　引　数　:　なし
     //　戻り値　:　[Date] ..... システム日時
-    //================================================================
+    //============================================================
     public Date getSysDate() throws Exception {
         String req = SoapRequestBuilders.buildGetSysDate();
         String res = client.call(SoapActions.GET_SYS_DATE, req);
@@ -59,11 +59,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseDateTimeResult(res, "GetSysDateResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　作業日を取得する
     //　引　数　:　なし
     //　戻り値　:　[Date] ..... 作業日
-    //================================================================
+    //============================================================
     public Date getSagyouYmd() throws Exception {
         String req = SoapRequestBuilders.buildGetSagyouYmd();
         String res = client.call(SoapActions.GET_SAGYOU_YMD, req);
@@ -71,11 +71,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseDateTimeResult(res, "GetSagyouYmdResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　更新日時を取得する
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[Date] ..... 更新日時
-    //================================================================
+    //============================================================
     public Date getUpdateYmdHms(Date sagyouYmd) throws Exception {
         String req = SoapRequestBuilders.buildGetUpdateYmdHms(sagyouYmd);
         String res = client.call(SoapActions.GET_UPDATE_YMD_HMS, req);
@@ -83,11 +83,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseDateTimeResult(res, "GetUpdateYmdHmsResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データを取得する
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[SyukkaData] ..... 出荷データ
-    //================================================================
+    //============================================================
     public SyukkaData getSyukkaData(Date sagyouYmd) throws Exception {
         String req = SoapRequestBuilders.buildGetSyukkaData(sagyouYmd);
         String res = client.call(SoapActions.GET_SYUKKA_DATA, req);
@@ -95,11 +95,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseSyukkaDataResult(res);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データを送信する
-    //　引　数　:　data ..... BunningData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
-    //================================================================
+    //============================================================
     public boolean sendSyukkaData(BunningData data) throws Exception {
         String req = SendSyukkaSoapBuilder.buildSendSyukkaData(data);
         String res = client.call(SoapActions.SEND_SYUKKA_DATA, req);
@@ -107,11 +107,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseBooleanResult(res, "SendSyukkaDataResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　照合データを取得する
     //　引　数　:　なし
     //　戻り値　:　[SyougoData] ..... 照合データ
-    //================================================================
+    //============================================================
     public SyougoData getSyougoData() throws Exception {
         String req = SoapRequestBuilders.buildGetSyougoData();
         String res = client.call(SoapActions.GET_SYOUGO_DATA, req);
@@ -119,11 +119,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseSyougoDataResult(res);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　照合データを送信する
-    //　引　数　:　data ..... CollateData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
-    //================================================================
+    //============================================================
     public boolean sendSyougoData(CollateData data) throws Exception {
         String req = SendSyougoSoapBuilder.buildSendSyougoData(data);
         String res = client.call(SoapActions.SEND_SYOUGO_DATA, req);
@@ -131,12 +131,12 @@ public class SvcHandyRepository {
         return SoapParsers.parseBooleanResult(res, "SendSyougoDataResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　バイナリファイルを送信する
-    //　引　数　:　fileName ..... String
-    //　　　　　:　buffer ..... byte[]
+    //　引　数　:　fileName ..... ファイル関連情報
+    //　　　　　:　buffer ..... 文字列バッファ
     //　戻り値　:　[boolean] ..... 成功:true
-    //================================================================
+    //============================================================
     public boolean uploadBinaryFile(String fileName, byte[] buffer) throws Exception {
         String req = SoapRequestBuilders.buildUploadBinaryFile(fileName, buffer);
         String res = client.call(SoapActions.UPLOAD_BINARY_FILE, req);
@@ -149,11 +149,11 @@ public class SvcHandyRepository {
         return true;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　実行ファイル名一覧を取得する
     //　引　数　:　なし
     //　戻り値　:　[String[]] ..... ファイル名一覧
-    //================================================================
+    //============================================================
     public String[] getDownloadHandyExecuteFileNames() throws Exception {
         String req = SoapRequestBuilders.buildGetDownloadHandyExecuteFileNames();
         String res = client.call(SoapActions.GET_DOWNLOAD_HANDY_EXECUTE_FILE_NAMES, req);
@@ -161,11 +161,11 @@ public class SvcHandyRepository {
         return SoapParsers.parseStringArrayResult(res, "GetDownloadHandyExecuteFileNamesResult");
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　実行ファイルを取得する
-    //　引　数　:　fileName ..... String
+    //　引　数　:　fileName ..... ファイル関連情報
     //　戻り値　:　[byte[]] ..... ファイルデータ
-    //================================================================
+    //============================================================
     public byte[] getDownloadHandyExecuteFile(String fileName) throws Exception {
         String req = SoapRequestBuilders.buildGetDownloadHandyExecuteFile(fileName);
         String res = client.call(SoapActions.GET_DOWNLOAD_HANDY_EXECUTE_FILE, req);

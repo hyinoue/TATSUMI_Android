@@ -47,11 +47,11 @@ public class CommTestActivity extends BaseActivity {
     // 疎通テスト結果（インターネット接続状態）を保持
     private boolean gprsConnected; // モバイル接続フラグ
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,11 +76,11 @@ public class CommTestActivity extends BaseActivity {
         updateInternetStatus();
     }
 
-    //================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupBottomButtons() {
         // 下部ボタン取得
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
@@ -106,11 +106,11 @@ public class CommTestActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //================================
+    //============================================================
     //　機　能　:　画面部品をバインドする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void bindViews() {
         tvMobilePowerValue = findViewById(R.id.tvMobilePowerValue);
         tvWifiValue = findViewById(R.id.tvWifiValue);
@@ -118,11 +118,11 @@ public class CommTestActivity extends BaseActivity {
         tvInternetValue = findViewById(R.id.tvInternetValue);
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　画面内ボタンのイベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //============================================================
     private void setupActionButtons() {
         Button btnTest = findViewById(R.id.btnTestConn);
 
@@ -132,32 +132,32 @@ public class CommTestActivity extends BaseActivity {
         }
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 終了
         finish();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionBlue() {
         // 最小画面では保存処理なし
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　疎通テストを実行する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     private void testConnection() {
         // 現在のネットワーク状態を取得し、表示へ反映
         NetworkSnapshot snapshot = updateNetworkStatus();
@@ -178,11 +178,11 @@ public class CommTestActivity extends BaseActivity {
         showInfoMsg("接続しました", MsgDispMode.MsgBox);
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　インターネット疎通状態を表示更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //============================================================
     private void updateInternetStatus() {
         if (tvInternetValue == null) {
             return;
@@ -199,11 +199,11 @@ public class CommTestActivity extends BaseActivity {
         }
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　回線状態を取得して表示更新する
     //　引　数　:　なし
     //　戻り値　:　[NetworkSnapshot] ..... 現在の回線状態スナップショット
-    //========================================
+    //============================================================
     private NetworkSnapshot updateNetworkStatus() {
         // 回線状態取得
         NetworkSnapshot snapshot = getNetworkSnapshot();
@@ -238,11 +238,11 @@ public class CommTestActivity extends BaseActivity {
         return snapshot;
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　ネットワーク状態スナップショットを取得する
     //　引　数　:　なし
     //　戻り値　:　[NetworkSnapshot] ..... 回線状態
-    //========================================
+    //============================================================
     private NetworkSnapshot getNetworkSnapshot() {
         // ConnectivityManager取得
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -43,11 +43,11 @@ public class ImagerTestActivity extends BaseActivity {
     // ===== Scanner =====
     private DensoScannerController scanner; // DENSOスキャナ制御
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,9 +95,9 @@ public class ImagerTestActivity extends BaseActivity {
         scanner = new DensoScannerController(
                 this,
 
-                //===============================
+                //============================================================
                 // スキャン結果受け取り
-                //===============================
+                //============================================================
                 new OnScanListener() {
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
@@ -134,9 +134,9 @@ public class ImagerTestActivity extends BaseActivity {
                     }
                 },
 
-                //===============================
+                //============================================================
                 // 受け入れ可否/プロファイル制御ポリシー
-                //===============================
+                //============================================================
                 new DensoScannerController.ScanPolicy() {
 
                     @Override
@@ -165,11 +165,11 @@ public class ImagerTestActivity extends BaseActivity {
         scanner.onCreate();
     }
 
-    //================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupBottomButtons() {
         // 黄：終了のみ使用
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
@@ -186,22 +186,22 @@ public class ImagerTestActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 画面終了
         finish();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面再表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     protected void onResume() {
         super.onResume();
@@ -216,11 +216,11 @@ public class ImagerTestActivity extends BaseActivity {
         if (etBarcode != null) etBarcode.requestFocus();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面非表示時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     protected void onPause() {
         // スキャナ停止（バックグラウンドでの読み取り抑止）
@@ -228,11 +228,11 @@ public class ImagerTestActivity extends BaseActivity {
         super.onPause();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     protected void onDestroy() {
         // スキャナ破棄（リソース解放）
@@ -240,11 +240,11 @@ public class ImagerTestActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    //=================================
+    //============================================================
     //　機　能　:　キーイベント処理を行う
-    //　引　数　:　event ..... KeyEvent
+    //　引　数　:　event ..... イベント情報
     //　戻り値　:　[boolean] ..... true:処理済み / false:未処理
-    //=================================
+    //============================================================
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (scanner != null && scanner.handleDispatchKeyEvent(event)) {

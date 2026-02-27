@@ -1,7 +1,7 @@
 package com.example.myapplication.grid;
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　一覧表示データの制御を行うクラス
 //　関　　数　:　VanningCollationRow ..... バンニング照合一覧の表示行データ
 //============================================================
 public class VanningCollationRow {
@@ -16,15 +16,15 @@ public class VanningCollationRow {
     // 照合状態表示（"済" または 空白）
     public final String confirmed; // 確定状態
 
-    //===========================================
+    //============================================================
     //　機　能　:　VanningCollationRowの初期化処理
-    //　引　数　:　pNo ..... String
-    //　　　　　:　bNo ..... String
-    //　　　　　:　index ..... String
-    //　　　　　:　jyuryo ..... String
-    //　　　　　:　confirmed ..... String
+    //　引　数　:　pNo ..... PNo
+    //　　　　　:　bNo ..... BNo
+    //　　　　　:　index ..... 位置番号
+    //　　　　　:　jyuryo ..... 重量
+    //　　　　　:　confirmed ..... 照合状態
     //　戻り値　:　[VanningCollationRow] ..... なし
-    //===========================================
+    //============================================================
     public VanningCollationRow(String pNo,
                                String bNo,
                                String index,

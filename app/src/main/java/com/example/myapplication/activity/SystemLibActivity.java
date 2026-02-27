@@ -58,11 +58,11 @@ public class SystemLibActivity extends BaseActivity {
     private Button btnVibrationTest;      // バイブテストボタン
     private List<VolumeOption> volumeOptions; // 音量選択肢
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,11 +84,11 @@ public class SystemLibActivity extends BaseActivity {
         setupTestButtons();
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　画面部品の取得
     //　引　数　:　なし
     //　戻り値　:　[void]  ..... なし
-    //================================================================
+    //============================================================
     private void bindViews() {
         chkBuzzerOnOff = findViewById(R.id.chkBuzzerOnOff);
         etBuzzerLength = findViewById(R.id.etBuzzerLengthMs);
@@ -101,11 +101,11 @@ public class SystemLibActivity extends BaseActivity {
         btnVibrationTest = findViewById(R.id.btnVibrationTest);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　ブザー音量スピナー設定
     //　引　数　:　なし
     //　戻り値　:　[void]  ..... なし
-    //================================================================
+    //============================================================
     private void setupVolumeSpinner() {
         // 表示ラベルと実値(1/5/10)の対応を作成
         volumeOptions = new ArrayList<>();
@@ -123,11 +123,11 @@ public class SystemLibActivity extends BaseActivity {
         spBuzzerVolume.setAdapter(adapter);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　設定値を画面へ反映
     //　引　数　:　なし
     //　戻り値　:　[void]  ..... なし
-    //================================================================
+    //============================================================
     private void loadSettingsToForm() {
         // ブザー設定を画面へ反映（Muteは画面上はON/OFFの反転表現）
         chkBuzzerOnOff.setChecked(!AppSettings.BuzzerMute);
@@ -141,11 +141,11 @@ public class SystemLibActivity extends BaseActivity {
         etVibInterval.setText(String.valueOf(AppSettings.VibratorInterval));
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　テストボタン(ブザー/バイブ)設定
     //　引　数　:　なし
     //　戻り値　:　[void]  ..... なし
-    //================================================================
+    //============================================================
     private void setupTestButtons() {
         // ブザーテスト：画面入力値でプレビュー再生
         btnBuzzerTest.setOnClickListener(v -> {
@@ -165,11 +165,11 @@ public class SystemLibActivity extends BaseActivity {
         });
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　スピナー選択位置設定
     //　引　数　:　value ..... 設定したい音量値(実値)
     //　戻り値　:　[void]  ..... なし
-    //================================================================
+    //============================================================
     private void setSpinnerSelection(int value) {
         // 実値一致する選択肢を探して選択
         for (int i = 0; i < volumeOptions.size(); i++) {
@@ -180,11 +180,11 @@ public class SystemLibActivity extends BaseActivity {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　スピナー選択音量の取得
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 音量値(実値)
-    //================================================================
+    //============================================================
     private int readSelectedVolume() {
         Object selected = spBuzzerVolume.getSelectedItem();
         if (selected instanceof VolumeOption) {
@@ -194,12 +194,12 @@ public class SystemLibActivity extends BaseActivity {
         return AppSettings.BuzzerVolume;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　数値入力の取得(フォールバックあり)
     //　引　数　:　editText ..... 入力欄
     //　　　　　:　fallback ..... 取得失敗時に返す値
     //　戻り値　:　[int] ..... 入力値(不正/未入力時はfallback)
-    //================================================================
+    //============================================================
     private int readInt(EditText editText, int fallback) {
         if (editText == null) return fallback;
 
@@ -215,13 +215,13 @@ public class SystemLibActivity extends BaseActivity {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　ブザープレビュー再生
     //　引　数　:　mute   ..... True:ミュート(鳴らさない)
     //　　　　　:　volume ..... 音量(0～10)
     //　　　　　:　length ..... 鳴動時間(ms)
     //　戻り値　:　[void] ..... なし
-    //================================================================
+    //============================================================
     private void playBuzzerPreview(boolean mute, int volume, int length) {
         // ミュートなら何もしない
         if (mute) return;
@@ -241,14 +241,14 @@ public class SystemLibActivity extends BaseActivity {
         new Handler(Looper.getMainLooper()).postDelayed(tone::release, safeLength + 50L);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　バイブプレビュー実行
     //　引　数　:　mute     ..... True:ミュート(振動しない)
     //　　　　　:　count    ..... 回数
     //　　　　　:　length   ..... 1回の振動時間(ms)
     //　　　　　:　interval ..... 振動間隔(ms)
     //　戻り値　:　[void]   ..... なし
-    //================================================================
+    //============================================================
     private void playVibrationPreview(boolean mute, int count, int length, int interval) {
         // ミュートなら何もしない
         if (mute) return;
@@ -279,11 +279,11 @@ public class SystemLibActivity extends BaseActivity {
         }
     }
 
-    //================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupBottomButtons() {
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
         MaterialButton red = findViewById(R.id.btnBottomRed);
@@ -300,11 +300,11 @@ public class SystemLibActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　青ボタン押下時の処理を行う(保存)
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionBlue() {
         // 画面入力値を設定へ反映（Muteは画面上はON/OFFの反転表現）
@@ -322,41 +322,41 @@ public class SystemLibActivity extends BaseActivity {
         finish();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う(終了)
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         finish();
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　音量選択肢クラス(内部クラス)
     //　引　数　:　なし
     //　戻り値　:　[なし]
-    //================================================================
+    //============================================================
     private static class VolumeOption {
         private final int value;
         private final String label;
 
-        //================================================================
+        //============================================================
         //　機　能　:　音量選択肢生成
         //　引　数　:　value ..... 音量値(実値)
         //　　　　　:　label ..... 表示ラベル
         //　戻り値　:　[void]  ..... なし
-        //================================================================
+        //============================================================
         private VolumeOption(int value, String label) {
             this.value = value;
             this.label = label;
         }
 
-        //================================================================
+        //============================================================
         //　機　能　:　スピナー表示文字列の返却
         //　引　数　:　なし
         //　戻り値　:　[String] ..... 表示ラベル
-        //================================================================
+        //============================================================
         @Override
         public String toString() {
             return label;
