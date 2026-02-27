@@ -6,7 +6,7 @@ import com.example.myapplication.time.XmlUtil;
 
 
 //============================================================
-//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
+//　処理概要　:　照合データ送信用（SendSyougoData）のSOAP本文を組み立てるクラス
 //　関　　数　:　buildSendSyougoData ..... SendSyougoData用SOAPボディ生成
 //============================================================
 public class SendSyougoSoapBuilder {

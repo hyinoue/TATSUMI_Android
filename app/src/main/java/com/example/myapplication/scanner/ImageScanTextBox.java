@@ -16,7 +16,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 
 //============================================================
-//　処理概要　:　バーコードスキャン連携を行うクラス
+//　処理概要　:　TextBoxへスキャン入力を反映し読み取り完了を通知するUI連携クラス
 //　関　　数　:　ImageScanTextBox ..... フォーカス中のみCode39をアプリ処理するEditText
 //　　　　　　:　onFocusChanged ..... フォーカス変化に合わせてスキャナ開始/停止＋プロファイル反映
 //　　　　　　:　onDetachedFromWindow ..... View破棄時にスキャナを破棄

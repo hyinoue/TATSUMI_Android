@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 //============================================================
-//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
+//　処理概要　:　各SOAPメソッドのリクエストXML生成を集約するファクトリクラス
 //　関　　数　:　buildGetSysDate ................................. GetSysDate要求XML生成
 //　　　　　　:　buildGetSagyouYmd .............................. GetSagyouYmd要求XML生成
 //　　　　　　:　buildGetUpdateYmdHms ........................... GetUpdateYmdHms要求XML生成
