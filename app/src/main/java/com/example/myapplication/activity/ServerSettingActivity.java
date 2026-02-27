@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 //============================================================
-//　処理概要　:　サーバ設定画面Activity
+//　処理概要　:　サーバ接続先設定画面Activity
 //　　　　　　:　サーバ接続先(URL)の選択、接続テスト、設定保存を行う。
 //　　　　　　:　保存前に接続テスト成功を必須とし、DB(SystemEntity)へ接続先URLを保存する。
 //　関　　数　:　onCreate              ..... 画面生成/初期化

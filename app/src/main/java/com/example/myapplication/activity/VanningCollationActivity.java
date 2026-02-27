@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 //============================================================
-//　処理概要　:　積込照合(バンニング照合)画面のActivity
+//　処理概要　:　積載束照合画面のActivity
 //　　　　　　:　コンテナに紐づく積載束情報を表示し、現品番号(スキャナ入力)で照合を進め、
 //　　　　　　:　全件照合完了後に確定処理(DB更新＋送信)を行う。
 //　関　　数　:　onCreate                    ..... 画面生成/初期化

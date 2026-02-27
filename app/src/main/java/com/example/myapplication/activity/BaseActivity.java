@@ -24,7 +24,7 @@ import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
 //============================================================
-//　処理概要　:　BaseActivity（共通基底Activity）
+//　処理概要　:　共通基底Activity
 //　　　　　　:　全画面共通のUI/操作を提供する。
 //　　　　　　:　- バナー表示（一定時間で自動消去）
 //　　　　　　:　- ローディングオーバーレイ（Long/Short）

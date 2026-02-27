@@ -13,7 +13,7 @@ import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
 //============================================================
-//　処理概要　:　通信テスト用の最小画面（Activity）
+//　処理概要　:　通信テスト画面（Activity）
 //　関　　数　:　onCreate ................. 画面生成時の初期化（部品取得/イベント設定/初期表示）
 //　　　　　　:　setupBottomButtons ...... 下部ボタン設定
 //　　　　　　:　bindViews ............... 画面部品のバインド
