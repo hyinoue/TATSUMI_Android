@@ -65,11 +65,11 @@ public class DbTestActivity extends BaseActivity {
 
     private volatile boolean isAlive = false; // 画面生存フラグ
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,14 +100,14 @@ public class DbTestActivity extends BaseActivity {
 
         // 行間の境界線が重なって太く見えないように、上方向を少し詰める
         rvDbTable.addItemDecoration(new RecyclerView.ItemDecoration() {
-            //===========================================
+            //============================================================
             //　機　能　:　一覧行の余白（オフセット）を設定する
-            //　引　数　:　outRect ..... Rect
-            //　　　　　:　view ..... View
-            //　　　　　:　parent ..... RecyclerView
-            //　　　　　:　state ..... RecyclerView.State
+            //　引　数　:　outRect ..... 余白情報
+            //　　　　　:　view ..... ビュー
+            //　　　　　:　parent ..... 親ビューグループ
+            //　　　　　:　state ..... RecyclerView状態
             //　戻り値　:　[void] ..... なし
-            //===========================================
+            //============================================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -135,14 +135,14 @@ public class DbTestActivity extends BaseActivity {
         // ---- Spinner選択イベント ----
         spTables.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-            //========================================
+            //============================================================
             //　機　能　:　項目選択時の処理を行う
             //　引　数　:　parent ..... AdapterView<?>
-            //　　　　　:　view ..... View
-            //　　　　　:　position ..... int
-            //　　　　　:　id ..... long
+            //　　　　　:　view ..... ビュー
+            //　　　　　:　position ..... 表示位置
+            //　　　　　:　id ..... ID
             //　戻り値　:　[void] ..... なし
-            //========================================
+            //============================================================
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // Spinnerの選択値（テーブル名）を取得
@@ -165,11 +165,11 @@ public class DbTestActivity extends BaseActivity {
                 loadTableData(table);
             }
 
-            //========================================
+            //============================================================
             //　機　能　:　未選択時の処理を行う
             //　引　数　:　parent ..... AdapterView<?>
             //　戻り値　:　[void] ..... なし
-            //========================================
+            //============================================================
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // 特に処理なし（必要ならクリア処理を入れる）
@@ -177,11 +177,11 @@ public class DbTestActivity extends BaseActivity {
         });
     }
 
-    //============================
+    //============================================================
     //　機　能　:　画面終了時の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     @Override
     protected void onDestroy() {
         // 非同期の戻りでUI更新しないようにする
@@ -196,11 +196,11 @@ public class DbTestActivity extends BaseActivity {
     // DB
     // =============================================================================================
 
-    //=============================
+    //============================================================
     //　機　能　:　テーブル名一覧を読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=============================
+    //============================================================
     private void loadTableNames() {
         // DBアクセスはバックグラウンドで行う
         executor.execute(() -> {
@@ -248,11 +248,11 @@ public class DbTestActivity extends BaseActivity {
         });
     }
 
-    //===============================
+    //============================================================
     //　機　能　:　テーブルデータを読み込む
-    //　引　数　:　table ..... String
+    //　引　数　:　table ..... テーブル名
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //============================================================
     private void loadTableData(String table) {
         // DBアクセスはバックグラウンドで行う
         executor.execute(() -> {
@@ -304,14 +304,14 @@ public class DbTestActivity extends BaseActivity {
     // Header / Layout
     // =============================================================================================
 
-    //=========================================
+    //============================================================
     //　機　能　:　列名を更新する
-    //　引　数　:　columns ..... List<String>
-    //　　　　　:　widthsPx ..... List<Integer>
-    //　　　　　:　rowHeaderWidthPx ..... int
-    //　　　　　:　rowHeightPx ..... int
+    //　引　数　:　columns ..... 列名一覧
+    //　　　　　:　widthsPx ..... ID
+    //　　　　　:　rowHeaderWidthPx ..... ID
+    //　　　　　:　rowHeightPx ..... 行データ
     //　戻り値　:　[void] ..... なし
-    //=========================================
+    //============================================================
     private void updateHeaderRow(List<String> columns, List<Integer> widthsPx, int rowHeaderWidthPx, int rowHeightPx) {
         // 既存ヘッダをクリア
         headerRow.removeAllViews();
@@ -333,14 +333,14 @@ public class DbTestActivity extends BaseActivity {
         }
     }
 
-    //===================================
+    //============================================================
     //　機　能　:　列のレイアウトを設定
-    //　引　数　:　label ..... String
-    //　　　　　:　widthPx ..... int
-    //　　　　　:　heightPx ..... int
-    //　　　　　:　leftMarginPx ..... int
+    //　引　数　:　label ..... 表示ラベル
+    //　　　　　:　widthPx ..... ID
+    //　　　　　:　heightPx ..... 高さ(px)
+    //　　　　　:　leftMarginPx ..... 左余白(px)
     //　戻り値　:　[TextView] ..... ヘッダセル
-    //===================================
+    //============================================================
     private TextView buildHeaderCell(String label, int widthPx, int heightPx, int leftMarginPx) {
         TextView tv = new TextView(this);
 
@@ -360,21 +360,21 @@ public class DbTestActivity extends BaseActivity {
         return tv;
     }
 
-    //===========================
+    //============================================================
     //　機　能　:　画面密度を考慮したピクセル変換
-    //　引　数　:　v ..... int
+    //　引　数　:　v ..... ビュー
     //　戻り値　:　[int] ..... px
-    //===========================
+    //============================================================
     private int dp(int v) {
         // densityを掛けてdp→pxに変換
         return (int) (v * getResources().getDisplayMetrics().density);
     }
 
-    //================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     private void setupBottomButtons() {
         // 黄：終了のみ使用
         MaterialButton yellow = findViewById(R.id.btnBottomYellow);
@@ -393,25 +393,25 @@ public class DbTestActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //====================================
+    //============================================================
     //　機　能　:　テーブルのVisibleを設定する
-    //　引　数　:　isVisible ..... boolean
+    //　引　数　:　isVisible ..... 表示可否
     //　戻り値　:　[void] ..... なし
-    //====================================
+    //============================================================
     private void setTableVisible(boolean isVisible) {
         // テーブル領域全体の表示/非表示を切り替え
         int visibility = isVisible ? View.VISIBLE : View.GONE;
         hsvDbTable.setVisibility(visibility);
     }
 
-    //========================================
+    //============================================================
     //　機　能　:　セルのサイズと左マージンを設定
-    //　引　数　:　cell ..... TextView
-    //　　　　　:　widthPx ..... int
-    //　　　　　:　heightPx ..... int
-    //　　　　　:　leftMarginPx ..... int
+    //　引　数　:　cell ..... セル情報
+    //　　　　　:　widthPx ..... ID
+    //　　　　　:　heightPx ..... 高さ(px)
+    //　　　　　:　leftMarginPx ..... 左余白(px)
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //============================================================
     private void applyCellLayoutParams(TextView cell, int widthPx, int heightPx, int leftMarginPx) {
         // 横並びセルのサイズ/左マージンを設定
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(widthPx, heightPx);
@@ -419,11 +419,11 @@ public class DbTestActivity extends BaseActivity {
         cell.setLayoutParams(lp);
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 画面終了
@@ -447,34 +447,34 @@ public class DbTestActivity extends BaseActivity {
         private final List<String> currentColumns = new ArrayList<>();
         private final List<List<String>> currentRows = new ArrayList<>();
 
-        //==============================
+        //============================================================
         //　機　能　:　改行をスペースに置換
-        //　引　数　:　s ..... String
+        //　引　数　:　s ..... 文字列
         //　戻り値　:　[String] ..... 変換後文字列
-        //==============================
+        //============================================================
         private String norm(String s) {
             // 改行があるとTextView計測/表示が崩れるためスペースへ置換
             if (s == null) return "";
             return s.replace("\n", " ").replace("\r", " ");
         }
 
-        //================================
+        //============================================================
         //　機　能　:　表示する列数をViewTypeとして返す
-        //　引　数　:　position ..... int
+        //　引　数　:　position ..... 表示位置
         //　戻り値　:　[int] ..... 列数（セル生成数に利用）
-        //================================
+        //============================================================
         @Override
         public int getItemViewType(int position) {
             // viewTypeに列数を渡し、onCreateViewHolderでその数だけセルを生成する
             return currentColumns.size();
         }
 
-        //==========================================
+        //============================================================
         //　機　能　:　tableを設定する
-        //　引　数　:　cols ..... List<String>
-        //　　　　　:　data ..... List<List<String>>
+        //　引　数　:　cols ..... 列定義
+        //　　　　　:　data ..... データ
         //　戻り値　:　[void] ..... なし
-        //==========================================
+        //============================================================
         void setTable(List<String> cols, List<List<String>> data) {
             // 既存データをクリアして差し替え
             currentColumns.clear();
@@ -493,11 +493,11 @@ public class DbTestActivity extends BaseActivity {
          * 列幅を「ヘッダ（太字） + セル（通常）」の最大文字幅に合わせて決める（上限なし）
          * ★最後の1文字見切れ対策で safety を少し足す
          */
-        //=========================================
+        //============================================================
         //　機　能　:　列の内容に合わせて最適な列幅を自動計算
         //　引　数　:　なし
         //　戻り値　:　[void] ..... なし
-        //=========================================
+        //============================================================
         private void autoAdjustColumnWidths() {
             colWidthsPx.clear();
 
@@ -536,39 +536,39 @@ public class DbTestActivity extends BaseActivity {
             }
         }
 
-        //=====================================
+        //============================================================
         //　機　能　:　列幅リストのコピーを返す
         //　引　数　:　なし
         //　戻り値　:　[List<Integer>] ..... 列幅(px)のコピー
-        //=====================================
+        //============================================================
         List<Integer> getColumnWidthsPx() {
             // 外部から変更されないようにコピーを返す
             return new ArrayList<>(colWidthsPx);
         }
 
-        //=====================================
+        //============================================================
         //　機　能　:　行ヘッダの幅をpxで取得
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行番号列幅(px)
-        //=====================================
+        //============================================================
         int getRowHeaderWidthPx() {
             return dp(rowHeaderWidthDp);
         }
 
-        //===============================
+        //============================================================
         //　機　能　:　行ヘッダの高さをpxで取得
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行高さ(px)
-        //===============================
+        //============================================================
         int getRowHeightPx() {
             return dp(rowHeightDp);
         }
 
-        //=====================================
+        //============================================================
         //　機　能　:　指定列の幅を取得
-        //　引　数　:　columnPosition ..... int
+        //　引　数　:　columnPosition ..... 列位置
         //　戻り値　:　[int] ..... 列幅(px)
-        //=====================================
+        //============================================================
         private int getColWidthPx(int columnPosition) {
             // 計算済みがあればそれを返す。無い場合はデフォルト
             if (columnPosition >= 0 && columnPosition < colWidthsPx.size()) {
@@ -577,12 +577,12 @@ public class DbTestActivity extends BaseActivity {
             return dp(120);
         }
 
-        //=====================================
+        //============================================================
         //　機　能　:　一覧の行レイアウトを生成
-        //　引　数　:　parent ..... ViewGroup
-        //　　　　　:　viewType ..... int
+        //　引　数　:　parent ..... 親ビューグループ
+        //　　　　　:　viewType ..... ビュー種別
         //　戻り値　:　[RowViewHolder] ..... 行ViewHolder
-        //=====================================
+        //============================================================
         @Override
         public RowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // 1行分のコンテナを横並びLinearLayoutで作る
@@ -611,12 +611,12 @@ public class DbTestActivity extends BaseActivity {
             return new RowViewHolder(row, cells);
         }
 
-        //=======================================
+        //============================================================
         //　機　能　:　指定行のデータを一覧へ表示する
-        //　引　数　:　holder ..... RowViewHolder
-        //　　　　　:　position ..... int
+        //　引　数　:　holder ..... ビューホルダー
+        //　　　　　:　position ..... 表示位置
         //　戻り値　:　[void] ..... なし
-        //=======================================
+        //============================================================
         @Override
         public void onBindViewHolder(RowViewHolder holder, int position) {
             List<TextView> cells = holder.cells;
@@ -646,21 +646,21 @@ public class DbTestActivity extends BaseActivity {
             }
         }
 
-        //============================
+        //============================================================
         //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
-        //============================
+        //============================================================
         @Override
         public int getItemCount() {
             return currentRows.size();
         }
 
-        //================================
+        //============================================================
         //　機　能　:　列名のレイアウトを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... 行番号セル
-        //================================
+        //============================================================
         private TextView buildRowHeader() {
             TextView tv = new TextView(DbTestActivity.this);
             tv.setTextColor(0xFF000000);
@@ -671,11 +671,11 @@ public class DbTestActivity extends BaseActivity {
             return tv;
         }
 
-        //================================
+        //============================================================
         //　機　能　:　セルのレイアウトを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... データセル
-        //================================
+        //============================================================
         private TextView buildCell() {
             TextView tv = new TextView(DbTestActivity.this);
             tv.setTextColor(0xFF000000);

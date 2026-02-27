@@ -22,7 +22,7 @@ import java.util.Locale;
 
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　バーコードスキャン連携を行うクラス
 //　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/バーコード種別ー制御）
 //　　　　　　:　createFocusCode39Policy ..... フォーカス中のみCode39許可の標準ポリシー生成
 //　　　　　　:　onCreate ..... BarcodeManager生成
@@ -52,18 +52,18 @@ public class DensoScannerController
     // 端末によってSCANトリガーのキーコードが違うので列挙（必要に応じて追加）
     private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234}; // スキャン起動キーコード
 
-    //==============================
+    //============================================================
     //　処理概要　:　読み取り可能なバーコード種別を表す列挙型
-    //==============================
+    //============================================================
     public enum SymbologyProfile {
         NONE,
         CODE39_ONLY,
         ALL
     }
 
-    //=================================
+    //============================================================
     //　処理概要　:　スキャナの読み取り制御ルールを定義するインターフェース
-    //=================================
+    //============================================================
     public interface ScanPolicy {
         /**
          * 受信/照射を許可するか（例：EditTextフォーカス時のみ）
@@ -82,11 +82,11 @@ public class DensoScannerController
         boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName);
     }
 
-    //=========================================================
+    //============================================================
     //　機　能　:　フォーカス中のみCode39許可のポリシーを生成する
     //　引　数　:　target ..... EditText（フォーカス判定対象）
     //　戻り値　:　[ScanPolicy] ..... ポリシー
-    //=========================================================
+    //============================================================
     @NonNull
     public static ScanPolicy createFocusCode39Policy(@Nullable EditText target) {
         return new ScanPolicy() {
@@ -137,13 +137,13 @@ public class DensoScannerController
     private String last = ""; // 直近読取データ
     private long lastAt = 0L; // 直近読取時刻(ms)
 
-    //=========================================================
+    //============================================================
     //　機　能　:　スキャナ制御クラスを初期化する
-    //　引　数　:　activity ..... Activity
+    //　引　数　:　activity ..... 画面オブジェクト
     //　　　　　:　listener ..... OnScanListener（読み取り結果通知先）
     //　　　　　:　policy ..... ScanPolicy（照射/受信ポリシー）
     //　戻り値　:　[DensoScannerController] ..... なし
-    //=========================================================
+    //============================================================
     public DensoScannerController(@NonNull Activity activity,
                                   @NonNull OnScanListener listener,
                                   @NonNull ScanPolicy policy) {
@@ -152,11 +152,11 @@ public class DensoScannerController
         this.policy = policy;
     }
 
-    //============================
+    //============================================================
     //　機　能　:　生成時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     public void onCreate() {
         // BarcodeManagerを生成（非同期で onBarcodeManagerCreated が呼ばれる）
         try {
@@ -166,22 +166,22 @@ public class DensoScannerController
         }
     }
 
-    //============================
+    //============================================================
     //　機　能　:　再開時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     public void onResume() {
         // 再開フラグを立て、現在のフォーカス状態に応じてプロファイル適用
         resumed = true;
         applyProfileIfReady("onResume");
     }
 
-    //============================
+    //============================================================
     //　機　能　:　一時停止時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     public void onPause() {
         // 停止フラグを下げ、照射停止＋強制無効化
         resumed = false;
@@ -204,11 +204,11 @@ public class DensoScannerController
         }
     }
 
-    //============================
+    //============================================================
     //　機　能　:　破棄時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     public void onDestroy() {
         // 照射停止＋無効化（安全側）
         stopTimedScan();
@@ -240,21 +240,21 @@ public class DensoScannerController
         }
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　プロファイルを再適用する
-    //　引　数　:　from ..... String（呼び出し元識別）
+    //　引　数　:　from ..... 呼び出し元情報
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     public void refreshProfile(@NonNull String from) {
         // フォーカス変化などで即時反映したい場合に呼び出す
         applyProfileIfReady(from);
     }
 
-    //=========================================================
+    //============================================================
     //　機　能　:　キーイベント処理を制御する
-    //　引　数　:　event ..... KeyEvent
+    //　引　数　:　event ..... イベント情報
     //　戻り値　:　[boolean] ..... true:イベントを握る、false:握らない
-    //=========================================================
+    //============================================================
     public boolean handleDispatchKeyEvent(@NonNull KeyEvent event) {
 
         int keyCode = event.getKeyCode();
@@ -299,21 +299,21 @@ public class DensoScannerController
         return true;
     }
 
-    //============================
+    //============================================================
     //　機　能　:　タイマー経由のスキャン停止
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     private void stopTimedScan() {
         // 現状は即時停止のみ（将来的にタイマー制御を入れても呼び出し口を変えない）
         stopScanProgrammatically();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　スキャナの読み取りを強制停止する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //============================================================
     private void stopScanProgrammatically() {
         if (scanner == null) return;
 
@@ -322,12 +322,12 @@ public class DensoScannerController
                 "softTriggerOff", "releaseTrigger", "triggerOff", "stopScan", "stopRead");
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　引数なしメソッドを総当たりで呼び出す
-    //　引　数　:　target ..... Object
-    //　　　　　:　methodNames ..... String...（候補メソッド名）
+    //　引　数　:　target ..... 対象ビュー
+    //　　　　　:　methodNames ..... 名称
     //　戻り値　:　[boolean] ..... true:どれか呼べた、false:全滅
-    //=================================================
+    //============================================================
     private boolean invokeNoArgAny(@NonNull Object target, @NonNull String... methodNames) {
         Class<?> cls = target.getClass();
 
@@ -344,11 +344,11 @@ public class DensoScannerController
         return false;
     }
 
-    //============================
+    //============================================================
     //　機　能　:　スキャントリガーキー判定
-    //　引　数　:　keyCode ..... int
+    //　引　数　:　keyCode ..... キー値
     //　戻り値　:　[boolean] ..... true:SCANキー、false:それ以外
-    //============================
+    //============================================================
     private boolean isScanTriggerKey(int keyCode) {
         for (int code : SCAN_TRIGGER_KEY_CODES) {
             if (code == keyCode) return true;
@@ -356,11 +356,11 @@ public class DensoScannerController
         return false;
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　スキャナ初期化完了時にScannerを取得し設定を適用する
-    //　引　数　:　barcodeManager ..... BarcodeManager
+    //　引　数　:　barcodeManager ..... コード値
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     @Override
     public void onBarcodeManagerCreated(BarcodeManager barcodeManager) {
         this.manager = barcodeManager;
@@ -388,11 +388,11 @@ public class DensoScannerController
      * - フォーカス外：claim解除＋close（照射させない）
      * - フォーカス中：CODE39_ONLYを適用してclaim（照射可能）
      */
-    //=================================================
+    //============================================================
     //　機　能　:　プロファイルを適用する（準備完了時のみ）
-    //　引　数　:　from ..... String（呼び出し元識別）
+    //　引　数　:　from ..... 呼び出し元情報
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void applyProfileIfReady(@NonNull String from) {
 
         // onResume前は適用しない（Activity停止中の操作を避ける）
@@ -464,11 +464,11 @@ public class DensoScannerController
     /**
      * 解除を強めに行う（端末設定OFFを尊重して“照射させない”方向へ）
      */
-    //=================================================
+    //============================================================
     //　機　能　:　スキャナを強制無効化する
-    //　引　数　:　from ..... String（呼び出し元識別）
+    //　引　数　:　from ..... 呼び出し元情報
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void disableScannerHard(@NonNull String from) {
         try {
             // 念のため照射停止
@@ -497,11 +497,11 @@ public class DensoScannerController
         Log.d(TAG, "scanner disabled from=" + from);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　バーコード受信時処理
-    //　引　数　:　event ..... BarcodeDataReceivedEvent
+    //　引　数　:　event ..... イベント情報
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     @Override
     public void onBarcodeDataReceived(BarcodeDataReceivedEvent event) {
 
@@ -541,21 +541,21 @@ public class DensoScannerController
         activity.runOnUiThread(() -> listener.onScan(normalized, aim, denso));
     }
 
-    //============================
+    //============================================================
     //　機　能　:　受信データを正規化する
-    //　引　数　:　s ..... String
+    //　引　数　:　s ..... 文字列
     //　戻り値　:　[String] ..... 正規化後文字列
-    //============================
+    //============================================================
     private String normalize(String s) {
         // 改行等を除去してトリム
         return s.replace("\r", "").replace("\n", "").trim();
     }
 
-    //============================
+    //============================================================
     //　機　能　:　null安全に文字列化する
-    //　引　数　:　v ..... Object
+    //　引　数　:　v ..... ビュー
     //　戻り値　:　[String] ..... 文字列
-    //============================
+    //============================================================
     @NonNull
     private String safeToString(@Nullable Object v) {
         return v == null ? "" : String.valueOf(v);
@@ -565,13 +565,13 @@ public class DensoScannerController
     // Code39 判定
     // ============================
 
-    //=================================================
+    //============================================================
     //　機　能　:　Code39か判定する
-    //　引　数　:　aim ..... String（AIM識別）
-    //　　　　　:　denso ..... String（DENSO識別）
-    //　　　　　:　displayName ..... String（推定表示名）
+    //　引　数　:　aim ..... AIMスキャンデータ
+    //　　　　　:　denso ..... DENSOスキャンデータ
+    //　　　　　:　displayName ..... 名称
     //　戻り値　:　[boolean] ..... true:Code39、false:それ以外
-    //=================================================
+    //============================================================
     public static boolean isCode39(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
         // 既に表示名がある場合はそれを優先
         if (displayName != null) {
@@ -582,12 +582,12 @@ public class DensoScannerController
         return "Code39".equals(resolveBarcodeDisplayName(aim, denso));
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　バーコード種別の表示名を推定する（共通）
-    //　引　数　:　aim ..... String
-    //　　　　　:　denso ..... String
+    //　引　数　:　aim ..... AIMスキャンデータ
+    //　　　　　:　denso ..... DENSOスキャンデータ
     //　戻り値　:　[String] ..... 表示名（不明ならnull）
-    //=================================================
+    //============================================================
     @Nullable
     public static String resolveBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
@@ -611,23 +611,23 @@ public class DensoScannerController
         return null;
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　バーコード種別の表示名を推定する
-    //　引　数　:　aim ..... String
-    //　　　　　:　denso ..... String
+    //　引　数　:　aim ..... AIMスキャンデータ
+    //　　　　　:　denso ..... DENSOスキャンデータ
     //　戻り値　:　[String] ..... 表示名（不明ならnull）
-    //=================================================
+    //============================================================
     @Nullable
     private String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         return resolveBarcodeDisplayName(aim, denso);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　バーコード種別の有効/無効を適用する
     //　引　数　:　settingsRoot ..... Object（Settingsルート）
-    //　　　　　:　profile ..... SymbologyProfile
+    //　　　　　:　profile ..... ファイル関連情報
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void applySymbology(Object settingsRoot, @NonNull SymbologyProfile profile) {
 
         // BarcodeScannerSettings の内部構造に依存するためパス指定で反映
@@ -662,13 +662,13 @@ public class DensoScannerController
         }
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　指定パスのbooleanフィールドへ値を設定する
     //　引　数　:　root ..... Object（探索開始オブジェクト）
-    //　　　　　:　path ..... String（例：decode.symbologies.code39.enabled）
-    //　　　　　:　value ..... boolean
+    //　　　　　:　path ..... ファイル関連情報
+    //　　　　　:　value ..... 設定値
     //　戻り値　:　[void] ..... なし
-    //=================================================
+    //============================================================
     private void setBoolean(Object root, String path, boolean value) {
         try {
             // パスから「所有者」と「最終フィールド」を解決
@@ -688,12 +688,12 @@ public class DensoScannerController
         }
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　パス文字列から所有者とフィールドを解決する
-    //　引　数　:　root ..... Object
-    //　　　　　:　path ..... String
+    //　引　数　:　root ..... ルートビュー
+    //　　　　　:　path ..... ファイル関連情報
     //　戻り値　:　[FieldAndOwner] ..... 解決結果（失敗はnull）
-    //=================================================
+    //============================================================
     @Nullable
     private FieldAndOwner resolveOwnerAndField(Object root, String path) {
         String[] parts = path.split("\\.");
@@ -723,12 +723,12 @@ public class DensoScannerController
         return new FieldAndOwner(cur, last);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　フィールドを検索する（継承階層を辿る）
     //　引　数　:　cls ..... Class<?>
-    //　　　　　:　name ..... String
+    //　　　　　:　name ..... 名称
     //　戻り値　:　[Field] ..... フィールド（見つからなければnull）
-    //=================================================
+    //============================================================
     @Nullable
     private Field findField(Class<?> cls, String name) {
         Class<?> cur = cls;
@@ -744,19 +744,19 @@ public class DensoScannerController
         return null;
     }
 
-    //====================================
+    //============================================================
     //　処理概要　:　フィールドとその所属オブジェクトをまとめて保持
-    //====================================
+    //============================================================
     private static final class FieldAndOwner {
         final Object owner;
         final Field field;
 
-        //=====================================
+        //============================================================
         //　機　能　:　FieldAndOwnerの初期化処理
-        //　引　数　:　owner ..... Object
-        //　　　　　:　field ..... Field
+        //　引　数　:　owner ..... 所有オブジェクト
+        //　　　　　:　field ..... フィールド情報
         //　戻り値　:　[FieldAndOwner] ..... なし
-        //=====================================
+        //============================================================
         FieldAndOwner(Object owner, Field field) {
             this.owner = owner;
             this.field = field;

@@ -9,7 +9,7 @@ import com.densowave.bhtsdk.barcode.OutputSettings;
 
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　バーコードスキャン連携を行うクラス
 //　関　　数　:　DensoScanReceiver ..... DENSOスキャン結果Broadcast受信→アプリ内Broadcastへ橋渡し
 //　　　　　　:　onReceive ..... 受信処理（EXTRA取得/正規化/内部Broadcast送信）
 //　　　　　　:　normalize ..... 受信文字列の正規化（改行除去/trim）
@@ -23,12 +23,12 @@ public class DensoScanReceiver extends BroadcastReceiver {
     // Manifestで指定したAction名（SDK側の設定とも一致させる）
     public static final String ACTION_DENSO_SCAN = "com.example.myapplication.DENSO_SCAN"; // 外部スキャン受信アクション
 
-    //==================================
+    //============================================================
     //　機　能　:　受信時の処理
-    //　引　数　:　context ..... Context
-    //　　　　　:　intent ..... Intent
+    //　引　数　:　context ..... コンテキスト情報
+    //　　　　　:　intent ..... 画面遷移情報
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     public void onReceive(Context context, Intent intent) {
         // intent未設定は処理しない
@@ -58,11 +58,11 @@ public class DensoScanReceiver extends BroadcastReceiver {
         context.sendBroadcast(i);
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　文字列を正規化する
-    //　引　数　:　s ..... String
+    //　引　数　:　s ..... 文字列
     //　戻り値　:　[String] ..... 正規化後文字列
-    //==============================
+    //============================================================
     private String normalize(String s) {
         // nullは空文字扱い
         if (s == null) return "";
@@ -71,9 +71,9 @@ public class DensoScanReceiver extends BroadcastReceiver {
         return s.replace("\r", "").replace("\n", "").trim();
     }
 
-    //=========================================
-    //　処理概要　:　ImagerTestActivityBridgeクラス
-    //=========================================
+    //============================================================
+    //　処理概要　:　内部ブロードキャスト連携定数をまとめたクラス
+    //============================================================
 
     /**
      * Activity側で使う内部Action/Extra定義（Receiver→Activity橋渡し）

@@ -18,7 +18,7 @@ import java.util.Locale;
 
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　一覧表示データの制御を行うクラス
 //　関　　数　:　VanningCollationController ..... バンニング照合制御（Work作成/照合更新/件数/表示行生成/完了更新）
 //　　　　　　:　load ..... コンテナID指定でWork再作成→一覧読込→表示更新
 //　　　　　　:　getDetails ..... Work明細の取得
@@ -50,8 +50,8 @@ public class VanningCollationController {
 
     //============================================================
     //　機　能　:　VanningCollationControllerの初期化処理
-    //　引　数　:　kakuninMeisaiDao ..... KakuninMeisaiDao
-    //　　　　　:　kakuninMeisaiWorkDao ..... KakuninMeisaiWorkDao
+    //　引　数　:　kakuninMeisaiDao ..... データアクセスオブジェクト
+    //　　　　　:　kakuninMeisaiWorkDao ..... データアクセスオブジェクト
     //　戻り値　:　[VanningCollationController] ..... なし
     //============================================================
     public VanningCollationController(@NonNull KakuninMeisaiDao kakuninMeisaiDao,
@@ -60,11 +60,11 @@ public class VanningCollationController {
         this.kakuninMeisaiWorkDao = kakuninMeisaiWorkDao;
     }
 
-    //=====================================
+    //============================================================
     //　機　能　:　データを読み込む
-    //　引　数　:　containerId ..... String
+    //　引　数　:　containerId ..... ID
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //============================================================
     public void load(@Nullable String containerId) {
 
         // 保持中の明細をクリア
@@ -84,34 +84,34 @@ public class VanningCollationController {
         refreshDisplayRows();
     }
 
-    //=====================================================
+    //============================================================
     //　機　能　:　detailsを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<KakuninMeisaiWorkEntity>] ..... Work明細（読み取り専用）
-    //=====================================================
+    //============================================================
     @NonNull
     public List<KakuninMeisaiWorkEntity> getDetails() {
         // 外部から改変されないよう unmodifiableList を返す
         return Collections.unmodifiableList(details);
     }
 
-    //=================================================
+    //============================================================
     //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<VanningCollationRow>] ..... 表示用行データ（読み取り専用）
-    //=================================================
+    //============================================================
     @NonNull
     public List<VanningCollationRow> getDisplayRows() {
         // 外部から改変されないよう unmodifiableList を返す
         return Collections.unmodifiableList(displayRows);
     }
 
-    //=================================
+    //============================================================
     //　機　能　:　束明細の照合可否を確認する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[String] ..... 結果（OK/エラーメッセージ）
-    //=================================
+    //============================================================
     public String checkSokuDtl(String heatNo, String sokuban) {
 
         // 入力をトリム（nullは空文字）
@@ -139,12 +139,12 @@ public class VanningCollationController {
         return "OK";
     }
 
-    //=================================
+    //============================================================
     //　機　能　:　syougoを更新する
-    //　引　数　:　heatNo ..... String
-    //　　　　　:　sokuban ..... String
+    //　引　数　:　heatNo ..... ヒートNo
+    //　　　　　:　sokuban ..... 束番
     //　戻り値　:　[void] ..... なし
-    //=================================
+    //============================================================
     public void updateSyougo(String heatNo, String sokuban) {
 
         // Workテーブルから該当1件を取得
@@ -174,11 +174,11 @@ public class VanningCollationController {
         refreshDisplayRows();
     }
 
-    //====================================
+    //============================================================
     //　機　能　:　照合済件数を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 照合済件数
-    //====================================
+    //============================================================
     public int getSyougouSumiCount() {
 
         int count = 0;
@@ -193,11 +193,11 @@ public class VanningCollationController {
         return count;
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　未照合件数を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 未照合件数
-    //==================================
+    //============================================================
     public int getUncollatedCount() {
 
         int count = 0;
@@ -212,11 +212,11 @@ public class VanningCollationController {
         return count;
     }
 
-    //==========================================================
+    //============================================================
     //　機　能　:　コンテナを照合済として更新する
-    //　引　数　:　kakuninContainerDao ..... KakuninContainerDao
+    //　引　数　:　kakuninContainerDao ..... データアクセスオブジェクト
     //　戻り値　:　[void] ..... なし
-    //==========================================================
+    //============================================================
     public void markContainerCollated(@NonNull KakuninContainerDao kakuninContainerDao) {
 
         // 明細が無ければ何もしない
@@ -250,11 +250,11 @@ public class VanningCollationController {
         kakuninContainerDao.upsert(container);
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　表示用行データを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==============================
+    //============================================================
     private void refreshDisplayRows() {
 
         // 一旦クリアして作り直す
@@ -282,11 +282,11 @@ public class VanningCollationController {
         }
     }
 
-    //=====================================================
+    //============================================================
     //　機　能　:　t_KAKUNIN_MEISAIto W_KAKUNIN_MEISAIを設定する
-    //　引　数　:　containerId ..... String
+    //　引　数　:　containerId ..... ID
     //　戻り値　:　[void] ..... なし
-    //=====================================================
+    //============================================================
     private void setT_KAKUNIN_MEISAItoW_KAKUNIN_MEISAI(@NonNull String containerId) {
 
         // Workテーブルを一旦全削除（コンテナ切替時のゴミを残さない）
@@ -301,11 +301,11 @@ public class VanningCollationController {
         }
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　W_KAKUNIN_MEISAIを一覧へ読み込む
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     private void readW_KAKUNIN_MEISAItoList() {
 
         // 保持中の明細をクリアして、Workの最新を読込
@@ -313,11 +313,11 @@ public class VanningCollationController {
         details.addAll(kakuninMeisaiWorkDao.findAllOrdered());
     }
 
-    //===============================================
+    //============================================================
     //　機　能　:　ワークエンティティへ変換する
-    //　引　数　:　entity ..... KakuninMeisaiEntity
+    //　引　数　:　entity ..... エンティティ情報
     //　戻り値　:　[KakuninMeisaiWorkEntity] ..... WorkEntity
-    //===============================================
+    //============================================================
     private KakuninMeisaiWorkEntity toWorkEntity(KakuninMeisaiEntity entity) {
 
         // TのEntityをWorkにコピー（照合状態の更新はWork側で行う）
@@ -348,30 +348,30 @@ public class VanningCollationController {
         return work;
     }
 
-    //===============================
+    //============================================================
     //　機　能　:　null安全な文字列へ変換する
-    //　引　数　:　value ..... String
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... nullなら空文字、非nullはそのまま
-    //===============================
+    //============================================================
     private String safeStr(String value) {
         return value == null ? "" : value;
     }
 
-    //===============================
+    //============================================================
     //　機　能　:　空文字かどうか判定する
-    //　引　数　:　value ..... String
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[boolean] ..... true:空/空白、false:それ以外
-    //===============================
+    //============================================================
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
 
-    //==============================
+    //============================================================
     //　機　能　:　指定文字列を繰り返して作成する
-    //　引　数　:　s ..... String
-    //　　　　　:　n ..... int
+    //　引　数　:　s ..... 文字列
+    //　　　　　:　n ..... 数値
     //　戻り値　:　[String] ..... s を n回繰り返した文字列
-    //==============================
+    //============================================================
     private String repeat(String s, int n) {
 
         // 繰り返し回数が0以下の場合は空文字

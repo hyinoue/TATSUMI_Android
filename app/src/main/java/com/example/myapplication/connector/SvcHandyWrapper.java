@@ -15,7 +15,7 @@ import java.util.Locale;
 
 
 //============================================================
-//　処理概要　:　SvcHandyWrapperクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　getSagyouYmd ............................... 作業日取得（リトライ＋履歴）
 //　　　　　　:　getUpdateYmdHms ............................ 更新日時取得（リトライ＋履歴）
 //　　　　　　:　getSyukkaData .............................. 出荷データ取得（リトライ＋履歴）
@@ -49,40 +49,40 @@ public class SvcHandyWrapper implements Closeable {
     private final SimpleDateFormat logIdDateFormat =
             new SimpleDateFormat("yyyyMMdd", Locale.JAPAN);
 
-    //================================================================
+    //============================================================
     //　機　能　:　SvcHandyWrapperを初期化する（デフォルト）
     //　引　数　:　なし
     //　戻り値　:　[SvcHandyWrapper] ..... なし
-    //================================================================
+    //============================================================
     public SvcHandyWrapper() {
         this(new SvcHandyRepository(), null);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　SvcHandyWrapperを初期化する（リポジトリ指定）
-    //　引　数　:　repository ..... SvcHandyRepository
+    //　引　数　:　repository ..... 通信リポジトリ
     //　戻り値　:　[SvcHandyWrapper] ..... なし
-    //================================================================
+    //============================================================
     public SvcHandyWrapper(SvcHandyRepository repository) {
         this(repository, null);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　SvcHandyWrapperを初期化する（リポジトリ＋履歴DAO指定）
-    //　引　数　:　repository ..... SvcHandyRepository
-    //　　　　　:　commHistoryDao ..... CommHistoryDao
+    //　引　数　:　repository ..... 通信リポジトリ
+    //　　　　　:　commHistoryDao ..... データアクセスオブジェクト
     //　戻り値　:　[SvcHandyWrapper] ..... なし
-    //================================================================
+    //============================================================
     public SvcHandyWrapper(SvcHandyRepository repository, CommHistoryDao commHistoryDao) {
         this.repository = repository;
         this.commHistoryDao = commHistoryDao;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　作業日を取得する（リトライし、履歴を保存する）
     //　引　数　:　なし
     //　戻り値　:　[Date] ..... 作業日
-    //================================================================
+    //============================================================
     public Date getSagyouYmd() throws Exception {
         CommHistoryRow history = getHistoryRow("getSagyouYmd");
         Exception lastException = null;
@@ -114,11 +114,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データ更新日時を取得する（リトライし、履歴を保存する）
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[Date] ..... 更新日時
-    //================================================================
+    //============================================================
     public Date getUpdateYmdHms(Date sagyouYmd) throws Exception {
         CommHistoryRow history = getHistoryRow("getUpdateYmdHms");
         history.argument = String.valueOf(sagyouYmd);
@@ -145,11 +145,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データを取得する（リトライし、履歴を保存する）
-    //　引　数　:　sagyouYmd ..... Date
+    //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[SyukkaData] ..... 出荷データ
-    //================================================================
+    //============================================================
     public SyukkaData getSyukkaData(Date sagyouYmd) throws Exception {
         CommHistoryRow history = getHistoryRow("getSyukkaData");
         history.argument = String.valueOf(sagyouYmd);
@@ -176,11 +176,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データを送信する（リトライし、履歴を保存する）
-    //　引　数　:　data ..... BunningData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
-    //================================================================
+    //============================================================
     public boolean sendSyukkaData(BunningData data) throws Exception {
         CommHistoryRow history = getHistoryRow("sendSyukkaData");
         Exception lastException = null;
@@ -206,11 +206,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　照合データを取得する（リトライし、履歴を保存する）
     //　引　数　:　なし
     //　戻り値　:　[SyougoData] ..... 照合データ
-    //================================================================
+    //============================================================
     public SyougoData getSyougoData() throws Exception {
         CommHistoryRow history = getHistoryRow("getSyougoData");
         Exception lastException = null;
@@ -236,11 +236,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　照合データを送信する（リトライし、履歴を保存する）
-    //　引　数　:　data ..... CollateData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
-    //================================================================
+    //============================================================
     public boolean sendSyougoData(CollateData data) throws Exception {
         CommHistoryRow history = getHistoryRow("sendSyougoData");
         Exception lastException = null;
@@ -266,12 +266,12 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　バイナリファイルを送信する（リトライし、履歴を保存する）
-    //　引　数　:　fileName ..... String
-    //　　　　　:　buffer ..... byte[]
+    //　引　数　:　fileName ..... ファイル関連情報
+    //　　　　　:　buffer ..... 文字列バッファ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
-    //================================================================
+    //============================================================
     public boolean uploadBinaryFile(String fileName, byte[] buffer) throws Exception {
         CommHistoryRow history = getHistoryRow("uploadBinaryFile");
         history.argument = fileName;
@@ -298,11 +298,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　実行ファイル名一覧を取得する（リトライし、履歴を保存する）
     //　引　数　:　なし
     //　戻り値　:　[String[]] ..... 実行ファイル名一覧
-    //================================================================
+    //============================================================
     public String[] getDownloadHandyExecuteFileNames() throws Exception {
         CommHistoryRow history = getHistoryRow("getDownloadHandyExecuteFileNames");
         Exception lastException = null;
@@ -331,11 +331,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　実行ファイルを取得する（リトライし、履歴を保存する）
-    //　引　数　:　fileName ..... String
+    //　引　数　:　fileName ..... ファイル関連情報
     //　戻り値　:　[byte[]] ..... ファイルデータ
-    //================================================================
+    //============================================================
     public byte[] getDownloadHandyExecuteFile(String fileName) throws Exception {
         CommHistoryRow history = getHistoryRow("getDownloadHandyExecuteFile");
         history.argument = fileName;
@@ -365,11 +365,11 @@ public class SvcHandyWrapper implements Closeable {
         }
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　履歴行（作業領域）を生成する
-    //　引　数　:　procName ..... String
+    //　引　数　:　procName ..... 名称
     //　戻り値　:　[CommHistoryRow] ..... 履歴行
-    //================================================================
+    //============================================================
     private CommHistoryRow getHistoryRow(String procName) {
         CommHistoryRow row = new CommHistoryRow();
         row.startYmdhms = new Date();
@@ -377,11 +377,11 @@ public class SvcHandyWrapper implements Closeable {
         return row;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　履歴行をDBへ保存する
-    //　引　数　:　history ..... CommHistoryRow
+    //　引　数　:　history ..... 通信履歴情報
     //　戻り値　:　[void] ..... なし
-    //================================================================
+    //============================================================
     private void saveHistoryRow(CommHistoryRow history) {
         // DAO未指定（履歴不要運用）の場合は何もしない
         if (commHistoryDao == null || history == null) {
@@ -409,12 +409,12 @@ public class SvcHandyWrapper implements Closeable {
         commHistoryDao.upsert(entity);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　履歴行へエラー情報を設定する
-    //　引　数　:　history ..... CommHistoryRow
-    //　　　　　:　exception ..... Exception
+    //　引　数　:　history ..... 通信履歴情報
+    //　　　　　:　exception ..... 例外情報
     //　戻り値　:　[void] ..... なし
-    //================================================================
+    //============================================================
     private void setErrorInfo(CommHistoryRow history, Exception exception) {
         if (history == null || exception == null) {
             return;
@@ -422,11 +422,11 @@ public class SvcHandyWrapper implements Closeable {
         history.errorDescription = exception.getMessage();
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　DateをDB用日時文字列へ整形する
-    //　引　数　:　value ..... Date
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... DB用日時文字列
-    //================================================================
+    //============================================================
     private String formatDbDate(Date value) {
         if (value == null) {
             return null;
@@ -434,21 +434,21 @@ public class SvcHandyWrapper implements Closeable {
         return DateTimeFormatUtil.formatDbYmdHms(value);
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　nullを空文字へ変換する
-    //　引　数　:　value ..... String
+    //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... nullの場合は空文字
-    //================================================================
+    //============================================================
     private String nullSafe(String value) {
         return value == null ? "" : value;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　文字列を最大長で切り詰める
-    //　引　数　:　value ..... String
-    //　　　　　:　maxLength ..... int
+    //　引　数　:　value ..... 設定値
+    //　　　　　:　maxLength ..... 件数
     //　戻り値　:　[String] ..... 切り詰め後文字列（valueがnullならnull）
-    //================================================================
+    //============================================================
     private String trimToLength(String value, int maxLength) {
         if (value == null) {
             return null;
@@ -459,11 +459,11 @@ public class SvcHandyWrapper implements Closeable {
         return value;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　ログIDを採番する（yyyyMMdd + 3桁連番）
-    //　引　数　:　startDate ..... Date
+    //　引　数　:　startDate ..... 日時
     //　戻り値　:　[String] ..... ログID
-    //================================================================
+    //============================================================
     private String createLogId(Date startDate) {
         synchronized (LOG_ID_LOCK) {
             // 基準日はstartDate優先（nullなら現在時刻）
@@ -499,11 +499,11 @@ public class SvcHandyWrapper implements Closeable {
         private String errorDescription;
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　closeの処理（将来拡張用：現状はクローズ対象なし）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================================================
+    //============================================================
     @Override
     public void close() {
         // no-op（現状クローズ対象のリソースなし）

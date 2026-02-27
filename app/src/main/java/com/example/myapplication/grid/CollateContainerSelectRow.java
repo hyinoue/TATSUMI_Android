@@ -1,7 +1,7 @@
 package com.example.myapplication.grid;
 
 //============================================================
-//　処理概要　:　共通関数
+//　処理概要　:　一覧表示データの制御を行うクラス
 //　関　　数　:　CollateContainerSelectRow ..... 照合対象コンテナ一覧の表示行データ
 //============================================================
 public class CollateContainerSelectRow {
@@ -12,14 +12,14 @@ public class CollateContainerSelectRow {
     public final String bundleCnt; // 束数
     public final String sagyouYmd; // 作業日時
 
-    //===========================================
+    //============================================================
     //　機　能　:　CollateContainerSelectRowの初期化処理
-    //　引　数　:　index ..... String
-    //　　　　　:　containerNo ..... String
-    //　　　　　:　bundleCnt ..... String
-    //　　　　　:　sagyouYmd ..... String
+    //　引　数　:　index ..... 位置番号
+    //　　　　　:　containerNo ..... コンテナ番号
+    //　　　　　:　bundleCnt ..... バンドル本数
+    //　　　　　:　sagyouYmd ..... 日時
     //　戻り値　:　[CollateContainerSelectRow] ..... なし
-    //===========================================
+    //============================================================
     public CollateContainerSelectRow(String index,
                                      String containerNo,
                                      String bundleCnt,

@@ -11,7 +11,7 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
-//==================================================================================
+//============================================================
 //　処理概要　:　カメラ設定画面（Activity）
 //　　　　　　:　撮影解像度・フラッシュ・光源モードをSpinnerで選択し、
 //　　　　　　:　AppSettingsへ保存する。
@@ -26,7 +26,7 @@ import java.util.List;
 //　　　　　　:　onFunctionYellow ......... 終了（キャンセル→RESULT_CANCELED）
 //　　　　　　:　getSelectedValue ......... Spinnerの選択値（Option.value）取得
 //　クラス　　:　Option ................... Spinner表示用の選択肢（value/label）
-//==================================================================================
+//============================================================
 
 public class CameraSettingActivity extends BaseActivity {
 
@@ -55,11 +55,11 @@ public class CameraSettingActivity extends BaseActivity {
     private List<Option> flashOptions; // フラッシュ選択肢
     private List<Option> lightOptions; // 露出補正選択肢
 
-    //============================================
+    //============================================================
     //　機　能　:　画面生成時の初期化処理
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,12 +95,12 @@ public class CameraSettingActivity extends BaseActivity {
         setupBottomButtonTexts();
     }
 
-    //=======================================
+    //============================================================
     //　機　能　:　スピナー部品を関連付ける
-    //　引　数　:　spinner ..... Spinner
-    //　　　　　:　options ..... List<Option>
+    //　引　数　:　spinner ..... スピナー
+    //　　　　　:　options ..... 選択肢一覧
     //　戻り値　:　[void] ..... なし
-    //=======================================
+    //============================================================
     private void bindSpinner(Spinner spinner, List<Option> options) {
         // Option.toString()（label）を表示するAdapterを作成
         ArrayAdapter<Option> adapter = new ArrayAdapter<>(
@@ -114,13 +114,13 @@ public class CameraSettingActivity extends BaseActivity {
         spinner.setAdapter(adapter);
     }
 
-    //=======================================
+    //============================================================
     //　機　能　:　スピナーの選択値を設定する
-    //　引　数　:　spinner ..... Spinner
-    //　　　　　:　options ..... List<Option>
-    //　　　　　:　value ..... int
+    //　引　数　:　spinner ..... スピナー
+    //　　　　　:　options ..... 選択肢一覧
+    //　　　　　:　value ..... 設定値
     //　戻り値　:　[void] ..... なし
-    //=======================================
+    //============================================================
     private void setSpinnerSelection(Spinner spinner, List<Option> options, int value) {
         // 設定値と一致するOptionを探し、その位置を選択する
         int index = 0;
@@ -133,11 +133,11 @@ public class CameraSettingActivity extends BaseActivity {
         spinner.setSelection(index);
     }
 
-    //==============================================
+    //============================================================
     //　機　能　:　サイズ選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 解像度選択肢一覧
-    //==============================================
+    //============================================================
     private List<Option> buildSizeOptions() {
         // 解像度（表示文言はユーザー向け）
         List<Option> options = new ArrayList<>();
@@ -150,11 +150,11 @@ public class CameraSettingActivity extends BaseActivity {
         return options;
     }
 
-    //==================================================
+    //============================================================
     //　機　能　:　フラッシュ選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... フラッシュ選択肢一覧
-    //==================================================
+    //============================================================
     private List<Option> buildFlashOptions() {
         // フラッシュ設定
         List<Option> options = new ArrayList<>();
@@ -164,11 +164,11 @@ public class CameraSettingActivity extends BaseActivity {
         return options;
     }
 
-    //==================================================
+    //============================================================
     //　機　能　:　照明選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 光源モード選択肢一覧
-    //==================================================
+    //============================================================
     private List<Option> buildLightOptions() {
         // 光源（ホワイトバランス想定）
         List<Option> options = new ArrayList<>();
@@ -180,11 +180,11 @@ public class CameraSettingActivity extends BaseActivity {
         return options;
     }
 
-    //=====================================
+    //============================================================
     //　機　能　:　下部ボタンの表示文言を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //============================================================
     private void setupBottomButtonTexts() {
         // 下部ボタン取得
         MaterialButton blue = findViewById(R.id.btnBottomBlue);
@@ -198,11 +198,11 @@ public class CameraSettingActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //================================
+    //============================================================
     //　機　能　:　青ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     @Override
     protected void onFunctionBlue() {
         // Spinnerの選択値をAppSettingsへ反映
@@ -218,11 +218,11 @@ public class CameraSettingActivity extends BaseActivity {
         finish();
     }
 
-    //==================================
+    //============================================================
     //　機　能　:　黄ボタン押下時の処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 変更を保存せず終了
@@ -230,11 +230,11 @@ public class CameraSettingActivity extends BaseActivity {
         finish();
     }
 
-    //================================================
+    //============================================================
     //　機　能　:　選択値を取得する
-    //　引　数　:　spinner ..... Spinner
+    //　引　数　:　spinner ..... スピナー
     //　戻り値　:　[int] ..... Option.value（未取得時は0）
-    //================================================
+    //============================================================
     private int getSelectedValue(Spinner spinner) {
         // Spinnerの選択項目からOption.valueを取り出す
         Object item = spinner.getSelectedItem();
@@ -244,30 +244,30 @@ public class CameraSettingActivity extends BaseActivity {
         return 0;
     }
 
-    //======================================================================
+    //============================================================
     //　処理概要　:　Spinner表示用の選択肢クラス
     //　　　　　　:　value（内部値）とlabel（表示名）を保持し、toStringでlabelを返す
-    //======================================================================
+    //============================================================
     private static final class Option {
         private final int value;
         private final String label;
 
-        //===============================
+        //============================================================
         //　機　能　:　オプションの初期化処理
-        //　引　数　:　value ..... int
-        //　　　　　:　label ..... String
+        //　引　数　:　value ..... 設定値
+        //　　　　　:　label ..... 表示ラベル
         //　戻り値　:　[Option] ..... なし
-        //===============================
+        //============================================================
         private Option(int value, String label) {
             this.value = value;
             this.label = label;
         }
 
-        //==================================================
+        //============================================================
         //　機　能　:　表示文字列へ変換する
         //　引　数　:　なし
         //　戻り値　:　[String] ..... Spinner表示用文字列（label）
-        //==================================================
+        //============================================================
         @Override
         public String toString() {
             return label;

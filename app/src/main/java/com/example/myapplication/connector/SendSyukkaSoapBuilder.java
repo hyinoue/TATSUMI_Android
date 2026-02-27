@@ -8,27 +8,27 @@ import com.example.myapplication.time.XmlUtil;
 
 
 //============================================================
-//　処理概要　:　SendSyukkaSoapBuilderクラス
+//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
 //　関　　数　:　buildSendSyukkaData ..... SendSyukkaData用SOAPボディ生成
 //============================================================
 public class SendSyukkaSoapBuilder {
 
     private static final String NS = "http://tempuri.org/";
 
-    //================================================================
+    //============================================================
     //　機　能　:　SendSyukkaSoapBuilderの生成を禁止する（ユーティリティクラス化）
     //　引　数　:　なし
     //　戻り値　:　[SendSyukkaSoapBuilder] ..... なし
-    //================================================================
+    //============================================================
     private SendSyukkaSoapBuilder() {
         // static専用クラスのためインスタンス化させない
     }
 
-    //================================================================
+    //============================================================
     //　機　能　:　出荷データ送信用（SendSyukkaData）のSOAPメッセージを生成する
-    //　引　数　:　data ..... BunningData
+    //　引　数　:　data ..... データ
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //================================================================
+    //============================================================
     public static String buildSendSyukkaData(BunningData data) {
 
         // Body内に埋め込むXML文字列を構築する
@@ -47,9 +47,9 @@ public class SendSyukkaSoapBuilder {
         XmlUtil.tag(inner, "DunnageJyuryo", String.valueOf(data.dunnageJyuryo));
         XmlUtil.tag(inner, "SealNo", data.sealNo);
 
-        //========================
+        //============================================================
         // 明細配列：Bundles
-        //========================
+        //============================================================
         inner.append("<Bundles>");
 
         // 束（SyukkaMeisai）を1件ずつXMLへ変換
@@ -75,9 +75,9 @@ public class SendSyukkaSoapBuilder {
 
         inner.append("</Bundles>");
 
-        //========================
+        //============================================================
         // 画像（base64Binary）
-        //========================
+        //============================================================
 
         // コンテナ写真が存在する場合のみ出力
         if (data.containerPhoto != null && data.containerPhoto.length > 0) {

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//======================================================================================
+//============================================================
 //　処理概要　:　積込照合用のコンテナ選択画面（Activity）
 //　　　　　　:　DBからコンテナ一覧を取得して表示し、照合対象№入力で選択状態を更新する。
 //　　　　　　:　決定で次画面へ遷移、終了で画面を閉じる。
@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　validateAndSelect ....... 入力チェック＋選択確定
 //　　　　　　:　onDestroy ............... 終了処理（スレッド停止）
 //　クラス　　:　CollateContainerAdapter . 一覧表示用Adapter
-//======================================================================================
+//============================================================
 
 public class CollateContainerSelectActivity extends BaseActivity {
 
@@ -57,11 +57,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
     private CollateContainerAdapter adapter;             // 一覧アダプター
     private ExecutorService io;                          // I/O処理スレッド
 
-    //============================================
+    //============================================================
     //　機　能　:　画面表示時の初期化を行う
-    //　引　数　:　savedInstanceState ..... Bundle
+    //　引　数　:　savedInstanceState ..... 画面再生成時の保存状態
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,14 +85,14 @@ public class CollateContainerSelectActivity extends BaseActivity {
         RecyclerView rvBundles = findViewById(R.id.rvBundles);
         rvBundles.addItemDecoration(new RecyclerView.ItemDecoration() {
 
-            //===========================================
+            //============================================================
             //　機　能　:　一覧行の余白（オフセット）を設定する
-            //　引　数　:　outRect ..... Rect
-            //　　　　　:　view ..... View
-            //　　　　　:　parent ..... RecyclerView
-            //　　　　　:　state ..... RecyclerView.State
+            //　引　数　:　outRect ..... 余白情報
+            //　　　　　:　view ..... ビュー
+            //　　　　　:　parent ..... 親ビューグループ
+            //　　　　　:　state ..... RecyclerView状態
             //　戻り値　:　[void] ..... なし
-            //===========================================
+            //============================================================
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                        RecyclerView.State state) {
@@ -105,11 +105,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         });
     }
 
-    //==========================================
+    //============================================================
     //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==========================================
+    //============================================================
     private void bindViews() {
         // 照合対象№入力欄（※ID名は画面側の都合でetContainerKgになっている想定）
         etSelectedNo = findViewById(R.id.etContainerKg);
@@ -124,11 +124,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         btnYellow = findViewById(R.id.btnBottomYellow);
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　下部ボタンの表示内容と活性状態を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     private void setupBottomButtons() {
         // ボタン文言設定
         if (btnBlue != null) btnBlue.setText("決定");
@@ -140,11 +140,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //==================================================
+    //============================================================
     //　機　能　:　コンテナ一覧表示（RecyclerView）を初期化する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================================
+    //============================================================
     private void setupRecycler() {
         // Adapter作成
         adapter = new CollateContainerAdapter();
@@ -161,11 +161,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         });
     }
 
-    //============================================
+    //============================================================
     //　機　能　:　照合対象№入力欄の入力イベントを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================================
+    //============================================================
     private void setupInputHandlers() {
         if (etSelectedNo == null) return;
 
@@ -179,11 +179,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         });
     }
 
-    //================================================
+    //============================================================
     //　機　能　:　DBからコンテナ一覧を読み込み、画面に反映する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================================
+    //============================================================
     private void loadContainers() {
         // ローディング表示
         showLoadingShort();
@@ -219,11 +219,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         });
     }
 
-    //===============================================
+    //============================================================
     //　機　能　:　コンテナ一覧の有無に応じて画面状態を更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===============================================
+    //============================================================
     private void updateUiForContainers() {
         // 一覧が存在するか
         boolean hasContainers = controller != null && !controller.getContainers().isEmpty();
@@ -245,11 +245,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //===========================================
+    //============================================================
     //　機　能　:　入力された照合対象№の妥当性を確認する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===========================================
+    //============================================================
     private void handleSelectedNoInput() {
         if (controller == null) return;
 
@@ -283,11 +283,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         }
     }
 
-    //==================================================
+    //============================================================
     //　機　能　:　決定ボタン押下時に入力確認後、次画面へ遷移する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //==================================================
+    //============================================================
     @Override
     protected void onFunctionBlue() {
         // 入力チェック＋選択確定
@@ -307,42 +307,42 @@ public class CollateContainerSelectActivity extends BaseActivity {
         finish();
     }
 
-    //===================================
+    //============================================================
     //　機　能　:　赤ボタン押下時の処理（未使用）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //===================================
+    //============================================================
     @Override
     protected void onFunctionRed() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //=====================================
+    //============================================================
     //　機　能　:　緑ボタン押下時の処理（未使用）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=====================================
+    //============================================================
     @Override
     protected void onFunctionGreen() {
         // 今は空（ボタンTextが空なので実行されない想定）
     }
 
-    //======================================
+    //============================================================
     //　機　能　:　終了ボタン押下時に画面を閉じる
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //======================================
+    //============================================================
     @Override
     protected void onFunctionYellow() {
         // 終了
         finish();
     }
 
-    //===================================================
+    //============================================================
     //　機　能　:　入力値を検証し、照合対象コンテナの選択を確定する
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... True:選択成功、False:失敗
-    //===================================================
+    //============================================================
     private boolean validateAndSelect() {
         if (controller == null) return false;
 
@@ -379,11 +379,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
         return true;
     }
 
-    //================================
+    //============================================================
     //　機　能　:　画面終了時の後処理を行う
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //================================
+    //============================================================
     @Override
     protected void onDestroy() {
         // スレッド停止
@@ -399,11 +399,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
 
         private final List<CollateContainerSelectRow> rows = new ArrayList<>();
 
-        //========================================================
+        //============================================================
         //　機　能　:　一覧データを更新して再描画する
-        //　引　数　:　newRows ..... List<CollateContainerSelectRow>
+        //　引　数　:　newRows ..... 行データ
         //　戻り値　:　[void] ..... なし
-        //========================================================
+        //============================================================
         void submitList(List<CollateContainerSelectRow> newRows) {
             // データ入れ替え
             rows.clear();
@@ -413,12 +413,12 @@ public class CollateContainerSelectActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
-        //================================================
+        //============================================================
         //　機　能　:　一覧の行レイアウトを生成
-        //　引　数　:　parent ..... android.view.ViewGroup
-        //　　　　　:　viewType ..... int
+        //　引　数　:　parent ..... 親ビューグループ
+        //　　　　　:　viewType ..... ビュー種別
         //　戻り値　:　[ViewHolder] ..... 生成したViewHolder
-        //================================================
+        //============================================================
         @Override
         public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             // 行レイアウトを生成
@@ -427,12 +427,12 @@ public class CollateContainerSelectActivity extends BaseActivity {
             return new ViewHolder(view);
         }
 
-        //============================================
+        //============================================================
         //　機　能　:　指定行のデータを一覧へ表示する
-        //　引　数　:　holder ..... ViewHolder
-        //　　　　　:　position ..... int
+        //　引　数　:　holder ..... ビューホルダー
+        //　　　　　:　position ..... 表示位置
         //　戻り値　:　[void] ..... なし
-        //============================================
+        //============================================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             // 表示データ取得
@@ -445,11 +445,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             holder.tvSagyouYmd.setText(row.sagyouYmd);
         }
 
-        //================================
+        //============================================================
         //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
-        //================================
+        //============================================================
         @Override
         public int getItemCount() {
             return rows.size();
@@ -465,11 +465,11 @@ public class CollateContainerSelectActivity extends BaseActivity {
             final TextView tvBundleCnt;
             final TextView tvSagyouYmd;
 
-            //============================================
+            //============================================================
             //　機　能　:　行表示用ViewHolderを初期化する
-            //　引　数　:　itemView ..... android.view.View
+            //　引　数　:　itemView ..... 行ビュー
             //　戻り値　:　[void] ..... なし
-            //============================================
+            //============================================================
             ViewHolder(android.view.View itemView) {
                 super(itemView);
 
