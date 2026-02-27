@@ -168,9 +168,15 @@ public class DataSync {
         this.systemDao = db.systemDao();
 
         // 通信ラッパー（未指定の場合はデフォルト生成）
+        String endpointUrl = SvcHandyRepository.DEFAULT_ENDPOINT;
+        SystemEntity system = this.systemDao.findById(SYSTEM_RENBAN);
+        if (system != null && system.webSvcUrl != null && !system.webSvcUrl.trim().isEmpty()) {
+            endpointUrl = system.webSvcUrl;
+        }
+
         this.svcWrapper = svcWrapper != null
                 ? svcWrapper
-                : new SvcHandyWrapper(new SvcHandyRepository(), this.commHistoryDao);
+                : new SvcHandyWrapper(new SvcHandyRepository(endpointUrl), this.commHistoryDao);
 
         // 画像保存先ディレクトリ
         this.imageDir = resolveImageDir(context);

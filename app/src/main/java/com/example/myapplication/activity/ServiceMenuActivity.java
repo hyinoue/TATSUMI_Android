@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.myapplication.R;
+import com.example.myapplication.connector.SvcHandyRepository;
 import com.example.myapplication.connector.SvcHandyWrapper;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.dao.KakuninContainerDao;
@@ -21,6 +22,7 @@ import com.example.myapplication.db.dao.SyukkaContainerDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.dao.YoteiDao;
+import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.log.FileLogger;
 import com.example.myapplication.time.DateTimeFormatUtil;
 import com.google.android.material.button.MaterialButton;
@@ -334,7 +336,7 @@ public class ServiceMenuActivity extends BaseActivity {
 
         // 送信処理は別スレッドで実行
         io.execute(() -> {
-            try (SvcHandyWrapper svc = new SvcHandyWrapper()) {
+            try (SvcHandyWrapper svc = new SvcHandyWrapper(resolveRepositoryWithCurrentEndpoint())) {
 
                 // DBファイルを取得
                 File dbFile = getDatabasePath(AppDatabase.DB_NAME);
@@ -377,6 +379,23 @@ public class ServiceMenuActivity extends BaseActivity {
                 isMaintenanceSendRunning.set(false);
             }
         });
+    }
+
+    //============================================================
+    //　機　能　:　現在のシステム設定から通信リポジトリを生成する
+    //　引　数　:　なし
+    //　戻り値　:　[SvcHandyRepository] ..... 接続先反映済みリポジトリ
+    //============================================================
+    private SvcHandyRepository resolveRepositoryWithCurrentEndpoint() {
+        String endpointUrl = SvcHandyRepository.DEFAULT_ENDPOINT;
+
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        SystemEntity system = db.systemDao().findById(SYSTEM_RENBAN);
+        if (system != null && system.webSvcUrl != null && !system.webSvcUrl.trim().isEmpty()) {
+            endpointUrl = system.webSvcUrl;
+        }
+
+        return new SvcHandyRepository(endpointUrl);
     }
 
     //============================================================
