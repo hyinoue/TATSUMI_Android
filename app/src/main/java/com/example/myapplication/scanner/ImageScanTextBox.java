@@ -27,9 +27,6 @@ import androidx.appcompat.widget.AppCompatEditText;
 //　　　　　　:　findActivity ..... ContextからActivityを探索
 //============================================================
 
-//====================================
-//　処理概要　:　ImageScanTextBoxクラス
-//====================================
 public class ImageScanTextBox extends AppCompatEditText {
 
     private int minLength = 0; // 最小文字数
@@ -103,7 +100,7 @@ public class ImageScanTextBox extends AppCompatEditText {
         destroyScanner();
         super.onDetachedFromWindow();
     }
-    
+
 
     //=================================================
     //　機　能　:　スキャナを利用可能状態にする

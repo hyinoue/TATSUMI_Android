@@ -11,9 +11,6 @@ import com.example.myapplication.log.FileLogger;
 //　　　　　　:　onCreate ..... アプリ起動時の初期化処理
 //============================================================
 
-//====================================
-//　処理概要　:　MyApplicationクラス
-//====================================
 public class MyApplication extends Application {
 
     //========================================
