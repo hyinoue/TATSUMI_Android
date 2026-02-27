@@ -564,6 +564,20 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
+    //　機　能　:　キーイベントを画面全体で先に制御する
+    //　引　数　:　event ..... イベント情報
+    //　戻り値　:　[boolean] ..... なし
+    //============================================================
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_SPACE) {
+            // フォーカス中Viewに渡る前に無効化し、Enter相当のクリック変換を防ぐ
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    //============================================================
     //　機　能　:　キー押下時の処理
     //　引　数　:　keyCode ..... キー値
     //　　　　　:　event ..... イベント情報
@@ -575,6 +589,10 @@ public class MenuActivity extends BaseActivity {
         if (event.getRepeatCount() > 0) return true;
 
         switch (keyCode) {
+            case KeyEvent.KEYCODE_SPACE:
+                // スペースキーはフォーカス中Viewのクリックに変換されるため無効化
+                return true;
+
             case KeyEvent.KEYCODE_0:
                 // 0キー：サービスメニューへ
                 goServiceMenu();

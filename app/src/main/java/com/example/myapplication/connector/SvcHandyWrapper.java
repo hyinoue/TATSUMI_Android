@@ -50,15 +50,6 @@ public class SvcHandyWrapper implements Closeable {
             new SimpleDateFormat("yyyyMMdd", Locale.JAPAN);
 
     //============================================================
-    //　機　能　:　SvcHandyWrapperを初期化する（デフォルト）
-    //　引　数　:　なし
-    //　戻り値　:　[SvcHandyWrapper] ..... なし
-    //============================================================
-    public SvcHandyWrapper() {
-        this(new SvcHandyRepository(), null);
-    }
-
-    //============================================================
     //　機　能　:　SvcHandyWrapperを初期化する（リポジトリ指定）
     //　引　数　:　repository ..... 通信リポジトリ
     //　戻り値　:　[SvcHandyWrapper] ..... なし

@@ -98,6 +98,7 @@
                 android:background="@drawable/bg_text_input"
                 android:gravity="start|center_vertical"
                 android:inputType="textCapCharacters"
+                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:maxLength="3"
                 android:textSize="14sp"
                 android:padding="4dp"
