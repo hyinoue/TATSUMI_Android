@@ -674,7 +674,7 @@ public class VanningCollationActivity extends BaseActivity {
 
 
     //================================================================
-    //　機　能　:　一覧表示用Adapter(内部クラス)
+    //　機　能　:　一覧表示用アダプター(内部クラス)
     //　引　数　:　なし
     //　戻り値　:　[なし]
     //================================================================
@@ -696,7 +696,7 @@ public class VanningCollationActivity extends BaseActivity {
         }
 
         //================================================================
-        //　機　能　:　ViewHolder生成
+        //　機　能　:　一覧の1行分のレイアウトを生成
         //　引　数　:　parent ..... 親ViewGroup
         //　　　　　:　viewType ... View種別
         //　戻り値　:　[ViewHolder] ..... 生成したViewHolder
@@ -744,7 +744,7 @@ public class VanningCollationActivity extends BaseActivity {
             final TextView tvConfirmed;
 
             //================================================================
-            //　機　能　:　ViewHolder生成(行View内の部品取得)
+            //　機　能　:　行内の表示部品を取得して保持
             //　引　数　:　itemView ..... 行View
             //　戻り値　:　[void]
             //================================================================

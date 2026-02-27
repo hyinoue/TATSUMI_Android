@@ -16,9 +16,6 @@ import com.densowave.bhtsdk.barcode.OutputSettings;
 //　　　　　　:　ImagerTestActivityBridge ..... Receiver→Activity橋渡し用の内部Action/Extra定義
 //============================================================
 
-//==================================
-//　処理概要　:　DensoScanReceiverクラス
-//==================================
 public class DensoScanReceiver extends BroadcastReceiver {
 
     public static final String TAG = "DensoScanReceiver"; // ログタグ
@@ -80,7 +77,7 @@ public class DensoScanReceiver extends BroadcastReceiver {
 
     /**
      * Activity側で使う内部Action/Extra定義（Receiver→Activity橋渡し）
-     * ※別ファイルにしたくなければ Activity側に同じ定数を置いてもOKです
+     * ※別ファイルにしたくなければ Activity側に同じ定数を置いてもOK
      */
     public static class ImagerTestActivityBridge {
 

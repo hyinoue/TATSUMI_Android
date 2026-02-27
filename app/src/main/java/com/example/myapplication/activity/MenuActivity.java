@@ -164,7 +164,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　activity Launchersを設定する
+    //　機　能　:　別画面入力データ同期＆画面更新
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //====================================
@@ -253,7 +253,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //========================================
-    //　機　能　:　container Size Spinnerを設定する
+    //　機　能　:　コンテナサイズのスピナーを設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
@@ -316,7 +316,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　wire Actionsの処理
+    //　機　能　:　各ボタンにクリック処理を設定する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -358,7 +358,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　on Restart Menuの処理
+    //　機　能　:　再起動（終了）の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -417,7 +417,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　go Service Menuの処理
+    //　機　能　:　サービスメニュー遷移の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -426,7 +426,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================
-    //　機　能　:　bundle Selectを開く
+    //　機　能　:　積載束選定画面を開く
     //　引　数　:　mode ..... String
     //　戻り値　:　[void] ..... なし
     //==============================
@@ -446,12 +446,12 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================================
-    //　機　能　:　container Values From Bundleを同期する
+    //　機　能　:　重量の値を同期する（束選定画面）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
     private void syncContainerValuesFromBundle() {
-        // 束選定で入力した重量（コンテナ重量/緩衝材重量）をコンテナ入力側へ反映する
+        // 束選定で入力した重量（コンテナ重量/ダンネージ重量）をコンテナ入力側へ反映する
         if (bundleValues.containsKey(KEY_CONTAINER_JYURYO)) {
             containerValues.put(KEY_CONTAINER_JYURYO, bundleValues.get(KEY_CONTAINER_JYURYO));
         } else {
@@ -467,7 +467,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================================
-    //　機　能　:　bundle Values From Containerを同期する
+    //　機　能　:　重量の値を同期する（コンテナ入力画面）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
@@ -485,7 +485,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================================
-    //　機　能　:　container Weights From Prefsを同期する
+    //　機　能　:　重量の値を同期する（アプリ専用保存ストレージ）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
@@ -507,7 +507,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //==============================================
-    //　機　能　:　container Input If Work Existsを開く
+    //　機　能　:　作業データが存在する場合のみコンテナ入力画面へ遷移する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //==============================================
@@ -555,7 +555,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //========================================
-    //　機　能　:　collate Container Selectを開く
+    //　機　能　:　コンテナ情報入力画面を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //========================================
@@ -611,7 +611,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //===============================
-    //　機　能　:　center Statusを設定する
+    //　機　能　:　中央ステータス表示の文字を設定する
     //　引　数　:　text ..... String
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -620,7 +620,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　data Syncを開始する
+    //　機　能　:　データ送受信を開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -638,7 +638,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　run Data Syncの処理
+    //　機　能　:　データ送受信の処理
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -686,7 +686,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　data Syncのエラー表示
+    //　機　能　:　データ送受信のエラー表示
     //　引　数　:　message ..... String
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -731,7 +731,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //=============================
-    //　機　能　:　informationを更新する
+    //　機　能　:　画面情報を更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=============================
@@ -848,7 +848,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //================================
-    //　機　能　:　int Or Zeroの処理
+    //　機　能　:　Null→0の処理
     //　引　数　:　value ..... Integer
     //　戻り値　:　[long] ..... なし
     //================================
@@ -878,7 +878,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================
-    //　機　能　:　String Mapを取り出す
+    //　機　能　:　画面遷移で渡されたデータを安全に取り出して整形する処理
     //　引　数　:　data ..... Intent
     //　　　　　:　key ..... String
     //　戻り値　:　[Map<String, String>] ..... Map

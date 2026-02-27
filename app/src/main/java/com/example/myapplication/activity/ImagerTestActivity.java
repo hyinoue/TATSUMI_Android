@@ -96,7 +96,7 @@ public class ImagerTestActivity extends BaseActivity {
                 this,
 
                 //===============================
-                // Scan結果受け取り
+                // スキャン結果受け取り
                 //===============================
                 new OnScanListener() {
                     @Override

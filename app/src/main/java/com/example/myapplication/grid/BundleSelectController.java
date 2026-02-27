@@ -7,8 +7,8 @@ import com.example.myapplication.db.dao.SyukkaMeisaiDao;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
-import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.model.BundleInfo;
+import com.example.myapplication.time.DateTimeFormatUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -152,7 +152,7 @@ public class BundleSelectController {
         // DBの重量（nullは0扱い）
         int jyuryo = (e.jyuryo == null) ? 0 : e.jyuryo;
 
-        // 重量超過チェック（保持中重量 + 容器 + 当て木 + 対象Bundle）
+        // 重量超過チェック（保持中重量 + コンテナ + ダンネージ + 対象Bundle）
         int tmpWt = getJyuryoSum() + containerJyuryo + dunnageJyuryo + jyuryo;
         if (tmpWt > maxContainerJyuryo) {
             return "積載重量を超過します";

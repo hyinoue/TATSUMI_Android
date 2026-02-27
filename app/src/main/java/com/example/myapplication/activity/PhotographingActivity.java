@@ -237,7 +237,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　cameraを開始する
+    //　機　能　:　カメラを開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -564,7 +564,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　captureを保存する
+    //　機　能　:　キャプチャーを保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -681,7 +681,7 @@ public class PhotographingActivity extends BaseActivity {
     }
 
     //=================================
-    //　機　能　:　statusを設定する
+    //　機　能　:　ステータスを設定する
     //　引　数　:　message ..... String
     //　戻り値　:　[void] ..... なし
     //=================================

@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//======================================================================================
 //　処理概要　:　積載束選択／重量計算 画面Activity
 //　　　　　　:　束(現品番号)の追加/削除、重量の合計/残量計算を行う。
 //　　　　　　:　スキャナは「etGenpinNoフォーカス中のみ Code39 を許可」し、
@@ -81,7 +81,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　dispatchKeyEvent ......... SCANキー等をスキャナへ委譲
 //　　　　　　:　saveBundleInputValues .... 重量入力をbundleValuesへ保存
 //　クラス　　:　BundleRowAdapter .......... 一覧表示Adapter（削除クリック対応）
-//============================================================
+//========================================================================================
 
 public class BundleSelectActivity extends BaseActivity {
 
@@ -179,11 +179,11 @@ public class BundleSelectActivity extends BaseActivity {
         });
     }
 
-    //============================
+    //==========================================
     //　機　能　:　画面部品を取得してメンバーに保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==========================================
     private void bindViews() {
         etContainerKg = findViewById(R.id.etContainerKg);
         etDunnageKg = findViewById(R.id.etDunnageKg);
@@ -195,11 +195,11 @@ public class BundleSelectActivity extends BaseActivity {
         rvBundles = findViewById(R.id.rvBundles);
     }
 
-    //===============================
-    //　機　能　:　modeを設定する
+    //===========================================
+    //　機　能　:　画面のモードを設定する（束選定/重量計算）
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
-    //===============================
+    //===========================================
     private void setupMode(@Nullable Intent intent) {
         // Extraから画面モードを判定
         String modeExtra = intent != null ? intent.getStringExtra(EXTRA_MODE) : null;
@@ -215,11 +215,11 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
-    //================================
+    //==================================
     //　機　能　:　束関連の引き継ぎ値を読み込む
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
-    //================================
+    //==================================
     private void loadBundleValues(@Nullable Intent intent) {
         if (intent == null) return;
 
@@ -238,11 +238,11 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
-    //====================================
+    //========================================
     //　機　能　:　コンテナ関連の引き継ぎ値を読み込む
     //　引　数　:　intent ..... Intent
     //　戻り値　:　[void] ..... なし
-    //====================================
+    //========================================
     private void loadContainerValues(@Nullable Intent intent) {
         if (intent == null) return;
 
@@ -261,11 +261,11 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
-    //============================
+    //==================================================
     //　機　能　:　scannerを初期化する（フォーカス中だけCode39）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //============================
+    //==================================================
     private void initScanner() {
         if (scannerCreated) return;
 
@@ -273,13 +273,13 @@ public class BundleSelectActivity extends BaseActivity {
         scanner = new DensoScannerController(
                 this,
                 new OnScanListener() {
-                    //=========================================
+                    //=================================================
                     //　機　能　:　scan結果受信時の処理
                     //　引　数　:　normalizedData ..... String（正規化済み）
                     //　　　　　:　aim ..... String（AIM識別子）
                     //　　　　　:　denso ..... String（DENSO識別子）
                     //　戻り値　:　[void] ..... なし
-                    //=========================================
+                    //=================================================
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
                         // スキャン結果を入力欄に反映し、同じ処理経路（handleGenpinInput）に流す
@@ -305,9 +305,9 @@ public class BundleSelectActivity extends BaseActivity {
                     }
 
                     //====================================================
-                    //　機　能　:　シンボロジープロファイルを取得する
+                    //　機　能　:　読み取り可否を制御する設定取得処理
                     //　引　数　:　なし
-                    //　戻り値　:　[SymbologyProfile] ..... 許可するシンボロジ
+                    //　戻り値　:　[SymbologyProfile] ..... 許可するバーコード種別
                     //====================================================
                     @NonNull
                     @Override
@@ -319,7 +319,7 @@ public class BundleSelectActivity extends BaseActivity {
                     }
 
                     //====================================================
-                    //　機　能　:　対象シンボロジが許可か判定する
+                    //　機　能　:　対象バーコードが読取許可か判定する
                     //　引　数　:　aim ..... String
                     //　　　　　:　denso ..... String
                     //　　　　　:　displayName ..... String
@@ -418,12 +418,12 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
-    //=====================================
+    //===========================================
     //　機　能　:　Enter操作か判定する
     //　引　数　:　actionId ..... int
     //　　　　　:　event ..... KeyEvent
     //　戻り値　:　[boolean] ..... True:Enter相当
-    //=====================================
+    //===========================================
     private boolean isEnterAction(int actionId, KeyEvent event) {
         return actionId == EditorInfo.IME_ACTION_NEXT
                 || actionId == EditorInfo.IME_ACTION_DONE
@@ -540,7 +540,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //===================================================
-    //　機　能　:　既定の緩衝材重量を取得する
+    //　機　能　:　既定のダンネージ重量を取得する
     //　引　数　:　system ..... SystemEntity
     //　戻り値　:　[int] ..... 既定ダンネージ重量
     //===================================================
@@ -563,7 +563,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　recyclerを設定する
+    //　機　能　:　一覧表示の初期設定
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -578,7 +578,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================
-    //　機　能　:　rowsを再表示する
+    //　機　能　:　行を再表示する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -670,7 +670,7 @@ public class BundleSelectActivity extends BaseActivity {
     };
 
     //=========================================
-    //　機　能　:　重量入力をPrefsへ保存する
+    //　機　能　:　重量入力を保持する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=========================================
@@ -829,11 +829,11 @@ public class BundleSelectActivity extends BaseActivity {
         finish();
     }
 
-    //========================================
-    //　機　能　:　bundleValues→containerValuesを同期する
+    //================================================
+    //　機　能　:　積載束選定→コンテナ入力での値の同期
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //========================================
+    //================================================
     private void syncContainerValuesFromBundle() {
         // bundleValuesの重量をcontainerValuesへ反映（空なら削除）
         String container = bundleValues.get(KEY_CONTAINER_JYURYO);
@@ -973,21 +973,21 @@ public class BundleSelectActivity extends BaseActivity {
         });
     }
 
-    //==================================
+    //======================================
     //　機　能　:　残重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 残量（最大-合計）
-    //==================================
+    //======================================
     private int getRemainingWeight() {
         int total = getTotalWeight();
         return maxContainerJyuryo - total;
     }
 
-    //============================
+    //================================
     //　機　能　:　総重量を取得する
     //　引　数　:　なし
     //　戻り値　:　[int] ..... 合計重量
-    //============================
+    //================================
     private int getTotalWeight() {
         // 束重量合計（controller側保持）
         int bundle = controller != null ? controller.getJyuryoSum() : 0;
@@ -1003,11 +1003,11 @@ public class BundleSelectActivity extends BaseActivity {
         return bundle + bundleCount + container + dunnage;
     }
 
-    //====================================
-    //　機　能　:　EditTextからint値を取得する
+    //==========================================
+    //　機　能　:　テキストからint値を取得する
     //　引　数　:　et ..... EditText
     //　戻り値　:　[int] ..... 数値（不正/未入力は0）
-    //====================================
+    //==========================================
     private int getIntValue(EditText et) {
         if (et == null) return 0;
 
@@ -1026,17 +1026,17 @@ public class BundleSelectActivity extends BaseActivity {
         }
     }
 
-    //===============================
+    //===============================================
     //　機　能　:　未入力/0を判定する
     //　引　数　:　et ..... EditText
     //　戻り値　:　[boolean] ..... True:未入力または0以下
-    //===============================
+    //===============================================
     private boolean isEmptyOrZero(EditText et) {
         return getIntValue(et) <= 0;
     }
 
     //===============================
-    //　機　能　:　footerを更新する
+    //　機　能　:　フッターを更新する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //===============================
@@ -1052,11 +1052,11 @@ public class BundleSelectActivity extends BaseActivity {
         if (tvRemainWeight != null) tvRemainWeight.setText(formatNumber(remain));
     }
 
-    //==============================
+    //====================================
     //　機　能　:　数値文字列を整形する
     //　引　数　:　value ..... int
     //　戻り値　:　[String] ..... 3桁区切り
-    //==============================
+    //====================================
     private String formatNumber(int value) {
         return String.format(Locale.JAPAN, "%,d", value);
     }
@@ -1140,7 +1140,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //=========================================
-    //　機　能　:　bundle入力値（重量）を保存する
+    //　機　能　:　入力値（重量）を保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=========================================
@@ -1165,7 +1165,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　処理概要　:　束一覧表示用Adapter
+    //　処理概要　:　束一覧表示用アダプター
     //　　　　　　:　行表示と削除ボタン（tvDelete）クリックを扱う
     //============================================================
     private static class BundleRowAdapter extends RecyclerView.Adapter<BundleRowAdapter.ViewHolder> {
@@ -1176,11 +1176,11 @@ public class BundleSelectActivity extends BaseActivity {
         private final List<BundleSelectRow> rows = new ArrayList<>();
         private final DeleteHandler deleteHandler;
 
-        //===============================
-        //　機　能　:　Adapterの初期化処理
+        //===============================================
+        //　機　能　:　アダプターの初期化処理
         //　引　数　:　deleteHandler ..... DeleteHandler
         //　戻り値　:　[BundleRowAdapter] ..... なし
-        //===============================
+        //===============================================
         BundleRowAdapter(DeleteHandler deleteHandler) {
             this.deleteHandler = deleteHandler;
         }
@@ -1198,7 +1198,7 @@ public class BundleSelectActivity extends BaseActivity {
         }
 
         //================================================
-        //　機　能　:　一覧1行分のViewHolderを生成する
+        //　機　能　:　一覧の行レイアウトを生成
         //　引　数　:　parent ..... android.view.ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[ViewHolder] ..... なし
@@ -1211,12 +1211,12 @@ public class BundleSelectActivity extends BaseActivity {
             return new ViewHolder(view);
         }
 
-        //====================================
-        //　機　能　:　指定行のデータをViewHolderへ表示する
+        //============================================
+        //　機　能　:　指定行のデータを一覧へ表示する
         //　引　数　:　holder ..... ViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
-        //====================================
+        //============================================
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             // 行データを取得して各ラベルへ反映
@@ -1241,11 +1241,11 @@ public class BundleSelectActivity extends BaseActivity {
             });
         }
 
-        //============================
+        //================================
         //　機　能　:　一覧の表示件数を取得する
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行数
-        //============================
+        //================================
         @Override
         public int getItemCount() {
             return rows.size();

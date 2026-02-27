@@ -23,7 +23,7 @@ import com.example.myapplication.settings.AppSettings;
 import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
-//============================================================
+//========================================================================================
 //　処理概要　:　BaseActivity（共通基底Activity）
 //　　　　　　:　全画面共通のUI/操作を提供する。
 //　　　　　　:　- バナー表示（一定時間で自動消去）
@@ -50,7 +50,7 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　createLoadingOverlay ...... ローディングView生成
 //　　　　　　:　dpToPx .................... dp→px変換
 //　　　　　　:　getAppVersionName ......... アプリバージョン名取得
-//============================================================
+//==========================================================================================
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -102,7 +102,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //===================================
-    //　機　能　:　setContentViewの拡張
+    //　機　能　:　レイアウト設定後に共通UI紐付け
     //　引　数　:　layoutResID ..... int
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -113,7 +113,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //===================================
-    //　機　能　:　setContentViewの拡張
+    //　機　能　:　レイアウト設定後に共通UI紐付け
     //　引　数　:　view ..... View
     //　戻り値　:　[void] ..... なし
     //===================================
@@ -124,7 +124,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //===================================
-    //　機　能　:　setContentViewの拡張
+    //　機　能　:　レイアウト設定後に共通UI紐付け
     //　引　数　:　view ..... View
     //　　　　　:　params ..... LayoutParams
     //　戻り値　:　[void] ..... なし
@@ -136,7 +136,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //=========================================
-    //　機　能　:　setContentView後の共通処理
+    //　機　能　:　Overlay付与/下部ボタン/Version表示
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //=========================================
@@ -144,19 +144,6 @@ public class BaseActivity extends AppCompatActivity {
         ensureBaseOverlaysAttached();
         bindBottomButtonsIfExists();
         bindVersionNameIfExists();
-    }
-
-    //=========================================
-    //　機　能　:　Version表示（tvVersionがある場合）
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //=========================================
-    private void bindVersionNameIfExists() {
-        TextView tvVersion = findViewById(R.id.tvVersion);
-        if (tvVersion != null) {
-            String versionName = getAppVersionName();
-            tvVersion.setText(versionName.isEmpty() ? "" : "Ver " + versionName);
-        }
     }
 
     //================================================================
@@ -184,7 +171,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //========================================================
-    //　機　能　:　Error/Warning/Info 表示
+    //　機　能　:　エラー/警告/情報 表示
     //　引　数　:　msg ..... String
     //　　　　　:　mode ..... MsgDispMode（MsgBox or Label）
     //　戻り値　:　[void] ..... なし
@@ -312,11 +299,11 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
-    //=================================
+    //=====================================
     //　機　能　:　長時間ローディングを非表示にする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================
+    //=====================================
     protected void hideLoadingLong() {
         if (overlayLong == null) return;
         runOnUiThread(() -> overlayLong.setVisibility(View.GONE));
@@ -335,11 +322,11 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
-    //=================================
+    //=====================================
     //　機　能　:　短時間ローディングを非表示にする
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=================================
+    //=====================================
     protected void hideLoadingShort() {
         if (overlayShort == null) return;
         runOnUiThread(() -> overlayShort.setVisibility(View.GONE));
@@ -481,11 +468,11 @@ public class BaseActivity extends AppCompatActivity {
         return (v instanceof MaterialButton) ? (MaterialButton) v : null;
     }
 
-    //=========================================
+    //===================================================
     //　機　能　:　Overlay(バナー/ローディング)をrootへ付与する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
-    //=========================================
+    //===================================================
     private void ensureBaseOverlaysAttached() {
         if (bannerView != null && overlayLong != null && overlayShort != null) return;
 
@@ -510,11 +497,11 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
-    //============================
+    //======================================
     //　機　能　:　バナー表示Viewを生成する
     //　引　数　:　なし
     //　戻り値　:　[TextView] ..... バナーView
-    //============================
+    //======================================
     private TextView createBannerView() {
         TextView tv = new TextView(this);
         tv.setVisibility(View.GONE);
@@ -534,11 +521,11 @@ public class BaseActivity extends AppCompatActivity {
         return tv;
     }
 
-    //============================
-    //　機　能　:　ローディングオーバーレイを生成する
+    //==============================================
+    //　機　能　:　処理中の画面表示
     //　引　数　:　isLong ..... boolean（Long/Short）
     //　戻り値　:　[FrameLayout] ..... overlay
-    //============================
+    //==============================================
     private FrameLayout createLoadingOverlay(boolean isLong) {
         FrameLayout overlay = new FrameLayout(this);
         overlay.setVisibility(View.GONE);
@@ -592,6 +579,19 @@ public class BaseActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    //=========================================
+    //　機　能　:　Version表示（tvVersionがある場合）
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //=========================================
+    private void bindVersionNameIfExists() {
+        TextView tvVersion = findViewById(R.id.tvVersion);
+        if (tvVersion != null) {
+            String versionName = getAppVersionName();
+            tvVersion.setText(versionName.isEmpty() ? "" : "Ver " + versionName);
+        }
     }
 
     //============================

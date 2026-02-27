@@ -23,7 +23,7 @@ import java.util.Locale;
 
 //============================================================
 //　処理概要　:　共通関数
-//　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/シンボロジー制御）
+//　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/バーコード種別ー制御）
 //　　　　　　:　createFocusCode39Policy ..... フォーカス中のみCode39許可の標準ポリシー生成
 //　　　　　　:　onCreate ..... BarcodeManager生成
 //　　　　　　:　onResume ..... 再開フラグ設定＋プロファイル適用
@@ -34,18 +34,15 @@ import java.util.Locale;
 //　　　　　　:　onBarcodeManagerCreated ..... Manager作成完了時にScanner取得＋初期設定
 //　　　　　　:　applyProfileIfReady ..... ポリシーに従い照射可能/不可能を切替（claim/close等）
 //　　　　　　:　disableScannerHard ..... 強制無効化（claim解除/close/Listener解除）
-//　　　　　　:　onBarcodeDataReceived ..... バーコード受信（重複ガード/シンボロジー判定/通知）
+//　　　　　　:　onBarcodeDataReceived ..... バーコード受信（重複ガード/バーコード種別ー判定/通知）
 //　　　　　　:　isCode39 ..... Code39判定
 //　　　　　　:　getBarcodeDisplayName ..... AIM/DENSOコードから表示名を推定
-//　　　　　　:　applySymbology ..... シンボロジーON/OFF適用（reflection）
+//　　　　　　:　applySymbology ..... バーコード種別ーON/OFF適用（reflection）
 //　　　　　　:　setBoolean ..... 設定オブジェクトへboolean設定（reflection）
 //　　　　　　:　resolveOwnerAndField ..... パスからフィールド所有者とフィールド解決
 //　　　　　　:　findField ..... フィールド検索（継承階層含む）
 //============================================================
 
-//====================================
-//　処理概要　:　DensoScannerControllerクラス
-//====================================
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {
 
@@ -56,7 +53,7 @@ public class DensoScannerController
     private static final int[] SCAN_TRIGGER_KEY_CODES = new int[]{501, 230, 233, 234}; // スキャン起動キーコード
 
     //==============================
-    //　処理概要　:　SymbologyProfile列挙
+    //　処理概要　:　読み取り可能なバーコード種別を表す列挙型
     //==============================
     public enum SymbologyProfile {
         NONE,
@@ -65,7 +62,7 @@ public class DensoScannerController
     }
 
     //=================================
-    //　処理概要　:　ScanPolicyインタフェース
+    //　処理概要　:　スキャナの読み取り制御ルールを定義するインターフェース
     //=================================
     public interface ScanPolicy {
         /**
@@ -116,7 +113,7 @@ public class DensoScannerController
 
     private final Activity activity;     // ホストActivity
     private final OnScanListener listener; // 読取結果コールバック
-    private final ScanPolicy policy;     // 受入/シンボロジー制御ポリシー
+    private final ScanPolicy policy;     // 受入/バーコード種別ー制御ポリシー
 
     private BarcodeManager manager;          // DENSOバーコードマネージャ
     private BarcodeScanner scanner;          // DENSOスキャナ本体
@@ -141,7 +138,7 @@ public class DensoScannerController
     private long lastAt = 0L; // 直近読取時刻(ms)
 
     //=========================================================
-    //　機　能　:　DensoScannerControllerの初期化処理
+    //　機　能　:　スキャナ制御クラスを初期化する
     //　引　数　:　activity ..... Activity
     //　　　　　:　listener ..... OnScanListener（読み取り結果通知先）
     //　　　　　:　policy ..... ScanPolicy（照射/受信ポリシー）
@@ -303,7 +300,7 @@ public class DensoScannerController
     }
 
     //============================
-    //　機　能　:　タイムドスキャンを停止する
+    //　機　能　:　タイマー経由のスキャン停止
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -313,7 +310,7 @@ public class DensoScannerController
     }
 
     //============================
-    //　機　能　:　スキャンをプログラムで停止する
+    //　機　能　:　スキャナの読み取りを強制停止する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================
@@ -348,7 +345,7 @@ public class DensoScannerController
     }
 
     //============================
-    //　機　能　:　SCANトリガーキー判定
+    //　機　能　:　スキャントリガーキー判定
     //　引　数　:　keyCode ..... int
     //　戻り値　:　[boolean] ..... true:SCANキー、false:それ以外
     //============================
@@ -360,7 +357,7 @@ public class DensoScannerController
     }
 
     //=================================================
-    //　機　能　:　BarcodeManager生成完了時処理
+    //　機　能　:　スキャナ初期化完了時にScannerを取得し設定を適用する
     //　引　数　:　barcodeManager ..... BarcodeManager
     //　戻り値　:　[void] ..... なし
     //=================================================
@@ -439,7 +436,7 @@ public class DensoScannerController
             } catch (Exception ignored) {
             }
 
-            // シンボロジーON/OFFを適用
+            // バーコード種別ーON/OFFを適用
             applySymbology(settings, want);
 
             // 設定をScannerへ反映
@@ -520,7 +517,7 @@ public class DensoScannerController
         if (data == null) data = "";
         final String normalized = normalize(data);
 
-        // シンボロジー情報を取得
+        // バーコード種別ー情報を取得
         final String aim = safeToString(first.getSymbologyAim());
         final String denso = safeToString(first.getSymbologyDenso());
         final String displayName = getBarcodeDisplayName(aim, denso);
@@ -528,7 +525,7 @@ public class DensoScannerController
         // フォーカスOFF等なら無視
         if (!policy.canAcceptResult()) return;
 
-        // 念のため許可シンボロジー以外は弾く
+        // 念のため許可バーコード種別ー以外は弾く
         if (!policy.isSymbologyAllowed(aim, denso, displayName)) return;
 
         // 空データは無視
@@ -626,7 +623,7 @@ public class DensoScannerController
     }
 
     //=================================================
-    //　機　能　:　シンボロジーの有効/無効を適用する
+    //　機　能　:　バーコード種別の有効/無効を適用する
     //　引　数　:　settingsRoot ..... Object（Settingsルート）
     //　　　　　:　profile ..... SymbologyProfile
     //　戻り値　:　[void] ..... なし
@@ -636,7 +633,7 @@ public class DensoScannerController
         // BarcodeScannerSettings の内部構造に依存するためパス指定で反映
         final String root = "decode.symbologies";
 
-        // 代表的なシンボロジー一覧（機種/SDKで差があるため存在するものだけ設定される）
+        // 代表的なバーコード種別ー一覧（機種/SDKで差があるため存在するものだけ設定される）
         final String[] all = new String[]{
                 "code39",
                 "ean8", "ean13UpcA", "upcE",
@@ -748,7 +745,7 @@ public class DensoScannerController
     }
 
     //====================================
-    //　処理概要　:　FieldAndOwnerクラス
+    //　処理概要　:　フィールドとその所属オブジェクトをまとめて保持
     //====================================
     private static final class FieldAndOwner {
         final Object owner;

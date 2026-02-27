@@ -305,7 +305,7 @@ public class DbTestActivity extends BaseActivity {
     // =============================================================================================
 
     //=========================================
-    //　機　能　:　header Rowを更新する
+    //　機　能　:　列名を更新する
     //　引　数　:　columns ..... List<String>
     //　　　　　:　widthsPx ..... List<Integer>
     //　　　　　:　rowHeaderWidthPx ..... int
@@ -334,7 +334,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //===================================
-    //　機　能　:　header Cellを生成する
+    //　機　能　:　列のレイアウトを設定
     //　引　数　:　label ..... String
     //　　　　　:　widthPx ..... int
     //　　　　　:　heightPx ..... int
@@ -361,7 +361,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //===========================
-    //　機　能　:　dpの処理
+    //　機　能　:　画面密度を考慮したピクセル変換
     //　引　数　:　v ..... int
     //　戻り値　:　[int] ..... px
     //===========================
@@ -394,7 +394,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //====================================
-    //　機　能　:　table Visibleを設定する
+    //　機　能　:　テーブルのVisibleを設定する
     //　引　数　:　isVisible ..... boolean
     //　戻り値　:　[void] ..... なし
     //====================================
@@ -405,7 +405,7 @@ public class DbTestActivity extends BaseActivity {
     }
 
     //========================================
-    //　機　能　:　apply Cell Layout Paramsの処理
+    //　機　能　:　セルのサイズと左マージンを設定
     //　引　数　:　cell ..... TextView
     //　　　　　:　widthPx ..... int
     //　　　　　:　heightPx ..... int
@@ -448,7 +448,7 @@ public class DbTestActivity extends BaseActivity {
         private final List<List<String>> currentRows = new ArrayList<>();
 
         //==============================
-        //　機　能　:　normの処理
+        //　機　能　:　改行をスペースに置換
         //　引　数　:　s ..... String
         //　戻り値　:　[String] ..... 変換後文字列
         //==============================
@@ -459,7 +459,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //================================
-        //　機　能　:　item View Typeを取得する
+        //　機　能　:　表示する列数をViewTypeとして返す
         //　引　数　:　position ..... int
         //　戻り値　:　[int] ..... 列数（セル生成数に利用）
         //================================
@@ -494,7 +494,7 @@ public class DbTestActivity extends BaseActivity {
          * ★最後の1文字見切れ対策で safety を少し足す
          */
         //=========================================
-        //　機　能　:　auto Adjust Column Widthsの処理
+        //　機　能　:　列の内容に合わせて最適な列幅を自動計算
         //　引　数　:　なし
         //　戻り値　:　[void] ..... なし
         //=========================================
@@ -537,7 +537,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=====================================
-        //　機　能　:　column Widths Pxを取得する
+        //　機　能　:　列幅リストのコピーを返す
         //　引　数　:　なし
         //　戻り値　:　[List<Integer>] ..... 列幅(px)のコピー
         //=====================================
@@ -547,7 +547,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=====================================
-        //　機　能　:　row Header Width Pxを取得する
+        //　機　能　:　行ヘッダの幅をpxで取得
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行番号列幅(px)
         //=====================================
@@ -556,7 +556,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //===============================
-        //　機　能　:　row Height Pxを取得する
+        //　機　能　:　行ヘッダの高さをpxで取得
         //　引　数　:　なし
         //　戻り値　:　[int] ..... 行高さ(px)
         //===============================
@@ -565,7 +565,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=====================================
-        //　機　能　:　col Width Pxを取得する
+        //　機　能　:　指定列の幅を取得
         //　引　数　:　columnPosition ..... int
         //　戻り値　:　[int] ..... 列幅(px)
         //=====================================
@@ -578,7 +578,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=====================================
-        //　機　能　:　一覧1行分のViewHolderを生成する
+        //　機　能　:　一覧の行レイアウトを生成
         //　引　数　:　parent ..... ViewGroup
         //　　　　　:　viewType ..... int
         //　戻り値　:　[RowViewHolder] ..... 行ViewHolder
@@ -612,7 +612,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //=======================================
-        //　機　能　:　指定行のデータをViewHolderへ表示する
+        //　機　能　:　指定行のデータを一覧へ表示する
         //　引　数　:　holder ..... RowViewHolder
         //　　　　　:　position ..... int
         //　戻り値　:　[void] ..... なし
@@ -657,7 +657,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //================================
-        //　機　能　:　row Headerを生成する
+        //　機　能　:　列名のレイアウトを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... 行番号セル
         //================================
@@ -672,7 +672,7 @@ public class DbTestActivity extends BaseActivity {
         }
 
         //================================
-        //　機　能　:　cellを生成する
+        //　機　能　:　セルのレイアウトを生成する
         //　引　数　:　なし
         //　戻り値　:　[TextView] ..... データセル
         //================================

@@ -10,14 +10,9 @@ import java.util.Locale;
 //　関　　数　:　DateTimeFormatUtil ..... 日時関連の整形ユーティリティ
 //============================================================
 
-//===================================
-//　処理概要　:　DateTimeFormatUtilクラス
-//===================================
 public final class DateTimeFormatUtil {
     private static final String DB_YMD_HMS_PATTERN = "yyyy-MM-dd HH:mm:ss";   // DB保存/更新日時
     private static final String COMPACT_YMD_HMS_PATTERN = "yyyyMMddHHmmss";    // 並び順/採番用
-    private static final String OUTPUT_PATTERN = "MM-dd HH:mm";     // 出力形式（表示用）
-    private static final String[] INPUT_PATTERNS = {DB_YMD_HMS_PATTERN, "yyyy-MM-dd HH:mm"};   // 入力として想定する形式（DB/既存資産互換）
 
     //==========================================
     //　機　能　:　DateTimeFormatUtilのインスタンス生成を禁止する
