@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -116,6 +117,30 @@ public class ContainerInputActivity extends BaseActivity {
     private static final String KEY_SEAL_PHOTO_URI = "seal_photo_uri";              // シール写真URIキー
 
     private static final String MSG_CONTAINER_CONFIRMED = "コンテナ情報を確定しました"; // 確定メッセージ
+
+    //コンテナNo1の大文字英字のみフィルタ
+    private static final InputFilter UPPERCASE_ALPHABET_FILTER = (source, start, end, dest, dstart, dend) -> {
+        if (source == null) return null;
+        if (end - start == 0) return null;
+
+        StringBuilder out = new StringBuilder(end - start);
+        boolean changed = false;
+
+        for (int i = start; i < end; i++) {
+            char c = source.charAt(i);
+
+            if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')) {
+                char upper = Character.toUpperCase(c);
+                out.append(upper);
+                if (upper != c) changed = true;
+            } else {
+                changed = true;
+            }
+        }
+
+        if (!changed) return null;
+        return out.toString();
+    };
 
     private Button btnPhotoContainerNo; // コンテナ番号写真ボタン
     private Button btnPhotoSealNo;      // シール番号写真ボタン
@@ -327,6 +352,9 @@ public class ContainerInputActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void setupInputHandlers() {
+        // コンテナNo1は英字のみ許可（小文字は大文字化）
+        applyContainerNo1InputFilter();
+
         // コンテナNo入力 → チェックデジット更新
         if (etContainerNo1 != null) etContainerNo1.addTextChangedListener(containerNoWatcher);
         if (etContainerNo2 != null) etContainerNo2.addTextChangedListener(containerNoWatcher);
@@ -347,6 +375,21 @@ public class ContainerInputActivity extends BaseActivity {
             etBookingNo.setFocusable(false);
             etBookingNo.setFocusableInTouchMode(false);
         }
+    }
+
+    //============================================================
+    //　機　能　:　コンテナNo1入力フィルタを設定する
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void applyContainerNo1InputFilter() {
+        if (etContainerNo1 == null) return;
+
+        InputFilter[] current = etContainerNo1.getFilters();
+        InputFilter[] merged = new InputFilter[current.length + 1];
+        System.arraycopy(current, 0, merged, 0, current.length);
+        merged[current.length] = UPPERCASE_ALPHABET_FILTER;
+        etContainerNo1.setFilters(merged);
     }
 
     //============================================================
