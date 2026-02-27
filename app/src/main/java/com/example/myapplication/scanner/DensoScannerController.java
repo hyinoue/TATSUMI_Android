@@ -22,7 +22,7 @@ import java.util.Locale;
 
 
 //============================================================
-//　処理概要　:　バーコードスキャン連携を行うクラス
+//　処理概要　:　スキャナ受信の開始/停止とListener連携を管理する制御クラス
 //　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/バーコード種別ー制御）
 //　　　　　　:　createFocusCode39Policy ..... フォーカス中のみCode39許可の標準ポリシー生成
 //　　　　　　:　onCreate ..... BarcodeManager生成

@@ -1,7 +1,7 @@
 package com.example.myapplication.connector;
 
 //============================================================
-//　処理概要　:　サーバー通信とSOAPデータ処理を行うクラス
+//　処理概要　:　SOAP Envelope（Header/Body）文字列を生成するユーティリティクラス
 //　関　　数　:　wrapBody ................................. SOAP Envelope生成
 //============================================================
 public class SoapEnvelope {

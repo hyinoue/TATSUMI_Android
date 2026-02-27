@@ -18,7 +18,7 @@ import java.util.Map;
 
 
 //============================================================
-//　処理概要　:　アプリ設定の管理を行うクラス
+//　処理概要　:　アプリ設定をSharedPreferencesとINIで永続化・読込する管理クラス
 //　関　　数　:　AppSettings ..... アプリ設定（SharedPreferences + INI）管理
 //　　　　　　:　init ..... 初期化処理
 //　　　　　　:　load ..... 設定読込（Preferences→INI上書き→デフォルト補正）
