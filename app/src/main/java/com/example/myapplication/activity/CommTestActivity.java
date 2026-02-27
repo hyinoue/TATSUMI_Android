@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.example.myapplication.R;
 import com.google.android.material.button.MaterialButton;
 
-//============================================================
+//==================================================================================
 //　処理概要　:　通信テスト画面（Activity）
 //　関　　数　:　onCreate ................. 画面生成時の初期化（部品取得/イベント設定/初期表示）
 //　　　　　　:　setupBottomButtons ...... 下部ボタン設定
@@ -24,7 +24,7 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　updateInternetStatus .... インターネット接続状態表示更新
 //　　　　　　:　updateNetworkStatus ..... 回線状態表示更新（モバイル/Wi-Fi/アクティブ回線）
 //　　　　　　:　getNetworkSnapshot ...... 回線スナップショット取得
-//============================================================
+//==================================================================================
 
 public class CommTestActivity extends BaseActivity {
 

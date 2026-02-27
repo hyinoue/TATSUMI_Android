@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//================================================================================
 //　処理概要　:　積載束照合画面のActivity
 //　　　　　　:　コンテナに紐づく積載束情報を表示し、現品番号(スキャナ入力)で照合を進め、
 //　　　　　　:　全件照合完了後に確定処理(DB更新＋送信)を行う。
@@ -61,7 +61,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　safeStr                    ..... null安全文字列
 //　　　　　　:　trimSagyouYmd              ..... 作業日時表示用トリム
 //　　　　　　:　VanningCollationAdapter    ..... 一覧表示用Adapter(内部クラス)
-//============================================================
+//================================================================================
 
 public class VanningCollationActivity extends BaseActivity {
 

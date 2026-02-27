@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//======================================================================================
 //　処理概要　:　積載束選択／重量計算 画面Activity
 //　　　　　　:　束(現品番号)の追加/削除、重量の合計/残量計算を行う。
 //　　　　　　:　スキャナは「etGenpinNoフォーカス中のみ Code39 を許可」し、
@@ -81,7 +81,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　dispatchKeyEvent ......... SCANキー等をスキャナへ委譲
 //　　　　　　:　saveBundleInputValues .... 重量入力をbundleValuesへ保存
 //　クラス　　:　BundleRowAdapter .......... 一覧表示Adapter（削除クリック対応）
-//============================================================
+//======================================================================================
 
 public class BundleSelectActivity extends BaseActivity {
 

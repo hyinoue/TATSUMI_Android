@@ -23,7 +23,7 @@ import com.example.myapplication.settings.AppSettings;
 import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
 
-//============================================================
+//========================================================================================
 //　処理概要　:　共通基底Activity
 //　　　　　　:　全画面共通のUI/操作を提供する。
 //　　　　　　:　- バナー表示（一定時間で自動消去）
@@ -50,12 +50,14 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　createLoadingOverlay ...... ローディングView生成
 //　　　　　　:　dpToPx .................... dp→px変換
 //　　　　　　:　getAppVersionName ......... アプリバージョン名取得
-//============================================================
+//========================================================================================
 
 public class BaseActivity extends AppCompatActivity {
 
-    public enum MsgDispMode {MsgBox, Label}
+    //メッセージ表示方法を表す列挙型
+    public enum MsgDispMode {MsgBox, Label}    //ダイアログ表示/ラベル表示
 
+    //はい／いいえの結果を呼び出し元へ通知するための処理定義
     public interface QuestionCallback {
         void onResult(boolean yes);
     }
@@ -136,7 +138,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //============================================================
-    //　機　能　:　Overlay付与/下部ボタン/Version表示
+    //　機　能　:　オーバーレイ付与/下部ボタン/Version表示
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
@@ -152,6 +154,8 @@ public class BaseActivity extends AppCompatActivity {
     //　　　　　:　ex ..... 例外情報
     //　戻り値　:　[void] ..... なし
     //============================================================
+
+    //ローディングを閉じ、エラー音を鳴らし、ダイアログでエラー内容を表示する処理
     protected void errorProcess(String procName, Exception ex) {
         hideLoadingLong();
         hideLoadingShort();
@@ -159,12 +163,14 @@ public class BaseActivity extends AppCompatActivity {
         showDialog("エラー", "エラーが発生しました\n" + safeMessage(ex));
     }
 
+    //例外メッセージを安全に取得する処理（null対策）
     private String safeMessage(Exception ex) {
         if (ex == null) return "";
         String m = ex.getMessage();
         return (m == null) ? ex.getClass().getSimpleName() : m;
     }
 
+    //エラー時のブザーとバイブを鳴らす処理
     private void playErrorFeedback() {
         HandyUtil.playErrorBuzzer(this);
         HandyUtil.playVibrater(this);
@@ -522,7 +528,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //============================================================
-    //　機　能　:　処理中の画面表示
+    //　機　能　:　処理中...の画面表示
     //　引　数　:　isLong ..... 表示時間長さ
     //　戻り値　:　[FrameLayout] ..... overlay
     //============================================================

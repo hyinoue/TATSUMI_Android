@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
-//============================================================
+//========================================================================
 //　処理概要　:　アプリ設定をSharedPreferencesとINIで永続化・読込する管理クラス
 //　関　　数　:　AppSettings ..... アプリ設定（SharedPreferences + INI）管理
 //　　　　　　:　init ..... 初期化処理
@@ -36,7 +36,7 @@ import java.util.Map;
 //　　　　　　:　parseString ..... String変換（null時デフォルト）
 //　　　　　　:　nullToEmpty ..... null→空文字
 //　　　　　　:　ensureInitialized ..... init呼出しチェック
-//============================================================
+//========================================================================
 public final class AppSettings {
 
     // ================================
@@ -63,6 +63,8 @@ public final class AppSettings {
 
     private static final String KEY_WEBSVC_HONBAN = "WebSvcHonban"; // 本番WebSvcキー
     private static final String KEY_WEBSVC_SCS = "WebSvcSCS";       // SCS WebSvcキー
+
+    private static final String KEY_WEBSVC_SCS2 = "WebSvcSCS2";       // SCS WebSvcキー(新旧比較用)
     private static final String KEY_WEBSVC_TEST = "WebSvcTest";     // テストWebSvcキー
 
 
@@ -210,6 +212,7 @@ public final class AppSettings {
         // WebサービスURL
         e.putString(KEY_WEBSVC_HONBAN, WebSvcURL_Honban);
         e.putString(KEY_WEBSVC_SCS, WebSvcURL_SCS);
+        e.putString(KEY_WEBSVC_SCS2, WebSvcURL_SCS2);
         e.putString(KEY_WEBSVC_TEST, WebSvcURL_Test);
 
         // 非同期反映
@@ -245,6 +248,7 @@ public final class AppSettings {
         // WebサービスURL
         WebSvcURL_Honban = pref.getString(KEY_WEBSVC_HONBAN, "");
         WebSvcURL_SCS = pref.getString(KEY_WEBSVC_SCS, "");
+        WebSvcURL_SCS2 = pref.getString(KEY_WEBSVC_SCS2, "");
         WebSvcURL_Test = pref.getString(KEY_WEBSVC_TEST, "");
     }
 
@@ -277,6 +281,7 @@ public final class AppSettings {
         // WebサービスURL
         WebSvcURL_Honban = parseString(map.get(KEY_WEBSVC_HONBAN), WebSvcURL_Honban);
         WebSvcURL_SCS = parseString(map.get(KEY_WEBSVC_SCS), WebSvcURL_SCS);
+        WebSvcURL_SCS2 = parseString(map.get(KEY_WEBSVC_SCS2), WebSvcURL_SCS2);
         WebSvcURL_Test = parseString(map.get(KEY_WEBSVC_TEST), WebSvcURL_Test);
     }
 
@@ -309,6 +314,7 @@ public final class AppSettings {
         // WebサービスURL（nullは空文字へ）
         map.put(KEY_WEBSVC_HONBAN, nullToEmpty(WebSvcURL_Honban));
         map.put(KEY_WEBSVC_SCS, nullToEmpty(WebSvcURL_SCS));
+        map.put(KEY_WEBSVC_SCS2, nullToEmpty(WebSvcURL_SCS2));
         map.put(KEY_WEBSVC_TEST, nullToEmpty(WebSvcURL_Test));
 
         // INIへ書き込み
@@ -410,6 +416,7 @@ public final class AppSettings {
         // URLはnull禁止（空文字へ）
         if (WebSvcURL_Honban == null) WebSvcURL_Honban = "";
         if (WebSvcURL_SCS == null) WebSvcURL_SCS = "";
+        if (WebSvcURL_SCS2 == null) WebSvcURL_SCS2 = "";
         if (WebSvcURL_Test == null) WebSvcURL_Test = "";
     }
 
@@ -496,6 +503,8 @@ public final class AppSettings {
 
     public static String WebSvcURL_Honban; // 本番WebSvc URL
     public static String WebSvcURL_SCS;    // SCS WebSvc URL
+
+    public static String WebSvcURL_SCS2;    // SCS WebSvc URL(新旧比較用)
     public static String WebSvcURL_Test;   // テストWebSvc URL
 
     //============================================================

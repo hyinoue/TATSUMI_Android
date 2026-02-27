@@ -8,7 +8,7 @@ import com.example.myapplication.model.SyukkaData;
 import java.util.Date;
 
 
-//============================================================
+//======================================================================
 //　処理概要　:　SvcHandy SOAP API呼び出しを提供するリポジトリクラス
 //　関　　数　:　getSysDate .......................... システム日時取得
 //　　　　　　:　getSagyouYmd ....................... 作業日取得
@@ -20,12 +20,14 @@ import java.util.Date;
 //　　　　　　:　uploadBinaryFile ................... バイナリファイル送信
 //　　　　　　:　getDownloadHandyExecuteFileNames ... 実行ファイル名一覧取得
 //　　　　　　:　getDownloadHandyExecuteFile ........ 実行ファイル取得
-//============================================================
+//======================================================================
 public class SvcHandyRepository {
 
     // ASMXエンドポイント（※ ?wsdl は付けない）
     public static final String DEFAULT_ENDPOINT =
-            "https://scstestvanningreport.azurewebsites.net/WebSvc/SvcHandy.asmx";
+            //"https://scstestvanningreport.azurewebsites.net/WebSvc/SvcHandy.asmx";
+            //新旧比較用
+            "https://scshandytestvanningreport-ehe3c7dpbuatd0bg.japanwest-01.azurewebsites.net/WebSvc/svcHandy.asmx";
 
     private final SoapAsmxClient client; // SOAP通信クライアント
 

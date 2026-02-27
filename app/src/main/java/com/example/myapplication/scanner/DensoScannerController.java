@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-//============================================================
+//================================================================================================
 //　処理概要　:　スキャナ受信の開始/停止とListener連携を管理する制御クラス
 //　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/バーコード種別ー制御）
 //　　　　　　:　createFocusCode39Policy ..... フォーカス中のみCode39許可の標準ポリシー生成
@@ -41,7 +41,7 @@ import java.util.Locale;
 //　　　　　　:　setBoolean ..... 設定オブジェクトへboolean設定（reflection）
 //　　　　　　:　resolveOwnerAndField ..... パスからフィールド所有者とフィールド解決
 //　　　　　　:　findField ..... フィールド検索（継承階層含む）
-//============================================================
+//================================================================================================
 
 public class DensoScannerController
         implements BarcodeManager.BarcodeManagerListener, BarcodeScanner.BarcodeDataListener {

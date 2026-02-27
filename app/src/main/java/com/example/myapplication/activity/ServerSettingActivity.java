@@ -10,8 +10,8 @@ import android.widget.Spinner;
 import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SystemEntity;
-import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.settings.AppSettings;
+import com.example.myapplication.time.DateTimeFormatUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.BufferedReader;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//============================================================================
 //　処理概要　:　サーバ接続先設定画面Activity
 //　　　　　　:　サーバ接続先(URL)の選択、接続テスト、設定保存を行う。
 //　　　　　　:　保存前に接続テスト成功を必須とし、DB(SystemEntity)へ接続先URLを保存する。
@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　readResponse          ..... レスポンス読み捨て
 //　　　　　　:　equalsIgnoreCase      ..... 大文字小文字無視比較
 //　　　　　　:　ServerOption          ..... 接続先候補クラス(内部クラス)
-//============================================================
+//============================================================================
 
 public class ServerSettingActivity extends BaseActivity {
 
@@ -198,6 +198,7 @@ public class ServerSettingActivity extends BaseActivity {
         // 設定クラスのURL定義から候補を作成
         addServerOption(AppSettings.WebSvcURL_Honban, "本番環境");
         addServerOption(AppSettings.WebSvcURL_SCS, "SCS Azureテスト環境");
+        addServerOption(AppSettings.WebSvcURL_SCS2, "SCS Azureテスト環境2");
         addServerOption(AppSettings.WebSvcURL_Test, "SCS 社内テスト環境");
 
         // 候補が無い場合の保険

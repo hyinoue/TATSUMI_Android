@@ -46,7 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-//============================================================
+//====================================================================================
 //　処理概要　:　コンテナ情報入力画面（Activity）
 //　関　　数　:　onCreate ....................... 画面生成時の初期化
 //　　　　　　:　onDestroy ...................... 画面終了時の後処理
@@ -95,7 +95,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　toast .......................... トースト表示
 //　　　　　　:　finish ......................... 終了時：引継値保存＋返却
 //　　　　　　:　saveContainerValues ............ 引継用Mapへ入力値保存
-//============================================================
+//====================================================================================
 
 public class ContainerInputActivity extends BaseActivity {
 

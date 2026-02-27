@@ -22,7 +22,7 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
-//============================================================
+//==========================================================================
 //　処理概要　:　振動設定画面Activity
 //　　　　　　:　ブザー音/バイブレーションの設定を画面で編集し、保存して他画面へ反映する。
 //　関　　数　:　onCreate             ..... 画面生成/初期化
@@ -39,7 +39,7 @@ import java.util.List;
 //　　　　　　:　onFunctionBlue      ..... (青)保存処理
 //　　　　　　:　onFunctionYellow    ..... (黄)終了処理
 //　　　　　　:　VolumeOption        ..... 音量選択肢クラス(内部クラス)
-//============================================================
+//==========================================================================
 
 public class SystemLibActivity extends BaseActivity {
 

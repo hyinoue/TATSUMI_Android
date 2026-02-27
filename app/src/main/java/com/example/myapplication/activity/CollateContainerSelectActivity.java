@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//======================================================================================
 //　処理概要　:　照合コンテナ選定画面（Activity）
 //　　　　　　:　DBからコンテナ一覧を取得して表示し、照合対象№入力で選択状態を更新する。
 //　　　　　　:　決定で次画面へ遷移、終了で画面を閉じる。
@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　validateAndSelect ....... 入力チェック＋選択確定
 //　　　　　　:　onDestroy ............... 終了処理（スレッド停止）
 //　クラス　　:　CollateContainerAdapter . 一覧表示用Adapter
-//============================================================
+//======================================================================================
 
 public class CollateContainerSelectActivity extends BaseActivity {
 
@@ -246,7 +246,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　入力された照合対象№の妥当性を確認する
+    //　機　能　:　照合対象№の入力チェック
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================

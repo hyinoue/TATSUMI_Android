@@ -14,7 +14,7 @@ import com.example.myapplication.scanner.DensoScannerController;
 import com.example.myapplication.scanner.OnScanListener;
 import com.google.android.material.button.MaterialButton;
 
-//============================================================
+//================================================================================
 //　処理概要　:　バーコードテスト画面
 //　　　　　　:　対象入力欄（etBarcode）にフォーカス中のみスキャン結果を受け付ける。
 //　　　　　　:　読取種別は全許可（ALL）で、読取データは履歴として画面に追記する。
@@ -27,7 +27,7 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　onPause                     ..... 画面非表示時にスキャナ一時停止
 //　　　　　　:　onDestroy                   ..... 画面破棄時にスキャナ破棄
 //　　　　　　:　dispatchKeyEvent            ..... 物理キーイベントをスキャナへ委譲
-//============================================================
+//================================================================================
 
 public class ImagerTestActivity extends BaseActivity {
 

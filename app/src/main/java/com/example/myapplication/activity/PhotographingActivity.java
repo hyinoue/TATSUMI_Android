@@ -41,7 +41,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-//============================================================
+//======================================================================================
 //　処理概要　:　コンテナ/シール撮影用カメラ画面Activity
 //　　　　　　:　CameraXでプレビュー・撮影を行い、撮影後に確認/保存/破棄を行う。
 //　　　　　　:　権限未許可の場合はカメラ権限を要求し、許可後にカメラを開始する。
@@ -65,7 +65,7 @@ import java.util.concurrent.TimeUnit;
 //　　　　　　:　triggerAfAeAtCenter .... 中央でAF/AEをトリガー
 //　　　　　　:　getOutputFile .......... 出力ファイル生成
 //　　　　　　:　setStatus .............. ステータス表示設定
-//============================================================
+//======================================================================================
 
 @ExperimentalCamera2Interop
 public class PhotographingActivity extends BaseActivity {

@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-//============================================================
+//==================================================================================
 //　処理概要　:　メインメニュー画面Activity
 //　　　　　　:　各機能画面への遷移、作業状況/受信状況の表示更新、
 //　　　　　　:　束選定/コンテナ入力の値保持と同期、下部ボタン設定を行う。
@@ -68,7 +68,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　formatNumber                  ..... 数値表示整形
 //　　　　　　:　formatRemaining               ..... 残数表示整形
 //　　　　　　:　readStringMap                 ..... IntentからMap取得
-//============================================================
+//==================================================================================
 
 public class MenuActivity extends BaseActivity {
 

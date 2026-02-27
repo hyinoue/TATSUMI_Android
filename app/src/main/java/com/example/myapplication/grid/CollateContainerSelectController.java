@@ -4,18 +4,19 @@ import androidx.annotation.NonNull;
 
 import com.example.myapplication.db.dao.KakuninContainerDao;
 import com.example.myapplication.db.entity.KakuninContainerEntity;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
-//============================================================
+//==========================================================================================
 //　処理概要　:　照合コンテナ選択画面の一覧データ制御を行うコントローラクラス
 //　関　　数　:　CollateContainerSelectController ..... 照合対象コンテナ選択制御（読込/選択/表示行生成）
 //　　　　　　:　loadContainers ..... 未照合コンテナの読込
 //　　　　　　:　getContainers ..... 読込済みコンテナ一覧の取得
 //　　　　　　:　getDisplayRows ..... 表示用行データの取得
-//　　　　　　:　checkSelectedNo ..... 選択番号の妥当性チェック
+//　　　　　　:　checkSelectedNo ..... 選択番号の入力チェック
 //　　　　　　:　selectContainer ..... 選択番号に該当するコンテナを選択状態へ設定
 //　　　　　　:　getSelectedContainerId ..... 選択中コンテナIDの取得
 //　　　　　　:　getSelectedContainerNo ..... 選択中コンテナNoの取得
@@ -23,7 +24,7 @@ import java.util.List;
 //　　　　　　:　getSelectedSagyouYmd ..... 選択中作業日の取得
 //　　　　　　:　refreshDisplayRows ..... 表示行の再生成
 //　　　　　　:　safeStr ..... null安全な文字列化
-//============================================================
+//==========================================================================================
 
 public class CollateContainerSelectController {
 
@@ -67,22 +68,22 @@ public class CollateContainerSelectController {
         refreshDisplayRows();
     }
 
-    //============================================================
+    //============================================================================
     //　機　能　:　コンテナ一覧を取得する
     //　引　数　:　なし
     //　戻り値　:　[List<KakuninContainerEntity>] ..... 読込済みコンテナ一覧（読み取り専用）
-    //============================================================
+    //============================================================================
     @NonNull
     public List<KakuninContainerEntity> getContainers() {
         // 外部から改変されないよう unmodifiableList を返す
         return Collections.unmodifiableList(containers);
     }
 
-    //============================================================
+    //============================================================================
     //　機　能　:　表示用行データを取得する
     //　引　数　:　なし
     //　戻り値　:　[List<CollateContainerSelectRow>] ..... 表示用行データ（読み取り専用）
-    //============================================================
+    //============================================================================
     @NonNull
     public List<CollateContainerSelectRow> getDisplayRows() {
         // 外部から改変されないよう unmodifiableList を返す
@@ -90,7 +91,7 @@ public class CollateContainerSelectController {
     }
 
     //============================================================
-    //　機　能　:　照合対象№の妥当性を確認する
+    //　機　能　:　照合対象№の入力チェック
     //　引　数　:　selectedNo ..... 選択したコンテナ番号
     //　戻り値　:　[String] ..... 結果（OK/エラーメッセージ）
     //============================================================
@@ -113,7 +114,7 @@ public class CollateContainerSelectController {
     @NonNull
     public String selectContainer(int selectedNo) {
 
-        // 選択番号の妥当性をチェック
+        // 選択番号の入力チェック
         String check = checkSelectedNo(selectedNo);
         if (!"OK".equals(check)) {
             return check;

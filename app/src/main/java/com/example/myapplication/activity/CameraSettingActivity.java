@@ -11,7 +11,7 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
-//============================================================
+//==================================================================================
 //　処理概要　:　カメラ設定画面（Activity）
 //　　　　　　:　撮影解像度・フラッシュ・光源モードをSpinnerで選択し、
 //　　　　　　:　AppSettingsへ保存する。
@@ -26,7 +26,7 @@ import java.util.List;
 //　　　　　　:　onFunctionYellow ......... 終了（キャンセル→RESULT_CANCELED）
 //　　　　　　:　getSelectedValue ......... Spinnerの選択値（Option.value）取得
 //　クラス　　:　Option ................... Spinner表示用の選択肢（value/label）
-//============================================================
+//==================================================================================
 
 public class CameraSettingActivity extends BaseActivity {
 
@@ -134,7 +134,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　サイズ選択肢を生成する
+    //　機　能　:　画像サイズ選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 解像度選択肢一覧
     //============================================================
@@ -165,7 +165,7 @@ public class CameraSettingActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　照明選択肢を生成する
+    //　機　能　:　ライトモード選択肢を生成する
     //　引　数　:　なし
     //　戻り値　:　[List<Option>] ..... 光源モード選択肢一覧
     //============================================================

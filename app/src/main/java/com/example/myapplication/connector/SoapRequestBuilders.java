@@ -7,26 +7,26 @@ import com.example.myapplication.time.XmlUtil;
 import java.util.Date;
 
 
-//============================================================
+//====================================================================================================
 //　処理概要　:　各SOAPメソッドのリクエストXML生成を集約するファクトリクラス
-//　関　　数　:　buildGetSysDate ................................. GetSysDate要求XML生成
-//　　　　　　:　buildGetSagyouYmd .............................. GetSagyouYmd要求XML生成
-//　　　　　　:　buildGetUpdateYmdHms ........................... GetUpdateYmdHms要求XML生成
-//　　　　　　:　buildGetSyukkaData ............................. GetSyukkaData要求XML生成
-//　　　　　　:　buildGetSyougoData ............................. GetSyougoData要求XML生成
-//　　　　　　:　buildUploadBinaryFile .......................... UploadBinaryFile要求XML生成
-//　　　　　　:　buildGetDownloadHandyExecuteFileNames .......... GetDownloadHandyExecuteFileNames要求XML生成
-//　　　　　　:　buildGetDownloadHandyExecuteFile ............... GetDownloadHandyExecuteFile要求XML生成
-//============================================================
+//　関　　数　:　buildGetSysDate ............................ GetSysDate要求XML生成
+//　　　　　　:　buildGetSagyouYmd .......................... GetSagyouYmd要求XML生成
+//　　　　　　:　buildGetUpdateYmdHms ....................... GetUpdateYmdHms要求XML生成
+//　　　　　　:　buildGetSyukkaData ......................... GetSyukkaData要求XML生成
+//　　　　　　:　buildGetSyougoData ......................... GetSyougoData要求XML生成
+//　　　　　　:　buildUploadBinaryFile ...................... UploadBinaryFile要求XML生成
+//　　　　　　:　buildGetDownloadHandyExecuteFileNames ...... GetDownloadHandyExecuteFileNames要求XML生成
+//　　　　　　:　buildGetDownloadHandyExecuteFile ........... GetDownloadHandyExecuteFile要求XML生成
+//====================================================================================================
 public class SoapRequestBuilders {
 
     private static final String NS = "http://tempuri.org/";
 
-    //============================================================
+    //================================================================
     //　機　能　:　SoapRequestBuildersの生成を禁止する（ユーティリティクラス化）
     //　引　数　:　なし
     //　戻り値　:　[SoapRequestBuilders] ..... なし
-    //============================================================
+    //================================================================
     private SoapRequestBuilders() {
         // static専用クラスのためインスタンス化させない
     }
@@ -130,21 +130,21 @@ public class SoapRequestBuilders {
         return SoapEnvelope.wrapBody(inner.toString());
     }
 
-    //============================================================
+    //======================================================================
     //　機　能　:　GetDownloadHandyExecuteFileNames要求のSOAPメッセージを生成する
     //　引　数　:　なし
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //============================================================
+    //======================================================================
     public static String buildGetDownloadHandyExecuteFileNames() {
         String body = "<GetDownloadHandyExecuteFileNames xmlns=\"" + NS + "\" />";
         return SoapEnvelope.wrapBody(body);
     }
 
-    //============================================================
+    //==================================================================
     //　機　能　:　GetDownloadHandyExecuteFile要求のSOAPメッセージを生成する
     //　引　数　:　fileName ..... ファイル関連情報
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
-    //============================================================
+    //==================================================================
     public static String buildGetDownloadHandyExecuteFile(String fileName) {
         StringBuilder inner = new StringBuilder();
 

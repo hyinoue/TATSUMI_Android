@@ -26,7 +26,7 @@ import com.example.myapplication.db.entity.SyukkaMeisaiWorkEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
 
 
-//============================================================
+//======================================================================
 //　処理概要　:　Roomデータベース定義（AppDatabase）
 //　対　　象　:　アプリ内SQLite（Room）へのアクセス窓口
 //　内　　容　:　Entity定義、DAO提供、Singleton生成を行う
@@ -40,7 +40,7 @@ import com.example.myapplication.db.entity.YoteiEntity;
 //　　　　　　:　kakuninMeisaiWorkDao   ..... KakuninMeisaiWorkDao取得
 //　　　　　　:　commHistoryDao         ..... CommHistoryDao取得
 //　　　　　　:　getInstance            ..... DBインスタンス取得（Singleton）
-//============================================================
+//======================================================================
 @Database(
         entities = {
                 SystemEntity.class,
@@ -153,12 +153,12 @@ public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
 
-    //============================================================
+    //======================================================================================
     //　機　能　:　DBインスタンスを取得する（Singleton）
     //           Roomデータベースを一度だけ生成し、以降は同じインスタンスを使い回すシングルトン取得メソッド
     //　引　数　:　context ..... コンテキスト情報
     //　戻り値　:　[AppDatabase] ..... AppDatabaseインスタンス
-    //============================================================
+    //======================================================================================
     public static AppDatabase getInstance(Context context) {
 
         // 既に生成済みならそのまま返す

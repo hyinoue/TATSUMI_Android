@@ -8,13 +8,13 @@ import android.util.Log;
 import com.densowave.bhtsdk.barcode.OutputSettings;
 
 
-//============================================================
+//========================================================================================
 //　処理概要　:　デンソースキャナのBroadcastを受信して読み取り文字列を通知するクラス
 //　関　　数　:　DensoScanReceiver ..... DENSOスキャン結果Broadcast受信→アプリ内Broadcastへ橋渡し
 //　　　　　　:　onReceive ..... 受信処理（EXTRA取得/正規化/内部Broadcast送信）
 //　　　　　　:　normalize ..... 受信文字列の正規化（改行除去/trim）
 //　　　　　　:　ImagerTestActivityBridge ..... Receiver→Activity橋渡し用の内部Action/Extra定義
-//============================================================
+//========================================================================================
 
 public class DensoScanReceiver extends BroadcastReceiver {
 

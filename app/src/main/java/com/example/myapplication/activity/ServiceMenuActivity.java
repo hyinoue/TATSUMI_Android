@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-//============================================================
+//================================================================================
 //　処理概要　:　サービスメニュー画面Activity
 //　　　　　　:　保守/診断向け機能への入口をまとめた画面。
 //　　　　　　:　DB確認、データクリア、保守データ送信、通信/バーコードテスト、設定画面遷移を行う。
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　onFunctionYellow         ..... (黄)終了処理
 //　　　　　　:　onDestroy                ..... リソース解放
 //　　　　　　:　PasswordCallback         ..... PWダイアログ結果通知IF
-//============================================================
+//================================================================================
 
 public class ServiceMenuActivity extends BaseActivity {
 

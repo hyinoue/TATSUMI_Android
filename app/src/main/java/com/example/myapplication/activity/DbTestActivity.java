@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//============================================================
+//======================================================================================
 //　処理概要　:　DB参照画面
 //　　　　　　:　Room(DB)のテーブル一覧をSpinnerに表示し、選択テーブルの内容をRecyclerViewに表示する。
 //　　　　　　:　ヘッダ行は固定表示し、RecyclerView本体は横スクロール可能なため、
@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 //　　　　　　:　applyCellLayoutParams  ..... セルのLayoutParams適用
 //　　　　　　:　onFunctionYellow       ..... (黄)終了
 //　クラス　　:　DbTableAdapter         ..... DBテーブル表示用RecyclerViewアダプタ
-//============================================================
+//======================================================================================
 
 public class DbTestActivity extends BaseActivity {
 

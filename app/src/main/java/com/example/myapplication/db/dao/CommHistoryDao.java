@@ -10,14 +10,14 @@ import com.example.myapplication.db.entity.CommHistoryEntity;
 import java.util.List;
 
 
-//============================================================
+//========================================================================
 //　処理概要　:　通信履歴テーブル（C_COMM_HISTORY）に対するDAO
 //　関　　数　:　findAllDesc                 ..... 全件取得（降順）
 //　　　　　　:　findMaxLogIdByDatePrefix   ..... 日付接頭辞による最大LOG_ID取得
 //　　　　　　:　upsert                      ..... 追加／更新
 //　　　　　　:　deleteBefore               ..... 指定日時以前削除
 //　　　　　　:　deleteAll                  ..... 全件削除
-//============================================================
+//========================================================================
 @Dao
 public interface CommHistoryDao {
 
