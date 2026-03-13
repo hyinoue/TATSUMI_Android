@@ -2,8 +2,8 @@ package com.example.myapplication.connector;
 
 import android.util.Base64;
 
-import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.model.VanningData;
 import com.example.myapplication.time.XmlUtil;
 
 
@@ -29,7 +29,7 @@ public class SendSyukkaSoapBuilder {
     //　引　数　:　data ..... データ
     //　戻り値　:　[String] ..... SOAPメッセージ（Envelope + Body）
     //==================================================================
-    public static String buildSendSyukkaData(BunningData data) {
+    public static String buildSendSyukkaData(VanningData data) {
 
         // Body内に埋め込むXML文字列を構築する
         StringBuilder inner = new StringBuilder();

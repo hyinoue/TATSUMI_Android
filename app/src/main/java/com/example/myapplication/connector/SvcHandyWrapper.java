@@ -2,10 +2,10 @@ package com.example.myapplication.connector;
 
 import com.example.myapplication.db.dao.CommHistoryDao;
 import com.example.myapplication.db.entity.CommHistoryEntity;
-import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.SyougoData;
 import com.example.myapplication.model.SyukkaData;
+import com.example.myapplication.model.VanningData;
 import com.example.myapplication.time.DateTimeFormatUtil;
 
 import java.io.Closeable;
@@ -172,7 +172,7 @@ public class SvcHandyWrapper implements Closeable {
     //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
     //============================================================
-    public boolean sendSyukkaData(BunningData data) throws Exception {
+    public boolean sendSyukkaData(VanningData data) throws Exception {
         CommHistoryRow history = getHistoryRow("sendSyukkaData");
         Exception lastException = null;
 

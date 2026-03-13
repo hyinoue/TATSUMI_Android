@@ -22,7 +22,6 @@ import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.SyukkaContainerEntity;
 import com.example.myapplication.db.entity.SyukkaMeisaiEntity;
 import com.example.myapplication.db.entity.YoteiEntity;
-import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.CollateDtl;
 import com.example.myapplication.model.SyougoData;
@@ -31,6 +30,7 @@ import com.example.myapplication.model.SyougoHeader;
 import com.example.myapplication.model.SyukkaData;
 import com.example.myapplication.model.SyukkaHeader;
 import com.example.myapplication.model.SyukkaMeisai;
+import com.example.myapplication.model.VanningData;
 import com.example.myapplication.time.DateTimeFormatUtil;
 import com.example.myapplication.time.XsdDateTime;
 
@@ -238,7 +238,6 @@ public class DataSync {
         } catch (Exception ex) {
             hasError = true;
             reportError(ex);
-            reportError("作業予定が登録されていません");
         }
 
         // 出荷データ送信（作業予定日が取れた場合のみ）
@@ -333,10 +332,24 @@ public class DataSync {
 
         // DBに無い／解析できない場合はサービスから取得
         Date sagyouYmd = svcWrapper.getSagyouYmd();
-        if (sagyouYmd == null) {
+        if (isMinDateValue(sagyouYmd)) {
             throw new IllegalStateException("作業予定が登録されていません");
         }
         return sagyouYmd;
+    }
+
+    //============================================================
+    //　機　能　:　Dateが「Sat Jan 01 00:00:00 GMT+09:00 1」か判定する
+    //　引　数　:　value ..... 判定対象
+    //　戻り値　:　[boolean] ..... MinValue相当ならtrue
+    //============================================================
+    private boolean isMinDateValue(Date value) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(value);
+
+        return cal.get(Calendar.YEAR) == 1
+                && cal.get(Calendar.MONTH) == Calendar.JANUARY
+                && cal.get(Calendar.DAY_OF_MONTH) == 1;
     }
 
     //============================================================
@@ -390,7 +403,7 @@ public class DataSync {
             }
 
             // 送信用データを組み立て
-            BunningData data = new BunningData();
+            VanningData data = new VanningData();
             data.syukkaYmd = sagyouYmd;
             data.containerNo = normalizeSendKey(container.containerNo);
             data.containerJyuryo = intOrZero(container.containerJyuryo);
@@ -405,8 +418,6 @@ public class DataSync {
             List<SyukkaMeisaiEntity> detailRows =
                     syukkaMeisaiDao.findByContainerId(container.containerId);
 
-            // bookingNoは明細で欠ける可能性があるため、コンテナ側の値をフォールバックに使う
-            String fallbackBookingNo = normalizeSendKey(container.bookingNo);
             int missingBookingCount = 0;
             String missingBookingSample = "";
 
@@ -418,9 +429,6 @@ public class DataSync {
 
                 // bookingNoは明細→無ければコンテナのbookingNo→それでも無ければエラー扱い
                 String bookingNo = normalizeSendKey(row.bookingNo);
-                if (bookingNo.isEmpty()) {
-                    bookingNo = fallbackBookingNo;
-                }
                 if (bookingNo.isEmpty()) {
                     // 送信必須項目の欠落としてカウントし、ログ用にサンプルも保持
                     missingBookingCount++;

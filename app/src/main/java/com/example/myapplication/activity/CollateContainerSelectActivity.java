@@ -260,7 +260,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
 
         // 未入力チェック
         if (TextUtils.isEmpty(input)) {
-            showWarningMsg("照合対照№が未入力です", MsgDispMode.MsgBox);
+            showWarningMsg("照合対象№が未入力です", MsgDispMode.MsgBox);
             if (etSelectedNo != null) etSelectedNo.requestFocus();
             return;
         }
@@ -353,7 +353,7 @@ public class CollateContainerSelectActivity extends BaseActivity {
 
         // 未入力チェック
         if (TextUtils.isEmpty(input)) {
-            showWarningMsg("照合対照№が未入力です", MsgDispMode.MsgBox);
+            showWarningMsg("照合対象№が未入力です", MsgDispMode.MsgBox);
             if (etSelectedNo != null) etSelectedNo.requestFocus();
             return false;
         }

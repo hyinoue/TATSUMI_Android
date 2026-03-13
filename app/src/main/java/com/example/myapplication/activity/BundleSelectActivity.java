@@ -1,6 +1,5 @@
 package com.example.myapplication.activity;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
@@ -593,11 +592,11 @@ public class BundleSelectActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void confirmDeleteRow(int row) {
-        new AlertDialog.Builder(this)
-                .setMessage("行を削除します。よろしいですか？")
-                .setPositiveButton("いいえ", null)
-                .setNegativeButton("はい", (d, w) -> deleteBundleRow(row))
-                .show();
+        showQuestion("行を削除します。よろしいですか？", yes -> {
+            if (yes) {
+                deleteBundleRow(row);
+            }
+        });
     }
 
     //============================================================

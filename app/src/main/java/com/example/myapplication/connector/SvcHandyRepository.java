@@ -1,9 +1,9 @@
 package com.example.myapplication.connector;
 
-import com.example.myapplication.model.BunningData;
 import com.example.myapplication.model.CollateData;
 import com.example.myapplication.model.SyougoData;
 import com.example.myapplication.model.SyukkaData;
+import com.example.myapplication.model.VanningData;
 
 import java.util.Date;
 
@@ -102,7 +102,7 @@ public class SvcHandyRepository {
     //　引　数　:　data ..... データ
     //　戻り値　:　[boolean] ..... 送信結果（成功:true / 失敗:false）
     //============================================================
-    public boolean sendSyukkaData(BunningData data) throws Exception {
+    public boolean sendSyukkaData(VanningData data) throws Exception {
         String req = SendSyukkaSoapBuilder.buildSendSyukkaData(data);
         String res = client.call(SoapActions.SEND_SYUKKA_DATA, req);
         SoapParsers.throwIfSoapFault(res);

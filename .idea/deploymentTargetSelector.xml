@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-02-27T05:11:32.135399700Z">
+        <DropdownSelection timestamp="2026-03-11T07:11:26.650395100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=4969005160500407" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\hyinoue\.android\avd\BHT-M70.avd" />
             </handle>
           </Target>
         </DropdownSelection>

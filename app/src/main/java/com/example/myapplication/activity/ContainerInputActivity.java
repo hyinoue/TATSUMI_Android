@@ -504,7 +504,7 @@ public class ContainerInputActivity extends BaseActivity {
                 // 3) 初期値を解決（DB設定値が無い場合のフォールバック含む）
                 int defaultContainer = resolveDefaultContainerWeight(system);
                 int defaultDunnage = resolveDefaultDunnageWeight(system);
-                maxContainerJyuryo = resolveMaxContainerWeight(system);
+                maxContainerJyuryo = resolveMaxContainerWeight();
 
                 // 4) 集計値を画面用フィールドへ保持
                 bundleCount = summary != null ? summary.sokusu : 0;
@@ -1336,13 +1336,8 @@ public class ContainerInputActivity extends BaseActivity {
     //　引　数　:　system ..... システム設定情報
     //　戻り値　:　[int] ..... 最大積載重量
     //============================================================
-    private int resolveMaxContainerWeight(@Nullable SystemEntity system) {
-        // DB設定があり、かつ正の値ならそれを採用
-        if (system != null && system.maxContainerJyuryo != null && system.maxContainerJyuryo > 0) {
-            return system.maxContainerJyuryo;
-        }
-
-        // 無ければPreferencesのサイズから推定（20ft:24000, 40ft:30000）
+    private int resolveMaxContainerWeight() {
+        //Preferencesのサイズから推定（20ft:24000, 40ft:30000）
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         String size = prefs.getString("container_size", "20ft");
         return "40ft".equals(size) ? 30000 : 24000;
