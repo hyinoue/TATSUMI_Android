@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,10 +30,8 @@ import java.util.concurrent.Executors;
 //　　　　　　:　bindViews ............... 画面部品のバインド
 //　　　　　　:　setupBottomButtons ...... 下部ボタン設定
 //　　　　　　:　setupRecycler ........... RecyclerView設定（Adapter/レイアウト/フォーカス制御）
-//　　　　　　:　setupInputHandlers ...... 入力欄イベント設定（Enterで処理）
 //　　　　　　:　loadContainers .......... コンテナ一覧をDBから読込
 //　　　　　　:　updateUiForContainers ... 一覧有無に応じたUI制御
-//　　　　　　:　handleSelectedNoInput ... 入力された照合対象№のチェック
 //　　　　　　:　onFunctionBlue .......... 決定（入力チェック→選択確定→次画面へ）
 //　　　　　　:　onFunctionRed ........... 未使用
 //　　　　　　:　onFunctionGreen ......... 未使用
@@ -76,7 +73,6 @@ public class CollateContainerSelectActivity extends BaseActivity {
         bindViews();
         setupBottomButtons();
         setupRecycler();
-        setupInputHandlers();
 
         // 一覧読込
         loadContainers();
@@ -162,24 +158,6 @@ public class CollateContainerSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　照合対象№入力欄の入力イベントを設定する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void setupInputHandlers() {
-        if (etSelectedNo == null) return;
-
-        // Enter押下で入力処理
-        etSelectedNo.setOnKeyListener((v, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                handleSelectedNoInput();
-                return true;
-            }
-            return false;
-        });
-    }
-
-    //============================================================
     //　機　能　:　DBからコンテナ一覧を読み込み、画面に反映する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
@@ -245,43 +223,6 @@ public class CollateContainerSelectActivity extends BaseActivity {
         refreshBottomButtonsEnabled();
     }
 
-    //============================================================
-    //　機　能　:　照合対象№の入力チェック
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void handleSelectedNoInput() {
-        if (controller == null) return;
-
-        // 入力取得
-        String input = (etSelectedNo != null && etSelectedNo.getText() != null)
-                ? etSelectedNo.getText().toString().trim()
-                : "";
-
-        // 未入力チェック
-        if (TextUtils.isEmpty(input)) {
-            showWarningMsg("照合対象№が未入力です", MsgDispMode.MsgBox);
-            if (etSelectedNo != null) etSelectedNo.requestFocus();
-            return;
-        }
-
-        // 数値チェック
-        int selectedNo;
-        try {
-            selectedNo = Integer.parseInt(input);
-        } catch (NumberFormatException ex) {
-            showWarningMsg("照合対象№が不正です", MsgDispMode.MsgBox);
-            if (etSelectedNo != null) etSelectedNo.requestFocus();
-            return;
-        }
-
-        // コントローラ側のチェック処理（OK以外なら警告）
-        String err = controller.checkSelectedNo(selectedNo);
-        if (!TextUtils.isEmpty(err) && !"OK".equals(err)) {
-            showWarningMsg(err, MsgDispMode.MsgBox);
-            if (etSelectedNo != null) etSelectedNo.requestFocus();
-        }
-    }
 
     //============================================================
     //　機　能　:　決定ボタン押下時に入力確認後、次画面へ遷移する
