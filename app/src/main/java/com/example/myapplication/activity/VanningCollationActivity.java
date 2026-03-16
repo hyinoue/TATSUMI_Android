@@ -591,7 +591,10 @@ public class VanningCollationActivity extends BaseActivity {
     //============================================================
     private void registerDb() {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-        db.runInTransaction(() -> controller.markContainerCollated(db.kakuninContainerDao()));
+        db.runInTransaction(() -> controller.markContainerCollated(
+                db.kakuninMeisaiDao(),
+                db.kakuninContainerDao()
+        ));
     }
 
     //============================================================

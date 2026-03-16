@@ -217,11 +217,27 @@ public class VanningCollationController {
     //　引　数　:　kakuninContainerDao ..... データアクセスオブジェクト
     //　戻り値　:　[void] ..... なし
     //============================================================
-    public void markContainerCollated(@NonNull KakuninContainerDao kakuninContainerDao) {
+    public void markContainerCollated(@NonNull KakuninMeisaiDao kakuninMeisaiDao,
+                                      @NonNull KakuninContainerDao kakuninContainerDao) {
 
         // 明細が無ければ何もしない
         if (details.isEmpty()) {
             return;
+        }
+
+        String now = DateTimeFormatUtil.nowDbYmdHms();
+
+        // 明細ワークに存在する全件を確認済へ更新
+        for (KakuninMeisaiWorkEntity work : details) {
+            KakuninMeisaiEntity meisai = kakuninMeisaiDao.findOne(work.heatNo, work.sokuban);
+            if (meisai == null) {
+                continue;
+            }
+
+            meisai.containerSyougoKakunin = true;
+            meisai.updateProcName = "VanningCollation";
+            meisai.updateYmd = now;
+            kakuninMeisaiDao.upsert(meisai);
         }
 
         // 先頭明細から containerId を取得（全明細同一コンテナ想定）
@@ -244,7 +260,7 @@ public class VanningCollationController {
 
         // 更新情報を設定
         container.updateProcName = "VanningCollation";
-        container.updateYmd = DateTimeFormatUtil.nowDbYmdHms();
+        container.updateYmd = now;
 
         // コンテナを更新（upsert）
         kakuninContainerDao.upsert(container);

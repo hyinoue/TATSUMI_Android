@@ -34,6 +34,7 @@ import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.dao.SyukkaMeisaiWorkDao;
 import com.example.myapplication.db.entity.SystemEntity;
 import com.example.myapplication.db.entity.SyukkaContainerEntity;
+import com.example.myapplication.db.entity.YoteiEntity;
 import com.example.myapplication.settings.HandyUtil;
 import com.example.myapplication.time.DateTimeFormatUtil;
 import com.google.android.material.button.MaterialButton;
@@ -1180,12 +1181,16 @@ public class ContainerInputActivity extends BaseActivity {
 
         // 1トランザクションでコンテナ登録～関連テーブル更新まで実施
         db.runInTransaction(() -> {
-            // 1) 新規containerIdを採番（最大+1）
+            // 1) 作業予定日を取得
+            YoteiEntity firstYotei = db.yoteiDao().findFirst();
+            String sagyouYoteiYmd = firstYotei != null ? firstYotei.sagyouYoteiYmd : null;
+
+            // 2) 新規containerIdを採番（最大+1）
             Integer maxId = db.syukkaContainerDao().getMaxContainerId();
             int containerId = (maxId == null) ? 1 : maxId + 1;
             newId.set(containerId);
 
-            // 2) 登録用データを組み立て
+            // 3) 登録用データを組み立て
             String containerNo = buildContainerNo();
             String bookingNo = safeText(etBookingNo).trim();
             String now = DateTimeFormatUtil.nowDbYmdHms();
@@ -1193,6 +1198,7 @@ public class ContainerInputActivity extends BaseActivity {
             SyukkaContainerEntity entity = new SyukkaContainerEntity();
             entity.containerId = containerId;
             entity.bookingNo = bookingNo;
+            entity.sagyouYoteiYmd = sagyouYoteiYmd;
             entity.containerNo = containerNo;
             entity.containerJyuryo = getIntFromEdit(etContainerKg);
             entity.dunnageJyuryo = getIntFromEdit(etDunnageKg);
@@ -1203,18 +1209,18 @@ public class ContainerInputActivity extends BaseActivity {
             entity.updateProcName = "ContainerInput";
             entity.updateYmd = now;
 
-            // 3) コンテナ情報をUpsert
+            // 4) コンテナ情報をUpsert
             db.syukkaContainerDao().upsert(entity);
 
-            // 4) 作業中明細へcontainerIdを設定（紐付け）
+            // 5) 作業中明細へcontainerIdを設定（紐付け）
             db.syukkaMeisaiDao().updateContainerIdForWork(containerId);
 
-            // 5) 予約No.がある場合は完了数/重量を加算
+            // 6) 予約No.がある場合は完了数/重量を加算
             if (!TextUtils.isEmpty(bookingNo)) {
                 db.yoteiDao().incrementKanryo(bookingNo, bundleCount, sekisaiSokuJyuryo);
             }
 
-            // 6) 作業中明細をクリア（登録済みとして扱う）
+            // 7) 作業中明細をクリア（登録済みとして扱う）
             db.syukkaMeisaiWorkDao().deleteAll();
         });
 
