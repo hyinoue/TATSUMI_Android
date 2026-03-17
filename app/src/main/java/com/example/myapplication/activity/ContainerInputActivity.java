@@ -111,6 +111,11 @@ public class ContainerInputActivity extends BaseActivity {
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
     private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
     private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
+    private static final String PREFS_CONTAINER_NO1 = "prefs_container_no1";          // コンテナ番号1設定キー
+    private static final String PREFS_CONTAINER_NO2 = "prefs_container_no2";          // コンテナ番号2設定キー
+    private static final String PREFS_SEAL_NO = "prefs_seal_no";                      // シール番号設定キー
+    private static final String PREFS_CONTAINER_PHOTO_URI = "prefs_container_photo_uri"; // コンテナ写真URI設定キー
+    private static final String PREFS_SEAL_PHOTO_URI = "prefs_seal_photo_uri";           // シール写真URI設定キー
     private static final String KEY_CONTAINER_NO1 = "container_no1";                // コンテナ番号1キー
     private static final String KEY_CONTAINER_NO2 = "container_no2";                // コンテナ番号2キー
     private static final String KEY_SEAL_NO = "seal_no";                            // シール番号キー
@@ -520,6 +525,11 @@ public class ContainerInputActivity extends BaseActivity {
                 SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
                 String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, "");
                 String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, "");
+                String prefNo1 = prefs.getString(PREFS_CONTAINER_NO1, "");
+                String prefNo2 = prefs.getString(PREFS_CONTAINER_NO2, "");
+                String prefSeal = prefs.getString(PREFS_SEAL_NO, "");
+                String prefContainerPhoto = prefs.getString(PREFS_CONTAINER_PHOTO_URI, "");
+                String prefSealPhoto = prefs.getString(PREFS_SEAL_PHOTO_URI, "");
 
                 // 7) その他引継値を取得
                 String savedNo1 = containerValues.get(KEY_CONTAINER_NO1);
@@ -561,13 +571,23 @@ public class ContainerInputActivity extends BaseActivity {
                     }
 
                     // コンテナNo/シールNo復元
-                    if (etContainerNo1 != null) etContainerNo1.setText(defaultString(savedNo1));
-                    if (etContainerNo2 != null) etContainerNo2.setText(defaultString(savedNo2));
-                    if (etSealNo != null) etSealNo.setText(defaultString(savedSeal));
+                    if (etContainerNo1 != null) {
+                        etContainerNo1.setText(!TextUtils.isEmpty(savedNo1) ? savedNo1 : defaultString(prefNo1));
+                    }
+                    if (etContainerNo2 != null) {
+                        etContainerNo2.setText(!TextUtils.isEmpty(savedNo2) ? savedNo2 : defaultString(prefNo2));
+                    }
+                    if (etSealNo != null) {
+                        etSealNo.setText(!TextUtils.isEmpty(savedSeal) ? savedSeal : defaultString(prefSeal));
+                    }
 
                     // 写真URI復元（表示＋内部保持）
-                    restorePhoto(ivPhotoContainer, savedContainerPhoto, true);
-                    restorePhoto(ivPhotoSeal, savedSealPhoto, false);
+                    restorePhoto(ivPhotoContainer,
+                            !TextUtils.isEmpty(savedContainerPhoto) ? savedContainerPhoto : prefContainerPhoto,
+                            true);
+                    restorePhoto(ivPhotoSeal,
+                            !TextUtils.isEmpty(savedSealPhoto) ? savedSealPhoto : prefSealPhoto,
+                            false);
 
                     // 束数表示（個数）
                     if (tvBundleCount != null) {
@@ -1455,5 +1475,15 @@ public class ContainerInputActivity extends BaseActivity {
                 containerPhotoUri != null ? containerPhotoUri.toString() : "");
         containerValues.put(KEY_SEAL_PHOTO_URI,
                 sealPhotoUri != null ? sealPhotoUri.toString() : "");
+
+        // メインメニュー経由で再表示された場合にも復元できるようPreferencesにも保持
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        prefs.edit()
+                .putString(PREFS_CONTAINER_NO1, containerValues.get(KEY_CONTAINER_NO1))
+                .putString(PREFS_CONTAINER_NO2, containerValues.get(KEY_CONTAINER_NO2))
+                .putString(PREFS_SEAL_NO, containerValues.get(KEY_SEAL_NO))
+                .putString(PREFS_CONTAINER_PHOTO_URI, containerValues.get(KEY_CONTAINER_PHOTO_URI))
+                .putString(PREFS_SEAL_PHOTO_URI, containerValues.get(KEY_SEAL_PHOTO_URI))
+                .apply();
     }
 }

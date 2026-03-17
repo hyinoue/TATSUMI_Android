@@ -123,6 +123,11 @@ public class CollateContainerSelectController {
         // 1始まり→0始まりへ変換して取得
         KakuninContainerEntity entity = containers.get(selectedNo - 1);
 
+        // コンテナ情報取得チェック
+        if (entity == null || entity.containerId == null) {
+            return "積載束照合対象のコンテナ情報取得が取得できませんでした";
+        }
+
         // 選択中情報をメンバへ保持（nullは空文字、束数はnullなら0）
         selectedContainerId = safeStr(entity.containerId);
         selectedContainerNo = safeStr(entity.containerNo);
