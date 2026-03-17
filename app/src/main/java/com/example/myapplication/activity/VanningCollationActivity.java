@@ -554,8 +554,6 @@ public class VanningCollationActivity extends BaseActivity {
     //　戻り値　:　[void]
     //============================================================
     private void showRegisterCompleteInfoAndFinish() {
-        HandyUtil.playSuccessBuzzer(this);
-        HandyUtil.playVibrater(this);
         new AlertDialog.Builder(this)
                 .setTitle("情報")
                 .setMessage("積載束照合を確定しました")
