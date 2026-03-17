@@ -71,19 +71,27 @@ public interface SyukkaMeisaiDao {
     //　引　数　:　heatNo   ..... 鋼番
     //　　　　　:　sokuban  ..... 束番
     //　　　　　:　bundleNo ..... バンドルNo.
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
             "UPDATE " +
                     "T_SYUKKA_MEISAI " +
                     "SET " +
-                    "BUNDLE_NO = :bundleNo " +
+                    "BUNDLE_NO = :bundleNo, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(HEAT_NO) = TRIM(:heatNo) " +
                     "AND " +
                     "TRIM(SOKUBAN) = TRIM(:sokuban)"
     )
-    int updateBundleNo(String heatNo, String sokuban, String bundleNo);
+    int updateBundleNo(String heatNo,
+                       String sokuban,
+                       String bundleNo,
+                       String updateProcName,
+                       String updateYmd);
     // ・対象明細のBUNDLE_NOを更新
     // ・更新件数を返却（0の場合は該当なし）
 
@@ -96,6 +104,8 @@ public interface SyukkaMeisaiDao {
     //　　　　　:　bundleNo         ..... バンドルNo.
     //　　　　　:　jyuryo           ..... 重量
     //　　　　　:　bookingNo        ..... 予約No.
+    //　　　　　:　updateProcName   ..... 更新処理名
+    //　　　　　:　updateYmd        ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
@@ -105,7 +115,9 @@ public interface SyukkaMeisaiDao {
                     "SYUKKA_SASHIZU_NO = :syukkaSashizuNo, " +
                     "BUNDLE_NO = :bundleNo, " +
                     "JYURYO = :jyuryo, " +
-                    "BOOKING_NO = :bookingNo " +
+                    "BOOKING_NO = :bookingNo, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(HEAT_NO) = TRIM(:heatNo) " +
                     "AND " +
@@ -116,7 +128,9 @@ public interface SyukkaMeisaiDao {
                           String syukkaSashizuNo,
                           String bundleNo,
                           Integer jyuryo,
-                          String bookingNo);
+                          String bookingNo,
+                          String updateProcName,
+                          String updateYmd);
     // ・受信処理で取得した情報を一括反映
     // ・該当明細（HEAT_NO/SOKUBAN）を更新
     // ・更新件数を返却
@@ -176,10 +190,14 @@ public interface SyukkaMeisaiDao {
     //========================================================================
     //　機　能　:　ワーク明細（W_SYUKKA_MEISAI）に存在する明細へコンテナIDを一括設定する
     //　引　数　:　containerId ..... 設定するコンテナID
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //========================================================================
     @Query(
-            "UPDATE T_SYUKKA_MEISAI SET CONTAINER_ID = :containerId " +
+            "UPDATE T_SYUKKA_MEISAI SET CONTAINER_ID = :containerId, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "EXISTS(" +
                     "SELECT 1 FROM " +
@@ -189,7 +207,9 @@ public interface SyukkaMeisaiDao {
                     "AND " +
                     "TRIM(W.SOKUBAN) = TRIM(T_SYUKKA_MEISAI.SOKUBAN))"
     )
-    int updateContainerIdForWork(int containerId);
+    int updateContainerIdForWork(int containerId,
+                                 String updateProcName,
+                                 String updateYmd);
     // ・ワーク側に存在する（HEAT_NO/SOKUBAN一致）明細を対象に更新
     // ・一括でCONTAINER_IDを付与（コンテナ紐付け確定処理などで使用）
     // ・更新件数を返却
@@ -257,13 +277,17 @@ public interface SyukkaMeisaiDao {
     //　引　数　:　heatNo   ..... 鋼番
     //　　　　　:　sokuban  ..... 束番
     //　　　　　:　bundleNo ..... バンドルNo.
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
             "UPDATE " +
                     "T_SYUKKA_MEISAI " +
                     "SET " +
-                    "BUNDLE_NO = :bundleNo " +
+                    "BUNDLE_NO = :bundleNo, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(HEAT_NO) = TRIM(:heatNo) " +
                     "AND " +
@@ -271,7 +295,11 @@ public interface SyukkaMeisaiDao {
                     "AND " +
                     "(BUNDLE_NO IS NULL OR BUNDLE_NO = '')"
     )
-    int updateBundleNoIfEmpty(String heatNo, String sokuban, String bundleNo);
+    int updateBundleNoIfEmpty(String heatNo,
+                              String sokuban,
+                              String bundleNo,
+                              String updateProcName,
+                              String updateYmd);
     // ・BUNDLE_NOがNULLまたは空文字の場合のみ更新
     // ・既に値がある場合は上書きしない
     // ・更新件数を返却

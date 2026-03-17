@@ -1207,11 +1207,21 @@ public class ContainerInputActivity extends BaseActivity {
             db.syukkaContainerDao().upsert(entity);
 
             // 4) 作業中明細へcontainerIdを設定（紐付け）
-            db.syukkaMeisaiDao().updateContainerIdForWork(containerId);
+            db.syukkaMeisaiDao().updateContainerIdForWork(
+                    containerId,
+                    "ContainerInput",
+                    now
+            );
 
             // 5) 予約No.がある場合は完了数/重量を加算
             if (!TextUtils.isEmpty(bookingNo)) {
-                db.yoteiDao().incrementKanryo(bookingNo, bundleCount, sekisaiSokuJyuryo);
+                db.yoteiDao().incrementKanryo(
+                        bookingNo,
+                        bundleCount,
+                        sekisaiSokuJyuryo,
+                        "ContainerInput",
+                        now
+                );
             }
 
             // 6) 作業中明細をクリア（登録済みとして扱う）
