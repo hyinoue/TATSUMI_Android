@@ -3,10 +3,6 @@ package com.example.myapplication.scanner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
@@ -23,7 +19,6 @@ import androidx.appcompat.widget.AppCompatEditText;
 //　　　　　　:　ensureScannerReady ..... スキャナ生成/Resume/プロファイル適用（フォーカスON時）
 //　　　　　　:　pauseScanner ..... スキャナPause（フォーカスOFF時）
 //　　　　　　:　destroyScanner ..... スキャナDestroy（View破棄時）
-//　　　　　　:　resolveMaxLength ..... InputFilter.LengthFilterから最大長を推定
 //　　　　　　:　findActivity ..... ContextからActivityを探索
 //====================================================================================
 
@@ -125,13 +120,8 @@ public class ImageScanTextBox extends AppCompatEditText {
                         // 最小長チェック（0以下なら1扱い）
                         int effectiveMinLength = minLength <= 0 ? 1 : minLength;
                         if (normalizedData.length() < effectiveMinLength) return;
-
-                        // EditTextの最大長（LengthFilter）を推定し、超過分は切り捨て
-                        int maxLength = resolveMaxLength();
+                        
                         String value = normalizedData;
-                        if (maxLength > 0 && value.length() > maxLength) {
-                            value = value.substring(0, maxLength);
-                        }
 
                         // テキスト反映＋カーソル末尾
                         setText(value);
@@ -211,45 +201,6 @@ public class ImageScanTextBox extends AppCompatEditText {
             scannerController = null;
         }
         scannerCreated = false;
-    }
-
-    //============================================================
-    //　機　能　:　EditTextの最大長を推定する
-    //　引　数　:　なし
-    //　戻り値　:　[int] ..... 最大長（不明/未設定は0）
-    //============================================================
-    private int resolveMaxLength() {
-
-        // 設定されているInputFilterを取得
-        InputFilter[] filters = getFilters();
-        if (filters == null) return 0;
-
-        // LengthFilterを探して最大長を推定
-        for (InputFilter filter : filters) {
-            if (filter instanceof InputFilter.LengthFilter) {
-
-                // filter.filter(...) は Spanned(dest) を要求するため現在値を使う
-                Editable current = getText(); // Editable は Spanned
-                Spanned dest = (current != null) ? current : new SpannableStringBuilder("");
-
-                // 1文字追加できるかを試し、追加不可なら現在長が上限とみなす
-                CharSequence out = filter.filter(
-                        "A",
-                        0,
-                        1,
-                        dest,
-                        0,
-                        dest.length()
-                );
-
-                // outが空（追加不可）なら、dest.length()が最大長
-                if (out != null && out.length() == 0) {
-                    return dest.length();
-                }
-            }
-        }
-
-        return 0;
     }
 
     //============================================================

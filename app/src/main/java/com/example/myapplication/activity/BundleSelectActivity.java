@@ -83,6 +83,7 @@ import java.util.concurrent.Executors;
 //======================================================================================
 
 public class BundleSelectActivity extends BaseActivity {
+    private static final int MAX_GENPIN_SCAN_LENGTH = 18; // 現品番号スキャンの許容最大桁数
 
     public static final String EXTRA_MODE = "bundle_select_mode";                  // 画面モード受け渡しキー
     public static final String EXTRA_BUNDLE_VALUES = "bundle_select_values";        // 束入力値受け渡しキー
@@ -281,6 +282,10 @@ public class BundleSelectActivity extends BaseActivity {
                     //============================================================
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
+                        // 19桁以上は無視（Code39以外と同様に反応させない）
+                        if (normalizedData != null && normalizedData.length() > MAX_GENPIN_SCAN_LENGTH)
+                            return;
+
                         // スキャン結果を入力欄に反映し、同じ処理経路（handleGenpinInput）に流す
                         runOnUiThread(() -> {
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);

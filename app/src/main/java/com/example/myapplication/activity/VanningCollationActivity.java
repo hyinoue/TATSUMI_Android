@@ -64,6 +64,7 @@ import java.util.concurrent.Executors;
 //================================================================================
 
 public class VanningCollationActivity extends BaseActivity {
+    private static final int MAX_GENPIN_SCAN_LENGTH = 18; // 現品番号スキャンの許容最大桁数
 
     public static final String EXTRA_CONTAINER_ID = "extra_container_id"; // コンテナID受け渡しキー
     public static final String EXTRA_CONTAINER_NO = "extra_container_no"; // コンテナNo受け渡しキー
@@ -207,6 +208,9 @@ public class VanningCollationActivity extends BaseActivity {
                 new OnScanListener() {
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
+                        // 19桁以上は無視（Code39以外と同様に反応させない）
+                        if (normalizedData != null && normalizedData.length() > MAX_GENPIN_SCAN_LENGTH)
+                            return;
                         runOnUiThread(() -> {
                             // スキャン結果を現品番号に反映し、入力確定処理を実行
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
