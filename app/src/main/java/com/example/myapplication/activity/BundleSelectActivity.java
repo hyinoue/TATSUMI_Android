@@ -46,7 +46,6 @@ import java.util.concurrent.Executors;
 //　　　　　　:　bindViews ................ 画面部品取得
 //　　　　　　:　setupMode ................ 画面モード設定（通常/重量計算）
 //　　　　　　:　loadBundleValues ......... 前画面からの束関連値読込
-//　　　　　　:　loadContainerValues ...... 前画面からのコンテナ関連値読込
 //　　　　　　:　initScanner .............. スキャナ初期化（フォーカス中だけCode39）
 //　　　　　　:　setupInputHandlers ....... 入力監視/Enter移動/フォーカス時プロファイル更新
 //　　　　　　:　isEnterAction ............ Enter判定（物理/IME）
@@ -61,10 +60,9 @@ import java.util.concurrent.Executors;
 //　　　　　　:　persistContainerWeights .. 重量入力をSharedPreferencesへ保存
 //　　　　　　:　setupBottomButtonTexts ... 下部ボタン文言設定
 //　　　　　　:　onFunctionRed ............ 束クリア（全削除）
-//　　　　　　:　onFunctionBlue ........... 確定（入力検証→次画面へ）
+//　　　　　　:　onFunctionBlue ........... 確定（入力検証→終了）
 //　　　　　　:　validateBeforeConfirm .... 確定前入力チェック
-//　　　　　　:　openContainerInputAndFinish 次画面起動＆終了
-//　　　　　　:　syncContainerValuesFromBundle bundleValues→containerValues同期
+//　　　　　　:　requestConfirmAndFinish . 確定要求を立てて終了
 //　　　　　　:　onFunctionGreen .......... 未使用
 //　　　　　　:　onFunctionYellow ......... 終了
 //　　　　　　:　handleGenpinInput ........ 現品番号入力/スキャン処理（解析→チェック→追加）
@@ -114,7 +112,7 @@ public class BundleSelectActivity extends BaseActivity {
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
 
     private final Map<String, String> bundleValues = new HashMap<>();    // 束入力値保持
-    private final Map<String, String> containerValues = new HashMap<>(); // コンテナ入力値保持
+    private boolean confirmRequested = false; // 確定要求フラグ
 
     private int maxContainerJyuryo = 0; // 最大積載可能重量
     private BundleSelectController.Mode mode = BundleSelectController.Mode.Normal; // 画面モード
@@ -134,6 +132,7 @@ public class BundleSelectActivity extends BaseActivity {
         // DBアクセス用の単一スレッド
         io = Executors.newSingleThreadExecutor();
 
+
         // 画面部品取得
         bindViews();
 
@@ -142,7 +141,6 @@ public class BundleSelectActivity extends BaseActivity {
 
         // 前画面から渡された値を復元
         loadBundleValues(getIntent());
-        loadContainerValues(getIntent());
 
         // 下部ボタン文言設定（モードで確定表示が変わる）
         setupBottomButtonTexts();
@@ -234,29 +232,6 @@ public class BundleSelectActivity extends BaseActivity {
             Object value = entry.getValue();
             if (key != null && value != null) {
                 bundleValues.put(key.toString(), value.toString());
-            }
-        }
-    }
-
-    //============================================================
-    //　機　能　:　コンテナ関連の引き継ぎ値を読み込む
-    //　引　数　:　intent ..... 画面遷移情報
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void loadContainerValues(@Nullable Intent intent) {
-        if (intent == null) return;
-
-        // ContainerInputActivityからの戻り値を復元
-        java.io.Serializable extra = intent.getSerializableExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES);
-        if (!(extra instanceof Map)) return;
-
-        containerValues.clear();
-        Map<?, ?> raw = (Map<?, ?>) extra;
-        for (Map.Entry<?, ?> entry : raw.entrySet()) {
-            Object key = entry.getKey();
-            Object value = entry.getValue();
-            if (key != null && value != null) {
-                containerValues.put(key.toString(), value.toString());
             }
         }
     }
@@ -759,8 +734,8 @@ public class BundleSelectActivity extends BaseActivity {
             return;
         }
 
-        // 次画面（コンテナ入力）へ遷移して終了
-        openContainerInputAndFinish();
+        // 確定要求を立てて終了
+        requestConfirmAndFinish();
     }
 
     //============================================================
@@ -806,50 +781,14 @@ public class BundleSelectActivity extends BaseActivity {
 
         return true;
     }
-
     //============================================================
-    //　機　能　:　コンテナ入力画面へ遷移して終了する
+    //　機　能　:　確定要求を立てて画面を終了する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
-    private void openContainerInputAndFinish() {
-        // 入力値を保存（bundleValuesへ）
-        saveBundleInputValues();
-
-        // 次画面へ渡すcontainerValuesへ同期
-        syncContainerValuesFromBundle();
-
-        // 次画面起動
-        Intent intent = new Intent(this, ContainerInputActivity.class);
-        intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
-        intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
-        startActivity(intent);
-
-        // この画面は終了
+    private void requestConfirmAndFinish() {
+        confirmRequested = true;
         finish();
-    }
-
-    //============================================================
-    //　機　能　:　積載束選定→コンテナ入力での値の同期
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void syncContainerValuesFromBundle() {
-        // bundleValuesの重量をcontainerValuesへ反映（空なら削除）
-        String container = bundleValues.get(KEY_CONTAINER_JYURYO);
-        String dunnage = bundleValues.get(KEY_DUNNAGE_JYURYO);
-
-        if (TextUtils.isEmpty(container)) {
-            containerValues.remove(KEY_CONTAINER_JYURYO);
-        } else {
-            containerValues.put(KEY_CONTAINER_JYURYO, container);
-        }
-
-        if (TextUtils.isEmpty(dunnage)) {
-            containerValues.remove(KEY_DUNNAGE_JYURYO);
-        } else {
-            containerValues.put(KEY_DUNNAGE_JYURYO, dunnage);
-        }
     }
 
     //============================================================
@@ -1103,7 +1042,7 @@ public class BundleSelectActivity extends BaseActivity {
 
         Intent result = new Intent();
         result.putExtra(EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
-        setResult(RESULT_OK, result);
+        setResult(confirmRequested ? RESULT_OK : RESULT_CANCELED, result);
 
         super.finish();
     }

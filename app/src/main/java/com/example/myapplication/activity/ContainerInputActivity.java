@@ -174,6 +174,8 @@ public class ContainerInputActivity extends BaseActivity {
     private final java.util.Map<String, String> bundleValues = new java.util.HashMap<>();
     // 当画面の入力値（戻る/再表示用）を保持
     private final java.util.Map<String, String> containerValues = new java.util.HashMap<>();
+    // 確定処理後に引継データをクリアするか
+    private boolean clearValuesOnFinish = false;
 
     private int bundleCount = 0;        // 束数（個数）
     private int sekisaiSokuJyuryo = 0;  // 積載束重量（kg）
@@ -1144,8 +1146,8 @@ public class ContainerInputActivity extends BaseActivity {
                 .setMessage(MSG_CONTAINER_CONFIRMED)
                 .setCancelable(false)
                 .setPositiveButton("OK", (d, w) -> {
-                    // 呼び出し元へOKを返す
-                    setResult(RESULT_OK);
+                    clearResultValuesAfterConfirm();
+
                     finish();
                 })
                 .show();
@@ -1436,14 +1438,33 @@ public class ContainerInputActivity extends BaseActivity {
     @Override
     public void finish() {
         // 終了時に入力値をMapへ保存（次画面/再表示の引継用）
-        saveContainerValues();
+        if (clearValuesOnFinish) {
+            bundleValues.clear();
+            containerValues.clear();
+        } else {
+            saveContainerValues();
+        }
 
         // 呼び出し元へ引継Mapを返却
         Intent result = new Intent();
+        result.putExtra(EXTRA_BUNDLE_VALUES, new java.util.HashMap<>(bundleValues));
         result.putExtra(EXTRA_CONTAINER_VALUES, new java.util.HashMap<>(containerValues));
-        setResult(RESULT_OK, result);
+        setResult(clearValuesOnFinish ? RESULT_OK : RESULT_CANCELED, result);
 
         super.finish();
+    }
+
+    //============================================================
+    //　機　能　:　確定処理後の保持データをクリアする
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void clearResultValuesAfterConfirm() {
+        clearValuesOnFinish = true;
+        bundleValues.clear();
+        containerValues.clear();
+        containerPhotoUri = null;
+        sealPhotoUri = null;
     }
 
     //============================================================
