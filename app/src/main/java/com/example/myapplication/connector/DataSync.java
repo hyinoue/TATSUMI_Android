@@ -714,6 +714,8 @@ public class DataSync {
 
         // DB更新は一括トランザクションで整合性を保つ
         db.runInTransaction(() -> {
+            String now = formatDbDate(new Date());
+            final String receiveProcName = "DataSync#receiveSyukkaData";
             // 古いデータをクリア（送信済み・紐づき済みのものを削除）
             yoteiDao.deleteAll();
             syukkaMeisaiDao.deleteSentLinked();
@@ -731,6 +733,8 @@ public class DataSync {
                 entity.kanryoBundole = header.kanryoBundleSum;
                 entity.kanryoJyuryo = header.knaryoJyuryoSum;
                 entity.lastUpdYmdhms = formatDbDate(header.lastUpdYmdHms);
+                entity.insertProcName = receiveProcName;
+                entity.insertYmd = now;
                 yoteiDao.upsert(entity);
             }
 
@@ -744,7 +748,9 @@ public class DataSync {
                             bundle.syukkaSashizuNo,
                             bundle.bundleNo,
                             bundle.jyuryo,
-                            bundle.bookingNo
+                            bundle.bookingNo,
+                            receiveProcName,
+                            now
                     );
                 } else {
                     SyukkaMeisaiEntity entity = new SyukkaMeisaiEntity();
@@ -754,19 +760,20 @@ public class DataSync {
                     entity.bundleNo = bundle.bundleNo;
                     entity.jyuryo = bundle.jyuryo;
                     entity.bookingNo = bundle.bookingNo;
+                    entity.insertProcName = receiveProcName;
+                    entity.insertYmd = now;
                     syukkaMeisaiDao.insert(entity);
                 }
             }
 
             // システムテーブルへ受信日時を反映
-            String now = formatDbDate(new Date());
-            if (systemDao.updateDataSync(SYSTEM_RENBAN, now, now, "DataSync#receiveSyukkaData", now) == 0) {
+            if (systemDao.updateDataSync(SYSTEM_RENBAN, now, now, receiveProcName, now) == 0) {
                 // 更新対象が無い場合は新規作成（upsert）
                 SystemEntity system = new SystemEntity();
                 system.renban = SYSTEM_RENBAN;
                 system.dataConfYmdhms = now;
                 system.dataRecvYmdhms = now;
-                system.updateProcName = "DataSync#receiveSyukkaData";
+                system.updateProcName = receiveProcName;
                 system.updateYmd = now;
                 systemDao.upsert(system);
             }

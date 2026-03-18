@@ -96,6 +96,8 @@ public interface SyukkaMeisaiDao {
     //　　　　　:　bundleNo         ..... バンドルNo.
     //　　　　　:　jyuryo           ..... 重量
     //　　　　　:　bookingNo        ..... 予約No.
+    //　　　　　:　updateProcName   ..... 更新処理名
+    //　　　　　:　updateYmd        ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
@@ -105,7 +107,9 @@ public interface SyukkaMeisaiDao {
                     "SYUKKA_SASHIZU_NO = :syukkaSashizuNo, " +
                     "BUNDLE_NO = :bundleNo, " +
                     "JYURYO = :jyuryo, " +
-                    "BOOKING_NO = :bookingNo " +
+                    "BOOKING_NO = :bookingNo, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(HEAT_NO) = TRIM(:heatNo) " +
                     "AND " +
@@ -116,7 +120,9 @@ public interface SyukkaMeisaiDao {
                           String syukkaSashizuNo,
                           String bundleNo,
                           Integer jyuryo,
-                          String bookingNo);
+                          String bookingNo,
+                          String updateProcName,
+                          String updateYmd);
     // ・受信処理で取得した情報を一括反映
     // ・該当明細（HEAT_NO/SOKUBAN）を更新
     // ・更新件数を返却
