@@ -106,17 +106,24 @@ public interface SyukkaContainerDao {
     //　機　能　:　コンテナを送信済みに更新する
     //　引　数　:　containerId   ..... コンテナID
     //　　　　　:　dataSendYmdhms ..... 送信日時
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
             "UPDATE " +
                     "T_SYUKKA_CONTAINER " +
                     "SET " +
-                    "DATA_SEND_YMDHMS = :dataSendYmdhms " +
+                    "DATA_SEND_YMDHMS = :dataSendYmdhms, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "CONTAINER_ID = :containerId"
     )
-    int markSent(int containerId, String dataSendYmdhms);
+    int markSent(int containerId,
+                 String dataSendYmdhms,
+                 String updateProcName,
+                 String updateYmd);
     // ・送信日時を更新
     // ・更新件数を返却（0の場合は該当なし）
 

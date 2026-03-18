@@ -468,7 +468,12 @@ public class DataSync {
             if (svcWrapper.sendSyukkaData(data)) {
                 // 送信済みマークを更新
                 String now = formatDbDate(new Date());
-                syukkaContainerDao.markSent(container.containerId, now);
+                syukkaContainerDao.markSent(
+                        container.containerId,
+                        now,
+                        "DataSync#dataSousinSyukka",
+                        now
+                );
 
                 // 送信後は画像を削除（端末容量対策）
                 deletePicture(container.containerId, ImageType.CONTAINER);
@@ -627,7 +632,12 @@ public class DataSync {
             if (svcWrapper.sendSyougoData(collateData)) {
                 // 送信済みマークを更新
                 String now = formatDbDate(new Date());
-                kakuninContainerDao.markSent(container.containerId, now);
+                kakuninContainerDao.markSent(
+                        container.containerId,
+                        now,
+                        "DataSync#dataSousinSyougo",
+                        now
+                );
                 return true;
             }
 
