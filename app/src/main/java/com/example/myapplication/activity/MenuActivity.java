@@ -54,7 +54,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　goServiceMenu                 ..... サービスメニューへ遷移
 //　　　　　　:　openBundleSelect              ..... 積載束選定画面へ遷移
 //　　　　　　:　syncContainerValuesFromBundle ..... 束→コンテナの値同期
-//　　　　　　:　syncBundleValuesFromContainer ..... コンテナ→束の値同期
 //　　　　　　:　syncContainerWeightsFromPrefs  ..... Prefs重量→保持Mapへ同期
 //　　　　　　:　openContainerInputIfWorkExists ..... 作業有無チェック後にコンテナ入力へ遷移
 //　　　　　　:　openCollateContainerSelect     ..... 照合コンテナ選択へ遷移
@@ -173,20 +172,23 @@ public class MenuActivity extends BaseActivity {
         bundleSelectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    // OKの場合のみ、結果Mapを受け取る
-                    if (result.getResultCode() == RESULT_OK) {
-                        Map<String, String> resultMap = readStringMap(
-                                result.getData(),
-                                BundleSelectActivity.EXTRA_BUNDLE_VALUES
-                        );
-                        if (resultMap != null) {
-                            // 受け取った束情報を保持
-                            bundleValues.clear();
-                            bundleValues.putAll(resultMap);
+                    Map<String, String> resultBundleMap = readStringMap(
+                            result.getData(),
+                            BundleSelectActivity.EXTRA_BUNDLE_VALUES
+                    );
+                    if (resultBundleMap != null) {
+                        // 受け取った束情報を保持
+                        bundleValues.clear();
+                        bundleValues.putAll(resultBundleMap);
 
-                            // 束側に含まれる重量情報を、コンテナ側へ同期
-                            syncContainerValuesFromBundle();
-                        }
+                        // 束側に含まれる重量情報を、コンテナ側へ同期
+                        syncContainerValuesFromBundle();
+                    }
+
+                    // C#版同様、積載束選定で確定ならコンテナ入力を続けて起動する
+                    if (result.getResultCode() == RESULT_OK) {
+                        openContainerInputIfWorkExists();
+                        return;
                     }
 
                     // 戻ってきたら必ず画面表示を更新
@@ -198,19 +200,28 @@ public class MenuActivity extends BaseActivity {
         containerInputLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Map<String, String> resultMap = readStringMap(
-                                result.getData(),
-                                ContainerInputActivity.EXTRA_CONTAINER_VALUES
-                        );
-                        if (resultMap != null) {
-                            // 受け取ったコンテナ情報を保持
-                            containerValues.clear();
-                            containerValues.putAll(resultMap);
+                    Map<String, String> resultBundleMap = readStringMap(
+                            result.getData(),
+                            ContainerInputActivity.EXTRA_BUNDLE_VALUES
+                    );
+                    Map<String, String> resultContainerMap = readStringMap(
+                            result.getData(),
+                            ContainerInputActivity.EXTRA_CONTAINER_VALUES
+                    );
+                    if (resultBundleMap != null) {
+                        bundleValues.clear();
+                        bundleValues.putAll(resultBundleMap);
+                    }
+                    if (resultContainerMap != null) {
+                        // 受け取ったコンテナ情報を保持
+                        containerValues.clear();
+                        containerValues.putAll(resultContainerMap);
+                    }
 
-                            // コンテナ側の重量を束側へ同期
-                            syncBundleValuesFromContainer();
-                        }
+                    // C#版同様、確定時だけ bundle/container の保持値をクリアする
+                    if (result.getResultCode() == RESULT_OK) {
+                        bundleValues.clear();
+                        containerValues.clear();
                     }
 
                     // 戻ってきたら必ず画面表示を更新
@@ -435,7 +446,6 @@ public class MenuActivity extends BaseActivity {
         Intent intent = new Intent(this, BundleSelectActivity.class);
         intent.putExtra(BundleSelectActivity.EXTRA_MODE, mode);
         intent.putExtra(BundleSelectActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
-        intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
 
         // launcherがあれば結果を受け取り、無ければ通常遷移
         if (bundleSelectLauncher != null) {
@@ -463,24 +473,6 @@ public class MenuActivity extends BaseActivity {
             containerValues.put(KEY_DUNNAGE_JYURYO, bundleValues.get(KEY_DUNNAGE_JYURYO));
         } else {
             containerValues.remove(KEY_DUNNAGE_JYURYO);
-        }
-    }
-
-    //============================================================
-    //　機　能　:　重量の値を同期する（コンテナ入力画面）
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void syncBundleValuesFromContainer() {
-        // コンテナ入力で確定した重量を束側にも反映し、画面間の不整合を防ぐ
-        String container = containerValues.get(KEY_CONTAINER_JYURYO);
-        String dunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
-
-        if (container != null) {
-            bundleValues.put(KEY_CONTAINER_JYURYO, container);
-        }
-        if (dunnage != null) {
-            bundleValues.put(KEY_DUNNAGE_JYURYO, dunnage);
         }
     }
 
