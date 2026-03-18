@@ -89,6 +89,8 @@ public interface YoteiDao {
     //　引　数　:　bookingNo    ..... 予約No.
     //　　　　　:　bundleCount ..... 加算する束数
     //　　　　　:　jyuryo       ..... 加算する重量
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
@@ -97,11 +99,17 @@ public interface YoteiDao {
                     "SET " +
                     "KANRYO_CONTAINER = KANRYO_CONTAINER + 1, " +
                     "KANRYO_BUNDLE = KANRYO_BUNDLE + :bundleCount, " +
-                    "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo " +
+                    "KANRYO_JYURYO = KANRYO_JYURYO + :jyuryo, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(BOOKING_NO) = TRIM(:bookingNo)"
     )
-    int incrementKanryo(String bookingNo, int bundleCount, int jyuryo);
+    int incrementKanryo(String bookingNo,
+                        int bundleCount,
+                        int jyuryo,
+                        String updateProcName,
+                        String updateYmd);
     // ・完了コンテナ数は常に +1
     // ・完了束数／重量は引数分を加算
     // ・予約No.一致のレコードを更新

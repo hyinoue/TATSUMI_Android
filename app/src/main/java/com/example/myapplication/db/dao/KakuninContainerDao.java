@@ -77,17 +77,24 @@ public interface KakuninContainerDao {
     //　機　能　:　コンテナを送信済みに更新する
     //　引　数　:　containerId   ..... コンテナID
     //　　　　　:　dataSendYmdhms ..... 送信日時
+    //　　　　　:　updateProcName ..... 更新処理名
+    //　　　　　:　updateYmd      ..... 更新日時
     //　戻り値　:　[int] ..... 更新件数
     //============================================================
     @Query(
             "UPDATE " +
                     "T_KAKUNIN_CONTAINER " +
                     "SET " +
-                    "DATA_SEND_YMDHMS = :dataSendYmdhms " +
+                    "DATA_SEND_YMDHMS = :dataSendYmdhms, " +
+                    "UPDATE_PROC_NAME = :updateProcName, " +
+                    "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
                     "TRIM(CONTAINER_ID) = TRIM(:containerId)"
     )
-    int markSent(String containerId, String dataSendYmdhms);
+    int markSent(String containerId,
+                 String dataSendYmdhms,
+                 String updateProcName,
+                 String updateYmd);
     // ・指定コンテナの送信日時を更新
     // ・空白除去して一致判定
     // ・更新件数を返却（0の場合は該当なし）

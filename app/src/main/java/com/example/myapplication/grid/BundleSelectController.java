@@ -195,9 +195,16 @@ public class BundleSelectController {
 
         // 4桁右寄せスペース埋め
         String padded = padLeft4AsSpaces(bundleNoOrg);
+        String now = DateTimeFormatUtil.nowDbYmdHms();
 
         // bundleNoが空のものだけ更新（DB側の条件更新に委譲）
-        syukkaMeisaiDao.updateBundleNoIfEmpty(heatNo, sokuban, padded);
+        syukkaMeisaiDao.updateBundleNoIfEmpty(
+                heatNo,
+                sokuban,
+                padded,
+                "BundleSelectController#addBundleNo",
+                now
+        );
     }
 
     //============================================================
