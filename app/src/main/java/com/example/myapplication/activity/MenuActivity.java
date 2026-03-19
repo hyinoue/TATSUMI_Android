@@ -88,7 +88,7 @@ public class MenuActivity extends BaseActivity {
     private final Map<String, String> bundleValues = new HashMap<>(); // 束入力値保持
     private final Map<String, String> containerValues = new HashMap<>(); // コンテナ入力値保持
     private final AtomicBoolean isDataSyncRunning = new AtomicBoolean(false); // 送受信処理中フラグ
-    private boolean suppressMenuWhileChainedTransition = false; // 束選定→コンテナ入力の中継中はメニューを見せない
+    private boolean suppressMenuWhileChainedTransition = false; // 束選定→コンテナ入力の中継中フラグ
 
     // ============================
     // Views
@@ -184,12 +184,14 @@ public class MenuActivity extends BaseActivity {
 
                     // C#版同様、積載束選定で確定ならコンテナ入力を続けて起動する
                     if (result.getResultCode() == RESULT_OK) {
+                        showLoadingShort();
                         openContainerInputIfWorkExists();
                         return;
                     }
 
-                    // 通常復帰時はメニューを再表示する
+                    // 通常復帰時は中継状態/ローディングを解除する
                     suppressMenuWhileChainedTransition = false;
+                    hideLoadingShort();
                     setMenuVisible(true);
 
                     // 戻ってきたら必ず画面表示を更新
@@ -217,6 +219,9 @@ public class MenuActivity extends BaseActivity {
                         // 受け取ったコンテナ情報を保持
                         containerValues.clear();
                         containerValues.putAll(resultContainerMap);
+
+                        // コンテナ入力で変更した重量を束選定側へも同期する
+                        syncBundleValuesFromContainer();
                     }
 
                     // C#版同様、確定時だけ bundle/container の保持値をクリアする
@@ -225,8 +230,9 @@ public class MenuActivity extends BaseActivity {
                         containerValues.clear();
                     }
 
-                    // コンテナ入力から戻ったらメニューを再表示する
+                    // コンテナ入力から戻ったら中継状態/ローディングを解除してメニューを再表示する
                     suppressMenuWhileChainedTransition = false;
+                    hideLoadingShort();
                     setMenuVisible(true);
 
                     // 戻ってきたら必ず画面表示を更新
@@ -425,8 +431,13 @@ public class MenuActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        // 束選定→コンテナ入力の中継中は、一瞬でもメニューを見せない
-        setMenuVisible(!suppressMenuWhileChainedTransition);
+        // 束選定→コンテナ入力の中継中は、メニューの代わりに短時間ローディングを表示する
+        setMenuVisible(true);
+        if (suppressMenuWhileChainedTransition) {
+            showLoadingShort();
+        } else {
+            hideLoadingShort();
+        }
 
         // DB集計して表示更新
         refreshInformation();
@@ -447,13 +458,10 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void openBundleSelect(String mode) {
-        // 積載束選定→コンテナ入力の連続遷移中は、メインメニューの再描画を抑止する
+        // 積載束選定→コンテナ入力の連続遷移中フラグを保持する
         suppressMenuWhileChainedTransition = BundleSelectActivity.MODE_NORMAL.equals(mode);
-        if (suppressMenuWhileChainedTransition) {
-            setMenuVisible(false);
-        } else {
-            setMenuVisible(true);
-        }
+        hideLoadingShort();
+        setMenuVisible(true);
 
         // 遷移先へ渡すデータをIntentに詰める（MapはSerializableとして渡す）
         Intent intent = new Intent(this, BundleSelectActivity.class);
@@ -503,11 +511,34 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
+    //　機　能　:　重量の値を同期する（コンテナ入力画面→束選定画面）
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void syncBundleValuesFromContainer() {
+        // コンテナ入力で変更した重量を、再度束選定を開いた時にも反映する
+        if (containerValues.containsKey(KEY_CONTAINER_JYURYO)) {
+            bundleValues.put(KEY_CONTAINER_JYURYO, containerValues.get(KEY_CONTAINER_JYURYO));
+        } else {
+            bundleValues.remove(KEY_CONTAINER_JYURYO);
+        }
+
+        if (containerValues.containsKey(KEY_DUNNAGE_JYURYO)) {
+            bundleValues.put(KEY_DUNNAGE_JYURYO, containerValues.get(KEY_DUNNAGE_JYURYO));
+        } else {
+            bundleValues.remove(KEY_DUNNAGE_JYURYO);
+        }
+    }
+
+    //============================================================
     //　機　能　:　作業データが存在する場合のみコンテナ入力画面へ遷移する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void openContainerInputIfWorkExists() {
+        // 束選定→コンテナ入力の待ち時間は短時間ローディングで覆う
+        showLoadingShort();
+
         // DB確認があるため別スレッドでチェック
         io.execute(() -> {
             try {
@@ -520,6 +551,7 @@ public class MenuActivity extends BaseActivity {
                     if (!hasWork) {
                         // Work無しならユーザへ案内して中断
                         suppressMenuWhileChainedTransition = false;
+                        hideLoadingShort();
                         setMenuVisible(true);
                         showErrorMsg("積載束選定が行われていません。先に積載束選定を実施してください。", MsgDispMode.Label);
                         return;
@@ -533,6 +565,7 @@ public class MenuActivity extends BaseActivity {
                     if (containerInputLauncher != null) {
                         containerInputLauncher.launch(intent);
                     } else {
+                        hideLoadingShort();
                         setMenuVisible(true);
                         startActivity(intent);
                     }
@@ -543,6 +576,7 @@ public class MenuActivity extends BaseActivity {
                 // 例外内容を簡易表示（運用で原因が追いやすいように）
                 runOnUiThread(() -> {
                     suppressMenuWhileChainedTransition = false;
+                    hideLoadingShort();
                     setMenuVisible(true);
                     showErrorMsg(
                             "コンテナ情報入力の起動に失敗しました。\n"
