@@ -1017,6 +1017,9 @@ public class BundleSelectActivity extends BaseActivity {
         setResult(confirmRequested ? RESULT_OK : RESULT_CANCELED, result);
 
         super.finish();
+        if (confirmRequested) {
+            overridePendingTransition(0, 0);
+        }
     }
 
     //============================================================
