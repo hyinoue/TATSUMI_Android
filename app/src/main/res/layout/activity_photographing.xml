@@ -50,14 +50,13 @@
     <!--================================================================
     　機　能　:　フォーカスインジケータ表示
     　内　容　:　タップフォーカス等の位置をリングで表示
-    　備　考　:　通常は非表示（visibility=gone）
+    　備　考　:　起動時は中央表示、撮影レビュー中のみ非表示
     ==================================================================-->
     <View
         android:id="@+id/focusIndicator"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:background="@drawable/ic_camera_focus"
-        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@id/previewView"
         app:layout_constraintBottom_toBottomOf="@id/previewView"
         app:layout_constraintStart_toStartOf="@id/previewView"
