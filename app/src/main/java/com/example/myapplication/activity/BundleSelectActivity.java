@@ -56,7 +56,6 @@ import java.util.concurrent.Executors;
 //　　　　　　:　refreshRows .............. 一覧表示更新
 //　　　　　　:　confirmDeleteRow ......... 行削除確認ダイアログ
 //　　　　　　:　deleteBundleRow .......... 行削除実処理
-//　　　　　　:　persistContainerWeights .. 重量入力をSharedPreferencesへ保存
 //　　　　　　:　setupBottomButtonTexts ... 下部ボタン文言設定
 //　　　　　　:　onFunctionRed ............ 束クリア（全削除）
 //　　　　　　:　onFunctionBlue ........... 確定（入力検証→終了）
@@ -90,8 +89,7 @@ public class BundleSelectActivity extends BaseActivity {
 
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";          // コンテナ重量キー
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
-    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
-    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // 確定済みダンネージ重量の既定値キー
 
     private static final int SYSTEM_RENBAN = 1;    // システム連番
 
@@ -440,9 +438,8 @@ public class BundleSelectActivity extends BaseActivity {
                 maxContainerJyuryo = resolveMaxContainerWeight();
 
                 runOnUiThread(() -> {
-                    // 前回入力値（SharedPreferences）を取得
+                    // 前回確定したダンネージ重量を取得
                     SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-                    String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, "");
                     String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, "");
 
                     // 画面復元値（bundleValues）優先で初期設定
@@ -468,13 +465,9 @@ public class BundleSelectActivity extends BaseActivity {
                             );
                         }
                     } else {
-                        // 無ければSharedPreferences→無ければデフォルト
+                        // 無ければ、コンテナ重量はシステム既定、ダンネージ重量は前回確定値→既定
                         if (etContainerKg != null) {
-                            etContainerKg.setText(
-                                    TextUtils.isEmpty(prefContainer)
-                                            ? String.valueOf(defaultContainer)
-                                            : prefContainer
-                            );
+                            etContainerKg.setText(String.valueOf(defaultContainer));
                         }
                         if (etDunnageKg != null) {
                             etDunnageKg.setText(
@@ -643,33 +636,8 @@ public class BundleSelectActivity extends BaseActivity {
             // フッター表示（合計/残量）を更新
             updateFooter();
 
-            // 入力値をPrefsへ保存（次回初期値に利用）
-            persistContainerWeights();
         }
     };
-
-    //============================================================
-    //　機　能　:　重量入力を保持する
-    //　引　数　:　なし
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void persistContainerWeights() {
-        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-
-        // 入力値取得（null安全）
-        String container = etContainerKg != null && etContainerKg.getText() != null
-                ? etContainerKg.getText().toString().trim()
-                : "";
-        String dunnage = etDunnageKg != null && etDunnageKg.getText() != null
-                ? etDunnageKg.getText().toString().trim()
-                : "";
-
-        // 永続化
-        prefs.edit()
-                .putString(PREFS_CONTAINER_JYURYO, container)
-                .putString(PREFS_DUNNAGE_JYURYO, dunnage)
-                .apply();
-    }
 
     //============================================================
     //　機　能　:　下部ボタンの表示文言を設定する
