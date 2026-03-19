@@ -61,7 +61,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　initForm ....................... 画面項目初期化
 //　　　　　　:　loadPassedValues ............... 前画面引継値読込
 //　　　　　　:　updateCheckDigit ............... チェックデジット更新
-//　　　　　　:　persistContainerWeights ........ コンテナ/ダンネージ重量を保存（Preferences）
+//　　　　　　:　saveConfirmedDunnageWeight ....... 確定済みダンネージ重量を既定値として保存
 //　　　　　　:　calcJyuryo ..................... 総重量/残重量計算
 //　　　　　　:　launchCamera ................... カメラ起動（権限チェック含む）
 //　　　　　　:　launchCameraInternal ........... カメラ起動（内部処理）
@@ -108,8 +108,7 @@ public class ContainerInputActivity extends BaseActivity {
 
     private static final String KEY_CONTAINER_JYURYO = "container_jyuryo";          // コンテナ重量キー
     private static final String KEY_DUNNAGE_JYURYO = "dunnage_jyuryo";              // ダンネージ重量キー
-    private static final String PREFS_CONTAINER_JYURYO = "prefs_container_jyuryo";  // コンテナ重量設定キー
-    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // ダンネージ重量設定キー
+    private static final String PREFS_DUNNAGE_JYURYO = "prefs_dunnage_jyuryo";      // 確定済みダンネージ重量の既定値キー
     private static final String KEY_CONTAINER_NO1 = "container_no1";                // コンテナ番号1キー
     private static final String KEY_CONTAINER_NO2 = "container_no2";                // コンテナ番号2キー
     private static final String KEY_SEAL_NO = "seal_no";                            // シール番号キー
@@ -517,9 +516,8 @@ public class ContainerInputActivity extends BaseActivity {
                 String savedContainer = containerValues.get(KEY_CONTAINER_JYURYO);
                 String savedDunnage = containerValues.get(KEY_DUNNAGE_JYURYO);
 
-                // 6) 前回入力（Preferences）を取得
+                // 6) 確定済みダンネージ重量の既定値（Preferences）を取得
                 SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-                String prefContainer = prefs.getString(PREFS_CONTAINER_JYURYO, "");
                 String prefDunnage = prefs.getString(PREFS_DUNNAGE_JYURYO, "");
 
                 // 7) その他引継値を取得
@@ -535,12 +533,10 @@ public class ContainerInputActivity extends BaseActivity {
                     String bundleContainer = bundleValues.get(KEY_CONTAINER_JYURYO);
                     String bundleDunnage = bundleValues.get(KEY_DUNNAGE_JYURYO);
 
-                    // コンテナ自重：優先順位＝当画面引継 → Preferences → 前画面引継 → DB既定
+                    // コンテナ自重：優先順位＝当画面引継 → 前画面引継 → システム既定
                     if (etContainerKg != null) {
                         if (!TextUtils.isEmpty(savedContainer)) {
                             etContainerKg.setText(savedContainer);
-                        } else if (!TextUtils.isEmpty(prefContainer)) {
-                            etContainerKg.setText(prefContainer);
                         } else if (!TextUtils.isEmpty(bundleContainer)) {
                             etContainerKg.setText(bundleContainer);
                         } else {
@@ -548,14 +544,14 @@ public class ContainerInputActivity extends BaseActivity {
                         }
                     }
 
-                    // ダンネージ重量：優先順位＝当画面引継 → Preferences → 前画面引継 → DB既定
+                    // ダンネージ重量：優先順位＝当画面引継 → 前画面引継 → 前回確定値 → システム既定
                     if (etDunnageKg != null) {
                         if (!TextUtils.isEmpty(savedDunnage)) {
                             etDunnageKg.setText(savedDunnage);
-                        } else if (!TextUtils.isEmpty(prefDunnage)) {
-                            etDunnageKg.setText(prefDunnage);
                         } else if (!TextUtils.isEmpty(bundleDunnage)) {
                             etDunnageKg.setText(bundleDunnage);
+                        } else if (!TextUtils.isEmpty(prefDunnage)) {
+                            etDunnageKg.setText(prefDunnage);
                         } else {
                             etDunnageKg.setText(String.valueOf(defaultDunnage));
                         }
@@ -771,25 +767,19 @@ public class ContainerInputActivity extends BaseActivity {
             // 重量変更 → 合計/残量を即時計算
             calcJyuryo();
 
-            // 入力した重量を端末に保存（次回の初期値として使用）
-            persistContainerWeights();
         }
     };
 
     //============================================================
-    //　機　能　:　コンテナ重量を保存する
+    //　機　能　:　確定したダンネージ重量を既定値として保存する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
-    private void persistContainerWeights() {
-        // Preferencesへ保存（次回起動時の初期値に利用）
+    private void saveConfirmedDunnageWeight() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-
-        String container = safeText(etContainerKg).trim();
         String dunnage = safeText(etDunnageKg).trim();
 
         prefs.edit()
-                .putString(PREFS_CONTAINER_JYURYO, container)
                 .putString(PREFS_DUNNAGE_JYURYO, dunnage)
                 .apply();
     }
@@ -1146,6 +1136,7 @@ public class ContainerInputActivity extends BaseActivity {
                 .setMessage(MSG_CONTAINER_CONFIRMED)
                 .setCancelable(false)
                 .setPositiveButton("OK", (d, w) -> {
+                    saveConfirmedDunnageWeight();
                     clearResultValuesAfterConfirm();
 
                     finish();
