@@ -1,12 +1,14 @@
 package com.example.myapplication.activity;
 
 import android.Manifest;
+import android.content.res.ColorStateList;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CaptureRequest;
 import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
+import android.graphics.Color;
 import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
@@ -24,6 +26,7 @@ import androidx.camera.camera2.interop.ExperimentalCamera2Interop;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.FocusMeteringAction;
+import androidx.camera.core.FocusMeteringResult;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.MeteringPoint;
@@ -39,6 +42,7 @@ import com.example.myapplication.settings.AppSettings;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 //======================================================================================
@@ -117,6 +121,7 @@ public class PhotographingActivity extends BaseActivity {
     private int lastFlashMode;           // 最終フラッシュ設定
     private int lastLightMode;           // 最終露出補正設定
     private MediaActionSound shutterSound; // シャッター音
+    private int focusRequestSequence;    // タップAF要求の採番
 
     // カメラの実行時パーミッション（android.permission.CAMERA）をリクエストするためのLauncher。
     // Activity Result API を使用して、非同期で許可結果を受け取る。
@@ -514,7 +519,11 @@ public class PhotographingActivity extends BaseActivity {
         FocusMeteringAction action = new FocusMeteringAction.Builder(point)
                 .setAutoCancelDuration(2, TimeUnit.SECONDS)
                 .build();
-        camera.getCameraControl().startFocusAndMetering(action);
+        int requestId = ++focusRequestSequence;
+        ListenableFuture<FocusMeteringResult> focusFuture =
+                camera.getCameraControl().startFocusAndMetering(action);
+        focusFuture.addListener(() -> handleFocusResult(requestId, focusFuture),
+                ContextCompat.getMainExecutor(this));
         return true;
     }
 
@@ -529,13 +538,17 @@ public class PhotographingActivity extends BaseActivity {
             return;
         }
 
+        // 既存アニメーション/遅延を解除して最新のタップ位置表示へ更新
+        focusIndicator.animate().cancel();
+
         // インジケータをタッチ位置へ移動（中心合わせ）
         float halfWidth = focusIndicator.getWidth() / 2f;
         float halfHeight = focusIndicator.getHeight() / 2f;
         focusIndicator.setX(centerX - halfWidth);
         focusIndicator.setY(centerY - halfHeight);
 
-        // アニメーション表示
+        // フォーカス開始中は白リングを表示
+        focusIndicator.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         focusIndicator.setScaleX(1.3f);
         focusIndicator.setScaleY(1.3f);
         focusIndicator.setAlpha(1f);
@@ -543,12 +556,84 @@ public class PhotographingActivity extends BaseActivity {
         focusIndicator.animate()
                 .scaleX(1f)
                 .scaleY(1f)
+                .alpha(1f)
                 .setDuration(180)
-                .withEndAction(() -> focusIndicator.postDelayed(
-                        () -> focusIndicator.setVisibility(View.GONE),
-                        5000
-                ))
+                .withEndAction(null)
                 .start();
+    }
+
+    //============================================================
+    //　機　能　:　タッチAF結果に応じてインジケータ状態を更新する
+    //　引　数　:　requestId ..... タップAF要求番号
+    //　　　　　:　focusFuture ... CameraXフォーカス結果Future
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void handleFocusResult(int requestId,
+                                   ListenableFuture<FocusMeteringResult> focusFuture) {
+        if (focusIndicator == null || requestId != focusRequestSequence) {
+            return;
+        }
+
+        try {
+            updateFocusIndicatorResult(requestId, focusFuture.get().isFocusSuccessful());
+        } catch (ExecutionException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            Log.w(TAG, "focus metering result unavailable", e);
+            updateFocusIndicatorResult(requestId, false);
+        }
+    }
+
+    //============================================================
+    //　機　能　:　タッチAF結果に応じてインジケータ表示を更新する
+    //　引　数　:　requestId ..... タップAF要求番号
+    //　　　　　:　success ...... True:成功 / False:失敗
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void updateFocusIndicatorResult(int requestId, boolean success) {
+        if (focusIndicator == null || requestId != focusRequestSequence) {
+            return;
+        }
+
+        focusIndicator.animate().cancel();
+        focusIndicator.setBackgroundTintList(ColorStateList.valueOf(
+                success ? Color.parseColor("#7CFF6B") : Color.parseColor("#FFB347")));
+        focusIndicator.setScaleX(1f);
+        focusIndicator.setScaleY(1f);
+        focusIndicator.setAlpha(1f);
+        focusIndicator.setVisibility(View.VISIBLE);
+        focusIndicator.postDelayed(() -> {
+            if (requestId == focusRequestSequence && focusIndicator != null) {
+                focusIndicator.animate()
+                        .alpha(0f)
+                        .setDuration(success ? 180 : 150)
+                        .withEndAction(() -> {
+                            if (requestId == focusRequestSequence && focusIndicator != null) {
+                                hideFocusIndicator();
+                            }
+                        })
+                        .start();
+            }
+        }, success ? 1200 : 700);
+    }
+
+    //============================================================
+    //　機　能　:　フォーカスインジケータを非表示にする
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void hideFocusIndicator() {
+        if (focusIndicator == null) {
+            return;
+        }
+
+        focusIndicator.animate().cancel();
+        focusIndicator.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        focusIndicator.setAlpha(1f);
+        focusIndicator.setScaleX(1f);
+        focusIndicator.setScaleY(1f);
+        focusIndicator.setVisibility(View.GONE);
     }
 
     //============================================================
@@ -638,7 +723,7 @@ public class PhotographingActivity extends BaseActivity {
 
         // レビュー中はフォーカスインジケータを消す
         if (focusIndicator != null && show) {
-            focusIndicator.setVisibility(View.GONE);
+            hideFocusIndicator();
         }
     }
 
