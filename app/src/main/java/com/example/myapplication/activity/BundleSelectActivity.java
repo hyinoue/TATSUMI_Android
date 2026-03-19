@@ -525,7 +525,7 @@ public class BundleSelectActivity extends BaseActivity {
 
     //============================================================
     //　機　能　:　コンテナ最大重量を取得する
-    //　引　数　:　system ..... システム設定情報
+    //　引　数　:　なし
     //　戻り値　:　[int] ..... 最大積載重量
     //============================================================
     private int resolveMaxContainerWeight() {
@@ -753,6 +753,7 @@ public class BundleSelectActivity extends BaseActivity {
 
         return true;
     }
+
     //============================================================
     //　機　能　:　確定要求を立てて画面を終了する
     //　引　数　:　なし

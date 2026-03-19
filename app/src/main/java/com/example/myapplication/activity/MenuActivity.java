@@ -582,7 +582,7 @@ public class MenuActivity extends BaseActivity {
 
     //============================================================
     //　機　能　:　作業データが存在する場合のみコンテナ入力画面へ遷移する
-    //　引　数　:　なし
+    //　引　数　:　showLoading ..... 遷移前に短時間ローディングを表示するか
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void openContainerInputIfWorkExists(boolean showLoading) {
