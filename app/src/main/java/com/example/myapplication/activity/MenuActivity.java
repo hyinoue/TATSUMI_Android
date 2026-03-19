@@ -489,6 +489,51 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
+    //　機　能　:　コンテナ入力画面への遷移を実行する
+    //　引　数　:　intent ..... 遷移Intent
+    //　　　　　:　showLoading ..... True:ローディング表示を維持
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void launchContainerInput(Intent intent, boolean showLoading) {
+        Runnable launchAction = () -> {
+            if (isFinishing() || isDestroyed()) {
+                suppressMenuWhileChainedTransition = false;
+                hideLoadingShort();
+                setMenuVisible(true);
+                return;
+            }
+
+            if (containerInputLauncher != null) {
+                containerInputLauncher.launch(intent);
+            } else {
+                if (showLoading) {
+                    hideLoadingShort();
+                    setMenuVisible(true);
+                }
+                startActivity(intent);
+            }
+
+            if (showLoading) {
+                overridePendingTransition(0, 0);
+            }
+        };
+
+        if (!showLoading) {
+            launchAction.run();
+            return;
+        }
+
+        View decorView = getWindow() != null ? getWindow().getDecorView() : null;
+        if (decorView == null) {
+            launchAction.run();
+            return;
+        }
+
+        // ローディングオーバーレイが描画される時間を確保してから次画面へ進む
+        decorView.post(() -> decorView.post(launchAction));
+    }
+
+    //============================================================
     //　機　能　:　重量の値を同期する（束選定画面）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
@@ -567,21 +612,7 @@ public class MenuActivity extends BaseActivity {
                     intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
                     intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
 
-                    if (containerInputLauncher != null) {
-                        containerInputLauncher.launch(intent);
-                        if (showLoading) {
-                            overridePendingTransition(0, 0);
-                        }
-                    } else {
-                        if (showLoading) {
-                            hideLoadingShort();
-                            setMenuVisible(true);
-                        }
-                        startActivity(intent);
-                        if (showLoading) {
-                            overridePendingTransition(0, 0);
-                        }
-                    }
+                    launchContainerInput(intent, showLoading);
                 });
             } catch (Exception ex) {
                 Log.e(TAG, "openContainerInputIfWorkExists failed", ex);
