@@ -816,12 +816,10 @@ public class BundleSelectActivity extends BaseActivity {
 
         // 未入力なら入力順を戻す（コンテナ→現品番号）
         if (TextUtils.isEmpty(input)) {
-            if (etGenpinNo != null) {
-                if (etContainerKg != null) {
-                    etContainerKg.requestFocus();
-                } else {
-                    etGenpinNo.requestFocus();
-                }
+            if (etContainerKg != null) {
+                moveFocus(etContainerKg);
+            } else {
+                moveFocus(etGenpinNo);
             }
             return;
         }
