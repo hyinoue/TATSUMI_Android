@@ -360,7 +360,7 @@ public class BundleSelectController {
 
     // ============================================================
     // Workテーブル操作
-    // ※ WorkEntityが少カラムなので、heat/sokuban + updateYmd だけで運用
+    // ※ WorkEntityは登録監査項目も保持するため、追加時に登録情報を補完する
     // ============================================================
 
     //============================================================
@@ -369,17 +369,23 @@ public class BundleSelectController {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void addWorkTable(@NonNull BundleInfo item) {
+        String now = DateTimeFormatUtil.nowDbYmdHms();
+        SyukkaMeisaiWorkEntity existing = syukkaMeisaiWorkDao.findOne(item.heatNo, item.sokuban);
 
         // WorkEntity を作成
         SyukkaMeisaiWorkEntity w = new SyukkaMeisaiWorkEntity();
         w.heatNo = item.heatNo;
         w.sokuban = item.sokuban;
 
-        // 必要なら保持
-        w.containerId = null;
-
-        // 並び順/更新時刻用
-        w.updateYmd = DateTimeFormatUtil.nowCompactYmdHms();
+        if (existing != null) {
+            // 再登録時は初回登録情報を維持
+            w.insertProcName = existing.insertProcName;
+            w.insertYmd = existing.insertYmd;
+        } else {
+            // 新規追加時のみ登録情報を採番
+            w.insertProcName = "BundleSelectController";
+            w.insertYmd = now;
+        }
 
         // upsert（存在すれば更新、なければ追加）
         syukkaMeisaiWorkDao.upsert(w);
