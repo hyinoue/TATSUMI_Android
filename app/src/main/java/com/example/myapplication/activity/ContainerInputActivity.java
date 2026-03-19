@@ -1128,9 +1128,6 @@ public class ContainerInputActivity extends BaseActivity {
      * 完了メッセージ表示→OKで画面終了。
      */
     private void showCompleteInfoAndFinish() {
-        HandyUtil.playSuccessBuzzer(this);
-        HandyUtil.playVibrater(this);
-
         new AlertDialog.Builder(this)
                 .setTitle("情報")
                 .setMessage(MSG_CONTAINER_CONFIRMED)
