@@ -184,8 +184,7 @@ public class MenuActivity extends BaseActivity {
 
                     // C#版同様、積載束選定で確定ならコンテナ入力を続けて起動する
                     if (result.getResultCode() == RESULT_OK) {
-                        showLoadingShort();
-                        openContainerInputIfWorkExists();
+                        openContainerInputIfWorkExists(true);
                         return;
                     }
 
@@ -355,7 +354,7 @@ public class MenuActivity extends BaseActivity {
 
         // コンテナ情報入力（作業データがある場合のみ）
         if (btnContainerInput != null) {
-            btnContainerInput.setOnClickListener(v -> openContainerInputIfWorkExists());
+            btnContainerInput.setOnClickListener(v -> openContainerInputIfWorkExists(false));
         }
 
         // 重量計算（束選定の重量モード）
@@ -432,7 +431,7 @@ public class MenuActivity extends BaseActivity {
         super.onResume();
 
         // 束選定→コンテナ入力の中継中は、メニューの代わりに短時間ローディングを表示する
-        setMenuVisible(true);
+        setMenuVisible(!suppressMenuWhileChainedTransition);
         if (suppressMenuWhileChainedTransition) {
             showLoadingShort();
         } else {
@@ -535,9 +534,15 @@ public class MenuActivity extends BaseActivity {
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
-    private void openContainerInputIfWorkExists() {
-        // 束選定→コンテナ入力の待ち時間は短時間ローディングで覆う
-        showLoadingShort();
+    private void openContainerInputIfWorkExists(boolean showLoading) {
+        if (showLoading) {
+            // 束選定→コンテナ入力の待ち時間は短時間ローディングで覆う
+            setMenuVisible(false);
+            showLoadingShort();
+        } else {
+            hideLoadingShort();
+            setMenuVisible(true);
+        }
 
         // DB確認があるため別スレッドでチェック
         io.execute(() -> {
@@ -564,10 +569,18 @@ public class MenuActivity extends BaseActivity {
 
                     if (containerInputLauncher != null) {
                         containerInputLauncher.launch(intent);
+                        if (showLoading) {
+                            overridePendingTransition(0, 0);
+                        }
                     } else {
-                        hideLoadingShort();
-                        setMenuVisible(true);
+                        if (showLoading) {
+                            hideLoadingShort();
+                            setMenuVisible(true);
+                        }
                         startActivity(intent);
+                        if (showLoading) {
+                            overridePendingTransition(0, 0);
+                        }
                     }
                 });
             } catch (Exception ex) {
@@ -644,7 +657,7 @@ public class MenuActivity extends BaseActivity {
 
             case KeyEvent.KEYCODE_3:
                 // 3キー：コンテナ入力（作業がある場合のみ）
-                openContainerInputIfWorkExists();
+                openContainerInputIfWorkExists(false);
                 return true;
 
             case KeyEvent.KEYCODE_4:
