@@ -33,6 +33,7 @@ import java.util.Locale;
 //　　　　　　:　addWorkTable ..... Workテーブルへ追加（Upsert）
 //　　　　　　:　removeWorkTable ..... Workテーブルから削除
 //　　　　　　:　keyOf ..... heatNo+sokuban のキー生成
+//　　　　　　:　normalizeKeyPart ..... キー項目の正規化（trim）
 //　　　　　　:　safeStr ..... null安全な文字列化
 //　　　　　　:　padLeft4AsSpaces ..... 4桁右寄せスペース埋め
 //　　　　　　:　repeat ..... 文字列繰り返し生成
@@ -412,7 +413,16 @@ public class BundleSelectController {
     //　戻り値　:　[String] ..... 連結キー（heatNo+sokuban）
     //============================================================
     private String keyOf(String heatNo, String sokuban) {
-        return safeStr(heatNo) + safeStr(sokuban);
+        return normalizeKeyPart(heatNo) + normalizeKeyPart(sokuban);
+    }
+
+    //============================================================
+    //　機　能　:　キー項目を比較用に正規化する
+    //　引　数　:　value ..... 元の文字列
+    //　戻り値　:　[String] ..... 前後空白除去後の文字列
+    //============================================================
+    private String normalizeKeyPart(@Nullable String value) {
+        return safeStr(value).trim();
     }
 
     //============================================================
