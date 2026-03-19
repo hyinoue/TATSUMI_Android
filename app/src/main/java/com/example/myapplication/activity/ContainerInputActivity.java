@@ -219,14 +219,14 @@ public class ContainerInputActivity extends BaseActivity {
                     ivPhotoContainer.setImageURI(null);
                     ivPhotoContainer.setImageURI(uri);
 
-                    toast("コンテナNo写真を表示しました");
+                    toast("コンテナ№写真を表示しました");
                 } else {
                     sealPhotoUri = uri;
 
                     ivPhotoSeal.setImageURI(null);
                     ivPhotoSeal.setImageURI(uri);
 
-                    toast("シールNo写真を表示しました");
+                    toast("シール№写真を表示しました");
                 }
             });
 
@@ -971,7 +971,7 @@ public class ContainerInputActivity extends BaseActivity {
         String containerNo = safeText(etContainerNo1).trim() + safeText(etContainerNo2).trim();
         if (!TextUtils.isEmpty(containerNo)
                 && (safeText(etContainerNo1).trim().length() != 3 || safeText(etContainerNo2).trim().length() != 6)) {
-            showErrorMsg("コンテナNoの入力が正しくありません", MsgDispMode.MsgBox);
+            showErrorMsg("コンテナ№の入力が正しくありません", MsgDispMode.MsgBox);
             return false;
         }
 
