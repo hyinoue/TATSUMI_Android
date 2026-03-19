@@ -63,6 +63,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　loadPassedValues ............... 前画面引継値読込
 //　　　　　　:　updateCheckDigit ............... チェックデジット更新
 //　　　　　　:　persistContainerWeights ........ コンテナ/ダンネージ重量を保存（Preferences）
+//　　　　　　:　clearPersistedContainerWeights .. 保存済み重量をクリア（Preferences）
 //　　　　　　:　calcJyuryo ..................... 総重量/残重量計算
 //　　　　　　:　launchCamera ................... カメラ起動（権限チェック含む）
 //　　　　　　:　launchCameraInternal ........... カメラ起動（内部処理）
@@ -816,6 +817,19 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================================================
+    //　機　能　:　保存済み重量をクリアする
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void clearPersistedContainerWeights() {
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        prefs.edit()
+                .remove(PREFS_CONTAINER_JYURYO)
+                .remove(PREFS_DUNNAGE_JYURYO)
+                .apply();
+    }
+
+    //============================================================
     //　機　能　:　重量を計算する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
@@ -1478,8 +1492,7 @@ public class ContainerInputActivity extends BaseActivity {
     //============================================================
     private void clearResultValuesAfterConfirm() {
         clearValuesOnFinish = true;
-        bundleValues.clear();
-        containerValues.clear();
+        clearPersistedContainerWeights();
         containerPhotoUri = null;
         sealPhotoUri = null;
     }

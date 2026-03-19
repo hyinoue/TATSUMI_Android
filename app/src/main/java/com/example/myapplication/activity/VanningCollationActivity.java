@@ -312,7 +312,7 @@ public class VanningCollationActivity extends BaseActivity {
 
         // 対象が無い場合は入力不可・確定ボタン非表示
         if (!hasRows) {
-            showWarningMsg("照合対象の積載束情報がありません。", MsgDispMode.MsgBox);
+            showWarningMsg("照合対象の積載束情報がありません", MsgDispMode.MsgBox);
             if (etGenpinNo != null) etGenpinNo.setEnabled(false);
             if (btnBlue != null) btnBlue.setText("");
         } else {

@@ -180,16 +180,20 @@ public class MenuActivity extends BaseActivity {
                         // 受け取った束情報を保持
                         bundleValues.clear();
                         bundleValues.putAll(resultBundleMap);
-
-                        // 束側に含まれる重量情報を、コンテナ側へ同期
-                        syncContainerValuesFromBundle();
                     }
 
                     //積載束選定で確定ならコンテナ入力を続けて起動する
                     if (result.getResultCode() == RESULT_OK) {
+                        // 新しい束選定でコンテナ入力へ進む場合は、前回の途中入力を持ち越さない
+                        containerValues.clear();
+
+                        // 束側に含まれる重量情報だけをコンテナ側へ同期
+                        syncContainerValuesFromBundle();
                         openContainerInputIfWorkExists();
                         return;
                     }
+                    // キャンセル復帰時は束側の重量だけ最新化する
+                    syncContainerValuesFromBundle();
 
                     // 戻ってきたら必ず画面表示を更新
                     refreshInformation();
@@ -491,10 +495,16 @@ public class MenuActivity extends BaseActivity {
         if (!TextUtils.isEmpty(prefContainer)) {
             containerValues.put(KEY_CONTAINER_JYURYO, prefContainer);
             bundleValues.put(KEY_CONTAINER_JYURYO, prefContainer);
+        } else {
+            containerValues.remove(KEY_CONTAINER_JYURYO);
+            bundleValues.remove(KEY_CONTAINER_JYURYO);
         }
         if (!TextUtils.isEmpty(prefDunnage)) {
             containerValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
             bundleValues.put(KEY_DUNNAGE_JYURYO, prefDunnage);
+        } else {
+            containerValues.remove(KEY_DUNNAGE_JYURYO);
+            bundleValues.remove(KEY_DUNNAGE_JYURYO);
         }
     }
 
