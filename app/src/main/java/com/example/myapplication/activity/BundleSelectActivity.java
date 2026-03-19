@@ -108,6 +108,9 @@ public class BundleSelectActivity extends BaseActivity {
 
     private DensoScannerController scanner; // DENSOスキャナ制御
     private boolean scannerCreated = false; // スキャナ初期化済みフラグ
+    private final Runnable scannerProfileRefreshTask = () -> {
+        if (scanner != null) scanner.refreshProfile("focusSettled");
+    }; // フォーカス移動完了後のスキャナプロファイル更新
 
     private final Map<String, String> bundleValues = new HashMap<>();    // 束入力値保持
     private boolean confirmRequested = false; // 確定要求フラグ
@@ -328,53 +331,23 @@ public class BundleSelectActivity extends BaseActivity {
         if (etContainerKg != null) {
             // フォーカス変更時にスキャナプロファイル反映（主にデバッグ/状態同期用途）
             etContainerKg.setOnFocusChangeListener((v, hasFocus) -> {
-                if (scanner != null) scanner.refreshProfile("ContainerFocus=" + hasFocus);
-            });
-
-            // 物理Enterキーで次へ
-            etContainerKg.setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etDunnageKg != null) {
-                    etDunnageKg.requestFocus();
-                }
-                return true;
-            });
-
-            // IMEのNext/Doneでも次へ
-            etContainerKg.setOnEditorActionListener((v, actionId, event) -> {
-                if (!isEnterAction(actionId, event)) return false;
-                if (etDunnageKg != null) etDunnageKg.requestFocus();
-                return true;
+                scheduleScannerProfileRefresh();
             });
         }
+        setupEnterFocusTransfer(etContainerKg, etDunnageKg);
 
         if (etDunnageKg != null) {
             // フォーカス変更時にスキャナプロファイル反映
             etDunnageKg.setOnFocusChangeListener((v, hasFocus) -> {
-                if (scanner != null) scanner.refreshProfile("DunnageFocus=" + hasFocus);
-            });
-
-            // Enterで次（現品番号へ）
-            etDunnageKg.setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && etGenpinNo != null) {
-                    etGenpinNo.requestFocus();
-                }
-                return true;
-            });
-
-            // IMEでも次へ
-            etDunnageKg.setOnEditorActionListener((v, actionId, event) -> {
-                if (!isEnterAction(actionId, event)) return false;
-                if (etGenpinNo != null) etGenpinNo.requestFocus();
-                return true;
+                scheduleScannerProfileRefresh();
             });
         }
+        setupEnterFocusTransfer(etDunnageKg, etGenpinNo);
 
         if (etGenpinNo != null) {
             // ★フォーカスが変わったらプロファイルを即反映（NONE⇔CODE39_ONLY）
             etGenpinNo.setOnFocusChangeListener((v, hasFocus) -> {
-                if (scanner != null) scanner.refreshProfile("GenpinFocus=" + hasFocus);
+                scheduleScannerProfileRefresh();
             });
 
             // 物理Enterで確定処理へ
@@ -406,6 +379,52 @@ public class BundleSelectActivity extends BaseActivity {
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || actionId == EditorInfo.IME_ACTION_UNSPECIFIED
                 || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
+    }
+
+    //============================================================
+    //　機　能　:　Enter/IME入力で次の入力欄へフォーカスを移動する
+    //　引　数　:　from ..... 現在の入力欄
+    //　　　　　:　to ..... 次の入力欄
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void setupEnterFocusTransfer(@Nullable EditText from, @Nullable EditText to) {
+        if (from == null || to == null) return;
+
+        from.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+            if (event != null && event.getAction() == KeyEvent.ACTION_DOWN) {
+                moveFocus(to);
+            }
+            return true;
+        });
+
+        from.setOnEditorActionListener((v, actionId, event) -> {
+            if (!isEnterAction(actionId, event)) return false;
+            moveFocus(to);
+            return true;
+        });
+    }
+
+    //============================================================
+    //　機　能　:　フォーカス移動を次フレームへ寄せて体感差を抑える
+    //　引　数　:　target ..... フォーカス先
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void moveFocus(@Nullable EditText target) {
+        if (target == null) return;
+        target.post(target::requestFocus);
+    }
+
+    //============================================================
+    //　機　能　:　フォーカス移動後にスキャナプロファイル更新をまとめて行う
+    //　引　数　:　なし
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void scheduleScannerProfileRefresh() {
+        if (scanner == null || etGenpinNo == null) return;
+
+        etGenpinNo.removeCallbacks(scannerProfileRefreshTask);
+        etGenpinNo.post(scannerProfileRefreshTask);
     }
 
     //============================================================
