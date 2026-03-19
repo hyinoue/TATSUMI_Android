@@ -388,9 +388,9 @@
 
             <EditText
                 android:id="@+id/etSealNo"
-                android:layout_width="0dp"
+                android:layout_width="158dp"
                 android:layout_height="26dp"
-                android:layout_weight="1"
+                android:layout_weight="0"
                 android:background="@drawable/bg_text_input"
                 android:gravity="center_vertical"
                 android:inputType="text"

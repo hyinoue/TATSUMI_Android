@@ -144,8 +144,10 @@
         <!-- 保存／破棄ボタン（撮影後表示：通常は非表示） -->
         <LinearLayout
             android:id="@+id/confirmButtons"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
@@ -163,12 +165,16 @@
                 android:scaleType="center"
                 android:src="@android:drawable/ic_menu_save" />
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
             <!-- 破棄 -->
             <ImageButton
                 android:id="@+id/btnDiscard"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:layout_marginStart="24dp"
                 android:background="@drawable/bg_text_readonly"
                 android:contentDescription="discard"
                 android:scaleType="center"
