@@ -482,10 +482,61 @@ public class MenuActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void setMenuVisible(boolean visible) {
-        View decorView = getWindow() != null ? getWindow().getDecorView() : null;
-        if (decorView == null) return;
+        int visibility = visible ? View.VISIBLE : View.INVISIBLE;
 
-        decorView.setAlpha(visible ? 1f : 0f);
+        View topBar = findViewById(R.id.topBar);
+        View mainArea = findViewById(R.id.mainArea);
+        View bottomButtons = findViewById(R.id.includeBottomButtons);
+
+        if (topBar != null) topBar.setVisibility(visibility);
+        if (mainArea != null) mainArea.setVisibility(visibility);
+        if (bottomButtons != null) bottomButtons.setVisibility(visibility);
+    }
+
+    //============================================================
+    //　機　能　:　コンテナ入力画面への遷移を実行する
+    //　引　数　:　intent ..... 遷移Intent
+    //　　　　　:　showLoading ..... True:ローディング表示を維持
+    //　戻り値　:　[void] ..... なし
+    //============================================================
+    private void launchContainerInput(Intent intent, boolean showLoading) {
+        Runnable launchAction = () -> {
+            if (isFinishing() || isDestroyed()) {
+                suppressMenuWhileChainedTransition = false;
+                hideLoadingShort();
+                setMenuVisible(true);
+                return;
+            }
+
+            if (containerInputLauncher != null) {
+                containerInputLauncher.launch(intent);
+            } else {
+                if (showLoading) {
+                    hideLoadingShort();
+                    setMenuVisible(true);
+                }
+                startActivity(intent);
+            }
+
+            if (showLoading) {
+                overridePendingTransition(0, 0);
+            }
+        };
+
+        if (!showLoading) {
+            launchAction.run();
+            return;
+        }
+
+        View decorView = getWindow() != null ? getWindow().getDecorView() : null;
+
+        if (decorView == null) {
+            launchAction.run();
+            return;
+        }
+
+        // ローディングオーバーレイが描画される時間を確保してから次画面へ進む
+        decorView.post(() -> decorView.post(launchAction));
     }
 
     //============================================================
@@ -567,21 +618,7 @@ public class MenuActivity extends BaseActivity {
                     intent.putExtra(ContainerInputActivity.EXTRA_BUNDLE_VALUES, new HashMap<>(bundleValues));
                     intent.putExtra(ContainerInputActivity.EXTRA_CONTAINER_VALUES, new HashMap<>(containerValues));
 
-                    if (containerInputLauncher != null) {
-                        containerInputLauncher.launch(intent);
-                        if (showLoading) {
-                            overridePendingTransition(0, 0);
-                        }
-                    } else {
-                        if (showLoading) {
-                            hideLoadingShort();
-                            setMenuVisible(true);
-                        }
-                        startActivity(intent);
-                        if (showLoading) {
-                            overridePendingTransition(0, 0);
-                        }
-                    }
+                    launchContainerInput(intent, showLoading);
                 });
             } catch (Exception ex) {
                 Log.e(TAG, "openContainerInputIfWorkExists failed", ex);
