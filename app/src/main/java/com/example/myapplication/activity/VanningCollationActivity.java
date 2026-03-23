@@ -210,7 +210,7 @@ public class VanningCollationActivity extends BaseActivity {
                         runOnUiThread(() -> {
                             // スキャン結果を現品番号に反映し、入力確定処理を実行
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
-                            handleGenpinInput();
+                            handleGenpinInput(normalizedData);
                         });
                     }
                 },
@@ -237,7 +237,7 @@ public class VanningCollationActivity extends BaseActivity {
         // Enterキーで入力確定（手入力時も想定）
         etGenpinNo.setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                handleGenpinInput();
+                handleGenpinInput(etGenpinNo.getText() != null ? etGenpinNo.getText().toString() : "");
                 return true;
             }
             return false;
@@ -329,16 +329,14 @@ public class VanningCollationActivity extends BaseActivity {
 
     //============================================================
     //　機　能　:　現品番号入力処理(抽出/チェック/照合更新)
-    //　引　数　:　なし
+    //　引　数　:　rawInput ..... 入力文字列
     //　戻り値　:　[void]
     //============================================================
-    private void handleGenpinInput() {
+    private void handleGenpinInput(String rawInput) {
         if (controller == null) return;
 
         // 入力値を取得（前後空白除去）
-        String input = etGenpinNo != null && etGenpinNo.getText() != null
-                ? etGenpinNo.getText().toString().trim()
-                : "";
+        String input = rawInput != null ? rawInput.trim() : "";
 
         // 未入力チェック
         if (TextUtils.isEmpty(input)) {
