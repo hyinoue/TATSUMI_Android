@@ -48,6 +48,7 @@ public interface SyukkaMeisaiDao {
     // ・複合条件（HEAT_NO/SOKUBAN）で検索
     // ・前後空白を除去して比較
     // ・LIMIT 1 により先頭1件のみ取得
+    // ・旧C#互換のため比較はトリムせず完全一致
 
 
     //============================================================
@@ -240,9 +241,9 @@ public interface SyukkaMeisaiDao {
                     "FROM " +
                     "T_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "HEAT_NO = :heatNo " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban) " +
+                    "SOKUBAN = :sokuban " +
                     "LIMIT 1"
     )
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -262,14 +263,14 @@ public interface SyukkaMeisaiDao {
             "SELECT * FROM " +
                     "T_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "HEAT_NO = :heatNo " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "SOKUBAN = :sokuban"
     )
     SyukkaMeisaiEntity findOneForAdd(String heatNo, String sokuban);
     // ・AddBundle処理で対象明細を取得
     // ・（コメント上の意図としてCONTAINER_ID IS NULL条件等が必要ならSQL側に追加する想定）
-    // ・前後空白を除去して比較
+    // ・旧C#互換のため比較はトリムせず完全一致
 
 
     //============================================================
@@ -289,9 +290,9 @@ public interface SyukkaMeisaiDao {
                     "UPDATE_PROC_NAME = :updateProcName, " +
                     "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "HEAT_NO = :heatNo " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban) " +
+                    "SOKUBAN = :sokuban " +
                     "AND " +
                     "(BUNDLE_NO IS NULL OR BUNDLE_NO = '')"
     )
@@ -301,6 +302,7 @@ public interface SyukkaMeisaiDao {
                               String updateProcName,
                               String updateYmd);
     // ・BUNDLE_NOがNULLまたは空文字の場合のみ更新
+    // ・旧C#互換のため比較はトリムせず完全一致
     // ・既に値がある場合は上書きしない
     // ・更新件数を返却
 
