@@ -64,9 +64,9 @@ public interface KakuninMeisaiWorkDao {
             "SELECT * FROM " +
                     "W_KAKUNIN_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     KakuninMeisaiWorkEntity findOne(String heatNo, String sokuban);
     // ・HEAT_NOとSOKUBANの複合条件検索
@@ -96,9 +96,9 @@ public interface KakuninMeisaiWorkDao {
             "DELETE FROM " +
                     "W_KAKUNIN_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     int deleteOne(String heatNo, String sokuban);
     // ・複合キー一致データを削除

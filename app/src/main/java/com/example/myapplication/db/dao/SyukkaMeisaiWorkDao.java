@@ -47,9 +47,9 @@ public interface SyukkaMeisaiWorkDao {
             "SELECT * FROM " +
                     "W_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban) " +
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban) " +
                     "LIMIT 1"
     )
     SyukkaMeisaiWorkEntity findOne(String heatNo, String sokuban);
@@ -80,9 +80,9 @@ public interface SyukkaMeisaiWorkDao {
             "DELETE FROM " +
                     "W_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     int deleteOne(String heatNo, String sokuban);
     // ・複合キー一致データを削除
@@ -115,9 +115,9 @@ public interface SyukkaMeisaiWorkDao {
                     "INNER JOIN " +
                     "T_SYUKKA_MEISAI T " +
                     " ON " +
-                    "TRIM(W.HEAT_NO) = TRIM(T.HEAT_NO) " +
+                    "RTRIM(W.HEAT_NO) = RTRIM(T.HEAT_NO) " +
                     "AND " +
-                    "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN)"
+                    "RTRIM(W.SOKUBAN) = RTRIM(T.SOKUBAN)"
     )
     WorkSummary getWorkSummary();
     // ・ワーク（W）に登録されている明細を対象に集計
@@ -145,9 +145,9 @@ public interface SyukkaMeisaiWorkDao {
                     "INNER JOIN " +
                     "T_SYUKKA_MEISAI T " +
                     " ON " +
-                    "TRIM(W.HEAT_NO) = TRIM(T.HEAT_NO) " +
+                    "RTRIM(W.HEAT_NO) = RTRIM(T.HEAT_NO) " +
                     "AND " +
-                    "TRIM(W.SOKUBAN) = TRIM(T.SOKUBAN) " +
+                    "RTRIM(W.SOKUBAN) = RTRIM(T.SOKUBAN) " +
                     "ORDER BY " +
                     "W.INSERT_YMD"
     )
