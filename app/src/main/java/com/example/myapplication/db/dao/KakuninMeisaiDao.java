@@ -30,9 +30,9 @@ public interface KakuninMeisaiDao {
             "SELECT * FROM " +
                     "T_KAKUNIN_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     KakuninMeisaiEntity findOne(String heatNo, String sokuban);
     // ・HEAT_NOとSOKUBANの複合条件で検索

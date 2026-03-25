@@ -115,8 +115,8 @@ public class VanningCollationController {
     public String checkSokuDtl(String heatNo, String sokuban) {
 
         // 入力をトリム（nullは空文字）
-        heatNo = heatNo != null ? heatNo.trim() : "";
-        sokuban = sokuban != null ? sokuban.trim() : "";
+        heatNo = rtrim(heatNo);
+        sokuban = rtrim(sokuban);
 
         // 入力不足は対象外扱い
         if (isBlank(heatNo) || isBlank(sokuban)) {
@@ -378,6 +378,11 @@ public class VanningCollationController {
     //　引　数　:　value ..... 設定値
     //　戻り値　:　[boolean] ..... true:空/空白、false:それ以外
     //============================================================
+    private String rtrim(String value) {
+        if (value == null) return "";
+        return value.replaceFirst("\\s+$", "");
+    }
+
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
