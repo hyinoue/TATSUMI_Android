@@ -1195,4 +1195,5 @@ public class BundleSelectActivity extends BaseActivity {
             }
         }
     }
+
 }

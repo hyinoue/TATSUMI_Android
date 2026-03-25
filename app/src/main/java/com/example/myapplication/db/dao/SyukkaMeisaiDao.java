@@ -39,9 +39,9 @@ public interface SyukkaMeisaiDao {
             "SELECT * FROM " +
                     "T_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban) " +
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban) " +
                     "LIMIT 1"
     )
     SyukkaMeisaiEntity findOne(String heatNo, String sokuban);
@@ -84,9 +84,9 @@ public interface SyukkaMeisaiDao {
                     "UPDATE_PROC_NAME = :updateProcName, " +
                     "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     int updateBundleNo(String heatNo,
                        String sokuban,
@@ -120,9 +120,9 @@ public interface SyukkaMeisaiDao {
                     "UPDATE_PROC_NAME = :updateProcName, " +
                     "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
-                    "TRIM(HEAT_NO) = TRIM(:heatNo) " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "TRIM(SOKUBAN) = TRIM(:sokuban)"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     int updateFromReceive(String heatNo,
                           String sokuban,
@@ -204,9 +204,9 @@ public interface SyukkaMeisaiDao {
                     "SELECT 1 FROM " +
                     "W_SYUKKA_MEISAI W " +
                     "WHERE " +
-                    "TRIM(W.HEAT_NO) = TRIM(T_SYUKKA_MEISAI.HEAT_NO) " +
+                    "RTRIM(W.HEAT_NO) = RTRIM(T_SYUKKA_MEISAI.HEAT_NO) " +
                     "AND " +
-                    "TRIM(W.SOKUBAN) = TRIM(T_SYUKKA_MEISAI.SOKUBAN))"
+                    "RTRIM(W.SOKUBAN) = RTRIM(T_SYUKKA_MEISAI.SOKUBAN))"
     )
     int updateContainerIdForWork(int containerId,
                                  String updateProcName,

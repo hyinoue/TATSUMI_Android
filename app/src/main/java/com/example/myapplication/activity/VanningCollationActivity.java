@@ -759,4 +759,5 @@ public class VanningCollationActivity extends BaseActivity {
             }
         }
     }
+
 }
