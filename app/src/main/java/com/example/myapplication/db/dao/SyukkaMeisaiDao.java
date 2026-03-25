@@ -241,9 +241,9 @@ public interface SyukkaMeisaiDao {
                     "FROM " +
                     "T_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "HEAT_NO = :heatNo " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "SOKUBAN = :sokuban " +
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban) " +
                     "LIMIT 1"
     )
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -263,14 +263,14 @@ public interface SyukkaMeisaiDao {
             "SELECT * FROM " +
                     "T_SYUKKA_MEISAI " +
                     "WHERE " +
-                    "HEAT_NO = :heatNo " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "SOKUBAN = :sokuban"
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban)"
     )
     SyukkaMeisaiEntity findOneForAdd(String heatNo, String sokuban);
     // ・AddBundle処理で対象明細を取得
     // ・（コメント上の意図としてCONTAINER_ID IS NULL条件等が必要ならSQL側に追加する想定）
-    // ・旧C#互換のため比較はトリムせず完全一致
+    // ・旧C#(SQLServer)互換のためRTRIM比較（右側空白のみ無視）
 
 
     //============================================================
@@ -290,9 +290,9 @@ public interface SyukkaMeisaiDao {
                     "UPDATE_PROC_NAME = :updateProcName, " +
                     "UPDATE_YMD = :updateYmd " +
                     "WHERE " +
-                    "HEAT_NO = :heatNo " +
+                    "RTRIM(HEAT_NO) = RTRIM(:heatNo) " +
                     "AND " +
-                    "SOKUBAN = :sokuban " +
+                    "RTRIM(SOKUBAN) = RTRIM(:sokuban) " +
                     "AND " +
                     "(BUNDLE_NO IS NULL OR BUNDLE_NO = '')"
     )
@@ -302,7 +302,7 @@ public interface SyukkaMeisaiDao {
                               String updateProcName,
                               String updateYmd);
     // ・BUNDLE_NOがNULLまたは空文字の場合のみ更新
-    // ・旧C#互換のため比較はトリムせず完全一致
+    // ・旧C#(SQLServer)互換のためRTRIM比較（右側空白のみ無視）
     // ・既に値がある場合は上書きしない
     // ・更新件数を返却
 
