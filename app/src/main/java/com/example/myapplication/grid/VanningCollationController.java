@@ -339,9 +339,9 @@ public class VanningCollationController {
         // TのEntityをWorkにコピー（照合状態の更新はWork側で行う）
         KakuninMeisaiWorkEntity work = new KakuninMeisaiWorkEntity();
 
-        // キー項目はトリムして格納（nullはnullのまま）
-        work.heatNo = entity.heatNo != null ? entity.heatNo.trim() : null;
-        work.sokuban = entity.sokuban != null ? entity.sokuban.trim() : null;
+        // キー項目はそのまま格納（空白を保持）
+        work.heatNo = entity.heatNo;
+        work.sokuban = entity.sokuban;
 
         // 表示・判定に必要な項目をコピー
         work.syukkaSashizuNo = entity.syukkaSashizuNo;
