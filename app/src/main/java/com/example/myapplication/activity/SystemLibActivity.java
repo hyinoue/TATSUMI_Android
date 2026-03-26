@@ -44,8 +44,8 @@ import java.util.List;
 public class SystemLibActivity extends BaseActivity {
 
     private static final int BUZZER_VOLUME_MAX = 10; // ブザー音量: 最大
-    private static final int BUZZER_VOLUME_MID = 5;  // ブザー音量: 中
-    private static final int BUZZER_VOLUME_MIN = 1;  // ブザー音量: 最小
+    private static final int BUZZER_VOLUME_MID = 8;  // ブザー音量: 中
+    private static final int BUZZER_VOLUME_MIN = 6;  // ブザー音量: 最小
 
     private CheckBox chkBuzzerOnOff;      // ブザーON/OFF
     private EditText etBuzzerLength;      // ブザー時間
