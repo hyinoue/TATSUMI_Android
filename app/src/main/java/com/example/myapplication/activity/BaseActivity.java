@@ -353,6 +353,11 @@ public class BaseActivity extends AppCompatActivity {
 
             int keyCode = event.getKeyCode();
 
+            // ESCキーによる戻る動作を全画面で無効化
+            if (keyCode == KeyEvent.KEYCODE_ESCAPE) {
+                return true;
+            }
+
             // ★並び：左から「青・赤・緑・黄」
             // 物理キー：F1=青、F2=赤、F3=緑、F4=黄 に統一
             if (keyCode == KeyEvent.KEYCODE_F1) {
