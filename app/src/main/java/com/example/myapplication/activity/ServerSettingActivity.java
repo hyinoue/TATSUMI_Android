@@ -196,10 +196,10 @@ public class ServerSettingActivity extends BaseActivity {
         serverOptions = new ArrayList<>();
 
         // 設定クラスのURL定義から候補を作成
-        addServerOption(AppSettings.WebSvcURL_Honban, "本番環境");
         addServerOption(AppSettings.WebSvcURL_SCS, "SCS Azureテスト環境");
         addServerOption(AppSettings.WebSvcURL_SCS2, "SCS Azureテスト環境2");
         addServerOption(AppSettings.WebSvcURL_Test, "SCS 社内テスト環境");
+        addServerOption(AppSettings.WebSvcURL_Honban, "本番環境");//開発用のため順番を入れ替えています
 
         // 候補が無い場合の保険
         if (serverOptions.isEmpty()) {
