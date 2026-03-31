@@ -1,4 +1,6 @@
 本番用
 
-サービスメニューのサーバー切替で本番用URLが初期選択になっています。
-ServerSettingActivity.javaのsetupServerSpinner関数の表示順を変更して初期表示内容を変更
+・サービスメニューのサーバー切替で本番用URLが初期選択になっています。
+　→ServerSettingActivity.javaのsetupServerSpinner関数の表示順を変更して初期表示内容を変更
+
+・システムマスタのサーバーURLを本番用URLに設定しています。（SQLiteファイル内で初期設定）

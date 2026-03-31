@@ -164,7 +164,7 @@ public class CommTestActivity extends BaseActivity {
 
         // インターネット到達性が無い場合は失敗扱い
         if (!snapshot.hasInternet) {
-            showErrorMsg("接続できませんでした。", MsgDispMode.MsgBox);
+            showErrorMsg("接続できませんでした", MsgDispMode.MsgBox);
 
             // 疎通状態をOFFにして表示更新
             gprsConnected = false;
