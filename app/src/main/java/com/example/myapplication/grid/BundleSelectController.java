@@ -33,7 +33,7 @@ import java.util.Locale;
 //　　　　　　:　addWorkTable ..... Workテーブルへ追加（Upsert）
 //　　　　　　:　removeWorkTable ..... Workテーブルから削除
 //　　　　　　:　keyOf ..... heatNo+sokuban のキー生成
-    //　　　　　　:　normalizeKeyPart ..... キー項目の正規化（null安全のみ）
+//　　　　　　:　normalizeKeyPart ..... キー項目の正規化（null安全のみ）
 //　　　　　　:　safeStr ..... null安全な文字列化
 //　　　　　　:　padLeft4AsSpaces ..... 4桁右寄せスペース埋め
 //　　　　　　:　repeat ..... 文字列繰り返し生成
@@ -419,12 +419,10 @@ public class BundleSelectController {
     //============================================================
     //　機　能　:　キー項目を比較用に正規化する
     //　引　数　:　value ..... 元の文字列
-    //　戻り値　:　[String] ..... nullを空文字にした文字列
+    //　戻り値　:　[String] ..... 前後空白除去後の文字列
     //============================================================
     private String normalizeKeyPart(@Nullable String value) {
-        // 旧C#実装互換:
-        // 束キー比較はトリムせず、生値（nullのみ空文字化）で扱う
-        return safeStr(value);
+        return safeStr(value).trim();
     }
 
     //============================================================
