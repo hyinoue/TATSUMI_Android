@@ -69,7 +69,7 @@ public class ServiceMenuActivity extends BaseActivity {
     private static final int SYSTEM_RENBAN = 1; // システム連番
     private static final Set<String> SERVICE_PASSWORDS =
             new HashSet<>(Arrays.asList("2441", "4546", "4549", "4522", "4523")); // サービスメニューPW候補
-
+    private static final long MAX_UPLOAD_FILE_BYTES = 64L * 1024L * 1024L; // 送信可能な最大ファイルサイズ(64MB)
     // 画面メニュー（TextView）
     private TextView menu1; // データ確認
     private TextView menu2; // データクリア
@@ -334,6 +334,9 @@ public class ServiceMenuActivity extends BaseActivity {
             return;
         }
 
+        // 送信中は緑ローディングを表示
+        showLoadingLong();
+
         // 送信処理は別スレッドで実行
         io.execute(() -> {
             try (SvcHandyWrapper svc = new SvcHandyWrapper(resolveRepositoryWithCurrentEndpoint())) {
@@ -377,6 +380,8 @@ public class ServiceMenuActivity extends BaseActivity {
             } finally {
                 // フラグを必ず戻す
                 isMaintenanceSendRunning.set(false);
+                // 送信完了/失敗に関わらずローディングを閉じる
+                hideLoadingLong();
             }
         });
     }
@@ -429,9 +434,13 @@ public class ServiceMenuActivity extends BaseActivity {
     //　戻り値　:　[byte[]] ..... 読み込んだバイト配列
     //============================================================
     private byte[] readFileBytes(File file) throws IOException {
+        long fileSize = file.length();
+        if (fileSize > MAX_UPLOAD_FILE_BYTES) {
+            throw new IOException("ファイルサイズが大きすぎるため送信できません。");
+        }
         // サイズ分を一括で読み込む（途中で読めない場合は例外）
         try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] buffer = new byte[(int) file.length()];
+            byte[] buffer = new byte[(int) fileSize];
             int offset = 0;
             int read;
             while (offset < buffer.length
