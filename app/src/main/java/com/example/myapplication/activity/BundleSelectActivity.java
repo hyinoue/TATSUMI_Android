@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -237,7 +236,7 @@ public class BundleSelectActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　scannerを初期化する（フォーカス中だけCode39）
+    //　機　能　:　scannerを初期化する（フォーカス中のみ受信）
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
@@ -257,55 +256,14 @@ public class BundleSelectActivity extends BaseActivity {
                     //============================================================
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
-                        // スキャン結果を入力欄に反映し、同じ処理経路（handleGenpinInput）に流す
                         runOnUiThread(() -> {
+                            // スキャン結果を入力欄に反映し、同じ処理経路（handleGenpinInput）に流す
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
                             handleGenpinInput(normalizedData);
                         });
                     }
                 },
-                new DensoScannerController.ScanPolicy() {
-                    //============================================================
-                    //　機　能　:　scan結果を受け付けるか判定する
-                    //　引　数　:　なし
-                    //　戻り値　:　[boolean] ..... True:受け付ける
-                    //============================================================
-                    @Override
-                    public boolean canAcceptResult() {
-                        // etGenpinNoが有効かつフォーカス中のみ受け付ける
-                        return etGenpinNo != null
-                                && etGenpinNo.isEnabled()
-                                && etGenpinNo.hasFocus()
-                                && getCurrentFocus() == etGenpinNo;
-                    }
-
-                    //============================================================
-                    //　機　能　:　読み取り可否を制御する設定取得処理
-                    //　引　数　:　なし
-                    //　戻り値　:　[SymbologyProfile] ..... 許可するバーコード種別
-                    //============================================================
-                    @NonNull
-                    @Override
-                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                        // 受け付けるときだけCODE39、それ以外はNONE
-                        return canAcceptResult()
-                                ? DensoScannerController.SymbologyProfile.CODE39_ONLY
-                                : DensoScannerController.SymbologyProfile.NONE;
-                    }
-
-                    //============================================================
-                    //　機　能　:　対象バーコードが読取許可か判定する
-                    //　引　数　:　aim ..... AIMスキャンデータ
-                    //　　　　　:　denso ..... DENSOスキャンデータ
-                    //　　　　　:　displayName ..... 名称
-                    //　戻り値　:　[boolean] ..... True:許可
-                    //============================================================
-                    @Override
-                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                        // Code39かどうかの判定を共通関数へ委譲
-                        return DensoScannerController.isCode39(aim, denso, displayName);
-                    }
-                }
+                DensoScannerController.createFocusAllPolicy(etGenpinNo)
         );
 
         // スキャナライフサイクル開始

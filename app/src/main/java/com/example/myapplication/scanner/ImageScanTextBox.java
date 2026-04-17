@@ -13,7 +13,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 //====================================================================================
 //　処理概要　:　TextBoxへスキャン入力を反映し読み取り完了を通知するUI連携クラス
-//　関　　数　:　ImageScanTextBox ..... フォーカス中のみCode39をアプリ処理するEditText
+//　関　　数　:　ImageScanTextBox ..... フォーカス中のみスキャンを受け付けるEditText
 //　　　　　　:　onFocusChanged ..... フォーカス変化に合わせてスキャナ開始/停止＋プロファイル反映
 //　　　　　　:　onDetachedFromWindow ..... View破棄時にスキャナを破棄
 //　　　　　　:　ensureScannerReady ..... スキャナ生成/Resume/プロファイル適用（フォーカスON時）
@@ -120,7 +120,7 @@ public class ImageScanTextBox extends AppCompatEditText {
                         // 最小長チェック（0以下なら1扱い）
                         int effectiveMinLength = minLength <= 0 ? 1 : minLength;
                         if (normalizedData.length() < effectiveMinLength) return;
-                        
+
                         String value = normalizedData;
 
                         // テキスト反映＋カーソル末尾
@@ -137,32 +137,8 @@ public class ImageScanTextBox extends AppCompatEditText {
                                 android.view.KeyEvent.KEYCODE_ENTER
                         ));
                     },
-
-                    // フォーカス中のみ Code39 を許可するポリシー
-                    new DensoScannerController.ScanPolicy() {
-                        @Override
-                        public boolean canAcceptResult() {
-                            // フォーカス＋有効時のみ受信/照射許可
-                            return hasFocus() && isEnabled();
-                        }
-
-                        @NonNull
-                        @Override
-                        public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                            // フォーカス中のみCODE39_ONLY、それ以外はNONE
-                            return (hasFocus() && isEnabled())
-                                    ? DensoScannerController.SymbologyProfile.CODE39_ONLY
-                                    : DensoScannerController.SymbologyProfile.NONE;
-                        }
-
-                        @Override
-                        public boolean isSymbologyAllowed(@Nullable String aim,
-                                                          @Nullable String denso,
-                                                          @Nullable String displayName) {
-                            // 念のため Code39 以外は弾く
-                            return DensoScannerController.isCode39(aim, denso, displayName);
-                        }
-                    }
+                    // フォーカス中のみ受け付ける共通ポリシー
+                    DensoScannerController.createFocusAllPolicy(this)
             );
         }
 

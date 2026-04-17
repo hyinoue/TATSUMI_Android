@@ -24,7 +24,7 @@ import java.util.Locale;
 //================================================================================================
 //　処理概要　:　スキャナ受信の開始/停止とListener連携を管理する制御クラス
 //　関　　数　:　DensoScannerController ..... DENSO BHT SDK スキャナ制御（照射可否/受信/バーコード種別ー制御）
-//　　　　　　:　createFocusCode39Policy ..... フォーカス中のみCode39許可の標準ポリシー生成
+//　　　　　　:　createFocusAllPolicy ..... フォーカス中のみ全種許可の標準ポリシー生成
 //　　　　　　:　onCreate ..... BarcodeManager生成
 //　　　　　　:　onResume ..... 再開フラグ設定＋プロファイル適用
 //　　　　　　:　onPause ..... 停止処理（照射停止/無効化/Listener解除/close）
@@ -35,7 +35,6 @@ import java.util.Locale;
 //　　　　　　:　applyProfileIfReady ..... ポリシーに従い照射可能/不可能を切替（claim/close等）
 //　　　　　　:　disableScannerHard ..... 強制無効化（claim解除/close/Listener解除）
 //　　　　　　:　onBarcodeDataReceived ..... バーコード受信（重複ガード/バーコード種別ー判定/通知）
-//　　　　　　:　isCode39 ..... Code39判定
 //　　　　　　:　getBarcodeDisplayName ..... AIM/DENSOコードから表示名を推定
 //　　　　　　:　applySymbology ..... バーコード種別ーON/OFF適用（reflection）
 //　　　　　　:　setBoolean ..... 設定オブジェクトへboolean設定（reflection）
@@ -83,12 +82,12 @@ public class DensoScannerController
     }
 
     //============================================================
-    //　機　能　:　フォーカス中のみCode39許可のポリシーを生成する
+    //　機　能　:　フォーカス中のみ全種許可のポリシーを生成する
     //　引　数　:　target ..... EditText（フォーカス判定対象）
     //　戻り値　:　[ScanPolicy] ..... ポリシー
     //============================================================
     @NonNull
-    public static ScanPolicy createFocusCode39Policy(@Nullable EditText target) {
+    public static ScanPolicy createFocusAllPolicy(@Nullable EditText target) {
         return new ScanPolicy() {
             @Override
             public boolean canAcceptResult() {
@@ -99,14 +98,14 @@ public class DensoScannerController
             @NonNull
             @Override
             public SymbologyProfile getSymbologyProfile() {
-                // 受信可能時だけCode39を有効化（それ以外は全無効）
-                return canAcceptResult() ? SymbologyProfile.CODE39_ONLY : SymbologyProfile.NONE;
+                // 受信可能時だけ全種有効化（それ以外は全無効）
+                return canAcceptResult() ? SymbologyProfile.ALL : SymbologyProfile.NONE;
             }
 
             @Override
             public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                // 念のため Code39 以外は弾く
-                return isCode39(aim, denso, displayName);
+                // 画面側で判定/メッセージ表示する前提のためここでは許可
+                return true;
             }
         };
     }
@@ -560,27 +559,7 @@ public class DensoScannerController
     private String safeToString(@Nullable Object v) {
         return v == null ? "" : String.valueOf(v);
     }
-
-    // ============================
-    // Code39 判定
-    // ============================
-
-    //============================================================
-    //　機　能　:　Code39か判定する
-    //　引　数　:　aim ..... AIMスキャンデータ
-    //　　　　　:　denso ..... DENSOスキャンデータ
-    //　　　　　:　displayName ..... 名称
-    //　戻り値　:　[boolean] ..... true:Code39、false:それ以外
-    //============================================================
-    public static boolean isCode39(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-        // 既に表示名がある場合はそれを優先
-        if (displayName != null) {
-            return "Code39".equals(displayName);
-        }
-
-        // 判定ロジックは共通Resolverを利用
-        return "Code39".equals(resolveBarcodeDisplayName(aim, denso));
-    }
+    
 
     //============================================================
     //　機　能　:　バーコード種別の表示名を推定する（共通）
@@ -605,7 +584,6 @@ public class DensoScannerController
         if (a.contains("CODE39") || d.contains("CODE39")) return "Code39";
         if (a.contains("CODE93") || d.contains("CODE93")) return "Code93";
         if (a.contains("CODE128") || d.contains("CODE128")) return "Code128";
-        if (a.contains("QR") || d.contains("QR")) return "QR";
         if (a.contains("DATAMATRIX") || d.contains("DATAMATRIX")) return "DataMatrix";
         if (a.contains("PDF") || d.contains("PDF")) return "PDF417";
         return null;
@@ -639,7 +617,7 @@ public class DensoScannerController
                 "ean8", "ean13UpcA", "upcE",
                 "itf", "stf",
                 "code93", "code128", "codabar",
-                "qr", "qrCode", "dataMatrix", "pdf417"
+                "dataMatrix", "pdf417"
         };
 
         // まず全OFF

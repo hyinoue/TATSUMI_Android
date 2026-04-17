@@ -201,7 +201,7 @@ public class VanningCollationActivity extends BaseActivity {
     private void initScanner() {
         if (scannerCreated) return;
 
-        // 当画面は、etGenpinNoフォーカス中のみ Code39 受け取り（policyで制御）
+        // 当画面は、etGenpinNoフォーカス中のみ受け取り
         scanner = new DensoScannerController(
                 this,
                 new OnScanListener() {
@@ -214,7 +214,7 @@ public class VanningCollationActivity extends BaseActivity {
                         });
                     }
                 },
-                DensoScannerController.createFocusCode39Policy(etGenpinNo)
+                DensoScannerController.createFocusAllPolicy(etGenpinNo)
         );
 
         scanner.onCreate();

@@ -137,28 +137,7 @@ public class ImagerTestActivity extends BaseActivity {
                 //============================================================
                 // 受け入れ可否/プロファイル制御ポリシー
                 //============================================================
-                new DensoScannerController.ScanPolicy() {
-
-                    @Override
-                    public boolean canAcceptResult() {
-                        // 対象入力欄が存在し、フォーカスがあり、かつ有効なときのみ受け付ける
-                        return etBarcode != null && etBarcode.hasFocus() && etBarcode.isEnabled();
-                    }
-
-                    @Override
-                    public DensoScannerController.SymbologyProfile getSymbologyProfile() {
-                        // フォーカス中のみ「何でもOK」、それ以外は無効
-                        return canAcceptResult()
-                                ? DensoScannerController.SymbologyProfile.ALL
-                                : DensoScannerController.SymbologyProfile.NONE;
-                    }
-
-                    @Override
-                    public boolean isSymbologyAllowed(@Nullable String aim, @Nullable String denso, @Nullable String displayName) {
-                        // SymbologyProfileで制御しているため、ここは常に許可
-                        return true;
-                    }
-                }
+                DensoScannerController.createFocusAllPolicy(etBarcode)
         );
 
         // DensoScannerControllerのライフサイクル開始
