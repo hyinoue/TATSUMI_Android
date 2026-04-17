@@ -56,7 +56,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　openContainerInputIfWorkExists ..... 作業有無チェック後にコンテナ入力へ遷移
 //　　　　　　:　openCollateContainerSelect     ..... 照合コンテナ選択へ遷移
 //　　　　　　:　onKeyDown                     ..... 物理キーでメニュー操作
-//　　　　　　:　setCenterStatus               ..... 中央ステータス表示設定
 //　　　　　　:　startDataSync                 ..... データ送受信開始(二重実行防止)
 //　　　　　　:　runDataSync                   ..... データ送受信実処理
 //　　　　　　:　showSyncErrorAndWait          ..... 同期エラー表示/OK待ち
@@ -93,7 +92,6 @@ public class MenuActivity extends BaseActivity {
     // ============================
     // Views
     // ============================
-    private TextView tvCenterStatus; // 中央ステータス表示
     private Spinner spContainerSize; // コンテナサイズ選択
     private Button btnDataReceive; // 送受信ボタン
     private Button btnBundleSelect; // 束選定ボタン
@@ -639,7 +637,7 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　コンテナ情報入力画面を開く
+    //　機　能　:　照合コンテナ選定画面を開く
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
     //============================================================
@@ -713,15 +711,6 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　中央ステータス表示の文字を設定する
-    //　引　数　:　text ..... テキスト
-    //　戻り値　:　[void] ..... なし
-    //============================================================
-    private void setCenterStatus(String text) {
-        if (tvCenterStatus != null) tvCenterStatus.setText(text);
-    }
-
-    //============================================================
     //　機　能　:　データ送受信を開始する
     //　引　数　:　なし
     //　戻り値　:　[void] ..... なし
@@ -731,9 +720,6 @@ public class MenuActivity extends BaseActivity {
         if (!isDataSyncRunning.compareAndSet(false, true)) {
             return;
         }
-
-        // 画面中央に状況表示
-        setCenterStatus("データ送受信中...");
 
         // 実処理は別スレッドで実行
         io.execute(this::runDataSync);
@@ -758,10 +744,7 @@ public class MenuActivity extends BaseActivity {
             // 結果をUIへ反映
             runOnUiThread(() -> {
                 if (success) {
-                    setCenterStatus("データ送受信完了");
                     showInfoMsg("データ送受信完了", MsgDispMode.Label);
-                } else {
-                    setCenterStatus("NG データ送受信に失敗しました");
                 }
             });
 
@@ -776,7 +759,6 @@ public class MenuActivity extends BaseActivity {
             String msg = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getSimpleName();
 
             runOnUiThread(() -> {
-                setCenterStatus("NG " + msg);
                 showErrorMsg(msg, MsgDispMode.MsgBox);
             });
 
