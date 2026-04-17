@@ -208,6 +208,18 @@ public class VanningCollationActivity extends BaseActivity {
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
                         runOnUiThread(() -> {
+                            if (!DensoScannerController.isCode39Symbology(
+                                    aim,
+                                    denso,
+                                    DensoScannerController.resolveBarcodeDisplayName(aim, denso))) {
+                                showWarningMsg("不正なバーコートです", MsgDispMode.MsgBox);
+                                if (etGenpinNo != null) {
+                                    etGenpinNo.setText("");
+                                    etGenpinNo.requestFocus();
+                                }
+                                return;
+                            }
+
                             // スキャン結果を現品番号に反映し、入力確定処理を実行
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
                             handleGenpinInput(normalizedData);

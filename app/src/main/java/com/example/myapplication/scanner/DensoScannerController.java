@@ -36,6 +36,7 @@ import java.util.Locale;
 //　　　　　　:　disableScannerHard ..... 強制無効化（claim解除/close/Listener解除）
 //　　　　　　:　onBarcodeDataReceived ..... バーコード受信（重複ガード/バーコード種別ー判定/通知）
 //　　　　　　:　getBarcodeDisplayName ..... AIM/DENSOコードから表示名を推定
+//　　　　　　:　isCode39Symbology  ......code39判定
 //　　　　　　:　applySymbology ..... バーコード種別ーON/OFF適用（reflection）
 //　　　　　　:　setBoolean ..... 設定オブジェクトへboolean設定（reflection）
 //　　　　　　:　resolveOwnerAndField ..... パスからフィールド所有者とフィールド解決
@@ -559,7 +560,7 @@ public class DensoScannerController
     private String safeToString(@Nullable Object v) {
         return v == null ? "" : String.valueOf(v);
     }
-    
+
 
     //============================================================
     //　機　能　:　バーコード種別の表示名を推定する（共通）
@@ -598,6 +599,29 @@ public class DensoScannerController
     @Nullable
     private String getBarcodeDisplayName(@Nullable String aim, @Nullable String denso) {
         return resolveBarcodeDisplayName(aim, denso);
+    }
+
+    //============================================================
+    //　機　能　:　Code39かどうかを判定する
+    //　引　数　:　aim ..... AIMスキャンデータ
+    //　　　　　:　denso ..... DENSOスキャンデータ
+    //　　　　　:　displayName ..... 表示名
+    //　戻り値　:　[boolean] ..... true:Code39
+    //============================================================
+    public static boolean isCode39Symbology(@Nullable String aim,
+                                            @Nullable String denso,
+                                            @Nullable String displayName) {
+        final String a = aim == null ? "" : aim.toUpperCase(Locale.ROOT);
+        final String d = denso == null ? "" : denso.toUpperCase(Locale.ROOT);
+        final String n = displayName == null ? "" : displayName.toUpperCase(Locale.ROOT);
+
+        // AIM Code Identifier の ]A はCode39
+        if (a.startsWith("]A")) return true;
+
+        // 表示名/生データの表記ゆれにも対応
+        return n.contains("CODE39")
+                || a.contains("CODE39")
+                || d.contains("CODE39");
     }
 
     //============================================================

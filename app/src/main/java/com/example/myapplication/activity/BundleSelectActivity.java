@@ -257,6 +257,17 @@ public class BundleSelectActivity extends BaseActivity {
                     @Override
                     public void onScan(String normalizedData, @Nullable String aim, @Nullable String denso) {
                         runOnUiThread(() -> {
+                            if (!DensoScannerController.isCode39Symbology(
+                                    aim,
+                                    denso,
+                                    DensoScannerController.resolveBarcodeDisplayName(aim, denso))) {
+                                showWarningMsg("不正なバーコートです", MsgDispMode.MsgBox);
+                                if (etGenpinNo != null) {
+                                    etGenpinNo.setText("");
+                                    etGenpinNo.requestFocus();
+                                }
+                                return;
+                            }
                             // スキャン結果を入力欄に反映し、同じ処理経路（handleGenpinInput）に流す
                             if (etGenpinNo != null) etGenpinNo.setText(normalizedData);
                             handleGenpinInput(normalizedData);
