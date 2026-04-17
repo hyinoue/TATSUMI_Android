@@ -261,7 +261,7 @@ public class BundleSelectActivity extends BaseActivity {
                                     aim,
                                     denso,
                                     DensoScannerController.resolveBarcodeDisplayName(aim, denso))) {
-                                showWarningMsg("不正なバーコートです", MsgDispMode.MsgBox);
+                                showWarningMsg("不正なバーコードです", MsgDispMode.MsgBox);
                                 if (etGenpinNo != null) {
                                     etGenpinNo.setText("");
                                     etGenpinNo.requestFocus();
