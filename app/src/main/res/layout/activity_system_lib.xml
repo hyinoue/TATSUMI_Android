@@ -170,6 +170,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:maxLength="4"
             android:background="@android:drawable/edit_text"
             app:layout_constraintTop_toTopOf="@id/tvBuzzerLengthLabel"
             app:layout_constraintStart_toEndOf="@id/tvBuzzerLengthLabel" />
@@ -254,6 +255,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:maxLength="4"
             android:background="@android:drawable/edit_text"
             app:layout_constraintTop_toTopOf="@id/tvVibLengthLabel"
             app:layout_constraintStart_toEndOf="@id/tvVibLengthLabel" />
@@ -283,6 +285,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:maxLength="1"
             android:background="@android:drawable/edit_text"
             app:layout_constraintTop_toTopOf="@id/tvVibCountLabel"
             app:layout_constraintStart_toEndOf="@id/tvVibCountLabel" />
@@ -314,6 +317,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:maxLength="4"
             android:background="@android:drawable/edit_text"
             app:layout_constraintTop_toTopOf="@id/tvVibIntervalLabel"
             app:layout_constraintStart_toEndOf="@id/tvVibIntervalLabel" />
