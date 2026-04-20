@@ -23,8 +23,6 @@ import java.util.Locale;
 //　　　　　　:　getSyougoData ............................ 照合データ取得（リトライ＋履歴）
 //　　　　　　:　sendSyougoData ........................... 照合データ送信（リトライ＋履歴）
 //　　　　　　:　uploadBinaryFile ......................... バイナリ送信（リトライ＋履歴）
-//　　　　　　:　getDownloadHandyExecuteFileNames ......... 実行ファイル名一覧取得（リトライ＋履歴）
-//　　　　　　:　getDownloadHandyExecuteFile .............. 実行ファイル取得（リトライ＋履歴）
 //　　　　　　:　close .................................... クローズ（将来拡張用）
 //　　　　　　:　getHistoryRow ............................ 履歴行（作業領域）生成
 //　　　　　　:　saveHistoryRow ........................... 履歴行をDBへ保存
@@ -283,73 +281,6 @@ public class SvcHandyWrapper implements Closeable {
 
             setErrorInfo(history, lastException);
             throw new Exception("ファイルのアップロードに失敗しました", lastException);
-
-        } finally {
-            saveHistoryRow(history);
-        }
-    }
-
-    //============================================================
-    //　機　能　:　実行ファイル名一覧を取得する（リトライし、履歴を保存する）
-    //　引　数　:　なし
-    //　戻り値　:　[String[]] ..... 実行ファイル名一覧
-    //============================================================
-    public String[] getDownloadHandyExecuteFileNames() throws Exception {
-        CommHistoryRow history = getHistoryRow("getDownloadHandyExecuteFileNames");
-        Exception lastException = null;
-
-        try {
-            for (int count = 0; count < RETRY_COUNT; count++) {
-                try {
-                    String[] result = repository.getDownloadHandyExecuteFileNames();
-
-                    // String.valueOf(array) は参照値になってしまうため、件数だけ残す
-                    history.returnValue = (result == null) ? "null" : ("count=" + result.length);
-
-                    history.endYmdhms = new Date();
-                    return result;
-
-                } catch (Exception ex) {
-                    lastException = ex;
-                }
-            }
-
-            setErrorInfo(history, lastException);
-            throw new Exception("更新対象ファイルの取得に失敗しました", lastException);
-
-        } finally {
-            saveHistoryRow(history);
-        }
-    }
-
-    //============================================================
-    //　機　能　:　実行ファイルを取得する（リトライし、履歴を保存する）
-    //　引　数　:　fileName ..... ファイル関連情報
-    //　戻り値　:　[byte[]] ..... ファイルデータ
-    //============================================================
-    public byte[] getDownloadHandyExecuteFile(String fileName) throws Exception {
-        CommHistoryRow history = getHistoryRow("getDownloadHandyExecuteFile");
-        history.argument = fileName;
-        Exception lastException = null;
-
-        try {
-            for (int count = 0; count < RETRY_COUNT; count++) {
-                try {
-                    byte[] result = repository.getDownloadHandyExecuteFile(fileName);
-
-                    // byte[] も String.valueOf は参照値になるため、サイズだけ残す
-                    history.returnValue = (result == null) ? "null" : ("bytes=" + result.length);
-
-                    history.endYmdhms = new Date();
-                    return result;
-
-                } catch (Exception ex) {
-                    lastException = ex;
-                }
-            }
-
-            setErrorInfo(history, lastException);
-            throw new Exception("ファイルのダウンロードに失敗しました", lastException);
 
         } finally {
             saveHistoryRow(history);
