@@ -579,14 +579,28 @@ public class DensoScannerController
         if (a.startsWith("]C")) return "Code128";
         if (a.startsWith("]F")) return "Codabar(NW7)";
         if (a.startsWith("]I")) return "ITF(2of5)";
-        if (a.startsWith("]E")) return "EAN/UPC";
+        if (a.startsWith("]S")) return "STF(2of5)";
+        // EAN/UPC系まとめ
+        if (a.startsWith("]E") || a.startsWith("]X")) return "EAN/UPC";
 
         // fallback（文字列含有で判定）
         if (a.contains("CODE39") || d.contains("CODE39")) return "Code39";
         if (a.contains("CODE93") || d.contains("CODE93")) return "Code93";
         if (a.contains("CODE128") || d.contains("CODE128")) return "Code128";
-        if (a.contains("DATAMATRIX") || d.contains("DATAMATRIX")) return "DataMatrix";
-        if (a.contains("PDF") || d.contains("PDF")) return "PDF417";
+        if (a.contains("CODABAR") || d.contains("CODABAR")) return "Codabar(NW7)";
+        if (a.contains("NW7") || d.contains("NW7")) return "Codabar(NW7)";
+        if (a.contains("ITF") || d.contains("ITF")) return "ITF(2of5)";
+        if (a.contains("INTERLEAVED2OF5") || d.contains("INTERLEAVED2OF5")) return "ITF(2of5)";
+        if (a.contains("STF") || d.contains("STF")) return "STF(2of5)";
+        if (a.contains("STANDARD2OF5") || d.contains("STANDARD2OF5")) return "STF(2of5)";
+        if (a.contains("EAN8") || d.contains("EAN8")) return "EAN/UPC";
+        if (a.contains("EAN-8") || d.contains("EAN-8")) return "EAN/UPC";
+        if (a.contains("EAN13") || d.contains("EAN13")) return "EAN/UPC";
+        if (a.contains("EAN-13") || d.contains("EAN-13")) return "EAN/UPC";
+        if (a.contains("UPCA") || d.contains("UPCA")) return "EAN/UPC";
+        if (a.contains("UPC-A") || d.contains("UPC-A")) return "EAN/UPC";
+        if (a.contains("UPC-E") || d.contains("UPC-E")) return "EAN/UPC";
+        if (a.contains("UPCE") || d.contains("UPCE")) return "EAN/UPC";
         return null;
     }
 
@@ -638,10 +652,9 @@ public class DensoScannerController
         // 代表的なバーコード種別ー一覧（機種/SDKで差があるため存在するものだけ設定される）
         final String[] all = new String[]{
                 "code39",
-                "ean8", "ean13UpcA", "upcE",
+                "ean8", "ean13UpcA","upcE",
                 "itf", "stf",
                 "code93", "code128", "codabar",
-                "dataMatrix", "pdf417"
         };
 
         // まず全OFF
