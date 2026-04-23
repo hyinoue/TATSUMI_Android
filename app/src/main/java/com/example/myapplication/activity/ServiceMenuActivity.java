@@ -95,21 +95,6 @@ public class ServiceMenuActivity extends BaseActivity {
         // DB/IO用の単一スレッドを生成
         io = Executors.newSingleThreadExecutor();
 
-        // 下ボタン（include）を取得
-        View bottom = findViewById(R.id.includeBottomButtons);
-
-        // 各ボタンを取得
-        MaterialButton btnBlue = bottom.findViewById(R.id.btnBottomBlue);
-        MaterialButton btnRed = bottom.findViewById(R.id.btnBottomRed);
-        MaterialButton btnGreen = bottom.findViewById(R.id.btnBottomGreen);
-        MaterialButton btnYellow = bottom.findViewById(R.id.btnBottomYellow);
-
-        // 文字設定（画面ごとにここだけ変える）
-        btnBlue.setText("");
-        btnRed.setText("");
-        btnGreen.setText("");
-        btnYellow.setText("終了");
-
         // メニューTextView取得
         menu1 = findViewById(R.id.menu1);
         menu2 = findViewById(R.id.menu2);
