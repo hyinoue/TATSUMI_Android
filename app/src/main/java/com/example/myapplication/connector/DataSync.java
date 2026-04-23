@@ -190,15 +190,12 @@ public class DataSync {
     //　引　数　:　なし
     //　戻り値　:　[boolean] ..... 送信成否
     //============================================================
-    public boolean sendSyukkaOnly() throws Exception {
+    public boolean sendSyukkaOnly() {
         // 前回エラーを初期化
         lastErrorMessage = null;
 
-        // 作業予定日を取得（DB優先、無ければ通信で取得）
-        Date sagyouYmd = sagyouYotei();
-
         // 未送信の出荷データをコンテナ単位で送信
-        boolean sent = dataSousinAll(sagyouYmd);
+        boolean sent = dataSousinAll();
         return sent;
     }
 
@@ -241,7 +238,7 @@ public class DataSync {
         }
 
         try {
-            boolean syukkaSent = dataSousinAll(sagyouYmd);
+            boolean syukkaSent = dataSousinAll();
             if (!syukkaSent) {
                 hasError = true;
                 reportError(buildSendFailedMessage("出荷データの更新に失敗しました", lastErrorMessage));
@@ -373,7 +370,7 @@ public class DataSync {
     //　引　数　:　sagyouYmd ..... 日時
     //　戻り値　:　[boolean] ..... 送信成否
     //============================================================
-    private boolean dataSousinAll(Date sagyouYmd) {
+    private boolean dataSousinAll() {
         // 前回エラーを初期化
         lastErrorMessage = null;
 
@@ -382,7 +379,7 @@ public class DataSync {
 
         // 1件でも送信に失敗したらfalseで中断
         for (SyukkaContainerEntity container : containers) {
-            if (!dataSousinOnce(container, sagyouYmd)) {
+            if (!dataSousinOnce(container)) {
                 return false;
             }
         }
@@ -392,10 +389,9 @@ public class DataSync {
     //============================================================
     //　機　能　:　出荷データを1コンテナ分送信する
     //　引　数　:　container ..... コンテナ情報
-    //　　　　　:　sagyouYmd ..... 日時
     //　戻り値　:　[boolean] ..... 送信成否
     //============================================================
-    private boolean dataSousinOnce(SyukkaContainerEntity container, Date sagyouYmd) {
+    private boolean dataSousinOnce(SyukkaContainerEntity container) {
         try {
             // containerIdは送信や画像取得のキーとして必須
             if (container.containerId == null) {
@@ -406,7 +402,6 @@ public class DataSync {
 
             // 送信用データを組み立て
             VanningData data = new VanningData();
-            data.syukkaYmd = sagyouYmd;
             data.containerNo = normalizeSendKey(container.containerNo);
             data.containerJyuryo = intOrZero(container.containerJyuryo);
             data.dunnageJyuryo = intOrZero(container.dunnageJyuryo);
