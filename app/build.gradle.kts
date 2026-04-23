@@ -74,9 +74,6 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
-    // TableView
-    implementation("com.github.evrencoskun:TableView:v0.8.9.4")
-
     // JUnit5
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
 
