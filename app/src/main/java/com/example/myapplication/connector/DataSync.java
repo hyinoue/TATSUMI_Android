@@ -240,25 +240,27 @@ public class DataSync {
             reportError(ex);
         }
 
-        // 出荷データ送信（作業予定日が取れた場合のみ）
-        if (sagyouYmd != null) {
-            try {
-                boolean syukkaSent = dataSousinAll(sagyouYmd);
-                if (!syukkaSent) {
-                    hasError = true;
-                    reportError(buildSendFailedMessage("出荷データの更新に失敗しました", lastErrorMessage));
-                }
-            } catch (Exception ex) {
+        try {
+            boolean syukkaSent = dataSousinAll(sagyouYmd);
+            if (!syukkaSent) {
                 hasError = true;
-                reportError(ex);
+                reportError(buildSendFailedMessage("出荷データの更新に失敗しました", lastErrorMessage));
             }
+        } catch (Exception ex) {
+            hasError = true;
+            reportError(ex);
         }
 
         // 照合データ送信（作業予定日に依存しない）
-        boolean syougoSent = dataSousinSyougo();
-        if (!syougoSent) {
+        try {
+            boolean syougoSent = dataSousinSyougo();
+            if (!syougoSent) {
+                hasError = true;
+                reportError(buildSendFailedMessage("照合データの更新に失敗しました", lastErrorMessage));
+            }
+        } catch (Exception ex) {
             hasError = true;
-            reportError(buildSendFailedMessage("照合データの更新に失敗しました", lastErrorMessage));
+            reportError(ex);
         }
 
         // 出荷データ受信＆更新（作業予定日が取れた場合のみ）
