@@ -41,7 +41,6 @@ public class SendSyukkaSoapBuilder {
         inner.append("<data>");
 
         // reference.cs のプロパティ名（大小文字含む）に合わせて出力
-        XmlUtil.tag(inner, "SyukkaYmd", XmlUtil.toXsdDateTime(data.syukkaYmd));
         XmlUtil.tag(inner, "ContainerNo", data.containerNo);
         XmlUtil.tag(inner, "ContainerJyuryo", String.valueOf(data.containerJyuryo));
         XmlUtil.tag(inner, "DunnageJyuryo", String.valueOf(data.dunnageJyuryo));
