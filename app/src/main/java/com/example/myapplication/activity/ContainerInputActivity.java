@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,10 +89,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　resolveDefaultDunnageWeight .... 既定ダンネージ重量取得
 //　　　　　　:　resolveMaxContainerWeight ...... 最大積載重量取得
 //　　　　　　:　safeInt ..... 安全な数値変換処理
-//　　　　　　:　getIntFromEdit ................. EditText→int取得
 //　　　　　　:　safeText ....................... EditText→String安全取得
 //　　　　　　:　defaultString .................. null→""変換
-//　　　　　　:　formatNumber ................... 数値整形（カンマ区切り）
 //　　　　　　:　toast .......................... トースト表示
 //　　　　　　:　finish ......................... 終了時：引継値保存＋返却
 //　　　　　　:　saveContainerValues ............ 引継用Mapへ入力値保存
@@ -1364,30 +1361,6 @@ public class ContainerInputActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　入力欄から整数値を取得する
-    //　引　数　:　editText ..... テキスト
-    //　戻り値　:　[int] ..... 数値（不正/未入力は0）
-    //============================================================
-    private int getIntFromEdit(EditText editText) {
-        if (editText == null) return 0;
-
-        // 文字列取得
-        String raw = safeText(editText);
-        if (TextUtils.isEmpty(raw)) return 0;
-
-        // カンマ除去＋トリム
-        String cleaned = raw.replace(",", "").trim();
-        if (TextUtils.isEmpty(cleaned)) return 0;
-
-        // 数値変換（失敗時は0）
-        try {
-            return Integer.parseInt(cleaned);
-        } catch (NumberFormatException ex) {
-            return 0;
-        }
-    }
-
-    //============================================================
     //　機　能　:　null安全な文字列を取得する
     //　引　数　:　editText ..... テキスト
     //　戻り値　:　[String] ..... null安全な文字列
@@ -1404,15 +1377,6 @@ public class ContainerInputActivity extends BaseActivity {
     //============================================================
     private String defaultString(String value) {
         return value == null ? "" : value;
-    }
-
-    //============================================================
-    //　機　能　:　数値文字列を整形する
-    //　引　数　:　value ..... 設定値
-    //　戻り値　:　[String] ..... カンマ区切り文字列
-    //============================================================
-    private String formatNumber(int value) {
-        return String.format(Locale.JAPAN, "%,d", value);
     }
 
     //============================================================
