@@ -94,8 +94,6 @@
             android:name=".activity.CameraSettingActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
-        <!-- ・exported指定が無い場合、Android 12以降は intent-filter有無で要件が変わる
-             ・本Activityはintent-filterが無いので、基本的に外部公開目的ではない想定 -->
 
         <activity
             android:name=".activity.PhotographingActivity"
