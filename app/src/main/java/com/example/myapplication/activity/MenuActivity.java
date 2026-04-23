@@ -28,7 +28,6 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -61,9 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //　　　　　　:　showSyncErrorAndWait          ..... 同期エラー表示/OK待ち
 //　　　　　　:　refreshInformation            ..... DB集計/画面表示更新
 //　　　　　　:　intOrZero                     ..... null→0変換
-//　　　　　　:　formatNumber                  ..... 数値表示整形
 //　　　　　　:　formatRemaining               ..... 残数表示整形
-//　　　　　　:　readStringMap                 ..... IntentからMap取得
 //==================================================================================
 
 public class MenuActivity extends BaseActivity {
@@ -167,7 +164,7 @@ public class MenuActivity extends BaseActivity {
         bundleSelectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Map<String, String> resultBundleMap = readStringMap(
+                    Map<String, String> resultBundleMap = readStringMapExtra(
                             result.getData(),
                             BundleSelectActivity.EXTRA_BUNDLE_VALUES
                     );
@@ -200,11 +197,11 @@ public class MenuActivity extends BaseActivity {
         containerInputLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Map<String, String> resultBundleMap = readStringMap(
+                    Map<String, String> resultBundleMap = readStringMapExtra(
                             result.getData(),
                             ContainerInputActivity.EXTRA_BUNDLE_VALUES
                     );
-                    Map<String, String> resultContainerMap = readStringMap(
+                    Map<String, String> resultContainerMap = readStringMapExtra(
                             result.getData(),
                             ContainerInputActivity.EXTRA_CONTAINER_VALUES
                     );
@@ -942,16 +939,6 @@ public class MenuActivity extends BaseActivity {
     }
 
     //============================================================
-    //　機　能　:　数値文字列を整形する
-    //　引　数　:　value ..... 設定値
-    //　戻り値　:　[String] ..... なし
-    //============================================================
-    private String formatNumber(long value) {
-        // 3桁カンマ区切り
-        return String.format(Locale.JAPAN, "%,d", value);
-    }
-
-    //============================================================
     //　機　能　:　残数表示用の整形
     //　引　数　:　value ..... 設定値
     //　戻り値　:　[String] ..... なし
@@ -959,42 +946,5 @@ public class MenuActivity extends BaseActivity {
     private String formatRemaining(long value) {
         // 0は空（表示をスッキリさせる）
         return value == 0 ? "" : formatNumber(value);
-    }
-
-    //============================================================
-    //　機　能　:　画面遷移で渡されたデータを安全に取り出して整形する処理
-    //　引　数　:　data ..... データ
-    //　　　　　:　key ..... キー値
-    //　戻り値　:　[Map<String, String>] ..... Map
-    //============================================================
-    private Map<String, String> readStringMap(Intent data, String key) {
-        // Intentが無い場合は取得不可
-        if (data == null) {
-            return null;
-        }
-
-        // EXTRAからSerializableとして取得
-        java.io.Serializable extra = data.getSerializableExtra(key);
-
-        // 型がMapでなければ不正
-        if (!(extra instanceof Map)) {
-            return null;
-        }
-
-        // raw型をString-Stringへ詰め直す（安全化）
-        Map<?, ?> raw = (Map<?, ?>) extra;
-        Map<String, String> result = new HashMap<>();
-
-        for (Map.Entry<?, ?> entry : raw.entrySet()) {
-            Object rawKey = entry.getKey();
-            Object rawValue = entry.getValue();
-
-            // nullは除外（想定外データ対策）
-            if (rawKey != null && rawValue != null) {
-                result.put(rawKey.toString(), rawValue.toString());
-            }
-        }
-
-        return result;
     }
 }

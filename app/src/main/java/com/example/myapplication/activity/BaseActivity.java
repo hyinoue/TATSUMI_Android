@@ -1,15 +1,18 @@
 package com.example.myapplication.activity;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +25,10 @@ import com.example.myapplication.R;
 import com.example.myapplication.settings.AppSettings;
 import com.example.myapplication.settings.HandyUtil;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 //========================================================================================
 //　処理概要　:　共通基底Activity
@@ -49,6 +56,9 @@ import com.google.android.material.button.MaterialButton;
 //　　　　　　:　createBannerView .......... バナーView生成
 //　　　　　　:　createLoadingOverlay ...... ローディングView生成
 //　　　　　　:　dpToPx .................... dp→px変換
+//　　　　　　:　readStringMapExtra .........IntentのSerializable MapをString Mapとして取得
+//　　　　　　:　getIntFromEdit   ...........入力欄から整数値を取得
+//　　　　　　:　formatNumber     ...........数値文字列を整形
 //　　　　　　:　getAppVersionName ......... アプリバージョン名取得
 //========================================================================================
 
@@ -590,6 +600,60 @@ public class BaseActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    //============================================================
+    //　機　能　:　IntentのSerializable MapをString Mapとして取得する
+    //　引　数　:　data ..... Intent
+    //　　　　　:　key ..... Extraキー
+    //　戻り値　:　[Map<String, String>] ..... Map（取得不可時null）
+    //============================================================
+    protected Map<String, String> readStringMapExtra(Intent data, String key) {
+        if (data == null) return null;
+
+        java.io.Serializable extra = data.getSerializableExtra(key);
+        if (!(extra instanceof Map)) return null;
+
+        Map<?, ?> raw = (Map<?, ?>) extra;
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<?, ?> entry : raw.entrySet()) {
+            Object rawKey = entry.getKey();
+            Object rawValue = entry.getValue();
+            if (rawKey != null && rawValue != null) {
+                result.put(rawKey.toString(), rawValue.toString());
+            }
+        }
+        return result;
+    }
+
+    //============================================================
+    //　機　能　:　入力欄から整数値を取得する
+    //　引　数　:　editText ..... テキスト
+    //　戻り値　:　[int] ..... 数値（不正/未入力は0）
+    //============================================================
+    protected int getIntFromEdit(EditText editText) {
+        if (editText == null) return 0;
+
+        String raw = editText.getText() != null ? editText.getText().toString() : "";
+        if (TextUtils.isEmpty(raw)) return 0;
+
+        String cleaned = raw.replace(",", "").trim();
+        if (TextUtils.isEmpty(cleaned)) return 0;
+
+        try {
+            return Integer.parseInt(cleaned);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    //============================================================
+    //　機　能　:　数値文字列を整形する
+    //　引　数　:　value ..... 設定値
+    //　戻り値　:　[String] ..... 3桁区切り
+    //============================================================
+    protected String formatNumber(long value) {
+        return String.format(Locale.JAPAN, "%,d", value);
     }
 
     //============================================================

@@ -30,7 +30,6 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,10 +64,8 @@ import java.util.concurrent.Executors;
 //　　　　　　:　handleGenpinInput ........ 現品番号入力/スキャン処理（解析→チェック→追加）
 //　　　　　　:　getRemainingWeight ....... 残量計算
 //　　　　　　:　getTotalWeight ........... 合計計算
-//　　　　　　:　getIntValue .............. EditText数値取得（カンマ除去）
 //　　　　　　:　isEmptyOrZero ............ 未入力/0判定
 //　　　　　　:　updateFooter ............. フッター表示更新（束数/合計/残）
-//　　　　　　:　formatNumber ............. 数値フォーマット
 //　　　　　　:　onResume ................. スキャナ初期化/再開/プロファイル反映
 //　　　　　　:　onPause .................. スキャナ一時停止
 //　　　　　　:　finish ................... 入力値保存して結果返却
@@ -218,21 +215,10 @@ public class BundleSelectActivity extends BaseActivity {
     //　戻り値　:　[void] ..... なし
     //============================================================
     private void loadBundleValues(@Nullable Intent intent) {
-        if (intent == null) return;
-
-        // Serializableで受け取ったMapをString Mapへ変換
-        java.io.Serializable extra = intent.getSerializableExtra(EXTRA_BUNDLE_VALUES);
-        if (!(extra instanceof Map)) return;
-
+        Map<String, String> received = readStringMapExtra(intent, EXTRA_BUNDLE_VALUES);
+        if (received == null) return;
         bundleValues.clear();
-        Map<?, ?> raw = (Map<?, ?>) extra;
-        for (Map.Entry<?, ?> entry : raw.entrySet()) {
-            Object key = entry.getKey();
-            Object value = entry.getValue();
-            if (key != null && value != null) {
-                bundleValues.put(key.toString(), value.toString());
-            }
-        }
+        bundleValues.putAll(received);
     }
 
     //============================================================
@@ -827,8 +813,8 @@ public class BundleSelectActivity extends BaseActivity {
                 String errMsg = controller.checkBundle(
                         heatNo,
                         sokuban,
-                        getIntValue(etContainerKg),
-                        getIntValue(etDunnageKg),
+                        getIntFromEdit(etContainerKg),
+                        getIntFromEdit(etDunnageKg),
                         maxContainerJyuryo
                 );
 
@@ -889,34 +875,11 @@ public class BundleSelectActivity extends BaseActivity {
         int bundleCount = controller != null ? controller.getBundles().size() : 0;
 
         // コンテナ/ダンネージ重量
-        int container = getIntValue(etContainerKg);
-        int dunnage = getIntValue(etDunnageKg);
+        int container = getIntFromEdit(etContainerKg);
+        int dunnage = getIntFromEdit(etDunnageKg);
 
         // 合計（束重量 + 束数 + 自重）
         return bundle + bundleCount + container + dunnage;
-    }
-
-    //============================================================
-    //　機　能　:　テキストからint値を取得する
-    //　引　数　:　et ..... 入力欄
-    //　戻り値　:　[int] ..... 数値（不正/未入力は0）
-    //============================================================
-    private int getIntValue(EditText et) {
-        if (et == null) return 0;
-
-        // 入力文字列取得
-        String s = et.getText() != null ? et.getText().toString() : "";
-        if (TextUtils.isEmpty(s)) return 0;
-
-        // カンマを除去して数値化
-        String cleaned = s.replace(",", "").trim();
-        if (TextUtils.isEmpty(cleaned)) return 0;
-
-        try {
-            return Integer.parseInt(cleaned);
-        } catch (NumberFormatException ignored) {
-            return 0;
-        }
     }
 
     //============================================================
@@ -925,7 +888,7 @@ public class BundleSelectActivity extends BaseActivity {
     //　戻り値　:　[boolean] ..... True:未入力または0以下
     //============================================================
     private boolean isEmptyOrZero(EditText et) {
-        return getIntValue(et) <= 0;
+        return getIntFromEdit(et) <= 0;
     }
 
     //============================================================
@@ -941,17 +904,8 @@ public class BundleSelectActivity extends BaseActivity {
 
         // 画面へ反映
         if (tvBundleCount != null) tvBundleCount.setText(String.valueOf(count));
-        if (tvTotalWeight != null) tvTotalWeight.setText(formatNumber(total));
-        if (tvRemainWeight != null) tvRemainWeight.setText(formatNumber(remain));
-    }
-
-    //============================================================
-    //　機　能　:　数値文字列を整形する
-    //　引　数　:　value ..... 設定値
-    //　戻り値　:　[String] ..... 3桁区切り
-    //============================================================
-    private String formatNumber(int value) {
-        return String.format(Locale.JAPAN, "%,d", value);
+        if (tvTotalWeight != null) tvTotalWeight.setText(formatNumber((long) total));
+        if (tvRemainWeight != null) tvRemainWeight.setText(formatNumber((long) remain));
     }
 
     //============================================================
