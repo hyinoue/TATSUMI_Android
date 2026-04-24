@@ -229,7 +229,7 @@ public class DataSync {
         boolean hasError = false;
         Date sagyouYmd = null;
 
-        // 作業予定日の取得（ここで取れない場合は以降の出荷系処理をスキップ）
+        // 作業予定日の取得
         try {
             sagyouYmd = sagyouYotei();
         } catch (Exception ex) {
@@ -237,6 +237,7 @@ public class DataSync {
             reportError(ex);
         }
 
+        //出荷データ送信
         try {
             boolean syukkaSent = dataSousinAll();
             if (!syukkaSent) {
@@ -248,7 +249,7 @@ public class DataSync {
             reportError(ex);
         }
 
-        // 照合データ送信（作業予定日に依存しない）
+        // 照合データ送信
         try {
             boolean syougoSent = dataSousinSyougo();
             if (!syougoSent) {
