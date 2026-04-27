@@ -3,7 +3,6 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 
 
 //============================================================
@@ -84,24 +83,6 @@ public class KakuninMeisaiEntity {
 
 
     //============================================================
-    //　項目概要　:　確認コンテナID（DB非保持）
-    //　内　　容　:　画面／処理用一時保持値
-    //============================================================
-    @Ignore
-    public Integer kakuninContainerId;
-    // ・Roomには保存されない
-
-
-    //============================================================
-    //　項目概要　:　確認ステータス（DB非保持）
-    //　内　　容　:　画面制御用ステータス値
-    //============================================================
-    @Ignore
-    public Integer kakuninStatus;
-    // ・照合状態などの内部管理用
-
-
-    //============================================================
     //　項目概要　:　登録処理名
     //　内　　容　:　登録時の処理名称
     //============================================================
@@ -135,15 +116,5 @@ public class KakuninMeisaiEntity {
     @ColumnInfo(name = "UPDATE_YMD")
     public String updateYmd;
     // ・yyyy-MM-dd'T'HH:mm:ss
-
-
-    //============================================================
-    //　項目概要　:　削除フラグ（DB非保持）
-    //　内　　容　:　論理削除管理用フラグ
-    //============================================================
-    @Ignore
-    public Integer deleteFlg;
-    // ・Roomには保存されない
-    // ・画面制御／一時管理用途
 
 }

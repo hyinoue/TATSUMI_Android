@@ -3,7 +3,6 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 
 
 //============================================================
@@ -70,25 +69,6 @@ public class SyukkaContainerEntity {
     @ColumnInfo(name = "SEAL_NO")
     public String sealNo;
     // ・出荷管理用識別情報
-
-
-    //============================================================
-    //　項目概要　:　予約No.（DB非保持）
-    //　内　　容　:　JOIN結果や画面表示用一時項目
-    //============================================================
-    @Ignore
-    public String bookingNo;
-    // ・Roomには保存されない
-
-
-    //============================================================
-    //　項目概要　:　コンテナサイズ（DB非保持）
-    //　内　　容　:　画面表示／計算用サイズ区分
-    //============================================================
-    @Ignore
-    public Integer containerSize;
-    // ・内部処理用
-
 
     //============================================================
     //　項目概要　:　データ送信日時
