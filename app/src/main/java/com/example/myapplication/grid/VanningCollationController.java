@@ -353,13 +353,10 @@ public class VanningCollationController {
         work.containerSyougoKakunin = entity.containerSyougoKakunin;
 
         // 監査/状態系カラムをコピー
-        work.kakuninContainerId = entity.kakuninContainerId;
-        work.kakuninStatus = entity.kakuninStatus;
         work.insertProcName = entity.insertProcName;
         work.insertYmd = entity.insertYmd;
         work.updateProcName = entity.updateProcName;
         work.updateYmd = entity.updateYmd;
-        work.deleteFlg = entity.deleteFlg;
 
         return work;
     }

@@ -286,8 +286,8 @@ public class MenuActivity extends BaseActivity {
         // 永続化（container_size）用Prefs
         final SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
 
-        // 保存済みの選択肢を復元（無ければ20ft）
-        String savedSize = prefs.getString("container_size", "20ft");
+        // 保存済みの選択肢を復元（無ければ20ft_24t）
+        String savedSize = prefs.getString("container_size", "20ft_24t");
         int pos = adapter.getPosition(savedSize);
         if (pos >= 0) spContainerSize.setSelection(pos);
 

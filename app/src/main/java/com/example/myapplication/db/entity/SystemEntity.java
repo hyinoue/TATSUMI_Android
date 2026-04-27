@@ -3,7 +3,6 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 
 
 //============================================================
@@ -52,16 +51,6 @@ public class SystemEntity {
     @ColumnInfo(name = "DEFAULT_DUNNAGE_JYURYO")
     public Integer defaultDunnageJyuryo;
     // ・梱包材重量の基準値
-
-
-    //============================================================
-    //　項目概要　:　最大コンテナ重量（DB非保持）
-    //　内　　容　:　計算用最大重量値
-    //============================================================
-    @Ignore
-    public Integer maxContainerJyuryo;
-    // ・Roomには保存されない
-    // ・アプリ内部計算用
 
 
     //============================================================

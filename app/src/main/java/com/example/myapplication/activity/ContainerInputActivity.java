@@ -81,7 +81,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 //　　　　　　:　buildSendFailedMessage ......... 送信失敗メッセージ生成
 //　　　　　　:　registerDb ..................... DB登録（Transaction）
 //　　　　　　:　buildContainerNo ............... コンテナNo生成（チェックデジット付）
-//　　　　　　:　resolveContainerSize ........... コンテナサイズ取得
 //　　　　　　:　saveImageFile .................. 画像ファイル保存
 //　　　　　　:　getImageFile ................... 画像保存先ファイル取得
 //　　　　　　:　nowAsText ...................... 現在日時文字列生成
@@ -503,7 +502,7 @@ public class ContainerInputActivity extends BaseActivity {
                 // 3) 初期値を解決（DB設定値が無い場合のフォールバック含む）
                 int defaultContainer = resolveDefaultContainerWeight(system);
                 int defaultDunnage = resolveDefaultDunnageWeight(system);
-                maxContainerJyuryo = resolveMaxContainerWeight(system);
+                maxContainerJyuryo = resolveMaxContainerWeight();
 
                 // 4) 集計値を画面用フィールドへ保持
                 bundleCount = summary != null ? summary.sokusu : 0;
@@ -1184,13 +1183,11 @@ public class ContainerInputActivity extends BaseActivity {
 
             SyukkaContainerEntity entity = new SyukkaContainerEntity();
             entity.containerId = containerId;
-            entity.bookingNo = bookingNo;
             entity.sagyouYoteiYmd = sagyouYoteiYmd;
             entity.containerNo = containerNo;
             entity.containerJyuryo = getIntFromEdit(etContainerKg);
             entity.dunnageJyuryo = getIntFromEdit(etDunnageKg);
             entity.sealNo = safeText(etSealNo).trim();
-            entity.containerSize = resolveContainerSize();
             entity.insertProcName = "ContainerInput";
             entity.insertYmd = now;
             entity.updateProcName = "ContainerInput";
@@ -1243,18 +1240,6 @@ public class ContainerInputActivity extends BaseActivity {
         String base = no1 + "U" + no2;
         String checkDigit = HandyUtil.calcCheckDigit(base);
         return base + checkDigit;
-    }
-
-    //============================================================
-    //　機　能　:　コンテナサイズを決定する
-    //　引　数　:　なし
-    //　戻り値　:　[int] ..... 20 or 40
-    //============================================================
-    private int resolveContainerSize() {
-        // Preferencesからサイズを取得（既定は20ft）
-        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        String size = prefs.getString("container_size", "20ft");
-        return "40ft".equals(size) ? 40 : 20;
     }
 
     //============================================================
@@ -1336,19 +1321,13 @@ public class ContainerInputActivity extends BaseActivity {
 
     //============================================================
     //　機　能　:　コンテナ最大重量を決定する
-    //　引　数　:　system ..... システム設定情報
     //　戻り値　:　[int] ..... 最大積載重量
     //============================================================
-    private int resolveMaxContainerWeight(@Nullable SystemEntity system) {
-        // DB設定があり、かつ正の値ならそれを採用
-        if (system != null && system.maxContainerJyuryo != null && system.maxContainerJyuryo > 0) {
-            return system.maxContainerJyuryo;
-        }
-
-        // 無ければPreferencesのサイズから推定（20ft:24000, 40ft:30000）
+    private int resolveMaxContainerWeight() {
+        // Preferencesのサイズから推定（20ft_24t:24000, 40ft_30t/20ft_30t(ｲﾝﾄﾞ):30000）
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        String size = prefs.getString("container_size", "20ft");
-        return "40ft".equals(size) ? 30000 : 24000;
+        String size = prefs.getString("container_size", "20ft_24t");
+        return ("40ft_30t".equals(size) || "20ft_30t(ｲﾝﾄﾞ)".equals(size)) ? 30000 : 24000;
     }
 
     //============================================================

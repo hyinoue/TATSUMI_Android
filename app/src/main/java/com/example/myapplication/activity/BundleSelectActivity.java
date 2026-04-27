@@ -499,8 +499,8 @@ public class BundleSelectActivity extends BaseActivity {
     //============================================================
     private int resolveMaxContainerWeight() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        String size = prefs.getString("container_size", "20ft");
-        return "40ft".equals(size) ? 30000 : 24000;
+        String size = prefs.getString("container_size", "20ft_24t");
+        return ("40ft_30t".equals(size) || "20ft_30t(ｲﾝﾄﾞ)".equals(size)) ? 30000 : 24000;
     }
 
     //============================================================

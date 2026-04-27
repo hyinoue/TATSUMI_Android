@@ -3,7 +3,6 @@ package com.example.myapplication.db.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 
 
 //============================================================
@@ -53,25 +52,5 @@ public class SyukkaMeisaiWorkEntity {
     @ColumnInfo(name = "INSERT_YMD")
     public String insertYmd;
     // ・yyyy-MM-dd'T'HH:mm:ss
-
-
-    //============================================================
-    //　項目概要　:　コンテナID（DB非保持）
-    //　内　　容　:　画面表示／一時保持用項目
-    //============================================================
-    @Ignore
-    public Integer containerId;
-    // ・Roomには保存されない
-    // ・JOIN結果や処理中の保持用
-
-
-    //============================================================
-    //　項目概要　:　更新日（DB非保持）
-    //　内　　容　:　画面表示／一時管理用
-    //============================================================
-    @Ignore
-    public String updateYmd;
-    // ・ワークテーブルには存在しない項目
-    // ・本体テーブルJOIN時の補助項目などで使用
 
 }
